@@ -117,15 +117,15 @@ export function MochiPanel({
           </h2>
           <p className="mochi-panel__subtitle">Trợ lý đồng hành của Rodemap</p>
         </div>
+        <button type="button" className="mochi-panel__close" onClick={onClose}>
+          <Icon name="x" />
+          <span className="visually-hidden">Đóng Mochi</span>
+        </button>
         <div className="mochi-panel__tools">
           {mode === 'offline' ? <StatusTag tone="neutral">Chế độ ngoại tuyến</StatusTag> : null}
           <Button size="sm" variant="quiet" onClick={onNewConversation}>
             Cuộc trò chuyện mới
           </Button>
-          <button type="button" className="mochi-panel__close" onClick={onClose}>
-            <Icon name="x" />
-            <span className="visually-hidden">Đóng Mochi</span>
-          </button>
         </div>
       </header>
 
