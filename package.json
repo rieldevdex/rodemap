@@ -1,0 +1,59 @@
+{
+  "name": "rodemap",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Rodemap: lộ trình hoạt động ngoại khóa cho học sinh (bản trình diễn).",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite",
+    "dev:api": "npx wrangler@4 pages dev dist --port 8788",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --port 4173 --strictPort",
+    "typecheck": "tsc -b",
+    "lint": "eslint . --max-warnings 0",
+    "lint:tokens": "tsx scripts/lint-tokens.ts",
+    "lint:copy": "tsx scripts/lint-copy.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "e2e": "playwright test --project=smoke --project=a11y",
+    "screens": "playwright test --project=screens",
+    "size": "tsx scripts/size-check.ts",
+    "check:static": "run-p --aggregate-output --continue-on-error typecheck lint lint:tokens lint:copy test:coverage",
+    "check": "run-s check:static build size e2e"
+  },
+  "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/lexend": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@cloudflare/workers-types": "^5.20261007.1",
+    "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "@vitest/coverage-v8": "^5.0.3",
+    "eslint": "^9.39.5",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "npm-run-all2": "^8.0.4",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.1",
+    "vite": "^8.3.3",
+    "vitest": "^5.0.3"
+  },
+  "overrides": {
+    "playwright-core": "1.56.1"
+  }
+}
