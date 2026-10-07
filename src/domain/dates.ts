@@ -31,7 +31,7 @@ export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 const pad2 = (n: number): string => String(n).padStart(2, '0');
 
 /** Parses an IsoDateTime (any offset) or an IsoDate (midnight in Vietnam). Throws on invalid input. */
-export function toMillis(value: IsoDateTime | IsoDate): Millis {
+export function toMillis(value: IsoDateTime): Millis {
   const ms = ISO_DATE_RE.test(value) ? Date.parse(`${value}T00:00:00+07:00`) : Date.parse(value);
   if (Number.isNaN(ms)) throw new RangeError(`Invalid date: ${value}`);
   return ms;
