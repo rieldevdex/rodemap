@@ -31,6 +31,8 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       ...jsxA11y.flatConfigs.strict.rules,
+      // Option cards nest the label text a few elements deep (badge, title, description).
+      'jsx-a11y/label-has-associated-control': ['error', { depth: 4 }],
       // Inline styles may only set CSS custom properties (values come from tokens.css).
       'no-restricted-syntax': [
         'error',

@@ -21,7 +21,7 @@ export default defineConfig({
     timeout: 60_000,
   },
   projects: [
-    { name: 'smoke', testMatch: /e2e\/smoke\.spec\.ts/, use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
+    { name: 'smoke', testMatch: /e2e\/(smoke|demo-path)\.spec\.ts/, use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
     { name: 'a11y', testMatch: /e2e\/a11y\.spec\.ts/, use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
     { name: 'screens', testMatch: /screens\/screens\.spec\.ts/, use: { ...devices['Desktop Chrome'] } },
   ],

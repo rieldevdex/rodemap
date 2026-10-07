@@ -71,8 +71,8 @@ const MIN_LABELLED_ZONE = 72;
 const CARD_GAP = 18;
 /** Minimum distance between the card and the visible edge of the map, in CSS pixels. */
 const CARD_MARGIN = 8;
-/** Width of the pinned line column (code + name) of a scrolling horizontal map, in CSS pixels (RouteMap.css). */
-const LANE_COLUMN = 160;
+/** Width of the pinned line-code column of a scrolling horizontal map, in CSS pixels (RouteMap.css: space-7 + space-2). */
+const LANE_COLUMN = 56;
 
 type StationElement = HTMLElement | SVGElement;
 
@@ -492,11 +492,11 @@ export function RouteMap({
               {layout.lanes.map((l) => (
                 <span
                   key={l.category}
-                  className="route-map__lane-label"
+                  className="route-map__lane-code"
+                  title={laneName(l.category)}
                   style={{ '--lane-color': laneVar(l.category), '--pos': crossFraction(l.y1) } as Record<string, string>}
                 >
-                  <span className="route-map__lane-code">{l.category}</span>
-                  <span className="route-map__lane-name">{laneName(l.category)}</span>
+                  {l.category}
                 </span>
               ))}
             </div>

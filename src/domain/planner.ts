@@ -3,9 +3,9 @@
 import { DEFAULT_WEEKLY_HOUR_BUDGET, hoursByWeek, wouldExceedBudget } from './budget';
 import { findConflicts } from './conflicts';
 import { DAY_MS } from './dates';
-import { eventStart, isDeadlinePassed, isEligible, isFull, isPast, isRegistered } from './events';
+import { eventStart, isDeadlinePassed, isEligible, isFull, isPast, isRegistered, sortByStart } from './events';
 import { recommendEvents, type RecommendContext } from './recommend';
-import type { SchoolEvent } from './types';
+import type { CategoryCode, SchoolEvent } from './types';
 
 export type DropReason = 'conflict' | 'over_budget' | 'full' | 'closed' | 'ineligible';
 
@@ -118,26 +118,38 @@ export function proposePlan(candidates: readonly SchoolEvent[], ctx: PlanContext
 }
 
 /**
- * Onboarding's first route: the top `size * 2` recommendations go through proposePlan with the
- * profile's weekly budget (6 hours without a profile), then accepted is trimmed to `size`
- * (default 4). Drops are checked again against the trimmed route (a candidate that only clashed
- * with, or only went over budget because of, a trimmed event is no longer dropped), and the
- * weekly hours are recomputed for it.
+ * Moves the best (first) event of each top interest, in rank order, to the front; the other
+ * events keep their order. A first route then covers every priority area before repeating one.
+ */
+function coverTopInterests(ranked: readonly SchoolEvent[], topInterests: readonly CategoryCode[]): SchoolEvent[] {
+  const leaders = topInterests.flatMap((code) => ranked.find((e) => e.category === code) ?? []);
+  const leaderIds = new Set(leaders.map((e) => e.id));
+  return [...leaders, ...ranked.filter((e) => !leaderIds.has(e.id))];
+}
+
+/**
+ * Onboarding's first route. All recommendations are ranked, the best event of each top interest
+ * moves to the front (so the route covers every priority area), and the first `size * 2` go
+ * through proposePlan with the profile's weekly budget (6 hours without a profile). Accepted is
+ * trimmed to `size` (default 4) and returned in start order. Drops are checked again against
+ * the trimmed route (a candidate that only clashed with, or only went over budget because of, a
+ * trimmed event is no longer dropped), and the weekly hours are recomputed for it.
  */
 export function firstRoute(
   events: readonly SchoolEvent[],
   ctx: RecommendContext,
   size: number = DEFAULT_FIRST_ROUTE_SIZE,
 ): PlanProposal {
-  const candidates = recommendEvents(events, ctx, { limit: size * 2 }).map((r) => r.event);
+  const ranked = recommendEvents(events, ctx, { limit: events.length }).map((r) => r.event);
+  const candidates = coverTopInterests(ranked, ctx.profile?.topInterests ?? []).slice(0, Math.max(0, size * 2));
   const budget = ctx.profile?.weeklyHourBudget ?? DEFAULT_WEEKLY_HOUR_BUDGET;
   const planCtx: PlanContext = { ...ctx, allEvents: [...events], budget };
   const proposal = proposePlan(candidates, planCtx);
   const accepted = proposal.accepted.slice(0, Math.max(0, size));
-  if (accepted.length === proposal.accepted.length) return proposal;
+  if (accepted.length === proposal.accepted.length) return { ...proposal, accepted: sortByStart(accepted) };
   const committed = [...ctx.plan, ...accepted];
   const dropped = proposal.dropped.flatMap((d) => dropReason(d.event, planCtx, committed) ?? []);
   const droppedIds = new Set(dropped.map((d) => d.event.id));
   const alternatives = proposal.alternatives.filter((a) => droppedIds.has(a.forEventId));
-  return { accepted, dropped, alternatives, hoursByWeek: Object.fromEntries(hoursByWeek(committed)) };
+  return { accepted: sortByStart(accepted), dropped, alternatives, hoursByWeek: Object.fromEntries(hoursByWeek(committed)) };
 }

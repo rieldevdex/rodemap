@@ -50,23 +50,25 @@ export function ClubPortalPage() {
           lead="Cổng câu lạc bộ dành cho đại diện câu lạc bộ gửi sự kiện mới và theo dõi trạng thái kiểm duyệt."
         />
         <section className="band band--surface">
-          <div className="container stack stack--md club-portal__gate">
-            <p>
-              Trong bản trình diễn, bạn có thể chuyển sang vai trò Câu lạc bộ để xem cổng gửi sự kiện. Vai trò được lưu trên trình
-              duyệt này và có thể thay đổi tại mục Tài khoản minh họa.
-            </p>
-            <div className="cluster">
-              <Button
-                variant="primary"
-                onClick={() => {
-                  dispatch({ type: 'role/set', role: 'club' });
-                }}
-              >
-                Chuyển sang vai trò Câu lạc bộ
-              </Button>
-              <Button to="/cau-lac-bo" variant="secondary">
-                Xem danh bạ câu lạc bộ
-              </Button>
+          <div className="container">
+            <div className="stack stack--md club-portal__gate">
+              <p>
+                Trong bản trình diễn, bạn có thể chuyển sang vai trò Câu lạc bộ để xem cổng gửi sự kiện. Vai trò được lưu trên trình
+                duyệt này và có thể thay đổi tại mục Tài khoản minh họa.
+              </p>
+              <div className="cluster">
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    dispatch({ type: 'role/set', role: 'club' });
+                  }}
+                >
+                  Chuyển sang vai trò Câu lạc bộ
+                </Button>
+                <Button to="/cau-lac-bo" variant="secondary">
+                  Xem danh bạ câu lạc bộ
+                </Button>
+              </div>
             </div>
           </div>
         </section>

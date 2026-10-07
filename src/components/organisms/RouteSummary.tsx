@@ -1,4 +1,5 @@
 import { CATEGORY_LABELS } from '../../domain/category-labels';
+import { formatHours } from '../../domain/text';
 import { CATEGORY_CODES, type CategoryCode } from '../../domain/types';
 import { LineBadge } from '../atoms/LineBadge';
 import { lineVar } from '../atoms/lineVar';
@@ -32,7 +33,7 @@ export function RouteSummary({ hours, total, title = 'Số giờ theo lĩnh vự
       <figcaption className="route-summary__caption">
         <span>{title}</span>
         <span className="route-summary__total">
-          Tổng cộng <span className="mono">{total}</span> giờ
+          Tổng cộng <span className="mono">{formatHours(total)}</span> giờ
         </span>
       </figcaption>
       {total > 0 ? (
@@ -53,7 +54,7 @@ export function RouteSummary({ hours, total, title = 'Số giờ theo lĩnh vự
           <li key={code} className={hours[code] > 0 ? 'route-summary__item' : 'route-summary__item route-summary__item--zero'}>
             <LineBadge code={code} size="sm" />
             <span className="route-summary__name">{CATEGORY_LABELS[code]}</span>
-            <span className="route-summary__hours mono">{hours[code]} giờ</span>
+            <span className="route-summary__hours mono">{formatHours(hours[code])} giờ</span>
           </li>
         ))}
       </ul>

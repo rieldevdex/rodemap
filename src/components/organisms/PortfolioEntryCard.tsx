@@ -1,4 +1,5 @@
 import { useId, useState } from 'react';
+import { formatHours } from '../../domain/text';
 import type { PortfolioEntry } from '../../domain/types';
 import { Link } from '../../router';
 import { Button } from '../atoms/Button';
@@ -37,7 +38,7 @@ export function PortfolioEntryCard({
   const uid = useId();
   const [editing, setEditing] = useState(false);
   const [role, setRole] = useState(entry.role);
-  const [hours, setHours] = useState(String(entry.hours));
+  const [hours, setHours] = useState(formatHours(entry.hours));
   const [reflection, setReflection] = useState(entry.reflection);
   const [links, setLinks] = useState(entry.evidenceLinks.join('\n'));
   const [errors, setErrors] = useState<Partial<Record<'role' | 'hours' | 'links', string>>>({});
@@ -46,7 +47,7 @@ export function PortfolioEntryCard({
 
   const startEdit = () => {
     setRole(entry.role);
-    setHours(String(entry.hours));
+    setHours(formatHours(entry.hours));
     setReflection(entry.reflection);
     setLinks(entry.evidenceLinks.join('\n'));
     setErrors({});
@@ -97,7 +98,7 @@ export function PortfolioEntryCard({
             </div>
             <div>
               <dt>Số giờ</dt>
-              <dd className="mono">{entry.hours}</dd>
+              <dd className="mono">{formatHours(entry.hours)}</dd>
             </div>
           </dl>
           <div className="portfolio-entry__reflection">

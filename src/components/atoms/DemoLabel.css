@@ -1,5 +1,7 @@
 .demo-label {
   display: inline-flex;
+  justify-self: start;
+  inline-size: fit-content;
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-1) var(--space-2);

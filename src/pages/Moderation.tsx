@@ -41,20 +41,22 @@ export function ModerationPage() {
           lead="Hội đồng Học sinh xem xét sự kiện do câu lạc bộ gửi và phê duyệt, yêu cầu chỉnh sửa hoặc từ chối kèm lý do."
         />
         <section className="band band--surface">
-          <div className="container stack stack--md moderation__gate">
-            <p>
-              Trong bản trình diễn, bạn có thể chuyển sang vai trò HĐHS để xem hàng chờ kiểm duyệt. Vai trò có thể thay đổi tại mục
-              Tài khoản minh họa.
-            </p>
-            <div className="cluster">
-              <Button
-                variant="primary"
-                onClick={() => {
-                  dispatch({ type: 'role/set', role: 'moderator' });
-                }}
-              >
-                Chuyển sang vai trò HĐHS
-              </Button>
+          <div className="container">
+            <div className="stack stack--md moderation__gate">
+              <p>
+                Trong bản trình diễn, bạn có thể chuyển sang vai trò HĐHS để xem hàng chờ kiểm duyệt. Vai trò có thể thay đổi tại mục
+                Tài khoản minh họa.
+              </p>
+              <div className="cluster">
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    dispatch({ type: 'role/set', role: 'moderator' });
+                  }}
+                >
+                  Chuyển sang vai trò HĐHS
+                </Button>
+              </div>
             </div>
           </div>
         </section>

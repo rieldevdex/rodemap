@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { foldVietnamese, matchesQuery } from './text';
+import { foldVietnamese, formatHours, matchesQuery } from './text';
 
 describe('foldVietnamese', () => {
   it('strips diacritics, folds đ and collapses whitespace', () => {
@@ -17,5 +17,14 @@ describe('matchesQuery', () => {
   });
   it('treats an empty query as a match', () => {
     expect(matchesQuery('bất kỳ', '   ')).toBe(true);
+  });
+});
+
+describe('formatHours', () => {
+  it('uses a decimal comma and at most two decimals', () => {
+    expect(formatHours(3)).toBe('3');
+    expect(formatHours(2.5)).toBe('2,5');
+    expect(formatHours(7.25)).toBe('7,25');
+    expect(formatHours(1 / 3)).toBe('0,33');
   });
 });

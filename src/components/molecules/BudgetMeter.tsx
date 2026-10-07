@@ -1,3 +1,4 @@
+import { formatHours } from '../../domain/text';
 import './BudgetMeter.css';
 
 export interface BudgetMeterProps {
@@ -15,13 +16,12 @@ export function BudgetMeter({ used, budget, label }: BudgetMeterProps) {
   const step = (W - 16) / stops;
   const share = budget > 0 ? Math.min(1, used / budget) : 0;
   const over = used > budget;
-  const fmt = (n: number) => String(Math.round(n * 100) / 100).replace('.', ',');
   return (
     <div className={over ? 'budget-meter budget-meter--over' : 'budget-meter'}>
       <p className="budget-meter__text">
         <span className="budget-meter__label">{label}</span>
         <span className="budget-meter__value">
-          <span className="mono">{fmt(used)}</span> / <span className="mono">{fmt(budget)}</span> giờ
+          <span className="mono">{formatHours(used)}</span> / <span className="mono">{formatHours(budget)}</span> giờ
         </span>
       </p>
       <svg className="budget-meter__svg" viewBox={`0 0 ${W} 20`} aria-hidden="true" focusable="false">
@@ -32,7 +32,7 @@ export function BudgetMeter({ used, budget, label }: BudgetMeterProps) {
         ))}
       </svg>
       <p className="budget-meter__note">
-        {over ? `Vượt ${fmt(used - budget)} giờ so với quỹ giờ trong tuần.` : `Còn ${fmt(Math.max(0, budget - used))} giờ trong quỹ giờ tuần này.`}
+        {over ? `Vượt ${formatHours(used - budget)} giờ so với quỹ giờ trong tuần.` : `Còn ${formatHours(Math.max(0, budget - used))} giờ trong quỹ giờ tuần này.`}
       </p>
     </div>
   );

@@ -8,6 +8,7 @@ import { RouteSummary } from '../components/organisms/RouteSummary';
 import { CATEGORY_LABELS } from '../domain/category-labels';
 import { formatDate, formatDayLabel, toIsoDateTime, toMillis } from '../domain/dates';
 import { entryFromEvent, groupByCategory, hoursByCategory, portfolioJson, totalHours } from '../domain/portfolio';
+import { formatHours } from '../domain/text';
 import type { PortfolioEntry } from '../domain/types';
 import { CLUBS } from '../data/clubs';
 import { SCHOOL } from '../data/school';
@@ -87,7 +88,7 @@ export function PortfolioPage() {
               Tóm tắt lộ trình
             </h2>
             <p className="portfolio__lead">
-              <span className="mono">{entries.length}</span> hoạt động · <span className="mono">{total}</span> giờ ·{' '}
+              <span className="mono">{entries.length}</span> hoạt động · <span className="mono">{formatHours(total)}</span> giờ ·{' '}
               <span className="mono">{groups.length}</span> lĩnh vực
             </p>
           </div>
@@ -167,7 +168,7 @@ export function PortfolioPage() {
               <h2 id={`portfolio-${g.category}`} className="portfolio__group-title">
                 <LineBadge code={g.category} />
                 <span>{CATEGORY_LABELS[g.category]}</span>
-                <span className="portfolio__group-hours mono">{g.hours} giờ</span>
+                <span className="portfolio__group-hours mono">{formatHours(g.hours)} giờ</span>
               </h2>
               <div className="portfolio__entries">
                 {g.entries.map((entry) => {

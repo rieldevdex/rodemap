@@ -19,3 +19,8 @@ export function matchesQuery(haystack: string, query: string): boolean {
   const folded = foldVietnamese(haystack);
   return tokens.every((t) => folded.includes(t));
 }
+
+/** "2,5" for 2.5 and "7,25" for 7.25: at most two decimals, Vietnamese decimal comma. */
+export function formatHours(hours: number): string {
+  return String(Math.round(hours * 100) / 100).replace('.', ',');
+}

@@ -298,7 +298,10 @@
   }
 
   .route-segmented__button {
-    padding-inline: var(--space-3);
+    min-inline-size: 0;
+    padding-inline: var(--space-2);
+    white-space: normal;
+    text-align: center;
   }
 
   .route-toolbar__end {

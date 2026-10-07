@@ -21,7 +21,8 @@ import { downloadFile, newId } from './effects';
 import { useAppState, useDispatch, useNow } from './hooks';
 import { MochiContext, type MochiApi, type MochiMode } from './mochiContext';
 import { subscribeMochi } from './mochiBridge';
-import { selectEventById, selectPublicEvents, selectUpcomingMine } from './selectors';
+import { rememberRouteBefore } from './routeMemory';
+import { selectEventById, selectMyEvents, selectPublicEvents, selectUpcomingMine } from './selectors';
 import { registrationInfo } from './useRegistration';
 import { DEFAULT_WEEKLY_HOUR_BUDGET } from '../domain/budget';
 import type { AppState } from './schema';
@@ -180,6 +181,7 @@ export function MochiProvider({ children }: { children: ReactNode }) {
         const info = infoFor(eventId);
         if (!info) return;
         if (action === 'register' && info.canRegister) {
+          rememberRouteBefore(selectMyEvents(st()).map((e) => e.id));
           dispatch({ type: 'registration/register', eventId, at: at() });
           resolveCard(cardId, true, `Học sinh đã xác nhận đăng ký sự kiện ${eventId}.`, `Đã đăng ký “${info.event.title}”. Sự kiện đã được thêm vào Lộ trình và Lịch của tôi.`);
         } else if (action === 'unregister' && info.canUnregister) {
@@ -191,6 +193,7 @@ export function MochiProvider({ children }: { children: ReactNode }) {
       },
       confirmPlan: (cardId, eventIds) => {
         const done: string[] = [];
+        rememberRouteBefore(selectMyEvents(st()).map((e) => e.id));
         for (const id of eventIds) {
           const info = infoFor(id);
           if (info?.canRegister) {

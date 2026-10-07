@@ -25,10 +25,12 @@ import {
 } from '../domain/dates';
 import { deadlineDaysLeft, isPast, registrationState, seatsLeft } from '../domain/events';
 import { layoutRoute, type Orientation, type RouteLayoutInput } from '../domain/route-layout';
+import { formatHours } from '../domain/text';
 import { CATEGORY_CODES, type CalendarPeriod, type CategoryCode, type SchoolEvent } from '../domain/types';
 import { useNavigate, useRoute } from '../router';
 import { selectConflictsInPlan, selectMyEvents, selectPlanBudget, selectUpcomingMine } from '../state/selectors';
 import { useCatalog } from '../state/useCatalog';
+import { routeMemory } from '../state/routeMemory';
 import './Route.css';
 
 type Scope = 'all' | 'mine';
@@ -60,12 +62,6 @@ const VERTICAL_FALLBACK_WIDTH = 390;
 const LANES = CATEGORIES.map((c) => ({ code: c.code, name: c.name }));
 const LANE_NAMES = new Map(CATEGORIES.map((c) => [c.code, c.name]));
 
-/**
- * "Your route" as the student last saw it during this session, so the line can extend to
- * newly registered events when they come back to this screen (not persisted across reloads).
- */
-const routeMemory: { seen: readonly string[] | null } = { seen: null };
-
 function verticalGeometry(width: number): Pick<RouteLayoutInput, 'pxPerDay' | 'laneGap' | 'padding'> {
   const gaps = CATEGORY_CODES.length - 1;
   const laneGap = Math.min(VERTICAL_LANE_GAP.max, Math.max(VERTICAL_LANE_GAP.min, (width - 2 * VERTICAL_GUTTER) / gaps));
@@ -75,11 +71,6 @@ function verticalGeometry(width: number): Pick<RouteLayoutInput, 'pxPerDay' | 'l
 
 /** Phones label the holiday zone briefly; the gutter beside the lines is narrow. */
 const VERTICAL_PERIODS: CalendarPeriod[] = PERIODS.map((p) => (p.kind === 'holiday' ? { ...p, label: 'Nghỉ Tết' } : p));
-
-/** "2,5" for 2.5 hours (Vietnamese decimal comma). */
-function formatHours(hours: number): string {
-  return String(Math.round(hours * 100) / 100).replace('.', ',');
-}
 
 /** Measures an element's inline size (and follows resizes). */
 function useElementWidth(): [RefCallback<HTMLElement>, number | null] {
@@ -133,9 +124,7 @@ function RouteSummary({ upcoming, weekLabel, used, budget, remaining, hasProfile
               {next && nextStart !== null ? (
                 <>
                   Gần nhất:{' '}
-                  <MonoTime dateTime={next.start}>
-                    {formatDayLabel(nextStart)} · {formatTime(nextStart)}
-                  </MonoTime>
+                  <MonoTime dateTime={next.start}>{formatDayLabel(nextStart)}</MonoTime> · <MonoTime dateTime={next.start}>{formatTime(nextStart)}</MonoTime>
                 </>
               ) : (
                 'Chưa có sự kiện sắp diễn ra'
@@ -473,7 +462,7 @@ export function RoutePage() {
             </div>
           ) : null}
 
-          {view === 'map' ? <RouteMapLegend lanes={LANES} variant="full" className="route-stage__legend" /> : null}
+          {view === 'map' && !wide ? <RouteMapLegend lanes={LANES} variant="full" className="route-stage__legend" /> : null}
         </div>
 
         {view === 'map' ? (
@@ -522,6 +511,11 @@ export function RoutePage() {
                 ? 'Cuộn ngang để xem toàn bộ năm học. Di chuột hoặc dùng phím Tab để xem thông tin điểm dừng; phím mũi tên chuyển giữa các điểm dừng, phím Enter mở trang sự kiện.'
                 : 'Chạm vào một điểm dừng để mở trang sự kiện. Dạng danh sách trình bày đầy đủ thông tin của từng sự kiện.'}
             </p>
+            {wide ? (
+              <div className="container">
+                <RouteMapLegend lanes={LANES} variant="full" className="route-stage__legend" />
+              </div>
+            ) : null}
           </div>
         ) : (
           <div className="container route-stage__list">

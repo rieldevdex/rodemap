@@ -96,9 +96,10 @@ export function EventDetailPage() {
         }
         title={event.title}
         lead={
-          <MonoTime dateTime={event.start}>
-            {formatLongDate(start)} · {formatTimeRange(start, end)} · {event.format === 'online' ? 'Trực tuyến' : event.location}
-          </MonoTime>
+          <>
+            <MonoTime dateTime={event.start}>{formatLongDate(start)}</MonoTime> · <MonoTime dateTime={event.start}>{formatTimeRange(start, end)}</MonoTime> ·{' '}
+            {event.format === 'online' ? 'Trực tuyến' : event.location}
+          </>
         }
       >
         {event.status !== 'approved' ? (

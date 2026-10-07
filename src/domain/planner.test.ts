@@ -256,6 +256,14 @@ describe('firstRoute', () => {
     expect(route.hoursByWeek).toEqual({ '2026-W42': 1.5, '2026-W43': 1, '2026-W44': 1, '2026-W45': 1 });
   });
 
+  it('covers every top interest before repeating one, in start order', () => {
+    const ht = ev('fr-ht', '2026-10-29T17:00', '2026-10-29T18:00', { category: 'HT' });
+    const tn = ev('fr-tn', '2026-10-24T08:00', '2026-10-24T09:00', { category: 'TN' });
+    const ts = ev('fr-ts', '2026-10-14T08:00', '2026-10-14T09:00', { category: 'TS' });
+    const route = firstRoute([...series, ht, tn, ts], ctxFor(), 4);
+    expect(ids(route.accepted)).toEqual(['fr-1', 'fr-2', 'fr-tn', 'fr-ht']);
+  });
+
   it("uses the profile's weekly budget", () => {
     const tight = makeProfile({ weeklyHourBudget: 2 });
     const second = ev('fr-1b', '2026-10-15T17:00', '2026-10-15T18:30', { category: 'CN' });
