@@ -1,0 +1,32 @@
+.station {
+  --station-line: var(--line-ts);
+  display: inline-block;
+  flex: none;
+  width: var(--station);
+  height: var(--station);
+  vertical-align: middle;
+  overflow: visible;
+}
+
+.station__ring {
+  fill: var(--color-surface);
+  stroke: var(--station-line);
+  stroke-width: var(--station-ring);
+}
+
+.station--interchange {
+  width: var(--station-interchange);
+  height: var(--station-interchange);
+}
+
+.station--interchange .station__ring {
+  stroke: var(--color-ink);
+}
+
+.station--mine .station__ring {
+  stroke: var(--color-signal);
+}
+
+.station__core {
+  fill: var(--station-line);
+}

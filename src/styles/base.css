@@ -1,0 +1,278 @@
+/*
+ * Rodemap base styles: reset, document defaults, typography, focus, utilities.
+ * Values come only from tokens.css (DESIGN.md §2–4, §9).
+ */
+
+/* ── Reset ───────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Anchored targets clear the sticky header. */
+  scroll-padding-top: calc(var(--header-h) + var(--space-4));
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--color-ground);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-synthesis-weight: none;
+}
+
+img,
+picture,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+ul[class],
+ol[class] {
+  list-style: none;
+  padding: 0;
+}
+
+p,
+li,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  overflow-wrap: break-word;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+fieldset {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+
+legend {
+  padding: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ── Typography ──────────────────────────────────────────────────── */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-display);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--text-3xl);
+}
+
+h2 {
+  font-size: var(--text-2xl);
+}
+
+h3 {
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+}
+
+h4,
+h5,
+h6 {
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+}
+
+a {
+  color: var(--color-signal);
+  text-decoration-thickness: var(--rule-hair);
+  text-underline-offset: var(--space-1);
+}
+
+a:hover {
+  text-decoration-thickness: var(--rule-strong);
+}
+
+strong,
+b {
+  font-weight: var(--weight-semibold);
+}
+
+code,
+kbd,
+samp,
+pre,
+time {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+kbd {
+  font-weight: var(--weight-medium);
+}
+
+::selection {
+  background: var(--color-signal);
+  color: var(--color-signal-ink);
+}
+
+/* ── Focus (DESIGN.md §9): always visible, 2 px signal with 2 px offset ── */
+
+:focus-visible {
+  outline: var(--focus-w) solid var(--color-signal);
+  outline-offset: var(--focus-offset);
+}
+
+/* Programmatic focus targets (h1#main-heading after navigation) only show a ring for keyboard users. */
+[tabindex='-1']:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Utilities ───────────────────────────────────────────────────── */
+
+.visually-hidden {
+  position: absolute !important;
+  width: var(--rule-hair) !important;
+  height: var(--rule-hair) !important;
+  margin: calc(var(--rule-hair) * -1) !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-weight: var(--weight-medium);
+  font-variant-numeric: tabular-nums;
+}
+
+.eyebrow {
+  color: var(--color-ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-caps);
+  line-height: var(--leading-snug);
+  text-transform: uppercase;
+}
+
+.measure {
+  max-width: var(--measure);
+}
+
+.lead {
+  color: var(--color-ink-2);
+  font-size: var(--text-lg);
+  line-height: var(--leading-body);
+  max-width: var(--measure);
+}
+
+/* ── Reduced motion: instant states, nothing loops or hops ───────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: var(--dur-fast) !important;
+    animation-delay: var(--dur-fast) !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: var(--dur-fast) !important;
+    transition-delay: var(--dur-fast) !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Print basics (the portfolio adds its own A4 sheet) ──────────── */
+
+@media print {
+  html {
+    scroll-padding-top: 0;
+  }
+
+  body {
+    background: var(--color-surface);
+  }
+
+  .skip-link,
+  .site-header,
+  .site-footer,
+  [data-print='hide'] {
+    display: none !important;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    break-after: avoid;
+  }
+
+  p,
+  li,
+  tr {
+    break-inside: avoid;
+  }
+}

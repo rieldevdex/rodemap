@@ -1,0 +1,62 @@
+.chip {
+  --chip-line: transparent;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: calc(var(--space-6) + var(--space-1));
+  padding: var(--space-1) var(--space-3);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+  white-space: nowrap;
+}
+
+.chip--edge {
+  padding-left: calc(var(--space-3) + var(--chip-edge));
+  border-left: var(--chip-edge) solid var(--chip-line);
+}
+
+.chip--toggle {
+  cursor: pointer;
+  border-color: var(--color-ink-2);
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+/* Extends the hit area to the 48-unit touch target without enlarging the pill. */
+.chip--toggle::before {
+  content: '';
+  position: absolute;
+  inset: calc((var(--size-touch) - var(--space-6) - var(--space-1)) / -2) 0;
+}
+
+.chip--edge.chip--toggle {
+  border-left-color: var(--chip-line);
+}
+
+.chip--toggle:hover {
+  background: var(--color-surface-2);
+}
+
+.chip--toggle[aria-pressed='true'] {
+  border-color: var(--color-ink);
+  background: var(--color-ink);
+  color: var(--color-surface);
+}
+
+.chip--edge.chip--toggle[aria-pressed='true'] {
+  border-left-color: var(--chip-line);
+}
+
+.chip--toggle:disabled {
+  border-color: var(--color-rule);
+  color: var(--color-ink-2);
+  cursor: not-allowed;
+}

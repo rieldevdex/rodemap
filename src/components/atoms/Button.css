@@ -1,0 +1,97 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--size-touch);
+  padding: var(--space-2) var(--space-5);
+  border: var(--rule-strong) solid transparent;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.button__label {
+  min-width: 0;
+}
+
+/* primary: signal fill, one per view */
+.button--primary {
+  background: var(--color-signal);
+  border-color: var(--color-signal);
+  color: var(--color-signal-ink);
+}
+
+.button--primary:hover {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-surface);
+}
+
+/* secondary: ink outline */
+.button--secondary {
+  border-color: var(--color-ink);
+  color: var(--color-ink);
+}
+
+.button--secondary:hover {
+  background: var(--color-surface-2);
+}
+
+/* quiet: text only */
+.button--quiet {
+  padding-inline: var(--space-3);
+  color: var(--color-signal);
+  text-decoration: underline;
+  text-decoration-thickness: var(--rule-hair);
+  text-underline-offset: var(--space-1);
+}
+
+.button--quiet:hover {
+  text-decoration-thickness: var(--rule-strong);
+}
+
+.button--sm {
+  padding: var(--space-1) var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.button--lg {
+  padding: var(--space-3) var(--space-6);
+  font-size: var(--text-lg);
+}
+
+.button--quiet.button--sm,
+.button--quiet.button--lg {
+  padding-inline: var(--space-3);
+}
+
+.button--block {
+  display: flex;
+  width: 100%;
+}
+
+.button:disabled,
+.button[aria-disabled='true'] {
+  border-color: var(--color-rule);
+  background: var(--color-surface-2);
+  color: var(--color-ink-2);
+  cursor: not-allowed;
+}
+
+.button--quiet:disabled {
+  border-color: transparent;
+  background: transparent;
+  text-decoration: none;
+}

@@ -23,20 +23,16 @@ export interface RouteMapProps {
   animateIn?: boolean;
   /** Show the "Hôm nay" marker. */
   showToday?: boolean;
+  /** Scale a horizontal map to the container width instead of scrolling (short fragments). */
+  fit?: boolean;
   className?: string;
 }
 
+/** Month zones narrower than this (user units) get no label, so labels never collide. */
+const MIN_LABELLED_ZONE = 72;
+
 function laneVar(code: CategoryCode): string {
   return `var(--line-${code.toLowerCase()})`;
-}
-
-/** Keeps the previous value of `value` across renders. */
-function usePrevious<T>(value: T): T | undefined {
-  const ref = useRef<T | undefined>(undefined);
-  useEffect(() => {
-    ref.current = value;
-  }, [value]);
-  return ref.current;
 }
 
 /**
@@ -54,38 +50,38 @@ export function RouteMap({
   onActivate,
   animateIn = false,
   showToday = true,
+  fit = false,
   className,
 }: RouteMapProps) {
   const uid = useId().replace(/:/g, '');
   const hatchId = `hatch-${uid}`;
   const scrollRef = useRef<HTMLDivElement>(null);
   const stationRefs = useRef(new Map<string, SVGGElement>());
-  const [activeId, setActiveId] = useState<string | null>(layout.stations[0]?.eventId ?? null);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const [cardId, setCardId] = useState<string | null>(null);
   const horizontal = orientation === 'horizontal';
 
   // "Your route" grows to its new length when an event is added: the key moment.
-  const previousLength = usePrevious(layout.myRoute.length);
   const routeRef = useRef<SVGPathElement>(null);
+  const lengthRef = useRef(layout.myRoute.length);
   useLayoutEffect(() => {
-    const path = routeRef.current;
-    if (!path || previousLength === undefined || previousLength >= layout.myRoute.length) return;
+    const previousLength = lengthRef.current;
     const total = layout.myRoute.length;
+    lengthRef.current = total;
+    const path = routeRef.current;
+    if (!path || previousLength >= total) return;
     path.style.setProperty('--route-from', String(total - previousLength));
     path.style.setProperty('--route-total', String(total));
     path.classList.remove('route-map__mine--grow');
     // Force a reflow so the animation restarts.
     void path.getBoundingClientRect();
     path.classList.add('route-map__mine--grow');
-  }, [layout.myRoute.length, previousLength]);
-
-  useEffect(() => {
-    if (activeId !== null && !layout.stations.some((s) => s.eventId === activeId)) {
-      setActiveId(layout.stations[0]?.eventId ?? null);
-    }
-  }, [activeId, layout.stations]);
+  }, [layout.myRoute.length]);
 
   const stations = layout.stations;
+  // The roving tab stop falls back to the first station when the active one disappears.
+  const tabStopId =
+    activeId !== null && stations.some((s) => s.eventId === activeId) ? activeId : (stations[0]?.eventId ?? null);
   const indexOf = (id: string) => stations.findIndex((s) => s.eventId === id);
 
   function focusStation(station: StationGeom | undefined) {
@@ -125,7 +121,7 @@ export function RouteMap({
   // Keep the focused station visible inside the scroll container.
   useEffect(() => {
     if (cardId === null) return;
-    stationRefs.current.get(cardId)?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+    stationRefs.current.get(cardId)?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }, [cardId]);
 
   const cardStation = cardId === null ? undefined : stations[indexOf(cardId)];
@@ -136,7 +132,7 @@ export function RouteMap({
 
   return (
     <div
-      className={['route-map', `route-map--${orientation}`, animateIn ? 'route-map--animate' : '', className]
+      className={['route-map', `route-map--${orientation}`, fit ? 'route-map--fit' : '', animateIn ? 'route-map--animate' : '', className]
         .filter(Boolean)
         .join(' ')}
     >
@@ -236,7 +232,7 @@ export function RouteMap({
                   style={{ '--lane-color': laneVar(s.category), '--i': String(i) } as Record<string, string>}
                   transform={`translate(${s.x} ${s.y})`}
                   role="button"
-                  tabIndex={s.eventId === activeId ? 0 : -1}
+                  tabIndex={s.eventId === tabStopId ? 0 : -1}
                   aria-label={stationLabel(s.eventId)}
                   aria-describedby={cardId === s.eventId ? `${uid}-card` : undefined}
                   onFocus={() => {
@@ -273,7 +269,7 @@ export function RouteMap({
 
           {/* Month labels (HTML, so they stay crisp and wrap-free). */}
           <ol className="route-map__months" aria-hidden="true">
-            {layout.months.map((m) => (
+            {layout.months.filter((m) => m.to - m.from >= MIN_LABELLED_ZONE).map((m) => (
               <li
                 key={m.index}
                 className="route-map__month"
@@ -292,7 +288,12 @@ export function RouteMap({
                 key={p.id}
                 className="route-map__period-label"
                 aria-hidden="true"
-                style={{ '--from': String(p.from / (horizontal ? layout.width : layout.height)) } as Record<string, string>}
+                style={
+                  {
+                    '--from': String(p.from / (horizontal ? layout.width : layout.height)),
+                    '--to': String(p.to / (horizontal ? layout.width : layout.height)),
+                  } as Record<string, string>
+                }
               >
                 Kiểm tra định kỳ
               </span>

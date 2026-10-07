@@ -22,9 +22,15 @@
   block-size: calc(var(--map-h) * var(--map-unit));
 }
 
-.route-map--vertical .route-map__canvas {
+.route-map--vertical .route-map__canvas,
+.route-map--fit .route-map__canvas {
   inline-size: 100%;
+  block-size: auto;
   aspect-ratio: var(--map-w) / var(--map-h);
+}
+
+.route-map--fit .route-map__scroll {
+  overflow: visible;
 }
 
 .route-map__svg {
@@ -213,9 +219,10 @@
   pointer-events: none;
 }
 
+/* Anchored to the end of the zone, so a zone clipped at the range end keeps its label inside. */
 .route-map--horizontal .route-map__period-label {
   inset-block-end: var(--space-3);
-  inset-inline-start: calc(var(--from) * 100% + var(--space-1));
+  inset-inline-end: calc((1 - var(--to)) * 100% + var(--space-1));
 }
 
 .route-map--vertical .route-map__period-label {

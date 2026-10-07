@@ -1,0 +1,30 @@
+.status-tag {
+  --status-color: var(--color-ink-2);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: calc(var(--space-1) / 2) var(--space-2) calc(var(--space-1) / 2) calc(var(--space-2) - var(--space-1) / 2);
+  border: var(--rule-hair) solid currentColor;
+  border-radius: var(--radius-sm);
+  color: var(--status-color);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+  white-space: nowrap;
+}
+
+.status-tag--ok {
+  --status-color: var(--color-ok);
+}
+
+.status-tag--warn {
+  --status-color: var(--color-warn);
+}
+
+.status-tag--stop {
+  --status-color: var(--color-stop);
+}
+
+.status-tag--signal {
+  --status-color: var(--color-signal);
+}

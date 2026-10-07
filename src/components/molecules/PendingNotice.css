@@ -1,0 +1,14 @@
+.pending-notice {
+  display: grid;
+  gap: var(--space-4);
+  padding-block: var(--space-7);
+  max-inline-size: var(--measure);
+}
+
+.pending-notice__title {
+  font-size: var(--text-xl);
+}
+
+.pending-notice__body {
+  color: var(--color-ink-2);
+}

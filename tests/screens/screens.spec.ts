@@ -20,9 +20,15 @@ for (const route of ROUTES.filter((r) => !ONLY || ONLY.includes(r.name))) {
         await page.goto(route.path);
         await expect(page.locator('#main-heading')).toBeVisible();
         await page.evaluate(() => document.fonts.ready);
-        const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-        expect(overflow, `horizontal overflow on ${route.path} at ${size.width}px`).toBeLessThanOrEqual(0);
         await page.screenshot({ path: `screenshots/${LABEL}/${route.name}-${size.name}-${theme}.png`, fullPage: true });
+        const offenders = await page.evaluate(() =>
+          [...document.querySelectorAll('body *')]
+            .filter((el) => el.getBoundingClientRect().right > window.innerWidth + 0.5)
+            .slice(0, 5)
+            .map((el) => `${el.tagName.toLowerCase()}.${el.getAttribute('class') ?? ''}`),
+        );
+        const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+        expect(overflow, `horizontal overflow on ${route.path} at ${size.width}px: ${offenders.join(', ')}`).toBeLessThanOrEqual(0);
       });
     }
   }

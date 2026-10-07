@@ -1,0 +1,334 @@
+/* ── Shell ───────────────────────────────────────────────────────── */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  border-bottom: var(--rule-hair) solid var(--color-rule);
+  background: var(--color-surface);
+}
+
+.site-header__inner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: 'brand . actions';
+  align-items: center;
+  column-gap: var(--space-2);
+  min-height: var(--header-h);
+}
+
+.site-header__brand {
+  grid-area: brand;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-touch);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.site-header__brand .wordmark__text {
+  font-size: var(--text-lg);
+}
+
+.site-header__actions {
+  grid-area: actions;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-1);
+}
+
+/* ── Primary navigation ──────────────────────────────────────────── */
+
+.site-nav__list {
+  display: flex;
+  margin: 0;
+}
+
+.site-nav__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.site-nav__link:hover {
+  color: var(--color-ink);
+}
+
+.site-nav__link[data-active='true'] {
+  color: var(--color-ink);
+  font-weight: var(--weight-semibold);
+}
+
+/* The active section: a 4-unit signal route segment with a station at each end. */
+.site-nav__track {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-1);
+  left: var(--space-3);
+  height: var(--route-w);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.site-nav__track::before,
+.site-nav__track::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  display: none;
+  width: calc(var(--route-w) * 2.5);
+  height: calc(var(--route-w) * 2.5);
+  margin-top: calc(var(--route-w) * -1.25);
+  border: var(--rule-strong) solid var(--color-signal);
+  border-radius: 50%;
+  background: var(--color-surface);
+}
+
+.site-nav__track::before {
+  left: calc(var(--route-w) * -1.25);
+}
+
+.site-nav__track::after {
+  right: calc(var(--route-w) * -1.25);
+}
+
+.site-nav__link:hover .site-nav__track {
+  background: var(--color-rule);
+}
+
+.site-nav__link[data-active='true'] .site-nav__track {
+  background: var(--color-signal);
+}
+
+.site-nav__link[data-active='true'] .site-nav__track::before,
+.site-nav__link[data-active='true'] .site-nav__track::after {
+  display: block;
+}
+
+/* ── Header actions ──────────────────────────────────────────────── */
+
+.site-header__search {
+  display: none;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--size-touch);
+  padding: 0 var(--space-2) 0 var(--space-4);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  background: var(--color-ground);
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+  white-space: nowrap;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.site-header__search:hover {
+  border-color: var(--color-ink-2);
+  color: var(--color-ink);
+}
+
+.site-header__kbd {
+  padding: calc(var(--space-1) / 2) var(--space-2);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-ink-2);
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+}
+
+.site-header__menu-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--size-touch);
+  padding: 0 var(--space-3);
+  border: var(--rule-hair) solid var(--color-ink);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  white-space: nowrap;
+}
+
+.site-header__menu-button[aria-expanded='true'] {
+  background: var(--color-ink);
+  color: var(--color-surface);
+}
+
+/* ── Phones (< 720px): nav folds into the "Danh mục" panel ───────── */
+
+@media (width < 720px) {
+  .site-header__brand .wordmark__text {
+    font-size: var(--text-md);
+  }
+
+  /* The theme choice moves into the account menu on phones (no room in the bar). */
+  .site-header__actions .theme-toggle {
+    display: none;
+  }
+
+  .site-header__menu-button {
+    gap: var(--space-1);
+    padding: 0 var(--space-3) 0 var(--space-2);
+  }
+
+  .site-header .account-menu__chevron {
+    display: none;
+  }
+
+  .site-header .account-menu__button {
+    padding: 0;
+  }
+
+  .site-nav {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    display: none;
+    max-height: calc(100dvh - var(--header-h));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-top: var(--rule-hair) solid var(--color-rule);
+    border-bottom: var(--rule-hair) solid var(--color-ink);
+    background: var(--color-surface);
+  }
+
+  .site-nav[data-open='true'] {
+    display: block;
+  }
+
+  .site-nav__list {
+    flex-direction: column;
+    padding: var(--space-2) var(--gutter) var(--space-4);
+  }
+
+  .site-nav__item + .site-nav__item {
+    border-top: var(--rule-hair) solid var(--color-rule);
+  }
+
+  .site-nav__link {
+    min-height: var(--size-touch);
+    padding: var(--space-3) var(--space-4) var(--space-3) var(--space-5);
+    color: var(--color-ink);
+    font-size: var(--text-md);
+  }
+
+  .site-nav__item--search .site-nav__link {
+    padding-left: 0;
+    color: var(--color-signal);
+  }
+
+  /* Vertical segment on the left edge, stations at both ends. */
+  .site-nav__track {
+    top: var(--space-3);
+    right: auto;
+    bottom: var(--space-3);
+    left: var(--space-1);
+    width: var(--route-w);
+    height: auto;
+  }
+
+  .site-nav__track::before,
+  .site-nav__track::after {
+    left: 50%;
+    margin-top: 0;
+    margin-left: calc(var(--route-w) * -1.25);
+  }
+
+  .site-nav__track::before {
+    top: calc(var(--route-w) * -1.25);
+  }
+
+  .site-nav__track::after {
+    top: auto;
+    right: auto;
+    bottom: calc(var(--route-w) * -1.25);
+  }
+
+  .site-nav__link:hover .site-nav__track {
+    background: transparent;
+  }
+
+  .site-nav__link[data-active='true'] .site-nav__track {
+    background: var(--color-signal);
+  }
+}
+
+/* ── Tablet and desktop ──────────────────────────────────────────── */
+
+@media (min-width: 720px) {
+  .site-header__inner {
+    grid-template-areas:
+      'brand . actions'
+      'nav nav nav';
+    column-gap: var(--space-5);
+  }
+
+  .site-header__brand .wordmark__text {
+    font-size: var(--text-xl);
+  }
+
+  .site-header__search {
+    display: inline-flex;
+  }
+
+  .site-header__menu-button,
+  .site-nav__item--search {
+    display: none;
+  }
+
+  .site-nav {
+    grid-area: nav;
+    min-width: 0;
+    border-top: var(--rule-hair) solid var(--color-rule);
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .site-nav__list {
+    margin-inline: calc(var(--space-3) * -1);
+  }
+
+  .site-nav__link {
+    height: var(--size-touch);
+    padding-inline: var(--space-3);
+  }
+}
+
+@media (min-width: 1080px) {
+  .site-header__inner {
+    grid-template-areas: 'brand nav actions';
+  }
+
+  .site-nav {
+    align-self: stretch;
+    border-top: 0;
+  }
+
+  .site-nav__list {
+    height: 100%;
+    margin-inline: 0;
+  }
+
+  .site-nav__link {
+    height: 100%;
+    min-height: var(--header-h);
+  }
+}
