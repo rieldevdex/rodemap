@@ -15,8 +15,8 @@ src/router/      tiny History-API router.
 src/components/  atoms | molecules | organisms — presentational, props only.
 src/pages/       one file per screen; may read the store through hooks from src/state/hooks.ts.
 functions/api/   Cloudflare Pages Function for Mochi.
-scripts/         token lint, copy lint, size check.
-tests/e2e        Playwright smoke + axe; tests/screens screenshots.
+scripts/         token lint, copy lint, size check, service-worker build plugin (sw-plugin.ts).
+tests/e2e        Playwright smoke, demo path, offline (service worker) + axe; tests/screens screenshots.
 ```
 
 Rules:
@@ -80,6 +80,28 @@ The product is **Rodemap** (never "Rode").
 // text.ts
 export function foldVietnamese(s: string): string;            // lowercase, strip diacritics, đ→d, collapse spaces
 export function matchesQuery(haystack: string, query: string): boolean; // every folded query token appears
+export function formatHours(hours: number): string;           // "2,5": two decimals at most, decimal comma
+
+// profile.ts — onboarding (Thiết lập hồ sơ)
+export const ONBOARDING_STEPS = ['class', 'interests', 'goals', 'time'] as const;
+export const BUDGET_LIMITS = { min: 2, max: 12, step: 1 }; export const TOP_INTEREST_COUNT = 3;
+export interface ProfileDraft { grade: Grade | null; className: string; interests: CategoryCode[]; goals: GoalId[];
+  weekdayAfterSchool: boolean; weekend: boolean; weeklyHourBudget: number }
+export function emptyDraft(): ProfileDraft;
+export function stepErrors(draft, step): Partial<Record<'grade'|'className'|'interests'|'goals'|'availability', string>>;
+//   class names: grade + one letter + ≤ 3 letters/digits ("11A2"), must start with the chosen grade.
+export function firstIncompleteStep(draft): OnboardingStep | null;
+export function toggleInterest(list, code) / moveInterest(list, code, -1 | 1) / toggleGoal(list, id);
+export function clampBudget(hours): number;
+export function draftToProfile(draft, now): Profile | null;    // null until every step is complete; topInterests = first 3
+
+// calendar-view.ts — Lịch của tôi
+export function monthGrid(ms): Millis[][];                    // Monday-first weeks covering the month
+export function weekDays(ms): Millis[]; export function isInMonth(day, monthMs): boolean;
+export function shiftMonth(ms, delta): Millis; export function shiftWeek(ms, delta): Millis;
+export function eventsOnDay(events, day): SchoolEvent[];      // overlapping the VN day, by start
+export function eventsBetween(events, from, to): SchoolEvent[];
+export function periodOn(periods, day): CalendarPeriod | undefined; export function periodsBetween(periods, from, to): CalendarPeriod[];
 
 // events.ts — event-level facts
 export function eventStart(e: SchoolEvent): Millis;
@@ -262,6 +284,8 @@ selectMyEvents(state)              // public events with registration registered
 selectUpcomingMine(state, now)
 selectConflictsInPlan(state)
 selectRecommendations(state, now, opts?)
+selectFirstRoute(state, now, size?)  // planner.firstRoute: best event of each top interest first, then by score
+selectPlanBudget(state, now)
 selectDeadlinesThisWeek(state, now)
 selectPendingAttendance(state, now)
 selectSubmissionsForClub(state, clubId) / selectModerationQueue(state)
@@ -270,6 +294,9 @@ selectNow(state, realNow: Millis): Millis   // demoToday at 09:00 VN if set, els
 loadState(storage: Storage | null): AppState;   // try/catch, version check, migrate, fallback seed
 saveState(storage: Storage | null, s: AppState): void;  // try/catch
 // hooks.ts (React): useAppState(), useDispatch(), useSelector(fn), useNow()
+// routeMemory.ts: "your route" as last seen on the Lộ trình map in this session; onboarding and
+//   Mochi call rememberRouteBefore(ids) before registering, so the map grows to the new stations.
+// effects.ts: applyTheme, downloadFile, printPage, newId, registerServiceWorker (production only).
 ```
 
 ## Router (`src/router`)

@@ -40,3 +40,16 @@ export function newId(prefix: string): string {
       : Math.random().toString(36).slice(2, 10);
   return `${prefix}-${rand}`;
 }
+
+/**
+ * Registers the build-time service worker (production builds only) so Rodemap keeps working
+ * without a network, e.g. on Voting Day.
+ */
+export function registerServiceWorker(): void {
+  if (!import.meta.env.PROD || !('serviceWorker' in navigator)) return;
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {
+      /* Unsupported or blocked: the app works online as usual. */
+    });
+  });
+}

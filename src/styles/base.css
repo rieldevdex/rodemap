@@ -63,8 +63,8 @@ button:disabled {
   cursor: not-allowed;
 }
 
-ul[class],
-ol[class] {
+/* Zero specificity, so a component's own list rules always win. */
+:where(ul[class], ol[class]) {
   list-style: none;
   padding: 0;
 }

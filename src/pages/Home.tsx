@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
 import { Button } from '../components/atoms/Button';
 import { LineBadge } from '../components/atoms/LineBadge';
+import { MonoTime } from '../components/atoms/MonoTime';
 import { StationCard } from '../components/molecules/StationCard';
 import { Mochi } from '../components/organisms/Mochi';
 import { RouteMap } from '../components/organisms/RouteMap';
 import { useMediaQuery } from '../components/useMediaQuery';
-import { CLOSING, HERO, MOCHI_INTRO, PARTICIPATION, PILLARS, PROBLEM, SOLUTION } from '../content/landing';
+import { CLOSING, DEMO_QUESTION, HERO, MOCHI_INTRO, PARTICIPATION, PILLARS, PROBLEM, SOLUTION } from '../content/landing';
 import { CATEGORIES } from '../data/categories';
 import { PERIODS } from '../data/calendar';
 import { CLUBS } from '../data/clubs';
@@ -13,9 +14,11 @@ import { EVENTS } from '../data/events';
 import { addDays, formatDayLabel, formatTime, startOfIsoWeek, toMillis } from '../domain/dates';
 import { deadlineDaysLeft, isRegistered, registrationState, seatsLeft } from '../domain/events';
 import { layoutRoute } from '../domain/route-layout';
+import { respondOffline } from '../mochi/offline/engine';
 import { CATEGORY_CODES } from '../domain/types';
 import { MAIN_HEADING_ID, useNavigate } from '../router';
 import { useAppState, useNow } from '../state/hooks';
+import { requestMochi } from '../state/mochiBridge';
 import './Home.css';
 
 const FRAGMENT_WEEKS = 6;
@@ -46,6 +49,21 @@ export function HomePage() {
       now,
     });
   }, [events, state.registrations, orientation, wide, now]);
+
+  /* The landing demo exchange: Mochi's offline engine answering DEMO_QUESTION over the current demo data. */
+  const demo = useMemo(() => {
+    const reply = respondOffline(DEMO_QUESTION, { state, now });
+    const card = reply.cards.find((c) => c.kind === 'events');
+    const lead = reply.text.split('\n\n')[0] ?? reply.text;
+    const list = card?.kind === 'events' ? card.eventIds.slice(0, 3) : [];
+    return {
+      lead,
+      events: list.flatMap((id) => {
+        const event = byId.get(id);
+        return event ? [{ event, reason: card?.kind === 'events' ? card.reasons?.[id]?.[0] : undefined }] : [];
+      }),
+    };
+  }, [state, now, byId]);
 
   const stationLabel = (id: string) => {
     const e = byId.get(id);
@@ -86,6 +104,7 @@ export function HomePage() {
               stationLabel={stationLabel}
               animateIn
               fit
+              endMarker={<Mochi state="idle" />}
               onActivate={(id) => {
                 const e = byId.get(id);
                 if (e) navigate(`/su-kien/${e.slug}`);
@@ -161,6 +180,48 @@ export function HomePage() {
               <li>Mochi không yêu cầu thông tin cá nhân nhạy cảm.</li>
             </ul>
           </div>
+          <figure className="home-demo" aria-labelledby="home-demo-caption">
+            <figcaption id="home-demo-caption" className="home-demo__caption">
+              Đoạn trao đổi minh họa · tạo từ dữ liệu minh họa ở chế độ ngoại tuyến
+            </figcaption>
+            <ol className="home-demo__log">
+              <li className="home-demo__entry home-demo__entry--student">
+                <p className="home-demo__who">Bạn</p>
+                <p>{DEMO_QUESTION}</p>
+              </li>
+              <li className="home-demo__entry">
+                <p className="home-demo__who">Mochi</p>
+                <p>{demo.lead}</p>
+                {demo.events.length > 0 ? (
+                  <ul className="home-demo__events">
+                    {demo.events.map(({ event: e, reason }) => (
+                      <li key={e.id}>
+                        <p className="home-demo__event-meta">
+                          <LineBadge code={e.category} size="sm" />
+                          <MonoTime dateTime={e.start}>
+                            {formatDayLabel(toMillis(e.start))} · {formatTime(toMillis(e.start))}
+                          </MonoTime>
+                        </p>
+                        <p className="home-demo__event-title">{e.title}</p>
+                        {reason ? <p className="home-demo__event-reason">{reason}</p> : null}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </li>
+            </ol>
+            <Button
+              variant="secondary"
+              size="sm"
+              iconEnd="arrow-right"
+              className="home-demo__ask"
+              onClick={() => {
+                requestMochi({ kind: 'prompt', text: DEMO_QUESTION });
+              }}
+            >
+              Gửi câu hỏi này cho Mochi
+            </Button>
+          </figure>
         </div>
       </section>
 

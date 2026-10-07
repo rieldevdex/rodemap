@@ -12,6 +12,8 @@ export default defineConfig({
     baseURL: 'http://localhost:4173',
     locale: 'vi-VN',
     timezoneId: 'Asia/Ho_Chi_Minh',
+    // The offline test opts in; elsewhere a worker would only add caching between tests.
+    serviceWorkers: 'block',
     launchOptions: executablePath ? { executablePath } : {},
   },
   webServer: {
@@ -21,7 +23,7 @@ export default defineConfig({
     timeout: 60_000,
   },
   projects: [
-    { name: 'smoke', testMatch: /e2e\/(smoke|demo-path)\.spec\.ts/, use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
+    { name: 'smoke', testMatch: /e2e\/(smoke|demo-path|offline)\.spec\.ts/, use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
     { name: 'a11y', testMatch: /e2e\/a11y\.spec\.ts/, use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
     { name: 'screens', testMatch: /screens\/screens\.spec\.ts/, use: { ...devices['Desktop Chrome'] } },
   ],

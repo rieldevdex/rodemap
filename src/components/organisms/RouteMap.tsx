@@ -59,6 +59,8 @@ export interface RouteMapProps {
   arrivals?: readonly string[] | undefined;
   /** Legend under the map: lines only (default), lines + symbols, or none (the page renders RouteMapLegend). */
   legend?: 'lines' | 'full' | 'none' | undefined;
+  /** Decorative content standing on the last station of "your route" (the landing page's Mochi). */
+  endMarker?: ReactNode;
   /** Pin the line codes to the leading edge while the map scrolls. Defaults to true unless `fit`. */
   laneLabels?: boolean | undefined;
   ref?: Ref<RouteMapHandle> | undefined;
@@ -223,6 +225,7 @@ export function RouteMap({
   growFrom,
   arrivals,
   legend = 'lines',
+  endMarker,
   laneLabels = !fit,
   ref,
   className,
@@ -424,6 +427,7 @@ export function RouteMap({
   const laneName = (code: CategoryCode) => lanes.find((l) => l.code === code)?.name ?? '';
   const fraction = (pos: number) => String(pos / extent);
   const crossFraction = (pos: number) => String(pos / (horizontal ? layout.height : layout.width));
+  const lastMine = layout.stations.filter((st) => st.mine).at(-1);
   const firstLane = layout.lanes[0];
   const lastLane = layout.lanes.at(-1);
   // Space between the outer lanes and the map edges (for labels in the vertical gutters).
@@ -653,6 +657,16 @@ export function RouteMap({
                 })}
               </g>
             </svg>
+
+            {endMarker !== undefined && lastMine ? (
+              <div
+                className="route-map__end-marker"
+                aria-hidden="true"
+                style={{ '--mx': String(lastMine.x / layout.width), '--my': String(lastMine.y / layout.height) } as Record<string, string>}
+              >
+                {endMarker}
+              </div>
+            ) : null}
 
             {/* Month labels (HTML, so they stay crisp and wrap-free). */}
             <ol className="route-map__months" aria-hidden="true">

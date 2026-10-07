@@ -8,6 +8,7 @@ import './styles/print.css';
 import { App } from './App';
 import { RouterProvider } from './router/Router';
 import { MochiProvider } from './state/MochiProvider';
+import { registerServiceWorker } from './state/effects';
 import { StoreProvider } from './state/StoreProvider';
 
 const root = document.getElementById('root');
@@ -24,3 +25,5 @@ createRoot(root).render(
     </StoreProvider>
   </StrictMode>,
 );
+
+registerServiceWorker();
