@@ -2,6 +2,7 @@ import { Component, lazy, Suspense, useEffect, type ComponentType, type ErrorInf
 import { Footer } from './components/organisms/Footer';
 import { Header } from './components/organisms/Header';
 import { HomePage } from './pages/Home';
+import { MochiConnected } from './pages/connected/MochiConnected';
 import { useRoute } from './router/Router';
 import type { RouteName } from './router/routes';
 import './App.css';
@@ -140,11 +141,7 @@ export function App() {
         </PageErrorBoundary>
       </main>
       <Footer />
-      {/*
-        ── MochiDock slot (milestone 4) ──────────────────────────────────
-        The MochiDock organism mounts here, after the footer and outside <main>,
-        so it stays available on every screen (fixed bottom-right, z-index var(--z-dock)).
-      */}
+      <MochiConnected />
     </div>
   );
 }

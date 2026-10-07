@@ -1,0 +1,48 @@
+.mochi-dock {
+  position: fixed;
+  z-index: var(--z-dock);
+  inset-block-end: var(--space-4);
+  inset-inline-end: var(--gutter);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: var(--dock-size);
+  padding: var(--space-1) var(--space-4) var(--space-1) var(--space-1);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: var(--rule-strong) solid var(--color-ink);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.mochi-dock:hover {
+  transform: translateY(calc(var(--space-1) * -1));
+}
+
+.mochi-dock__figure {
+  display: block;
+  inline-size: calc(var(--dock-size) - var(--space-3));
+  aspect-ratio: 100 / 120;
+  margin-block-start: calc(var(--space-3) * -1);
+}
+
+.mochi-dock--open {
+  visibility: hidden;
+}
+
+@media (width < 720px) {
+  .mochi-dock {
+    inset-block-end: var(--space-3);
+    padding-inline-end: var(--space-3);
+  }
+}
+
+@media print {
+  .mochi-dock {
+    display: none;
+  }
+}

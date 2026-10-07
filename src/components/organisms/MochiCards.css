@@ -1,0 +1,126 @@
+.mochi-card {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-sm);
+}
+
+.mochi-card--confirm {
+  border: var(--rule-strong) solid var(--color-ink);
+}
+
+.mochi-card__kicker,
+.mochi-card__reasons-label,
+.mochi-card__field-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+}
+
+.mochi-card__event {
+  display: grid;
+  gap: var(--space-1);
+  padding-inline-start: var(--space-3);
+  border-inline-start: var(--chip-edge) solid var(--color-rule);
+}
+
+.mochi-card__event + .mochi-card__event {
+  padding-block-start: var(--space-3);
+  border-block-start: var(--rule-hair) solid var(--color-rule);
+}
+
+.mochi-card__event-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.mochi-card__when {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-ink-2);
+}
+
+.mochi-card__title,
+.mochi-card__title-static {
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  color: var(--color-ink);
+}
+
+.mochi-card__title {
+  text-decoration: underline;
+  text-decoration-thickness: var(--rule-hair);
+  text-underline-offset: var(--space-1);
+}
+
+.mochi-card__meta {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.mochi-card__reasons ul,
+.mochi-card__links {
+  display: grid;
+  gap: var(--space-1);
+  margin: var(--space-1) 0 0;
+  padding-inline-start: var(--space-5);
+  font-size: var(--text-sm);
+}
+
+.mochi-card__links a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: var(--size-touch);
+  color: var(--color-signal);
+}
+
+.mochi-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.mochi-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.mochi-card__done {
+  margin: 0;
+}
+
+.mochi-card__check {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.mochi-card__check input {
+  inline-size: var(--space-5);
+  block-size: var(--space-5);
+  margin-block-start: var(--space-1);
+  accent-color: var(--color-signal);
+}
+
+.mochi-card__textarea {
+  inline-size: 100%;
+  padding: var(--space-3);
+  font: inherit;
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+  color: var(--color-ink);
+  background: var(--color-ground);
+  border: var(--rule-hair) solid var(--color-ink-2);
+  border-radius: var(--radius-sm);
+  resize: vertical;
+}

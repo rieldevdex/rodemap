@@ -6,6 +6,7 @@ import './styles/base.css';
 import './styles/layout.css';
 import { App } from './App';
 import { RouterProvider } from './router/Router';
+import { MochiProvider } from './state/MochiProvider';
 import { StoreProvider } from './state/StoreProvider';
 
 const root = document.getElementById('root');
@@ -15,7 +16,9 @@ createRoot(root).render(
   <StrictMode>
     <StoreProvider>
       <RouterProvider>
-        <App />
+        <MochiProvider>
+          <App />
+        </MochiProvider>
       </RouterProvider>
     </StoreProvider>
   </StrictMode>,
