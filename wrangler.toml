@@ -1,0 +1,16 @@
+# Cloudflare Pages configuration for Rodemap.
+# Secret (set in the Pages dashboard or with `npx wrangler pages secret put ANTHROPIC_API_KEY`):
+#   ANTHROPIC_API_KEY — without it Mochi runs in offline mode.
+name = "rodemap"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+MOCHI_MODEL = "claude-opus-5-5"
+MOCHI_EFFORT = "low"
+
+# Optional: durable rate limits across isolates. Create a KV namespace, then uncomment.
+# [[kv_namespaces]]
+# binding = "MOCHI_RATE_LIMIT"
+# id = "<kv-namespace-id>"

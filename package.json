@@ -26,6 +26,7 @@
     "check": "run-s check:static build size e2e"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
     "@fontsource-variable/lexend": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
