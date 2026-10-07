@@ -14,7 +14,6 @@ import {
   formatShortDate,
   formatTime,
   formatTimeRange,
-  isoWeekKey,
   startOfIsoWeek,
   startOfNextVnMonth,
   startOfVnMonth,
@@ -105,13 +104,13 @@ export function eventBrief(e: SchoolEvent, ctx: ToolContext) {
     title: e.title,
     category: e.category,
     category_name: CATEGORY_LABELS[e.category],
-    club: clubOf(e.clubId)?.shortName ?? e.clubId,
+    club: clubOf(e.clubId)?.name ?? e.clubId,
     date: formatLongDate(start),
     time: formatTimeRange(start, eventEnd(e)),
     location: e.location,
     format: e.format === 'online' ? 'Trực tuyến' : 'Trực tiếp',
     seats_left: seatsLeft(e, ctx.state.registrations),
-    registration_deadline: `${formatDate(deadline)} ${formatTime(deadline)}`,
+    registration_deadline: `${formatTime(deadline)} ngày ${formatDate(deadline)}`,
     status: STATUS_LABELS[registrationState(e, ctx.state.registrations, ctx.now)],
   };
 }
@@ -170,7 +169,7 @@ function searchEvents(input: Record<string, unknown>, ctx: ToolContext): ToolOut
   const clubQuery = optString(input, 'club_id', 120);
   const club = clubQuery === undefined ? undefined : resolveClub(clubQuery);
   if (clubQuery !== undefined && !club) {
-    return { result: { error: `Không tìm thấy câu lạc bộ "${clubQuery}".` }, isError: true };
+    return { result: { error: `Không tìm thấy câu lạc bộ “${clubQuery}”.` }, isError: true };
   }
   const query = optString(input, 'query', 100);
   const categories = optCategories(input, 'categories');
@@ -209,7 +208,7 @@ function getEvent(input: Record<string, unknown>, ctx: ToolContext): ToolOutcome
 function getClub(input: Record<string, unknown>, ctx: ToolContext): ToolOutcome {
   const query = reqString(input, 'club_id', 120);
   const club = resolveClub(query);
-  if (!club) return { result: { error: `Không tìm thấy câu lạc bộ "${query}".` }, isError: true };
+  if (!club) return { result: { error: `Không tìm thấy câu lạc bộ “${query}”.` }, isError: true };
   const events = selectPublicEvents(ctx.state).filter((e) => e.clubId === club.id);
   const upcoming = events.filter((e) => !isPast(e, ctx.now));
   return {
@@ -285,7 +284,7 @@ const NOT_POSSIBLE: Partial<Record<RegistrationState, string>> = {
   full: 'Sự kiện đã hết chỗ.',
   closed: 'Sự kiện đã hết hạn đăng ký.',
   past: 'Sự kiện đã diễn ra.',
-  attended: 'Học sinh đã tham gia sự kiện này.',
+  attended: 'Bạn đã tham gia sự kiện này.',
   absent: 'Sự kiện đã diễn ra.',
 };
 
@@ -305,8 +304,8 @@ function proposeRegistration(input: Record<string, unknown>, ctx: ToolContext): 
   const brief = eventBrief(e, ctx);
   if (action === 'register') {
     if (info.state === 'registered') return { result: { status: 'already_registered', event: brief } };
-    if (!info.eligible) return { result: { status: 'not_possible', reason: `Sự kiện dành cho khối ${e.eligibleGrades.join(', ')}.`, event: brief } };
-    if (!info.canRegister) return { result: { status: 'not_possible', reason: NOT_POSSIBLE[info.state] ?? 'Không thể đăng ký.', event: brief } };
+    if (!info.eligible) return { result: { status: 'not_possible', reason: `Sự kiện chỉ dành cho khối ${e.eligibleGrades.join(', ')}.`, event: brief } };
+    if (!info.canRegister) return { result: { status: 'not_possible', reason: NOT_POSSIBLE[info.state] ?? 'Sự kiện hiện không mở đăng ký.', event: brief } };
     return {
       result: {
         status: 'awaiting_confirmation',
@@ -409,7 +408,7 @@ function summarize(input: Record<string, unknown>, ctx: ToolContext): ToolOutcom
   return {
     result: {
       scope,
-      period: scope === 'week' ? `Tuần ${formatShortDate(from)} – ${formatDate(addDays(to, -1))} (${isoWeekKey(from)})` : formatMonthYear(from),
+      period: scope === 'week' ? `Tuần ${formatShortDate(from)} – ${formatDate(addDays(to, -1))}` : formatMonthYear(from),
       event_count: events.length,
       events_by_category: byCategory,
       events: events.slice(0, 12).map((e) => eventBrief(e, ctx)),

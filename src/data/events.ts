@@ -23,9 +23,9 @@ export const EVENTS: SchoolEvent[] = [
     seatsTaken: 548,
     registrationDeadline: '2026-09-03T23:59:00+07:00',
     summary:
-      'Lễ khai giảng chính thức mở đầu năm học 2026–2027, dành cho toàn thể học sinh nhà trường. Học sinh nắm được kế hoạch năm học, các nhiệm vụ trọng tâm và gương học sinh tiêu biểu được tuyên dương.',
+      'Lễ khai giảng chính thức mở đầu năm học 2026–2027, dành cho toàn thể học sinh nhà trường. Học sinh được phổ biến kế hoạch năm học và các nhiệm vụ trọng tâm, đồng thời tham dự lễ tuyên dương học sinh tiêu biểu.',
     description:
-      'Chương trình gồm nghi thức chào cờ, phát biểu khai giảng của Ban Giám hiệu, tuyên dương học sinh đạt thành tích xuất sắc năm học trước và phần văn nghệ chào mừng do các câu lạc bộ phụ trách. Học sinh có mặt tại sân trường trước 06:45, mặc đồng phục theo quy định và tập trung theo vị trí của lớp.',
+      'Chương trình gồm nghi thức chào cờ, diễn văn khai giảng của Ban Giám hiệu, tuyên dương học sinh đạt thành tích xuất sắc năm học trước và phần văn nghệ chào mừng do các câu lạc bộ phụ trách. Học sinh có mặt tại sân trường trước 06:45, mặc đồng phục theo quy định và tập trung theo vị trí của lớp.',
     tags: ['van-hoa', 'cong-dong'],
     status: 'approved',
   },
@@ -46,7 +46,7 @@ export const EVENTS: SchoolEvent[] = [
     summary:
       'Hội thảo giới thiệu các khái niệm cơ bản của khoa học dữ liệu và thao tác xử lý dữ liệu bằng ngôn ngữ Python, dành cho học sinh chưa có kinh nghiệm lập trình. Học sinh được thực hành trực tiếp trên bộ dữ liệu mẫu và nắm được lộ trình tự học sau hội thảo.',
     description:
-      'Nội dung gồm ba phần: tổng quan về vai trò của dữ liệu trong đời sống và học tập, hướng dẫn cài đặt môi trường lập trình, thực hành đọc, làm sạch và thống kê dữ liệu bằng thư viện pandas. Học sinh mang theo máy tính xách tay nếu có; câu lạc bộ bố trí máy tính của phòng Tin học cho học sinh chưa có thiết bị.',
+      'Nội dung gồm ba phần: tổng quan về vai trò của dữ liệu trong đời sống và học tập; hướng dẫn cài đặt môi trường lập trình; thực hành đọc, làm sạch và thống kê dữ liệu bằng thư viện pandas. Học sinh mang theo máy tính xách tay nếu có; câu lạc bộ bố trí máy tính của Phòng Tin học 2 cho học sinh chưa có thiết bị.',
     tags: ['du-lieu', 'cong-nghe', 'hoc-thuat'],
     status: 'approved',
   },
@@ -86,7 +86,7 @@ export const EVENTS: SchoolEvent[] = [
     seatsTaken: 33,
     registrationDeadline: '2026-09-20T23:59:00+07:00',
     summary:
-      'Buổi sinh hoạt giới thiệu cấu trúc một trận tranh biện và các kỹ năng lập luận cơ bản, dành cho học sinh mới quan tâm đến tranh biện. Học sinh được thực hành xây dựng luận điểm theo nhóm và nhận góp ý trực tiếp từ ban chủ nhiệm câu lạc bộ.',
+      'Buổi sinh hoạt giới thiệu cấu trúc một trận tranh biện và các kỹ năng lập luận cơ bản, dành cho học sinh bắt đầu tìm hiểu về tranh biện. Học sinh được thực hành xây dựng luận điểm theo nhóm và nhận góp ý trực tiếp từ ban chủ nhiệm câu lạc bộ.',
     description:
       'Nội dung buổi sinh hoạt gồm giới thiệu các thể thức tranh biện phổ biến, phương pháp phân tích kiến nghị và cách tổ chức luận điểm, dẫn chứng. Phần thực hành được tổ chức theo nhóm bốn học sinh, qua đó giúp học sinh làm quen với vai trò của từng thành viên trong đội tranh biện.',
     tags: ['thuyet-trinh', 'lanh-dao', 'lam-viec-nhom'],
@@ -149,7 +149,7 @@ export const EVENTS: SchoolEvent[] = [
     seatsTaken: 38,
     registrationDeadline: '2026-09-26T23:59:00+07:00',
     summary:
-      'Chuyên đề hệ thống các phương pháp đếm và kỹ thuật giải bài toán tổ hợp, dành cho học sinh yêu thích môn Toán. Học sinh được luyện tập qua các bài toán chọn lọc, qua đó củng cố tư duy lập luận phục vụ học tập và các kỳ thi học sinh giỏi.',
+      'Chuyên đề hệ thống hóa các phương pháp đếm và kỹ thuật giải bài toán tổ hợp, dành cho học sinh yêu thích môn Toán. Học sinh được luyện tập qua các bài toán chọn lọc, qua đó củng cố tư duy lập luận phục vụ học tập và các kỳ thi học sinh giỏi.',
     description:
       'Buổi chuyên đề do giáo viên tổ Toán và ban chủ nhiệm câu lạc bộ phụ trách, gồm phần trình bày lý thuyết về quy tắc đếm, hoán vị, chỉnh hợp, tổ hợp và nguyên lý bù trừ. Phần luyện tập được tổ chức theo nhóm, mỗi nhóm trình bày lời giải trước lớp và được giáo viên nhận xét.',
     tags: ['hoc-thuat', 'thi-dau'],
@@ -158,7 +158,7 @@ export const EVENTS: SchoolEvent[] = [
   {
     id: 'ev-008',
     slug: 'tuyen-chon-doi-tuyen-bong-ro-khoi-10',
-    title: 'Buổi tuyển chọn thành viên đội tuyển Bóng rổ khối 10',
+    title: 'Buổi tuyển chọn học sinh khối 10 vào đội tuyển Bóng rổ của trường',
     clubId: 'bong-ro',
     category: 'TT',
     format: 'in_person',
@@ -202,7 +202,7 @@ export const EVENTS: SchoolEvent[] = [
   {
     id: 'ev-010',
     slug: 'tap-huan-thanh-nhac-can-ban',
-    title: 'Buổi tập huấn Thanh nhạc căn bản cho thành viên mới',
+    title: 'Buổi tập huấn Thanh nhạc căn bản',
     clubId: 'am-nhac',
     category: 'NT',
     format: 'in_person',
@@ -214,7 +214,7 @@ export const EVENTS: SchoolEvent[] = [
     seatsTaken: 22,
     registrationDeadline: '2026-10-04T23:59:00+07:00',
     summary:
-      'Buổi tập huấn giới thiệu kỹ thuật hơi thở, phát âm và luyện thanh cơ bản, dành cho học sinh mới tham gia câu lạc bộ hoặc yêu thích ca hát. Học sinh được hướng dẫn bài luyện tập có thể tự thực hiện hằng ngày và nhận góp ý về giọng hát.',
+      'Buổi tập huấn giới thiệu kỹ thuật lấy hơi, phát âm và luyện thanh cơ bản, dành cho học sinh mới tham gia câu lạc bộ hoặc yêu thích ca hát. Học sinh được hướng dẫn bài luyện tập có thể tự thực hiện hằng ngày và nhận góp ý về giọng hát.',
     description:
       'Buổi tập huấn do ban chủ nhiệm câu lạc bộ phối hợp với giáo viên Âm nhạc phụ trách. Nội dung gồm khởi động giọng, kỹ thuật lấy hơi bằng cơ hoành, luyện thanh theo gam và thực hành một ca khúc tập thể, qua đó chuẩn bị lực lượng cho các chương trình văn nghệ của trường.',
     tags: ['nghe-thuat', 'van-hoa'],
@@ -319,9 +319,9 @@ export const EVENTS: SchoolEvent[] = [
     seatsTaken: 42,
     registrationDeadline: '2026-10-13T23:59:00+07:00',
     summary:
-      'Buổi giao hữu bóng rổ giữa đại diện các khối lớp, dành cho học sinh yêu thích bóng rổ ở mọi trình độ. Học sinh được rèn luyện thể chất, tinh thần đồng đội và làm quen với luật thi đấu trước giải bóng rổ cấp trường.',
+      'Buổi giao hữu bóng rổ giữa các đội học sinh thuộc các khối lớp, dành cho học sinh yêu thích bóng rổ ở mọi trình độ. Học sinh được rèn luyện thể chất, tinh thần đồng đội và làm quen với luật thi đấu trước giải bóng rổ cấp trường.',
     description:
-      'Các đội được ghép ngẫu nhiên theo khối, mỗi trận thi đấu gồm hai hiệp, mỗi hiệp mười phút dưới sự điều hành của trọng tài là thành viên câu lạc bộ. Học sinh đăng ký cá nhân, mặc trang phục thể thao và có mặt tại sân trước giờ bắt đầu mười lăm phút để khởi động.',
+      'Các đội được ghép ngẫu nhiên theo khối, mỗi trận thi đấu gồm hai hiệp, mỗi hiệp mười phút; thành viên câu lạc bộ đảm nhiệm vai trò trọng tài. Học sinh đăng ký cá nhân, mặc trang phục thể thao và có mặt tại sân trước giờ bắt đầu mười lăm phút để khởi động.',
     tags: ['the-chat', 'thi-dau', 'lam-viec-nhom'],
     status: 'approved',
   },
@@ -384,7 +384,7 @@ export const EVENTS: SchoolEvent[] = [
     summary:
       'Vòng loại giải tranh biện cấp trường dành cho các đội ba học sinh thuộc các khối lớp. Học sinh được rèn luyện kỹ năng lập luận, phản biện và làm việc nhóm; các đội xuất sắc được chọn vào vòng chung kết tổ chức trong học kỳ II.',
     description:
-      'Các đội thi đấu theo thể thức tranh biện ba người với kiến nghị được công bố trước mười lăm phút. Ban giám khảo gồm giáo viên và thành viên ban chủ nhiệm câu lạc bộ, đánh giá theo tiêu chí nội dung lập luận, khả năng phản biện và phong cách trình bày.',
+      'Các đội thi đấu theo thể thức tranh biện ba người với kiến nghị được công bố mười lăm phút trước giờ thi đấu. Ban giám khảo gồm giáo viên và thành viên ban chủ nhiệm câu lạc bộ, đánh giá theo tiêu chí nội dung lập luận, khả năng phản biện và phong cách trình bày.',
     tags: ['thuyet-trinh', 'lanh-dao', 'thi-dau'],
     status: 'approved',
   },
@@ -447,7 +447,7 @@ export const EVENTS: SchoolEvent[] = [
     summary:
       'Vòng bảng giải cầu lông cấp trường ở các nội dung đơn nam và đơn nữ, dành cho học sinh các khối. Học sinh được thi đấu theo luật chính thức, rèn luyện thể chất và tích lũy kinh nghiệm thi đấu.',
     description:
-      'Các vận động viên được bốc thăm chia bảng, thi đấu vòng tròn một lượt, mỗi trận một ván hai mươi mốt điểm. Hai vận động viên dẫn đầu mỗi bảng vào vòng loại trực tiếp; học sinh tự chuẩn bị vợt, câu lạc bộ cung cấp cầu thi đấu.',
+      'Các vận động viên được bốc thăm chia bảng, thi đấu vòng tròn một lượt, mỗi trận một ván hai mươi mốt điểm. Hai vận động viên dẫn đầu mỗi bảng giành quyền vào vòng loại trực tiếp; học sinh tự chuẩn bị vợt, câu lạc bộ cung cấp cầu thi đấu.',
     tags: ['the-chat', 'thi-dau'],
     status: 'approved',
   },
@@ -475,7 +475,7 @@ export const EVENTS: SchoolEvent[] = [
   {
     id: 'ev-023',
     slug: 'on-tap-truc-tuyen-kien-thuc-toan-giua-hoc-ky-1',
-    title: 'Buổi ôn tập trực tuyến: Hệ thống kiến thức Toán giữa học kỳ I',
+    title: 'Buổi ôn tập trực tuyến: Hệ thống hóa kiến thức Toán giữa học kỳ I',
     clubId: 'toan-hoc',
     category: 'HT',
     format: 'online',
@@ -487,9 +487,9 @@ export const EVENTS: SchoolEvent[] = [
     seatsTaken: 71,
     registrationDeadline: '2026-10-28T23:59:00+07:00',
     summary:
-      'Buổi ôn tập trực tuyến hệ thống các nội dung trọng tâm của môn Toán trước kỳ kiểm tra giữa học kỳ I, dành cho học sinh các khối. Học sinh được ôn luyện các dạng bài thường gặp, qua đó chủ động chuẩn bị cho kỳ kiểm tra định kỳ.',
+      'Buổi ôn tập trực tuyến hệ thống hóa các nội dung trọng tâm của môn Toán trước kỳ kiểm tra giữa học kỳ I, dành cho học sinh các khối. Học sinh được ôn luyện các dạng bài thường gặp, qua đó chủ động chuẩn bị cho kỳ kiểm tra định kỳ.',
     description:
-      'Buổi ôn tập được chia thành ba phòng theo khối lớp, mỗi phòng do một giáo viên tổ Toán và hai thành viên câu lạc bộ phụ trách. Tài liệu tóm tắt kiến thức và bộ bài tập luyện tập được gửi tới học sinh đã đăng ký trước buổi ôn tập một ngày.',
+      'Buổi ôn tập được chia thành ba phòng theo khối lớp, mỗi phòng do một giáo viên tổ Toán và hai thành viên câu lạc bộ phụ trách. Tài liệu tóm tắt kiến thức và bộ bài tập được gửi tới học sinh đã đăng ký trước buổi ôn tập một ngày.',
     tags: ['hoc-thuat'],
     status: 'approved',
   },
@@ -510,9 +510,9 @@ export const EVENTS: SchoolEvent[] = [
     seatsTaken: 22,
     registrationDeadline: '2026-11-09T23:59:00+07:00',
     summary:
-      'Buổi giới thiệu thể lệ, yêu cầu kỹ thuật và kế hoạch chuẩn bị cho cuộc thi robotics dành cho học sinh trung học phổ thông. Học sinh được tìm hiểu cách thành lập đội thi, phân công vai trò và lộ trình luyện tập của câu lạc bộ.',
+      'Buổi giới thiệu thể lệ, yêu cầu kỹ thuật và kế hoạch chuẩn bị cho Cuộc thi Robotics dành cho học sinh trung học phổ thông. Học sinh được tìm hiểu cách thành lập đội thi, phân công vai trò và lộ trình luyện tập của câu lạc bộ.',
     description:
-      'Ban chủ nhiệm câu lạc bộ trình bày thể lệ cuộc thi, các vòng đánh giá và tiêu chí chấm điểm, đồng thời giới thiệu robot của đội tuyển năm học trước. Học sinh quan tâm được đăng ký vào nhóm cơ khí, nhóm lập trình hoặc nhóm thuyết trình để chuẩn bị cho mùa giải.',
+      'Ban chủ nhiệm câu lạc bộ trình bày thể lệ cuộc thi, các vòng đánh giá và tiêu chí chấm điểm, đồng thời giới thiệu robot của đội tuyển năm học trước. Học sinh quan tâm có thể đăng ký vào nhóm cơ khí, nhóm lập trình hoặc nhóm thuyết trình để chuẩn bị cho cuộc thi.',
     tags: ['cong-nghe', 'thi-dau', 'lam-viec-nhom'],
     status: 'approved',
   },
@@ -596,7 +596,7 @@ export const EVENTS: SchoolEvent[] = [
     summary:
       'Cuộc thi hùng biện bằng tiếng Anh dành cho học sinh khối 10 và khối 11, với chủ đề về vai trò của thanh niên trong phát triển bền vững. Học sinh được rèn luyện kỹ năng trình bày trước công chúng, sử dụng tiếng Anh học thuật và tư duy phản biện.',
     description:
-      'Thí sinh trình bày bài hùng biện đã chuẩn bị trong ba phút và trả lời một câu hỏi ngẫu nhiên của ban giám khảo. Các thí sinh đạt giải được câu lạc bộ đề cử tham gia các cuộc thi cấp cao hơn và được cấp giấy chứng nhận của nhà trường.',
+      'Thí sinh trình bày trong ba phút bài hùng biện đã chuẩn bị trước và trả lời một câu hỏi ngẫu nhiên của ban giám khảo. Các thí sinh đạt giải được câu lạc bộ đề cử tham gia các cuộc thi cấp cao hơn và được cấp giấy chứng nhận của nhà trường.',
     tags: ['tieng-anh', 'thuyet-trinh', 'du-hoc'],
     status: 'approved',
   },
@@ -701,7 +701,7 @@ export const EVENTS: SchoolEvent[] = [
     summary:
       'Chương trình hòa nhạc tổng kết hoạt động học kỳ I của câu lạc bộ, dành cho học sinh toàn trường. Học sinh được thưởng thức các tiết mục thanh nhạc, khí nhạc do thành viên câu lạc bộ biểu diễn, qua đó tìm hiểu thêm về hoạt động của câu lạc bộ.',
     description:
-      'Chương trình gồm các tiết mục đơn ca, song ca, hòa tấu nhạc cụ và hợp xướng do thành viên câu lạc bộ dàn dựng trong học kỳ I. Học sinh đăng ký được bố trí chỗ ngồi theo thứ tự đăng ký và có mặt tại hội trường trước giờ biểu diễn mười lăm phút.',
+      'Chương trình gồm các tiết mục đơn ca, song ca, hòa tấu nhạc cụ và hợp xướng do thành viên câu lạc bộ dàn dựng trong học kỳ I. Học sinh đã đăng ký được bố trí chỗ ngồi theo thứ tự đăng ký và cần có mặt tại hội trường trước giờ biểu diễn mười lăm phút.',
     tags: ['nghe-thuat', 'van-hoa'],
     status: 'approved',
   },
@@ -743,9 +743,9 @@ export const EVENTS: SchoolEvent[] = [
     seatsTaken: 389,
     registrationDeadline: '2027-01-26T23:59:00+07:00',
     summary:
-      'Hội xuân chào đón Tết Nguyên đán Đinh Mùi dành cho toàn thể học sinh, gồm gian hàng của các lớp, trò chơi dân gian và chương trình văn nghệ. Học sinh được tham gia các hoạt động văn hóa truyền thống, đồng thời góp phần gây quỹ cho các chương trình thiện nguyện của trường.',
+      'Hội xuân chào đón Tết Nguyên đán Đinh Mùi dành cho toàn thể học sinh, gồm gian hàng của các lớp, trò chơi dân gian và chương trình văn nghệ. Học sinh được tham gia các hoạt động văn hóa truyền thống, đồng thời góp phần gây quỹ hỗ trợ học sinh có hoàn cảnh khó khăn.',
     description:
-      'Mỗi lớp được bố trí một gian hàng ẩm thực hoặc sản phẩm thủ công; lợi nhuận được chuyển vào quỹ hỗ trợ học sinh có hoàn cảnh khó khăn. Hội đồng Học sinh phụ trách điều phối gian hàng, tổ chức khu trò chơi dân gian và hoạt động viết thư pháp đầu xuân.',
+      'Mỗi lớp được bố trí một gian hàng ẩm thực hoặc sản phẩm thủ công; số tiền thu được chuyển vào quỹ hỗ trợ học sinh có hoàn cảnh khó khăn. Hội đồng Học sinh phụ trách điều phối gian hàng, tổ chức khu trò chơi dân gian và hoạt động viết thư pháp đầu xuân.',
     tags: ['van-hoa', 'cong-dong', 'lam-viec-nhom'],
     status: 'approved',
   },
@@ -787,7 +787,7 @@ export const EVENTS: SchoolEvent[] = [
     summary:
       'Chuyên đề trực tuyến giới thiệu các kỹ thuật chứng minh bất đẳng thức thường gặp trong chương trình Toán trung học phổ thông và đề thi học sinh giỏi. Học sinh được luyện tập theo mức độ từ cơ bản đến nâng cao, qua đó củng cố năng lực lập luận toán học.',
     description:
-      'Nội dung gồm bất đẳng thức giữa trung bình cộng và trung bình nhân, bất đẳng thức Cauchy – Schwarz và phương pháp dồn biến, minh họa qua các bài toán chọn lọc. Học sinh nhận phiếu bài tập sau buổi học và gửi lời giải để được thành viên ban chủ nhiệm nhận xét.',
+      'Nội dung gồm bất đẳng thức giữa trung bình cộng và trung bình nhân, bất đẳng thức Bunhiacốpxki (Cauchy – Schwarz) và phương pháp dồn biến, minh họa qua các bài toán chọn lọc. Học sinh nhận phiếu bài tập sau buổi học và gửi lời giải để được thành viên ban chủ nhiệm nhận xét.',
     tags: ['hoc-thuat', 'thi-dau'],
     status: 'approved',
   },
@@ -934,7 +934,7 @@ export const EVENTS: SchoolEvent[] = [
     seatsTaken: 35,
     registrationDeadline: '2027-05-12T23:59:00+07:00',
     summary:
-      'Giải bóng rổ giao hữu tổng kết năm học, dành cho các đội học sinh thuộc các khối lớp, tổ chức sau kỳ kiểm tra cuối học kỳ II. Học sinh được rèn luyện thể chất, giao lưu giữa các khối và ghi nhận hoạt động thể thao trong năm học.',
+      'Giải bóng rổ giao hữu tổng kết năm học, dành cho các đội học sinh thuộc các khối lớp, tổ chức sau kỳ kiểm tra cuối học kỳ II. Học sinh được rèn luyện thể chất, giao lưu giữa các khối và tổng kết hoạt động thể thao của năm học.',
     description:
       'Các đội đăng ký theo lớp hoặc liên lớp, thi đấu vòng bảng và trận chung kết trong cùng buổi sáng. Câu lạc bộ phụ trách công tác trọng tài, bố trí nước uống và phối hợp với nhân viên y tế trực tại sân trong suốt thời gian thi đấu.',
     tags: ['the-chat', 'thi-dau', 'lam-viec-nhom'],

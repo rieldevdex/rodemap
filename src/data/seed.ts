@@ -36,7 +36,7 @@ export const SEED_PORTFOLIO: PortfolioEntry[] = [
     role: 'Thành viên tham gia',
     hours: 3,
     reflection:
-      'Buổi chia sẻ giúp tôi hiểu rõ các giai đoạn phát triển một sản phẩm học tập, từ xác định vấn đề, nghiên cứu người dùng đến kiểm thử và cải tiến. Tôi đặc biệt quan tâm đến phần nghiên cứu người dùng, bởi đây là cơ sở để nhóm phát triển đưa ra các quyết định thiết kế. Sau buổi chia sẻ, tôi đã đăng ký tham gia buổi chia sẻ tiếp theo của câu lạc bộ về nghiên cứu người dùng.',
+      'Buổi chia sẻ giúp tôi hiểu rõ các giai đoạn phát triển một sản phẩm học tập, từ xác định vấn đề, nghiên cứu người dùng đến kiểm thử và cải tiến. Tôi đặc biệt quan tâm đến phần nghiên cứu người dùng, bởi đây là cơ sở để nhóm phát triển đưa ra các quyết định thiết kế. Sau buổi chia sẻ, tôi đã đăng ký tham gia buổi tiếp theo của câu lạc bộ về chủ đề này.',
     reflectionSource: 'student',
     evidenceLinks: ['https://example.com/minh-chung/inkstep-quy-trinh-phat-trien-san-pham'],
     createdAt: '2026-09-26T19:00:00+07:00',
@@ -49,7 +49,7 @@ export const SEED_PORTFOLIO: PortfolioEntry[] = [
     role: 'Thành viên nhóm thu gom và phân loại rác thải',
     hours: 2.5,
     reflection:
-      'Tôi tham gia Chương trình Chủ nhật Xanh với vai trò thành viên nhóm thu gom và phân loại rác thải tại khu vực cổng trường. Qua hoạt động, tôi được hướng dẫn phân loại rác thải tại nguồn và phối hợp với các thành viên khác để hoàn thành khu vực được phân công. Hoạt động góp phần nâng cao ý thức bảo vệ môi trường của bản thân và các bạn cùng tham gia.',
+      'Tôi tham gia Chương trình Chủ nhật Xanh với vai trò thành viên nhóm thu gom và phân loại rác thải tại khu vực cổng trường. Qua hoạt động, tôi được hướng dẫn phân loại rác thải tại nguồn và phối hợp với các thành viên khác để hoàn thành công việc tại khu vực được phân công. Hoạt động góp phần nâng cao ý thức bảo vệ môi trường của bản thân và các bạn cùng tham gia.',
     reflectionSource: 'mochi_draft',
     evidenceLinks: [],
     createdAt: '2026-09-27T19:30:00+07:00',

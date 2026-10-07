@@ -131,7 +131,7 @@ describe('executors', () => {
     if (!e) throw new Error('fixture');
     const b = eventBrief(e, ctx());
     expect(b.time).toMatch(/^\d{2}:\d{2}–\d{2}:\d{2}$/);
-    expect(b.registration_deadline).toMatch(/^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/);
+    expect(b.registration_deadline).toMatch(/^\d{2}:\d{2} ngày \d{2}\/\d{2}\/\d{4}$/);
   });
 });
 

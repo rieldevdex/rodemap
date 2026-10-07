@@ -4,11 +4,11 @@
  * It reuses the same tool executors as online mode, so cards and facts are identical.
  */
 import { CATEGORY_LABELS } from '../../domain/category-labels';
-import { addDays, formatDate, formatDayLabel, formatTimeRange, toIsoDate } from '../../domain/dates';
+import { addDays, formatDate, formatLongDate, formatTimeRange, toIsoDate } from '../../domain/dates';
 import { eventEnd, eventStart, isPast } from '../../domain/events';
 import { windowRange, type DateWindow } from '../../domain/filters';
 import { groupByCategory, totalHours } from '../../domain/portfolio';
-import { foldVietnamese } from '../../domain/text';
+import { foldVietnamese, formatHours } from '../../domain/text';
 import type { SchoolEvent } from '../../domain/types';
 import { CLUBS } from '../../data/clubs';
 import { tagLabel } from '../../data/tags';
@@ -98,11 +98,13 @@ export function windowInText(text: string): DateWindow | undefined {
   return undefined;
 }
 
-const line = (e: SchoolEvent) => `${formatDayLabel(eventStart(e))}, ${formatTimeRange(eventStart(e), eventEnd(e))}`;
-const clubName = (id: string) => CLUBS.find((c) => c.id === id)?.shortName ?? '';
+const line = (e: SchoolEvent) => `${formatLongDate(eventStart(e))}, ${formatTimeRange(eventStart(e), eventEnd(e))}`;
+const clubName = (id: string) => CLUBS.find((c) => c.id === id)?.name ?? '';
+/** "Tiếng Anh" → "tiếng Anh": only the first letter is lowered, so proper names keep their capitals. */
+const lowerFirst = (text: string) => text.charAt(0).toLocaleLowerCase('vi') + text.slice(1);
 
 const SUGGESTION_HINT =
-  'Bạn có thể nhắn: “Gợi ý sự kiện tuần tới”, “Đăng ký …”, “Lịch của tôi”, “Tóm tắt tuần này” hoặc “Hồ sơ năng lực”.';
+  'Bạn có thể nhập: “Gợi ý sự kiện tuần tới”, “Đăng ký …”, “Lịch của tôi”, “Tóm tắt tuần này” hoặc “Hồ sơ năng lực”.';
 
 function recommendReply(text: string, ctx: OfflineContext): OfflineReply {
   const window = windowInText(text);
@@ -116,18 +118,18 @@ function recommendReply(text: string, ctx: OfflineContext): OfflineReply {
   if (recs.length === 0) {
     return {
       intent: 'recommend',
-      text: 'Trong khoảng thời gian này, Mochi chưa tìm thấy sự kiện phù hợp còn mở đăng ký. Bạn có thể mở rộng thời gian tìm kiếm tại trang Khám phá sự kiện.',
+      text: 'Mochi chưa tìm thấy sự kiện phù hợp còn mở đăng ký trong khoảng thời gian đã chọn. Bạn có thể mở rộng khoảng thời gian tìm kiếm tại trang Khám phá sự kiện.',
       cards: [],
     };
   }
   const intro = ctx.state.profile
     ? `Dựa trên hồ sơ của bạn, Mochi đề xuất ${recs.length} sự kiện sau:`
-    : `Bạn chưa thiết lập hồ sơ, vì vậy Mochi đề xuất ${recs.length} sự kiện sắp diễn ra. Sau khi thiết lập hồ sơ, đề xuất sẽ phù hợp hơn với bạn:`;
+    : `Bạn chưa thiết lập hồ sơ; sau khi thiết lập, các đề xuất sẽ phù hợp hơn với bạn. Mochi đề xuất ${recs.length} sự kiện sắp diễn ra như sau:`;
   const items = recs.map((r) => `– ${r.title} (${r.date}, ${r.time})${r.reasons[0] ? `: ${r.reasons[0].toLocaleLowerCase('vi')}.` : '.'}`);
   const first = recs[0];
   return {
     intent: 'recommend',
-    text: [intro, items.join('\n'), `Bạn có thể nhấn Đăng ký trên thẻ bên dưới hoặc nhắn “Đăng ký ${first?.title ?? 'tên sự kiện'}” để Mochi chuẩn bị thẻ xác nhận.`].join('\n\n'),
+    text: [intro, items.join('\n'), `Bạn có thể nhấn Đăng ký trên thẻ bên dưới hoặc nhập “Đăng ký ${first?.title ?? 'tên sự kiện'}” để Mochi chuẩn bị thẻ xác nhận.`].join('\n\n'),
     cards: out.card ? [out.card] : [],
     ...(first ? { focusEventId: first.id } : {}),
   };
@@ -146,7 +148,7 @@ function registrationReply(intent: 'register' | 'unregister', text: string, ctx:
       intent,
       text:
         intent === 'register'
-          ? 'Mochi chưa xác định được sự kiện bạn muốn đăng ký. Vui lòng nêu tên sự kiện, ví dụ: “Đăng ký Hội thảo Kỹ năng thuyết trình”, hoặc nhắn “Gợi ý sự kiện” để xem đề xuất.'
+          ? `Mochi chưa xác định được sự kiện bạn muốn đăng ký. Vui lòng nêu tên sự kiện, ví dụ: “Đăng ký ${upcoming[0]?.title ?? '[tên sự kiện]'}”, hoặc nhập “Gợi ý sự kiện” để xem đề xuất.`
           : 'Mochi chưa xác định được sự kiện bạn muốn hủy đăng ký. Vui lòng nêu tên một sự kiện trong lịch của bạn.',
       cards: [],
     };
@@ -160,16 +162,16 @@ function registrationReply(intent: 'register' | 'unregister', text: string, ctx:
         ? [`Mochi đã chuẩn bị thẻ xác nhận đăng ký ${facts}.`]
         : [`Mochi đã chuẩn bị thẻ xác nhận hủy đăng ký ${facts}.`];
     if (r.conflicts && r.conflicts.length > 0) parts.push(`Lưu ý: sự kiện trùng thời gian với ${r.conflicts.map((c) => `“${c.title}”`).join(', ')}.`);
-    if (r.exceeds_weekly_budget) parts.push('Lưu ý: đăng ký sự kiện này sẽ vượt quỹ giờ trong tuần của bạn.');
+    if (r.exceeds_weekly_budget) parts.push('Lưu ý: nếu đăng ký sự kiện này, tổng số giờ trong tuần sẽ vượt quỹ giờ mỗi tuần của bạn.');
     parts.push('Vui lòng kiểm tra thông tin trên thẻ và nhấn Xác nhận để hoàn tất.');
     return { intent, text: parts.join(' '), cards: out.card ? [out.card] : [], focusEventId: event.id };
   }
   if (r.status === 'already_registered') {
-    return { intent, text: `Bạn đã đăng ký ${facts}. Sự kiện đã có trong Lộ trình và Lịch của tôi.`, cards: [], focusEventId: event.id };
+    return { intent, text: `Bạn đã đăng ký ${facts}. Sự kiện đã có trong trang Lộ trình và trang Lịch của tôi.`, cards: [], focusEventId: event.id };
   }
   return {
     intent,
-    text: `Mochi không thể chuẩn bị thao tác cho ${facts}: ${(r.reason ?? '').toLocaleLowerCase('vi')} Bạn có thể nhắn “Gợi ý sự kiện” để xem các sự kiện còn mở đăng ký.`,
+    text: `Mochi không thể chuẩn bị thẻ xác nhận cho ${facts}: ${lowerFirst(r.reason ?? '')} Bạn có thể nhập “Gợi ý sự kiện” để xem các sự kiện còn mở đăng ký.`,
     cards: [],
     focusEventId: event.id,
   };
@@ -180,7 +182,7 @@ function calendarReply(ctx: OfflineContext): OfflineReply {
   if (mine.length === 0) {
     return {
       intent: 'calendar',
-      text: 'Bạn chưa đăng ký sự kiện nào sắp diễn ra. Mochi có thể đề xuất sự kiện phù hợp nếu bạn nhắn “Gợi ý sự kiện”.',
+      text: 'Bạn chưa đăng ký sự kiện nào sắp diễn ra. Mochi có thể đề xuất sự kiện phù hợp nếu bạn nhập “Gợi ý sự kiện”.',
       cards: [],
     };
   }
@@ -213,7 +215,7 @@ function summaryReply(text: string, ctx: OfflineContext): OfflineReply {
   parts.push(
     r.event_count === 0
       ? `${r.period}: Rodemap chưa có sự kiện nào trong khoảng thời gian này.`
-      : `${r.period}: Rodemap có ${r.event_count} sự kiện thuộc các lĩnh vực ${cats.join(', ')}.`,
+      : `${r.period}: Rodemap có ${r.event_count} sự kiện, phân theo nhóm: ${cats.join(', ')}.`,
   );
   parts.push(
     r.my_events.length > 0
@@ -223,8 +225,8 @@ function summaryReply(text: string, ctx: OfflineContext): OfflineReply {
   if (r.registration_deadlines.length > 0) {
     parts.push(`Các hạn đăng ký cần lưu ý: ${r.registration_deadlines.slice(0, 4).map((d) => `“${d.title}” (${d.deadline})`).join('; ')}.`);
   }
-  for (const p of r.calendar_periods) parts.push(`Lưu ý: ${p.label} từ ${p.from} đến ${p.to}.`);
-  parts.push('Bạn có thể nhắn “Gợi ý sự kiện” để Mochi đề xuất các hoạt động phù hợp.');
+  for (const p of r.calendar_periods) parts.push(`Lưu ý: ${p.label} diễn ra từ ${p.from} đến ${p.to}.`);
+  parts.push('Bạn có thể nhập “Gợi ý sự kiện” để Mochi đề xuất các hoạt động phù hợp.');
   return { intent: 'summary', text: parts.join('\n\n'), cards: [] };
 }
 
@@ -252,19 +254,22 @@ function eventQuestionReply(text: string, ctx: OfflineContext): OfflineReply {
     conflicts_with_plan: { title: string }[];
   };
   const parts = [
-    `“${event.title}” do ${d.club} tổ chức vào ${d.date}, ${d.time}, tại ${d.location} (${d.format.toLocaleLowerCase('vi')}). Sự kiện dành cho ${d.eligible_grades.toLocaleLowerCase('vi')}; hiện còn ${d.seats_left} chỗ; hạn đăng ký: ${d.registration_deadline}. Trạng thái: ${d.status.toLocaleLowerCase('vi')}.`,
+    `“${event.title}” do ${d.club} tổ chức vào ${d.date}, ${d.time}, ${event.format === 'online' ? `theo hình thức trực tuyến (${d.location.replace(/^Trực tuyến\s*[–-]\s*/, '')})` : `tại ${d.location}`}. Sự kiện dành cho ${d.eligible_grades.toLocaleLowerCase('vi')}${
+      isPast(event, ctx.now) ? '' : d.seats_left > 0 ? `; hiện còn ${String(d.seats_left)} chỗ; hạn đăng ký: ${d.registration_deadline}` : '; hiện đã hết chỗ'
+    }. Trạng thái: ${d.status.toLocaleLowerCase('vi')}.`,
     d.summary,
   ];
   if (d.conflicts_with_plan.length > 0) parts.push(`Lưu ý: sự kiện trùng thời gian với ${d.conflicts_with_plan.map((c) => `“${c.title}”`).join(', ')} trong lịch của bạn.`);
-  if (d.status === 'Còn chỗ') parts.push('Nếu bạn muốn tham gia, vui lòng nhắn “Đăng ký sự kiện này” để Mochi chuẩn bị thẻ xác nhận.');
+  if (d.status === 'Còn chỗ') parts.push('Nếu bạn muốn tham gia, vui lòng nhập “Đăng ký sự kiện này” để Mochi chuẩn bị thẻ xác nhận.');
   return { intent: 'event_question', text: parts.join('\n\n'), cards: [{ kind: 'events', title: 'Sự kiện', eventIds: [event.id] }], focusEventId: event.id };
 }
 
 /** A clearly provisional reflection built only from the event's facts. */
 export function offlineDraft(e: SchoolEvent): string {
-  const topics = e.tags.slice(0, 2).map((t) => tagLabel(t).toLocaleLowerCase('vi'));
+  const topics = e.tags.slice(0, 2).map((t) => lowerFirst(tagLabel(t)));
   const topicText = topics.length > 0 ? `về ${topics.join(' và ')}` : 'thêm về lĩnh vực này';
-  return `Tôi đã tham gia ${e.title} do ${clubName(e.clubId)} tổ chức ngày ${formatDate(eventStart(e))}. Thông qua hoạt động thuộc lĩnh vực ${CATEGORY_LABELS[e.category].toLocaleLowerCase('vi')}, tôi có điều kiện tìm hiểu ${topicText}. [Bổ sung: vai trò cụ thể của bạn, điều bạn học được và kế hoạch tiếp theo.]`;
+  const scope = e.category === 'TS' ? 'hoạt động chung của toàn trường' : `hoạt động thuộc lĩnh vực ${CATEGORY_LABELS[e.category].toLocaleLowerCase('vi')}`;
+  return `Tôi đã tham gia ${e.title} do ${clubName(e.clubId)} tổ chức vào ngày ${formatDate(eventStart(e))}. Thông qua ${scope}, tôi có điều kiện tìm hiểu ${topicText}. [Bổ sung: vai trò cụ thể của bạn, điều bạn học được và kế hoạch tiếp theo.]`;
 }
 
 function portfolioReply(text: string, ctx: OfflineContext): OfflineReply {
@@ -273,8 +278,8 @@ function portfolioReply(text: string, ctx: OfflineContext): OfflineReply {
   const parts: string[] = [];
   const cards: MochiCard[] = [];
   if (entries.length > 0) {
-    const groups = groupByCategory(entries).map((g) => `${CATEGORY_LABELS[g.category]} (${g.hours} giờ)`);
-    parts.push(`Hồ sơ năng lực của bạn hiện có ${entries.length} hoạt động, tổng cộng ${totalHours(entries)} giờ: ${groups.join(', ')}.`);
+    const groups = groupByCategory(entries).map((g) => `${CATEGORY_LABELS[g.category]} (${formatHours(g.hours)} giờ)`);
+    parts.push(`Hồ sơ năng lực của bạn hiện có ${entries.length} hoạt động, tổng cộng ${formatHours(totalHours(entries))} giờ: ${groups.join(', ')}.`);
   } else {
     parts.push('Hồ sơ năng lực của bạn chưa có hoạt động nào.');
   }
@@ -292,10 +297,10 @@ function portfolioReply(text: string, ctx: OfflineContext): OfflineReply {
     const out = executeTool('draft_portfolio_entry', { event_id: event.id, draft_reflection: offlineDraft(event), role: needsReflection?.role ?? 'Thành viên tham gia' }, ctx);
     if (out.card) {
       cards.push(out.card);
-      parts.push(`Mochi đề xuất bản nháp phần tự đánh giá cho “${event.title}”. Đây là bản nháp do Mochi đề xuất; bạn cần chỉnh sửa trước khi sử dụng.`);
+      parts.push(`Mochi đã soạn bản nháp phần tự đánh giá cho “${event.title}”. Đây là bản nháp do Mochi đề xuất; bạn cần chỉnh sửa trước khi sử dụng.`);
     }
   }
-  parts.push('Bạn có thể xem và xuất bản in tại trang Hồ sơ năng lực.');
+  parts.push('Bạn có thể xem và in hồ sơ tại trang Hồ sơ năng lực.');
   return { intent: 'portfolio', text: parts.join('\n\n'), cards };
 }
 
@@ -306,7 +311,7 @@ export function respondOffline(text: string, ctx: OfflineContext): OfflineReply 
     case 'privacy':
       return {
         intent,
-        text: 'Để bảo vệ thông tin cá nhân, bạn không cần chia sẻ số điện thoại, địa chỉ hay mật khẩu với Mochi. Mochi chỉ sử dụng dữ liệu hoạt động ngoại khóa của Rodemap. ' + SUGGESTION_HINT,
+        text: 'Để bảo vệ thông tin cá nhân, bạn vui lòng không chia sẻ số điện thoại, địa chỉ hay mật khẩu với Mochi. Mochi chỉ sử dụng dữ liệu hoạt động ngoại khóa của Rodemap. ' + SUGGESTION_HINT,
         cards: [],
       };
     case 'unregister':

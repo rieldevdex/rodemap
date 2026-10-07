@@ -9,7 +9,7 @@ export const CLUBS: Club[] = [
     name: 'Hội đồng Học sinh',
     shortName: 'HĐHS',
     description:
-      'Hội đồng Học sinh là tổ chức đại diện cho học sinh toàn trường, phụ trách điều phối các sự kiện toàn trường và kết nối hoạt động giữa các câu lạc bộ. Hội đồng đồng thời tiếp nhận và kiểm duyệt sự kiện do các câu lạc bộ đề xuất trước khi công bố tới học sinh.',
+      'Hội đồng Học sinh là tổ chức đại diện cho học sinh toàn trường, phụ trách điều phối các sự kiện toàn trường và kết nối hoạt động giữa các câu lạc bộ. Bên cạnh đó, Hội đồng tiếp nhận và kiểm duyệt sự kiện do các câu lạc bộ đề xuất trước khi công bố tới học sinh.',
     categories: ['TS', 'KN'],
     contact: '[Email Hội đồng Học sinh]',
   },

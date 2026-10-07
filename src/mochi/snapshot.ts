@@ -29,7 +29,7 @@ export function buildSnapshot(state: AppState, now: Millis, full: boolean): stri
           top_interests: p.topInterests.map((c) => CATEGORY_LABELS[c]),
           goals: p.goals.map((g) => GOALS.find((x) => x.id === g)?.label ?? g),
           availability: [
-            p.availability.weekdayAfterSchool ? 'các ngày trong tuần sau 16:30' : null,
+            p.availability.weekdayAfterSchool ? 'từ Thứ Hai đến Thứ Sáu, từ 16:30' : null,
             p.availability.weekend ? 'cuối tuần' : null,
           ].filter(Boolean),
           weekly_hour_budget: p.weeklyHourBudget,
