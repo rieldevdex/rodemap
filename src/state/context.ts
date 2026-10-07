@@ -1,5 +1,4 @@
 import { createContext, type Dispatch } from 'react';
-import type { Millis } from '../domain/types';
 import type { Action } from './actions';
 import type { AppState } from './schema';
 

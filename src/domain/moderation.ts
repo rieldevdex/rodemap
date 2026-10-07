@@ -1,5 +1,5 @@
 /** Moderation workflow for club submissions. Pure. */
-import type { EventStatus, IsoDateTime, ReviewAction, Submission } from './types';
+import type { EventStatus, IsoDateTime, ReviewAction, ReviewActor, ReviewNote, Submission } from './types';
 
 const TRANSITIONS: Record<ReviewAction, { from: readonly EventStatus[]; to: EventStatus; needsReason: boolean }> = {
   submit: { from: ['draft'], to: 'pending', needsReason: false },
@@ -37,8 +37,8 @@ export function applyReview(
   if (rule.needsReason && trimmed === '') {
     throw new Error(`A reason is required for ${action}`);
   }
-  const actor = action === 'submit' || action === 'resubmit' ? 'club' : 'hdhs';
-  const note = trimmed === '' ? { at, actor, action } : { at, actor, action, reason: trimmed };
+  const actor: ReviewActor = action === 'submit' || action === 'resubmit' ? 'club' : 'hdhs';
+  const note: ReviewNote = trimmed === '' ? { at, actor, action } : { at, actor, action, reason: trimmed };
   return {
     submission: { ...sub, history: [...sub.history, note] },
     status: rule.to,

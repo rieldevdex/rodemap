@@ -1,0 +1,188 @@
+/* Mochi — colors only from --mochi-* tokens (plus the signal badge). */
+
+.mochi {
+  display: block;
+  overflow: visible;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.mochi__line {
+  fill: var(--mochi-outline);
+  stroke: var(--mochi-outline);
+  stroke-width: calc(var(--mochi-stroke) * 2);
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.mochi__fill {
+  fill: var(--mochi-body);
+}
+
+.mochi__inner {
+  fill: var(--mochi-blush);
+}
+
+.mochi__eye {
+  fill: var(--mochi-outline);
+}
+
+.mochi__mouth {
+  fill: none;
+  stroke: var(--mochi-outline);
+  stroke-width: var(--mochi-stroke);
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.mochi__badge-ring {
+  fill: var(--color-signal);
+}
+
+.mochi__badge-dot {
+  fill: var(--mochi-body);
+}
+
+/* ── Moving parts ─────────────────────────────────────────────────── */
+
+.mochi__figure,
+.mochi__ear,
+.mochi__eyes,
+.mochi__mouth {
+  transform-box: fill-box;
+  transition: transform var(--dur-med) var(--ease-spring);
+}
+
+.mochi__figure {
+  transform-origin: 50% 100%;
+}
+
+.mochi__ear {
+  transform-origin: 50% 100%;
+}
+
+.mochi__eyes,
+.mochi__mouth {
+  transform-origin: 50% 50%;
+}
+
+/* idle: slow blink */
+.mochi[data-state='idle'] .mochi__eyes {
+  animation: mochi-blink var(--dur-idle) var(--ease-linear) infinite;
+}
+
+/* listening: ears lift apart, eyes open a little wider */
+.mochi[data-state='listening'] .mochi__ear--left {
+  transform: rotate(-7deg);
+}
+
+.mochi[data-state='listening'] .mochi__ear--right {
+  transform: rotate(7deg);
+}
+
+.mochi[data-state='listening'] .mochi__eyes {
+  transform: scale(1.15);
+}
+
+/* thinking: ears twitch in turn, eyes glance up */
+.mochi[data-state='thinking'] .mochi__ear--right {
+  animation: mochi-twitch var(--dur-slow) var(--ease-out) infinite alternate;
+}
+
+.mochi[data-state='thinking'] .mochi__ear--left {
+  animation: mochi-twitch var(--dur-slow) var(--ease-out) var(--dur-med) infinite alternate-reverse;
+}
+
+.mochi[data-state='thinking'] .mochi__eyes {
+  transform: translateY(-30%);
+}
+
+/* answering: a gentle breathing squash */
+.mochi[data-state='answering'] .mochi__figure {
+  animation: mochi-breathe var(--dur-slow) var(--ease-out) infinite alternate;
+}
+
+/* celebrating: a small hop */
+.mochi[data-state='celebrating'] .mochi__figure {
+  animation: mochi-hop var(--dur-slow) var(--ease-spring) 2;
+}
+
+.mochi[data-state='celebrating'] .mochi__mouth {
+  transform: scale(1.25);
+}
+
+/* error: one ear down */
+.mochi[data-state='error'] .mochi__ear--right {
+  transform: rotate(118deg);
+}
+
+.mochi[data-state='error'] .mochi__eyes {
+  transform: scaleY(0.55);
+}
+
+.mochi[data-state='error'] .mochi__mouth {
+  transform: scaleY(-0.7);
+}
+
+@keyframes mochi-blink {
+  0%,
+  93%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  96% {
+    transform: scaleY(0.12);
+  }
+}
+
+@keyframes mochi-twitch {
+  0%,
+  60% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(9deg);
+  }
+}
+
+@keyframes mochi-breathe {
+  from {
+    transform: scale(1, 1);
+  }
+
+  to {
+    transform: scale(1.02, 0.975);
+  }
+}
+
+@keyframes mochi-hop {
+  0% {
+    transform: translateY(0) scale(1, 1);
+  }
+
+  20% {
+    transform: translateY(0) scale(1.06, 0.92);
+  }
+
+  50% {
+    transform: translateY(-14%) scale(0.97, 1.04);
+  }
+
+  80% {
+    transform: translateY(0) scale(1.04, 0.95);
+  }
+
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mochi *,
+  .mochi {
+    animation: none !important;
+    transition: none !important;
+  }
+}

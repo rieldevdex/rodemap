@@ -90,7 +90,7 @@ export function reducer(state: AppState, action: Action): AppState {
 
     case 'submission/resubmit': {
       const sub = state.submissions.find((s) => s.id === action.submissionId);
-      if (!sub || sub.eventId !== action.event.id) return state;
+      if (sub?.eventId !== action.event.id) return state;
       const status = effectiveStatus(state, sub.eventId);
       if (!status || !canTransition(status, 'resubmit')) return state;
       const result = applyReview(sub, status, 'resubmit', action.at);
