@@ -144,7 +144,8 @@ Scale (fluid): `--text-xs` 12 · `--text-sm` 14 · `--text-md` 16 ·
 - Layers `--z-base` 0, `--z-sticky` 10, `--z-dock` 40, `--z-panel` 50,
   `--z-overlay` 60, `--z-toast` 70.
 - Misc: chip category edge `--chip-edge` 4 px; icons `--size-icon` 20 px /
-  `--size-icon-sm` 16 px; header `--header-h` 64 px; grid gap `--grid-gap`
+  `--size-icon-sm` 16 px; header `--header-h` 64 px; RouteMap user unit
+  `--map-unit` 1 px (the horizontal map renders its geometry 1:1); grid gap `--grid-gap`
   24 px (`--grid-gap-phone` 16 px).
 - Exam zones on the RouteMap ("Kiểm tra định kỳ") are a diagonal hatch built
   from `--color-rule` (`--hatch-exam`), never a new color.
