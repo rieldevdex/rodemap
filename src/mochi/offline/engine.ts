@@ -267,7 +267,7 @@ export function offlineDraft(e: SchoolEvent): string {
   return `Tôi đã tham gia ${e.title} do ${clubName(e.clubId)} tổ chức ngày ${formatDate(eventStart(e))}. Thông qua hoạt động thuộc lĩnh vực ${CATEGORY_LABELS[e.category].toLocaleLowerCase('vi')}, tôi có điều kiện tìm hiểu ${topicText}. [Bổ sung: vai trò cụ thể của bạn, điều bạn học được và kế hoạch tiếp theo.]`;
 }
 
-function portfolioReply(ctx: OfflineContext): OfflineReply {
+function portfolioReply(text: string, ctx: OfflineContext): OfflineReply {
   const pending = selectPendingAttendance(ctx.state, ctx.now);
   const entries = ctx.state.portfolio;
   const parts: string[] = [];
@@ -281,8 +281,13 @@ function portfolioReply(ctx: OfflineContext): OfflineReply {
   if (pending.length > 0) {
     parts.push(`Bạn có ${pending.length} sự kiện đã diễn ra cần xác nhận tham gia: ${pending.map((e) => `“${e.title}”`).join(', ')}. Vui lòng xác nhận tại trang Tổng quan để bổ sung vào hồ sơ.`);
   }
-  const needsReflection = entries.find((p) => p.reflection.trim() === '' || p.reflectionSource === 'mochi_draft');
-  const event = needsReflection ? selectPublicEvents(ctx.state).find((e) => e.id === needsReflection.eventId) : undefined;
+  // A named attended event wins; otherwise the first entry still without the student's own reflection.
+  const entryEvents = selectPublicEvents(ctx.state).filter((e) => entries.some((p) => p.eventId === e.id));
+  const named = findEventInText(text, entryEvents, ctx.now);
+  const needsReflection = named
+    ? entries.find((p) => p.eventId === named.id)
+    : entries.find((p) => p.reflection.trim() === '' || p.reflectionSource === 'mochi_draft');
+  const event = needsReflection ? entryEvents.find((e) => e.id === needsReflection.eventId) : undefined;
   if (event) {
     const out = executeTool('draft_portfolio_entry', { event_id: event.id, draft_reflection: offlineDraft(event), role: needsReflection?.role ?? 'Thành viên tham gia' }, ctx);
     if (out.card) {
@@ -308,7 +313,7 @@ export function respondOffline(text: string, ctx: OfflineContext): OfflineReply 
     case 'register':
       return registrationReply(intent, text, ctx);
     case 'portfolio':
-      return portfolioReply(ctx);
+      return portfolioReply(text, ctx);
     case 'calendar':
       return calendarReply(ctx);
     case 'summary':

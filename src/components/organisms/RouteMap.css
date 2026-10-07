@@ -6,15 +6,43 @@
 
 .route-map__scroll {
   position: relative;
-  overflow: auto;
   background: var(--color-surface);
   border-block: var(--rule-hair) solid var(--color-rule);
+}
+
+/* A horizontal year map scrolls inside itself; the page never scrolls sideways. */
+.route-map--scrolls .route-map__scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
   overscroll-behavior-inline: contain;
-  scrollbar-color: var(--color-rule) transparent;
+  scrollbar-color: var(--color-ink-2) var(--color-surface-2);
+  scrollbar-width: thin;
+}
+
+/* Vertical maps flow with the page: clip (not hidden) keeps the sticky line codes working. */
+.route-map--vertical .route-map__scroll {
+  overflow-x: clip;
+}
+
+.route-map--fit .route-map__scroll {
+  overflow: visible;
+}
+
+.route-map__track {
+  display: flex;
+}
+
+.route-map--scrolls .route-map__track {
+  inline-size: max-content;
+}
+
+.route-map--vertical .route-map__track {
+  flex-direction: column;
 }
 
 .route-map__canvas {
   position: relative;
+  flex: none;
 }
 
 .route-map--horizontal .route-map__canvas {
@@ -29,15 +57,72 @@
   aspect-ratio: var(--map-w) / var(--map-h);
 }
 
-.route-map--fit .route-map__scroll {
-  overflow: visible;
-}
-
 .route-map__svg {
   display: block;
   inline-size: 100%;
   block-size: 100%;
   overflow: visible;
+}
+
+/* ── Pinned line codes ───────────────────────────────────────────── */
+
+/* Horizontal: a frozen column at the leading edge, like the first column of a timetable. */
+.route-map__lane-column {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 1;
+  flex: none;
+  inline-size: 0;
+}
+
+.route-map__lane-column::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: calc(var(--space-7) + var(--space-2));
+  background: var(--color-surface);
+  border-inline-end: var(--rule-hair) solid var(--color-rule);
+}
+
+.route-map__lane-column .route-map__lane-code {
+  position: absolute;
+  inset-block-start: calc(var(--pos) * 100%);
+  inset-inline-start: var(--space-3);
+  translate: 0 -50%;
+}
+
+/* Vertical: a sticky row under the site header while the page scrolls. */
+.route-map__lane-head {
+  position: sticky;
+  inset-block-start: var(--header-h);
+  z-index: 1;
+  block-size: calc(var(--space-6) + var(--space-2));
+  background: var(--color-surface);
+  border-block-end: var(--rule-hair) solid var(--color-rule);
+}
+
+.route-map__lane-head .route-map__lane-code {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: calc(var(--pos) * 100%);
+  translate: -50% -50%;
+}
+
+.route-map__lane-code,
+.route-map__legend-code {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: calc(var(--space-6) + var(--space-1));
+  padding: calc(var(--space-1) / 2) var(--space-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-caps);
+  line-height: var(--leading-snug);
+  color: var(--line-text);
+  background: var(--lane-color);
+  border-radius: var(--radius-sm);
 }
 
 /* ── Zones, periods, ticks ───────────────────────────────────────── */
@@ -48,7 +133,12 @@
 
 .route-map__zone--odd {
   fill: var(--color-surface-2);
-  fill-opacity: 0.55;
+  fill-opacity: 0.5;
+}
+
+.route-map__zone-edge {
+  stroke: var(--color-rule);
+  stroke-width: var(--rule-hair);
 }
 
 .route-map__period {
@@ -61,12 +151,17 @@
   stroke-width: var(--rule-strong);
 }
 
+.route-map__holiday-dot {
+  fill: var(--color-ink-2);
+  fill-opacity: 0.45;
+}
+
 .route-map__period--holiday {
-  opacity: 0.6;
+  stroke-dasharray: 4 4;
 }
 
 .route-map__tick {
-  stroke: var(--color-rule);
+  stroke: var(--color-ink-2);
   stroke-width: var(--rule-hair);
 }
 
@@ -84,17 +179,25 @@
   stroke-linecap: round;
 }
 
-.route-map__mine {
+.route-map__mine path {
   fill: none;
-  stroke: var(--color-signal);
-  stroke-width: var(--route-w-you);
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: var(--route-total);
-  stroke-dashoffset: 0;
 }
 
-.route-map__mine--grow {
+.route-map__mine-casing {
+  stroke: var(--color-surface);
+  stroke-width: calc(var(--route-w-you) + var(--route-w));
+}
+
+.route-map__mine-line {
+  stroke: var(--color-signal);
+  stroke-width: var(--route-w-you);
+}
+
+/* Growth: both paths reveal from the length seen last time to the full route. */
+.route-map__mine--grow path {
+  stroke-dasharray: var(--route-total) var(--route-total);
   animation: route-grow var(--dur-slow) var(--ease-out) both;
 }
 
@@ -128,9 +231,7 @@
   stroke-width: var(--focus-w);
 }
 
-.route-map__stop,
-.route-map__ring,
-.route-map__dot {
+.route-map__visual {
   transform-box: fill-box;
   transform-origin: center;
   transition: transform var(--dur-fast) var(--ease-out);
@@ -142,21 +243,25 @@
   stroke-width: var(--station-ring);
 }
 
+.route-map__interchange-ring {
+  fill: var(--color-surface);
+  stroke: var(--color-ink);
+  stroke-width: var(--station-ring);
+}
+
 .route-map__ring {
   fill: var(--color-surface);
   stroke: var(--color-signal);
   stroke-width: var(--station-ring);
 }
 
-.route-map__dot {
+.route-map__core {
   fill: var(--lane-color);
 }
 
-.route-map__station:hover .route-map__stop,
-.route-map__station:hover .route-map__ring,
-.route-map__station:focus-visible .route-map__stop,
-.route-map__station:focus-visible .route-map__ring {
-  transform: scale(1.25);
+.route-map__station:hover .route-map__visual,
+.route-map__station:focus-visible .route-map__visual {
+  transform: scale(1.3);
 }
 
 .route-map__station:focus-visible .route-map__hit {
@@ -180,19 +285,20 @@
   font-size: var(--text-xs);
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-caps);
+  line-height: var(--leading-snug);
   text-transform: uppercase;
   color: var(--color-ink-2);
   white-space: nowrap;
 }
 
 .route-map--horizontal .route-map__month {
-  inset-block-start: var(--space-2);
+  inset-block-start: var(--space-3);
   inset-inline-start: calc(var(--from) * 100% + var(--space-2));
 }
 
 .route-map--vertical .route-map__month {
-  inset-block-start: calc(var(--from) * 100% + var(--space-1));
-  inset-inline-start: var(--space-1);
+  inset-block-start: calc(var(--from) * 100% + var(--space-2));
+  inset-inline-start: var(--space-3);
 }
 
 .route-map__month-short {
@@ -210,74 +316,66 @@
 .route-map__period-label,
 .route-map__today-label {
   position: absolute;
-  padding: 0 var(--space-1);
-  font-family: var(--font-mono);
+  padding: calc(var(--space-1) / 2) var(--space-1);
   font-size: var(--text-xs);
+  line-height: var(--leading-snug);
   color: var(--color-ink-2);
   background: var(--color-surface);
-  white-space: nowrap;
   pointer-events: none;
 }
 
-/* Anchored to the end of the zone, so a zone clipped at the range end keeps its label inside. */
+.route-map__period-label {
+  inline-size: max-content;
+  font-weight: var(--weight-medium);
+}
+
+/* Anchored to the end of the zone, so a zone clipped at the range end keeps its label inside;
+   a narrow zone wraps its label onto two lines instead of clipping it. */
 .route-map--horizontal .route-map__period-label {
-  inset-block-end: var(--space-3);
+  inset-block-end: var(--space-4);
   inset-inline-end: calc((1 - var(--to)) * 100% + var(--space-1));
+  max-inline-size: max(calc((var(--to) - var(--from)) * 100% - var(--space-2)), calc(var(--space-9) - var(--space-3)));
 }
 
 .route-map--vertical .route-map__period-label {
   inset-block-start: calc(var(--from) * 100% + var(--space-1));
-  inset-inline-end: var(--space-1);
+  inset-inline-end: var(--space-2);
+  max-inline-size: calc(var(--gutter-end) * 100% - var(--space-4));
 }
 
 .route-map__today-label {
-  color: var(--color-ink);
+  font-family: var(--font-mono);
   font-weight: var(--weight-medium);
+  color: var(--color-surface);
+  background: var(--color-ink);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
 }
 
 .route-map--horizontal .route-map__today-label {
-  inset-block-start: calc(var(--space-6) + var(--space-1));
-  inset-inline-start: calc(var(--from) * 100% + var(--space-1));
+  inset-block-start: calc(var(--space-6) + var(--space-2));
+  inset-inline-start: calc(var(--from) * 100%);
+  translate: -50% 0;
 }
 
 .route-map--vertical .route-map__today-label {
-  inset-block-start: calc(var(--from) * 100% - var(--space-5));
-  inset-inline-end: var(--space-1);
+  inset-block-start: calc(var(--from) * 100%);
+  inset-inline-end: var(--space-2);
+  translate: 0 -50%;
 }
 
 /* ── Station card ────────────────────────────────────────────────── */
 
 .route-map__card {
   position: absolute;
-  z-index: var(--z-sticky);
-  inline-size: min(var(--card-w), 80vw);
-  inset-inline-start: calc(var(--card-x) * 100%);
-  inset-block-start: calc(var(--card-y) * 100%);
+  z-index: 1;
+  inline-size: min(var(--card-w), calc(100vw - var(--space-6)));
+  inset-inline-start: calc(var(--card-left, 0) * var(--map-unit));
+  inset-block-start: calc(var(--card-top, 0) * var(--map-unit));
   background: var(--color-surface);
   border: var(--rule-strong) solid var(--color-ink);
   border-radius: var(--radius-sm);
   pointer-events: none;
-  translate: -50% calc(-100% - var(--space-5));
-}
-
-.route-map__card[data-below='true'] {
-  translate: -50% var(--space-5);
-}
-
-.route-map__card[data-anchor='start'] {
-  translate: calc(var(--space-4) * -1) calc(-100% - var(--space-5));
-}
-
-.route-map__card[data-anchor='start'][data-below='true'] {
-  translate: calc(var(--space-4) * -1) var(--space-5);
-}
-
-.route-map__card[data-anchor='end'] {
-  translate: calc(-100% + var(--space-4)) calc(-100% - var(--space-5));
-}
-
-.route-map__card[data-anchor='end'][data-below='true'] {
-  translate: calc(-100% + var(--space-4)) var(--space-5);
 }
 
 /* ── Legend ──────────────────────────────────────────────────────── */
@@ -296,20 +394,7 @@
   align-items: center;
   gap: var(--space-2);
   font-size: var(--text-sm);
-}
-
-.route-map__legend-code {
-  display: inline-grid;
-  place-items: center;
-  min-inline-size: calc(var(--space-6) + var(--space-1));
-  padding: 0 var(--space-1);
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  font-weight: var(--weight-medium);
-  letter-spacing: var(--tracking-caps);
-  color: var(--line-text);
-  background: var(--lane-color);
-  border-radius: var(--radius-sm);
+  line-height: var(--leading-snug);
 }
 
 .route-map__legend-swatch {
@@ -320,6 +405,97 @@
   border-radius: var(--radius-pill);
 }
 
+.route-map__legend-full {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.route-map__legend-row {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.route-map__legend-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-caps);
+  line-height: var(--leading-snug);
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+}
+
+@media (min-width: 720px) {
+  .route-map__legend-row {
+    grid-template-columns: calc(var(--space-9) - var(--space-4)) minmax(0, 1fr);
+    align-items: baseline;
+  }
+}
+
+.route-map__legend-symbol {
+  inline-size: var(--space-5);
+  block-size: var(--space-5);
+  flex: none;
+  overflow: visible;
+}
+
+.route-map__legend-symbol--wide {
+  inline-size: calc(var(--space-5) * 2);
+}
+
+.route-map__legend-stop {
+  fill: var(--color-surface);
+  stroke: var(--color-ink-2);
+  stroke-width: var(--station-ring);
+}
+
+.route-map__legend-mine {
+  stroke: var(--color-signal);
+  stroke-width: var(--route-w-you);
+  stroke-linecap: round;
+}
+
+.route-map__legend-ring {
+  fill: var(--color-surface);
+  stroke: var(--color-signal);
+  stroke-width: var(--station-ring);
+}
+
+.route-map__legend-interchange {
+  fill: var(--color-surface);
+  stroke: var(--color-ink);
+  stroke-width: var(--station-ring);
+}
+
+.route-map__legend-core {
+  fill: var(--color-ink-2);
+}
+
+.route-map__legend-zone {
+  display: inline-block;
+  inline-size: var(--space-6);
+  block-size: var(--space-4);
+  border: var(--rule-hair) solid var(--color-rule);
+}
+
+.route-map__legend-zone--exam {
+  background: var(--hatch-exam);
+  border-color: var(--color-ink-2);
+}
+
+.route-map__legend-zone--holiday {
+  background: var(--color-surface-2);
+  border-style: dashed;
+  border-color: var(--color-ink-2);
+}
+
+.route-map__legend-today {
+  display: inline-block;
+  inline-size: var(--rule-strong);
+  block-size: var(--space-5);
+  border-inline-start: var(--rule-strong) dotted var(--color-ink);
+}
+
 /* ── Orchestrated entrance (landing page) ────────────────────────── */
 
 .route-map--animate .route-map__lane {
@@ -328,15 +504,22 @@
   animation: route-draw var(--dur-draw) var(--ease-out) forwards;
 }
 
-.route-map--animate .route-map__station > :not(.route-map__hit) {
+.route-map--animate .route-map__visual {
   animation: station-pop var(--dur-med) var(--ease-spring) both;
   animation-delay: calc(var(--dur-draw) * 0.5 + var(--i) * var(--dur-fast) / 4);
 }
 
-.route-map--animate .route-map__mine {
+.route-map--animate .route-map__mine path {
+  stroke-dasharray: var(--route-total) var(--route-total);
   animation: route-grow var(--dur-slow) var(--ease-out) both;
   animation-delay: var(--dur-draw);
   --route-from: var(--route-total);
+}
+
+/* A newly registered station arrives once the line has reached it. */
+.route-map__station--arrive .route-map__visual {
+  animation: station-pop var(--dur-med) var(--ease-spring) both;
+  animation-delay: calc(var(--dur-slow) * 0.8);
 }
 
 @keyframes route-draw {
@@ -359,6 +542,7 @@
   .route-map *,
   .route-map--animate .route-map__lane {
     animation: none !important;
+    transition: none !important;
     stroke-dashoffset: 0;
   }
 }

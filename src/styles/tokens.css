@@ -214,3 +214,29 @@
     --dur-idle: 0ms;
   }
 }
+
+/* ── Print: always the light palette on white paper ───────────────── */
+@media print {
+  :root:root:root {
+    color-scheme: light;
+    --color-ground: #ffffff;
+    --color-surface: #ffffff;
+    --color-surface-2: #ffffff;
+    --color-ink: #14181f;
+    --color-ink-2: #535b67;
+    --color-rule: #d5d8cf;
+    --color-signal: #1e47c8;
+    --color-signal-ink: #ffffff;
+    --color-ok: #1b6f46;
+    --color-warn: #8f5400;
+    --color-stop: #b3261e;
+    --line-ht: #1e47c8;
+    --line-nt: #b0306a;
+    --line-tt: #c2410c;
+    --line-tn: #1f7a4d;
+    --line-kn: #7a5a00;
+    --line-cn: #0e7490;
+    --line-ts: #14181f;
+    --shadow-panel: none;
+  }
+}

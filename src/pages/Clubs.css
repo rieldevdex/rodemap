@@ -1,0 +1,133 @@
+.clubs__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.clubs__filter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: var(--size-touch);
+  padding: 0 var(--space-4);
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: var(--rule-hair) solid var(--color-ink-2);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.clubs__filter[aria-pressed='true'] {
+  color: var(--color-surface);
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+}
+
+.clubs__filter-code {
+  display: inline-grid;
+  place-items: center;
+  padding: 0 var(--space-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--line-text);
+  background: var(--line);
+  border-radius: var(--radius-sm);
+}
+
+.clubs__count {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.clubs__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-block-start: var(--rule-strong) solid var(--color-ink);
+}
+
+.clubs__item {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4) 0 var(--space-4) var(--space-4);
+  border-block-end: var(--rule-hair) solid var(--color-rule);
+  border-inline-start: var(--chip-edge) solid var(--line);
+}
+
+.clubs__lines {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.clubs__name {
+  font-size: var(--text-xl);
+}
+
+.clubs__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.clubs__link:hover {
+  text-decoration: underline;
+  text-decoration-thickness: var(--rule-hair);
+  text-underline-offset: var(--space-1);
+}
+
+.clubs__full {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.clubs__desc {
+  max-inline-size: var(--measure);
+}
+
+.clubs__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-5);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.club-detail__events {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.club-detail__past {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-block-start: var(--rule-hair) solid var(--color-rule);
+}
+
+.club-detail__past li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  padding-block: var(--space-3);
+  border-block-end: var(--rule-hair) solid var(--color-rule);
+}
+
+.club-detail__past a {
+  color: var(--color-ink);
+}
+
+@media (min-width: 1080px) {
+  .club-detail__events {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .clubs__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+  }
+}

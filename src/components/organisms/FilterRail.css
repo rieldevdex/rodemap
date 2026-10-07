@@ -1,0 +1,263 @@
+.filter-rail {
+  --filter-row: calc(var(--space-6) + var(--space-1));
+  min-inline-size: 0;
+}
+
+/* ── Rail (desktop column): sticky under the header, scrolls on its own ── */
+
+.filter-rail--rail {
+  position: sticky;
+  top: calc(var(--header-h) + var(--space-5));
+  max-block-size: calc(100dvh - var(--header-h) - var(--space-5) * 2);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin-inline-end: calc(var(--space-3) * -1);
+  padding-inline-end: var(--space-3);
+  scrollbar-color: var(--color-rule) transparent;
+  scrollbar-width: thin;
+}
+
+.filter-rail__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-block-end: var(--space-3);
+}
+
+.filter-rail__title {
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+}
+
+/* ── Sheet (phones and tablets): larger rows, no outer rule on the first group ── */
+
+.filter-rail--sheet {
+  --filter-row: var(--size-touch);
+}
+
+.filter-rail--sheet > .filter-group:first-child {
+  border-block-start: 0;
+  padding-block-start: var(--space-2);
+}
+
+/* ── Counts ────────────────────────────────────────────────────────── */
+
+.filter-rail__count {
+  margin-inline-start: auto;
+  padding-inline-start: var(--space-2);
+  color: var(--color-ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+/* ── Chips: lĩnh vực and khối ──────────────────────────────────────── */
+
+.filter-rail__chips {
+  display: grid;
+  gap: var(--space-2);
+}
+
+/* Lĩnh vực: one full-width row per line (square-ish corners suit two-line names). */
+.filter-rail__chips .filter-rail__chip.chip {
+  display: flex;
+  inline-size: 100%;
+  border-radius: var(--radius-sm);
+}
+
+.filter-rail__chip.chip {
+  white-space: normal;
+  text-align: start;
+}
+
+.filter-rail__chip > span {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  column-gap: var(--space-1);
+  min-inline-size: 0;
+}
+
+.filter-rail__chip-name {
+  min-inline-size: 0;
+}
+
+.filter-rail__chip:has([data-zero='true']):not([aria-pressed='true']) .filter-rail__chip-name {
+  color: var(--color-ink-2);
+}
+
+/* Khối: a three-part row, "10 · 11 · 12" under the group title. */
+.filter-rail__grades {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.filter-rail__grade.chip {
+  display: flex;
+  inline-size: 100%;
+  justify-content: center;
+}
+
+.filter-rail__grade > span {
+  flex: none;
+  justify-content: center;
+}
+
+.filter-rail__grade-number {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.filter-rail__code {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-caps);
+}
+
+.filter-rail__chip[aria-pressed='true'] .filter-rail__count {
+  color: inherit;
+}
+
+/* ── Checkbox rows: câu lạc bộ and tình trạng ──────────────────────── */
+
+.filter-rail__checks {
+  display: grid;
+}
+
+.filter-rail__check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-block-size: var(--filter-row);
+  margin-inline: calc(var(--space-2) * -1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.filter-rail__check:hover {
+  background: var(--color-surface-2);
+}
+
+.filter-rail__checkbox {
+  flex: none;
+  inline-size: var(--size-icon-sm);
+  block-size: var(--size-icon-sm);
+  margin: 0;
+  accent-color: var(--color-ink);
+  cursor: pointer;
+}
+
+.filter-rail__check-label {
+  min-inline-size: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+}
+
+.filter-rail__check:has(:checked) .filter-rail__check-label {
+  font-weight: var(--weight-semibold);
+}
+
+.filter-rail__check:has([data-zero='true']):not(:has(:checked)) .filter-rail__check-label {
+  color: var(--color-ink-2);
+}
+
+.filter-rail__more {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: var(--filter-row);
+  margin-block-start: var(--space-1);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-signal);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+}
+
+.filter-rail__more:hover {
+  text-decoration: underline;
+  text-decoration-thickness: var(--rule-hair);
+  text-underline-offset: var(--space-1);
+}
+
+/* ── Single choice as stations on a line: thời gian, hình thức, hạn ── */
+
+.filter-rail__stations {
+  display: grid;
+}
+
+.filter-rail__station {
+  position: relative;
+}
+
+/* Line segment from this station to the next one. */
+.filter-rail__station:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  inset-block-start: calc(50% + var(--station) / 2);
+  inset-inline-start: calc(var(--station) / 2 - var(--rule-strong) / 2);
+  inline-size: var(--rule-strong);
+  block-size: calc(100% - var(--station));
+  background: var(--color-rule);
+  pointer-events: none;
+}
+
+.filter-rail__choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-block-size: var(--filter-row);
+  cursor: pointer;
+}
+
+.filter-rail__radio {
+  flex: none;
+  inline-size: var(--station);
+  block-size: var(--station);
+  margin: 0;
+  padding: var(--rule-strong);
+  border: var(--rule-strong) solid var(--color-ink-2);
+  border-radius: 50%;
+  background: var(--color-surface);
+  background-clip: content-box;
+  appearance: none;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+
+.filter-rail__choice:hover .filter-rail__radio {
+  border-color: var(--color-ink);
+}
+
+.filter-rail__radio:checked {
+  border-color: var(--color-signal);
+  background-color: var(--color-signal);
+}
+
+.filter-rail__choice-label {
+  min-inline-size: 0;
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+}
+
+.filter-rail__radio:checked + .filter-rail__choice-label {
+  font-weight: var(--weight-semibold);
+}
+
+@media (forced-colors: active) {
+  .filter-rail__radio:checked {
+    background-color: Highlight;
+  }
+}

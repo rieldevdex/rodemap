@@ -1,0 +1,46 @@
+/* Print: the page becomes a plain A4 document (portfolio export). */
+@page {
+  size: A4;
+  margin: 16mm 14mm;
+}
+
+.print-only {
+  display: none;
+}
+
+@media print {
+  body {
+    background: var(--color-surface);
+    font-size: var(--text-sm);
+  }
+
+  .site-header,
+  .footer,
+  .skip-link,
+  .no-print,
+  .mochi-dock,
+  .mochi-panel {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block;
+  }
+
+  .band,
+  .band--surface {
+    padding-block: var(--space-4);
+    background: var(--color-surface);
+    border: 0;
+  }
+
+  .container {
+    max-width: none;
+    padding-inline: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}

@@ -1,0 +1,455 @@
+/* ── Page head search ────────────────────────────────────────────── */
+
+.explore-search {
+  max-inline-size: calc(var(--measure) + var(--space-8));
+  padding-block-start: var(--space-3);
+}
+
+/* ── Layout: rail + results on desktop, results only below 1080 ─── */
+
+.explore {
+  padding-block: var(--space-5) var(--space-8);
+  border-block-start: var(--rule-hair) solid var(--color-rule);
+}
+
+.explore__layout {
+  display: grid;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.explore__results {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+}
+
+.explore__rail-active {
+  color: var(--color-ink-2);
+  font-size: var(--text-xs);
+  line-height: var(--leading-snug);
+}
+
+@media (min-width: 1080px) {
+  .explore {
+    padding-block-start: var(--space-6);
+  }
+
+  .explore__layout {
+    grid-template-columns: var(--rail-w) minmax(0, 1fr);
+    column-gap: var(--space-7);
+  }
+}
+
+/* ── Toolbar: filter button (phones/tablets), count, view toggle ─── */
+
+.explore-toolbar {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    'filters view'
+    'count count';
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.explore-toolbar__filters {
+  grid-area: filters;
+  justify-self: start;
+}
+
+.explore-toolbar__filters .button__label {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.explore-toolbar__badge {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: calc(var(--space-5) - var(--space-1));
+  margin-inline-start: var(--space-2);
+  padding-inline: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--color-ink);
+  color: var(--color-surface);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--leading-body);
+}
+
+.explore-toolbar__count {
+  grid-area: count;
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+}
+
+.explore-toolbar__number {
+  margin-inline-end: var(--space-1);
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tracking-tight);
+}
+
+.explore-toolbar__count:focus {
+  outline: none;
+}
+
+.explore-toolbar__count:focus-visible {
+  outline: var(--focus-w) solid var(--color-signal);
+}
+
+/* View toggle: a two-part segmented control. */
+.explore-view {
+  grid-area: view;
+  justify-self: end;
+  display: inline-flex;
+  border: var(--rule-hair) solid var(--color-ink-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+}
+
+.explore-view__option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: var(--size-touch);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.explore-view__option:hover {
+  background: var(--color-surface-2);
+}
+
+.explore-view__option[aria-pressed='true'] {
+  background: var(--color-ink);
+  color: var(--color-surface);
+}
+
+.explore-view__glyph {
+  flex: none;
+  inline-size: var(--size-icon-sm);
+  block-size: var(--size-icon-sm);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linejoin: round;
+}
+
+/* Phones show "Lưới" / "Danh sách"; the full name stays the accessible label. */
+.explore-view__full {
+  position: absolute;
+  inline-size: var(--rule-hair);
+  block-size: var(--rule-hair);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (min-width: 720px) {
+  .explore-view__full {
+    position: static;
+    inline-size: auto;
+    block-size: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+
+  .explore-view__short {
+    display: none;
+  }
+}
+
+@media (min-width: 1080px) {
+  .explore-toolbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'count view';
+  }
+
+  .explore-view__option {
+    min-block-size: calc(var(--space-6) + var(--space-2));
+  }
+}
+
+/* ── Active filters: removable chips ─────────────────────────────── */
+
+.explore-active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.explore-active__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.explore-active__chip {
+  --chip-line: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: calc(var(--space-6) + var(--space-1));
+  padding: var(--space-1) var(--space-2) var(--space-1) var(--space-3);
+  border: var(--rule-hair) solid var(--color-ink-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-snug);
+  text-align: start;
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.explore-active__chip[data-edge='true'] {
+  border-inline-start: var(--chip-edge) solid var(--chip-line);
+}
+
+.explore-active__chip:hover {
+  border-color: var(--color-ink);
+  background: var(--color-surface-2);
+}
+
+.explore-active__chip[data-edge='true']:hover {
+  border-inline-start-color: var(--chip-line);
+}
+
+.explore-active__code {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-caps);
+}
+
+/* ── Month groups ────────────────────────────────────────────────── */
+
+.explore-months {
+  display: grid;
+  gap: var(--space-7);
+  padding-block-start: var(--space-2);
+}
+
+.explore-month {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+}
+
+/* A fare-zone boundary: strong ink rule, mono month name, count on the right. */
+.explore-month__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  padding-block-start: var(--space-3);
+  border-block-start: var(--rule-strong) solid var(--color-ink);
+}
+
+.explore-month__title {
+  font-family: var(--font-mono);
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tracking-caps);
+  line-height: var(--leading-snug);
+  text-transform: uppercase;
+}
+
+.explore-month__count {
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+}
+
+/* Grid view: full station cards, as many 288-unit columns as fit. */
+.explore-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(var(--card-w) - var(--space-6))), 1fr));
+  gap: var(--space-4);
+}
+
+.explore-grid__item {
+  display: flex;
+  min-inline-size: 0;
+}
+
+.explore-grid__item > .station-card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+/* Same rhythm in every card: line badge, then the mono date on its own line. */
+.explore-grid__item .station-card__top {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+}
+
+/* Mochi's summary stays a short preview in the grid; the event page has the full text. */
+.explore-grid__item .station-card__summary {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+/* Status and actions line up at the bottom of each row of cards. */
+.explore-grid__item .station-card__status {
+  margin-block-start: auto;
+  padding-block-start: var(--space-1);
+}
+
+/* List view: compact rows separated by hairlines. */
+.explore-list {
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.explore-list__item + .explore-list__item {
+  border-block-start: var(--rule-hair) solid var(--color-rule);
+}
+
+/* Date next to the line code, so the eye runs code → date → title down the list. */
+.explore-list__item .station-card__top {
+  justify-content: flex-start;
+  column-gap: var(--space-3);
+}
+
+@media (min-width: 720px) {
+  .explore-list__item > .station-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--space-5);
+  }
+
+  .explore-list__item > .station-card > * {
+    grid-column: 1;
+  }
+
+  .explore-list__item > .station-card > .station-card__actions {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    align-self: center;
+    justify-content: flex-end;
+    padding-block-start: 0;
+  }
+}
+
+/* ── End of the list: a terminus station ─────────────────────────── */
+
+.explore-end {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding-block-start: var(--space-4);
+  border-block-start: var(--rule-hair) solid var(--color-rule);
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  line-height: var(--leading-snug);
+}
+
+.explore-end__terminus {
+  flex: none;
+  inline-size: var(--station);
+  block-size: var(--station);
+  margin-block-start: calc(var(--space-1) / 2);
+  border: var(--station-ring) solid var(--color-ink);
+  border-radius: 50%;
+  background: var(--color-surface);
+}
+
+.explore-end__text {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.explore-end__note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--space-1);
+}
+
+.explore-end__action.button {
+  min-block-size: var(--space-6);
+  padding-inline: var(--space-1);
+}
+
+/* ── Empty state ─────────────────────────────────────────────────── */
+
+.explore-empty {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-5);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.explore-empty__route {
+  inline-size: calc(var(--space-10) + var(--space-6));
+  block-size: auto;
+  overflow: visible;
+}
+
+.explore-empty__line {
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.explore-empty__gap {
+  fill: none;
+  stroke: var(--color-ink-2);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.explore-empty__station {
+  fill: var(--color-surface);
+  stroke: var(--color-ink);
+  stroke-width: 3;
+}
+
+.explore-empty__title {
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+}
+
+.explore-empty__body {
+  max-inline-size: var(--measure);
+  color: var(--color-ink-2);
+}
+
+@media (min-width: 720px) {
+  .explore-empty {
+    padding: var(--space-7) var(--space-6);
+  }
+}

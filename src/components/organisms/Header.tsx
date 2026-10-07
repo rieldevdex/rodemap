@@ -30,6 +30,22 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Kiểm duyệt', to: 'moderation', section: ['moderation'], role: 'moderator' },
 ];
 
+const TEXT_INPUT_EXCLUDED = new Set(['checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'color', 'file', 'image']);
+
+/** True while focus is in a text field (Ctrl K must not interrupt typing). */
+function isTypingTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.isContentEditable || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) return true;
+  return target instanceof HTMLInputElement && !TEXT_INPUT_EXCLUDED.has(target.type);
+}
+
+/** Khám phá sự kiện with its search field focused (?tim=1), keeping `current` query params. */
+function searchHref(explorePath: string, current: URLSearchParams | null): string {
+  const params = new URLSearchParams(current ?? undefined);
+  params.set('tim', '1');
+  return `${explorePath}?${params.toString()}`;
+}
+
 /**
  * Site header (DESIGN.md §7): wordmark, primary nav, search, theme toggle, account.
  * The active section is marked by a 4-unit signal route segment on the header's rule.
@@ -52,19 +68,24 @@ export function Header() {
     setMenuOpen(false);
   }
 
-  // Ctrl K / ⌘K opens Khám phá sự kiện (the search lives there).
+  // The search lives on Khám phá sự kiện: ?tim=1 focuses its field. Already there, the
+  // current filters are kept.
+  const searchTarget = searchHref(explorePath, route.name === 'explore' ? route.search : null);
+
+  // Ctrl K / ⌘K opens the search, except while the user is typing in a field.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || isTypingTarget(e.target)) return;
       if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        navigate(explorePath);
+        navigate(searchTarget);
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => {
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [navigate, explorePath]);
+  }, [navigate, searchTarget]);
 
   // Phone menu: Escape returns focus to "Danh mục"; a click outside the header folds it.
   useEffect(() => {
@@ -128,7 +149,7 @@ export function Header() {
             type="button"
             className="site-header__search"
             onClick={() => {
-              navigate(explorePath);
+              navigate(searchTarget);
             }}
           >
             <Icon name="search" />

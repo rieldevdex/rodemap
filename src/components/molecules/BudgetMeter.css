@@ -1,0 +1,63 @@
+.budget-meter {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.budget-meter__text {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.budget-meter__label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+}
+
+.budget-meter__svg {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  overflow: visible;
+}
+
+.budget-meter__track {
+  stroke: var(--color-rule);
+  stroke-width: var(--route-w);
+  stroke-linecap: round;
+}
+
+.budget-meter__fill {
+  stroke: var(--color-signal);
+  stroke-width: var(--route-w-you);
+  stroke-linecap: round;
+}
+
+.budget-meter--over .budget-meter__fill {
+  stroke: var(--color-stop);
+}
+
+.budget-meter__stop {
+  fill: var(--color-surface);
+  stroke: var(--color-ink-2);
+  stroke-width: var(--rule-strong);
+}
+
+.budget-meter__stop--on {
+  stroke: var(--color-signal);
+}
+
+.budget-meter--over .budget-meter__stop--on {
+  stroke: var(--color-stop);
+}
+
+.budget-meter__note {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
