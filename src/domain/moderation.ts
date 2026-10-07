@@ -112,7 +112,7 @@ export function validateDraft(d: EventDraft, now: Millis): ValidationErrors {
     errors.description = `Phần mô tả chi tiết cần có ít nhất ${L.descriptionMin} ký tự.`;
   }
   if (d.location.trim() === '') errors.location = 'Vui lòng nhập địa điểm tổ chức.';
-  if (d.eligibleGrades.length === 0) errors.eligibleGrades = 'Vui lòng chọn ít nhất một khối được tham gia.';
+  if (d.eligibleGrades.length === 0) errors.eligibleGrades = 'Vui lòng chọn ít nhất một khối được phép tham gia.';
   if (!Number.isInteger(d.capacity) || d.capacity < L.capacityMin || d.capacity > L.capacityMax) {
     errors.capacity = `Số lượng chỗ cần là số nguyên từ ${L.capacityMin} đến ${L.capacityMax}.`;
   }

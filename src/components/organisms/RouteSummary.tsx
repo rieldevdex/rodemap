@@ -47,7 +47,7 @@ export function RouteSummary({ hours, total, title = 'Số giờ theo lĩnh vự
           <circle className="route-summary__stop route-summary__stop--end" cx={segments.at(-1)?.x2 ?? 12} cy={Y} r="7" />
         </svg>
       ) : (
-        <p className="route-summary__empty">Chưa có giờ hoạt động được ghi nhận.</p>
+        <p className="route-summary__empty">Chưa có số giờ hoạt động nào được ghi nhận.</p>
       )}
       <ul className="route-summary__list">
         {CATEGORY_CODES.map((code) => (

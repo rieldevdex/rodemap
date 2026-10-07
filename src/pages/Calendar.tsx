@@ -220,7 +220,7 @@ export function CalendarPage() {
       <PageHead
         eyebrow="Lịch cá nhân"
         title="Lịch của tôi"
-        lead="Các sự kiện bạn đã đăng ký theo tháng và theo tuần, kèm cảnh báo trùng lịch và các đợt kiểm tra định kỳ."
+        lead="Các sự kiện bạn đã đăng ký, trình bày theo tháng và theo tuần, kèm cảnh báo trùng lịch và các đợt kiểm tra định kỳ."
       >
         <div className="cluster">
           <Button variant="primary" iconStart="download" onClick={exportAll} disabled={myEvents.length === 0}>
@@ -243,7 +243,7 @@ export function CalendarPage() {
                   Khám phá sự kiện
                 </Button>
                 <Button to="/thiet-lap" variant="quiet" size="sm" iconEnd="arrow-right">
-                  Thiết lập lộ trình
+                  Thiết lập hồ sơ
                 </Button>
               </div>
             </div>
@@ -304,7 +304,7 @@ export function CalendarPage() {
                   setCursor(clamp(now, FIRST_MONTH, toMillis(SCHOOL_YEAR.end)));
                 }}
               >
-                Hôm nay
+                Chuyển đến hôm nay
               </Button>
               <div className="calendar__toggle" role="group" aria-label="Chế độ xem lịch">
                 {(['month', 'week'] as const).map((v) => (

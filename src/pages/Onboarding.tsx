@@ -39,7 +39,7 @@ const STEP_TITLES: Record<OnboardingStep, { short: string; title: string; hint: 
   class: {
     short: 'Khối và lớp',
     title: 'Khối và lớp',
-    hint: 'Khối lớp giúp Rodemap chỉ đề xuất các sự kiện dành cho bạn.',
+    hint: 'Thông tin khối lớp giúp Rodemap chỉ đề xuất các sự kiện dành cho khối của bạn.',
   },
   interests: {
     short: 'Lĩnh vực quan tâm',
@@ -150,7 +150,7 @@ export function OnboardingPage() {
     const list = moveInterest(draft.interests, code, delta);
     update({ interests: list });
     const index = list.indexOf(code);
-    setAnnouncement(`${CATEGORY_LABELS[code]} chuyển đến vị trí ${String(index + 1)}.`);
+    setAnnouncement(`Đã chuyển ${CATEGORY_LABELS[code]} đến vị trí ${String(index + 1)}.`);
     if (index === 0) pendingFocus.current = `ob-rank-${code}-down`;
     else if (index === list.length - 1) pendingFocus.current = `ob-rank-${code}-up`;
   };
@@ -186,7 +186,7 @@ export function OnboardingPage() {
           <p className="onboarding__existing">
             <Icon name="info" size="sm" />
             <span>
-              Bạn đã thiết lập hồ sơ cho lớp {state.profile.className}. Hoàn tất bốn bước dưới đây sẽ cập nhật hồ sơ hiện tại; các sự kiện đã đăng ký được giữ
+              Bạn đã thiết lập hồ sơ cho lớp {state.profile.className}. Sau khi hoàn tất bốn bước dưới đây, hồ sơ hiện tại sẽ được cập nhật; các sự kiện đã đăng ký được giữ
               nguyên.
             </span>
           </p>
@@ -575,7 +575,7 @@ export function OnboardingPage() {
                   <p className="onboarding__small">
                     {chosen.length === 0
                       ? 'Vui lòng chọn ít nhất một sự kiện để xác nhận lộ trình.'
-                      : `Khi bạn xác nhận, Rodemap lưu hồ sơ và đăng ký ${String(chosen.length)} sự kiện đã chọn.`}
+                      : `Khi bạn xác nhận, Rodemap sẽ lưu hồ sơ và đăng ký ${String(chosen.length)} sự kiện đã chọn.`}
                   </p>
                 ) : null}
               </div>

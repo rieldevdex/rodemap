@@ -75,7 +75,7 @@ test.describe('demo path', () => {
     expect(titles.length).toBeGreaterThan(0);
     expect(titles.length).toBeLessThanOrEqual(4);
     // Nothing is registered before the student confirms.
-    await expect(page.getByText(`Khi bạn xác nhận, Rodemap lưu hồ sơ và đăng ký ${String(titles.length)} sự kiện đã chọn.`)).toBeVisible();
+    await expect(page.getByText(`Khi bạn xác nhận, Rodemap sẽ lưu hồ sơ và đăng ký ${String(titles.length)} sự kiện đã chọn.`)).toBeVisible();
     await page.getByRole('button', { name: 'Xác nhận lộ trình' }).click();
 
     await expectOnRoute(page, titles);
@@ -126,7 +126,7 @@ test.describe('demo path', () => {
     await seedDemo(page);
     await page.goto('/tong-quan');
     await page.getByRole('button', { name: 'Hỏi Mochi' }).click();
-    await page.getByRole('textbox', { name: 'Nhắn Mochi' }).fill('Gợi ý cho mình một sự kiện tuần này');
+    await page.getByRole('textbox', { name: 'Nội dung gửi Mochi' }).fill('Gợi ý cho mình một sự kiện tuần này');
     await page.getByRole('button', { name: 'Gửi' }).click();
 
     const card = page.getByRole('region', { name: 'Thẻ xác nhận đăng ký' });
@@ -151,7 +151,7 @@ test.describe('demo path', () => {
     await seedDemo(page, { mochiForcedOffline: true });
     await page.goto('/tong-quan');
     await page.getByRole('button', { name: 'Hỏi Mochi' }).click();
-    await page.getByRole('textbox', { name: 'Nhắn Mochi' }).fill(`Đăng ký ${target.title}`);
+    await page.getByRole('textbox', { name: 'Nội dung gửi Mochi' }).fill(`Đăng ký ${target.title}`);
     await page.getByRole('button', { name: 'Gửi' }).click();
     const card = page.getByRole('region', { name: 'Thẻ xác nhận đăng ký' });
     await expect(card).toContainText(target.title);
@@ -161,7 +161,7 @@ test.describe('demo path', () => {
     await expect(page.getByRole('region', { name: 'Sự kiện trong tháng 10/2026' }).getByRole('link', { name: target.title, exact: true })).toHaveCount(0);
     await page.goBack();
     await page.getByRole('button', { name: 'Hỏi Mochi' }).click();
-    await page.getByRole('textbox', { name: 'Nhắn Mochi' }).fill(`Đăng ký ${target.title}`);
+    await page.getByRole('textbox', { name: 'Nội dung gửi Mochi' }).fill(`Đăng ký ${target.title}`);
     await page.getByRole('button', { name: 'Gửi' }).click();
     await page.getByRole('region', { name: 'Thẻ xác nhận đăng ký' }).last().getByRole('button', { name: 'Xác nhận' }).click();
     await expect(page.getByText(`Đã đăng ký “${target.title}”`)).toBeVisible();

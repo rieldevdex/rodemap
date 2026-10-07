@@ -6,12 +6,12 @@ export const STATUS_LABELS: Record<EventStatus, { label: string; tone: 'ok' | 'w
   pending: { label: 'Chờ duyệt', tone: 'neutral' },
   approved: { label: 'Đã duyệt', tone: 'ok' },
   changes_requested: { label: 'Cần chỉnh sửa', tone: 'warn' },
-  rejected: { label: 'Từ chối', tone: 'stop' },
+  rejected: { label: 'Đã từ chối', tone: 'stop' },
 };
 
 export const ACTION_LABELS: Record<ReviewAction, string> = {
   submit: 'Câu lạc bộ gửi sự kiện',
-  resubmit: 'Câu lạc bộ gửi lại sau chỉnh sửa',
+  resubmit: 'Câu lạc bộ gửi lại sau khi chỉnh sửa',
   approve: 'HĐHS phê duyệt',
   request_changes: 'HĐHS yêu cầu chỉnh sửa',
   reject: 'HĐHS từ chối',

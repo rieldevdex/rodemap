@@ -156,7 +156,7 @@ function RouteSummary({ upcoming, weekLabel, used, budget, remaining, hasProfile
         </div>
 
         <div className="route-summary__item">
-          <dt className="route-summary__label">Lĩnh vực đã tham gia</dt>
+          <dt className="route-summary__label">Lĩnh vực trong lộ trình</dt>
           <dd className="route-summary__value">
             <span className="route-summary__figure">
               <span className="route-summary__number">{covered.length}</span>
@@ -366,7 +366,7 @@ export function RoutePage() {
           </>
         }
         title="Lộ trình"
-        lead="Toàn bộ năm học được trình bày như một bản đồ tuyến: mỗi lĩnh vực là một tuyến, mỗi sự kiện là một điểm dừng, các sự kiện bạn đăng ký được nối thành lộ trình của bạn."
+        lead="Toàn bộ năm học được trình bày như một bản đồ lộ trình: mỗi lĩnh vực là một tuyến, mỗi sự kiện là một điểm dừng, và các sự kiện bạn đã đăng ký được nối thành lộ trình của bạn."
       >
         <RouteSummary
           upcoming={upcoming}
@@ -423,7 +423,7 @@ export function RoutePage() {
                     mapRef.current?.scrollToToday();
                   }}
                 >
-                  Đến hôm nay
+                  Chuyển đến hôm nay
                 </Button>
               ) : null}
             </div>
@@ -451,12 +451,12 @@ export function RoutePage() {
             <div className="route-empty">
               <h3 className="route-empty__title">Chưa có sự kiện được phê duyệt</h3>
               <p className="route-empty__body">
-                Hội đồng Học sinh chưa phê duyệt sự kiện nào cho năm học. Vui lòng xem danh sách câu lạc bộ để theo dõi các hoạt
+                Hội đồng Học sinh chưa phê duyệt sự kiện nào trong năm học này. Vui lòng xem danh sách câu lạc bộ để theo dõi các hoạt
                 động sắp được công bố.
               </p>
               <div className="cluster">
                 <Button to="/cau-lac-bo" variant="secondary" iconEnd="arrow-right">
-                  Xem các câu lạc bộ
+                  Xem danh sách câu lạc bộ
                 </Button>
               </div>
             </div>
@@ -508,7 +508,7 @@ export function RoutePage() {
             ) : null}
             <p className="container route-stage__hint">
               {wide
-                ? 'Cuộn ngang để xem toàn bộ năm học. Di chuột hoặc dùng phím Tab để xem thông tin điểm dừng; phím mũi tên chuyển giữa các điểm dừng, phím Enter mở trang sự kiện.'
+                ? 'Cuộn ngang để xem toàn bộ năm học. Di chuột hoặc sử dụng phím Tab để xem thông tin điểm dừng; phím mũi tên chuyển giữa các điểm dừng, phím Enter mở trang sự kiện.'
                 : 'Chạm vào một điểm dừng để mở trang sự kiện. Dạng danh sách trình bày đầy đủ thông tin của từng sự kiện.'}
             </p>
             {wide ? (

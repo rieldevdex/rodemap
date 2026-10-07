@@ -20,9 +20,9 @@ export function ClubsPage() {
   return (
     <>
       <PageHead
-        eyebrow={`Danh bạ · ${CLUBS.length} câu lạc bộ`}
+        eyebrow={`Danh sách · ${CLUBS.length} câu lạc bộ`}
         title="Câu lạc bộ"
-        lead="Các câu lạc bộ và Hội đồng Học sinh cùng lĩnh vực hoạt động, kèm các sự kiện sắp diễn ra trên Rodemap."
+        lead="Các câu lạc bộ và Hội đồng Học sinh, kèm lĩnh vực hoạt động và các sự kiện sắp diễn ra trên Rodemap."
       />
       <section className="band band--surface" aria-labelledby="clubs-list">
         <div className="container stack stack--md">

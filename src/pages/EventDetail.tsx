@@ -105,7 +105,7 @@ export function EventDetailPage() {
         {event.status !== 'approved' ? (
           <p className="event-detail__staff">
             <StatusTag tone={STATUS_LABELS[event.status].tone}>{STATUS_LABELS[event.status].label}</StatusTag>
-            Sự kiện chưa hiển thị với học sinh; bạn đang xem với vai trò minh họa.
+            Sự kiện chưa hiển thị với học sinh; bạn đang xem với vai trò trình diễn.
           </p>
         ) : null}
         <div className="cluster event-detail__actions">
@@ -154,7 +154,7 @@ export function EventDetailPage() {
             {info?.overBudget ? (
               <div className="event-detail__warning" role="note">
                 <StatusTag tone="warn">Vượt quỹ giờ trong tuần</StatusTag>
-                <p>Đăng ký sự kiện này sẽ vượt quỹ giờ mỗi tuần trong hồ sơ của bạn.</p>
+                <p>Nếu đăng ký sự kiện này, tổng số giờ trong tuần sẽ vượt quỹ giờ mỗi tuần trong hồ sơ của bạn.</p>
               </div>
             ) : null}
 
@@ -203,7 +203,7 @@ export function EventDetailPage() {
                 <dd>{club ? <Link to={`/cau-lac-bo/${club.slug}`}>{club.name}</Link> : clubName(event.clubId)}</dd>
               </div>
               <div>
-                <dt>Khối được tham gia</dt>
+                <dt>Khối được phép tham gia</dt>
                 <dd>Khối {event.eligibleGrades.join(', ')}</dd>
               </div>
               <div>

@@ -64,7 +64,7 @@ function PageError() {
           Không thể hiển thị nội dung
         </h1>
         <p className="page-head__lead">
-          Rodemap chưa tải được màn hình này, có thể do kết nối mạng bị gián đoạn. Vui lòng tải lại trang để tiếp tục.
+          Rodemap không thể tải màn hình này, có thể do kết nối mạng bị gián đoạn. Vui lòng tải lại trang để tiếp tục.
         </p>
         <div className="cluster">
           <button
@@ -130,7 +130,7 @@ export function App() {
   return (
     <div className="app">
       <a className="skip-link" href="#main" onClick={skipToMain}>
-        Bỏ qua đến nội dung chính
+        Chuyển đến nội dung chính
       </a>
       <Header />
       <main id="main" className="app__main" tabIndex={-1}>

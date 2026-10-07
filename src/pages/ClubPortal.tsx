@@ -47,7 +47,7 @@ export function ClubPortalPage() {
         <PageHead
           eyebrow="Dành cho câu lạc bộ"
           title="Cổng câu lạc bộ"
-          lead="Cổng câu lạc bộ dành cho đại diện câu lạc bộ gửi sự kiện mới và theo dõi trạng thái kiểm duyệt."
+          lead="Nơi đại diện câu lạc bộ gửi sự kiện mới và theo dõi trạng thái kiểm duyệt."
         />
         <section className="band band--surface">
           <div className="container">
@@ -66,7 +66,7 @@ export function ClubPortalPage() {
                   Chuyển sang vai trò Câu lạc bộ
                 </Button>
                 <Button to="/cau-lac-bo" variant="secondary">
-                  Xem danh bạ câu lạc bộ
+                  Xem danh sách câu lạc bộ
                 </Button>
               </div>
             </div>
@@ -123,7 +123,7 @@ export function ClubPortalPage() {
         lead="Gửi sự kiện của câu lạc bộ để Hội đồng Học sinh kiểm duyệt. Sự kiện chỉ hiển thị với học sinh sau khi được phê duyệt."
       >
         <div className="club-portal__club">
-          <label htmlFor="club-portal-select">Câu lạc bộ đang đại diện</label>
+          <label htmlFor="club-portal-select">Câu lạc bộ đại diện</label>
           <select
             id="club-portal-select"
             value={club.id}

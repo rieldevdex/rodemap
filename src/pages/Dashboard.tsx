@@ -63,8 +63,8 @@ export function DashboardPage() {
         title="Tổng quan"
         lead={
           profile
-            ? `Chào bạn, học sinh lớp ${profile.className}. Hôm nay là ${formatLongDate(now)}.`
-            : 'Bạn chưa thiết lập hồ sơ. Sau khi thiết lập, Rodemap đề xuất sự kiện phù hợp với lĩnh vực quan tâm và thời gian của bạn.'
+            ? `Xin chào bạn, học sinh lớp ${profile.className}. Hôm nay là ${formatLongDate(now)}.`
+            : 'Bạn chưa thiết lập hồ sơ. Sau khi thiết lập, Rodemap sẽ đề xuất sự kiện phù hợp với lĩnh vực quan tâm và thời gian của bạn.'
         }
       >
         <div className="cluster">
@@ -95,13 +95,13 @@ export function DashboardPage() {
                         setBoardScope(s);
                       }}
                     >
-                      {s === 'all' ? 'Tất cả' : 'Của tôi'}
+                      {s === 'all' ? 'Toàn trường' : 'Của tôi'}
                     </button>
                   ))}
                 </div>
               </div>
               {rows.length > 0 ? (
-                <DepartureBoard rows={rows} caption={boardScope === 'all' ? 'Các sự kiện sắp diễn ra' : 'Các sự kiện bạn đã đăng ký sắp diễn ra'} />
+                <DepartureBoard rows={rows} caption={boardScope === 'all' ? 'Các sự kiện sắp diễn ra' : 'Các sự kiện sắp diễn ra mà bạn đã đăng ký'} />
               ) : (
                 <p className="dashboard__muted">
                   {boardScope === 'mine'
@@ -181,7 +181,7 @@ export function DashboardPage() {
             </section>
           </div>
 
-          <aside className="dashboard__side stack stack--xl" aria-label="Lộ trình và việc cần làm">
+          <aside className="dashboard__side stack stack--xl" aria-label="Lộ trình và nội dung cần thực hiện">
             <section className="dashboard__panel" aria-labelledby="dash-route">
               <h2 id="dash-route" className="dashboard__h3">
                 Lộ trình của bạn
@@ -223,7 +223,7 @@ export function DashboardPage() {
                 <StatusTag tone="ok">Không trùng lịch</StatusTag>
               )}
               <Button to="/lo-trinh?pham-vi=cua-toi" variant="secondary" size="sm" iconEnd="arrow-right">
-                Xem lộ trình
+                Xem Lộ trình
               </Button>
             </section>
 

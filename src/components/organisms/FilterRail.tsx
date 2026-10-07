@@ -193,7 +193,7 @@ export function FilterRail<V extends FilterRailValue>({
       </FilterGroup>
 
       <FilterGroup
-        title="Khối được tham gia"
+        title="Khối được phép tham gia"
         selectedCount={value.grades.length}
         onClear={() => {
           onChange({ ...value, grades: [] });

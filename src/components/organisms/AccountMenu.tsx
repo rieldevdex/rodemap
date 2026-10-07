@@ -185,7 +185,7 @@ export function AccountMenu() {
           {state.role === 'club' ? (
             <div className="account-menu__section">
               <label className="account-menu__label" htmlFor={clubId}>
-                Câu lạc bộ phụ trách
+                Câu lạc bộ đại diện
               </label>
               <select
                 id={clubId}
@@ -230,13 +230,13 @@ export function AccountMenu() {
                     dispatch({ type: 'demo/setToday', date: null });
                   }}
                 >
-                  Theo ngày thực tế
+                  Sử dụng ngày thực tế
                 </Button>
               )}
             </div>
             <p className="account-menu__help" id={dateHelpId}>
               {dateLabel === null
-                ? 'Để trống để theo ngày thực tế.'
+                ? 'Bỏ trống trường này để hiển thị theo ngày thực tế.'
                 : `Rodemap đang hiển thị dữ liệu theo ngày ${dateLabel}.`}
             </p>
           </div>
@@ -250,7 +250,7 @@ export function AccountMenu() {
                   dispatch({ type: 'demo/setMochiOffline', offline: e.target.checked });
                 }}
               />
-              <span>Buộc Mochi hoạt động ngoại tuyến</span>
+              <span>Chuyển Mochi sang chế độ ngoại tuyến</span>
             </label>
           </div>
 
@@ -277,15 +277,15 @@ export function AccountMenu() {
             {confirming ? (
               <div className="account-menu__confirm" role="group" aria-labelledby={confirmTextId}>
                 <p id={confirmTextId} className="account-menu__confirm-text">
-                  Hồ sơ, đăng ký, hồ sơ năng lực và sự kiện đã gửi trên trình duyệt này sẽ trở về dữ liệu minh họa ban
-                  đầu. Bạn xác nhận khôi phục?
+                  Hồ sơ, thông tin đăng ký, hồ sơ năng lực và sự kiện đã gửi trên trình duyệt này sẽ được đưa về dữ liệu minh
+                  họa ban đầu. Bạn có xác nhận khôi phục không?
                 </p>
                 <div className="account-menu__row">
                   <Button ref={confirmRef} variant="primary" size="sm" onClick={confirmReset}>
                     Xác nhận khôi phục
                   </Button>
                   <Button variant="secondary" size="sm" onClick={cancelReset}>
-                    Hủy
+                    Quay lại
                   </Button>
                 </div>
               </div>

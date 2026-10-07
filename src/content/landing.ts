@@ -38,19 +38,19 @@ export const PILLARS: Pillar[] = [
   {
     id: 'phan-loai',
     title: 'Phân loại',
-    body: 'Mỗi sự kiện thuộc một trong bảy lĩnh vực, có mã tuyến và màu riêng, kèm bộ lọc theo câu lạc bộ, khối, thời gian và hạn đăng ký.',
+    body: 'Mỗi sự kiện thuộc một trong bảy lĩnh vực; mỗi lĩnh vực có mã tuyến và màu riêng. Bộ lọc hỗ trợ tra cứu theo câu lạc bộ, khối, thời gian, hình thức và hạn đăng ký.',
     line: 'NT',
   },
   {
     id: 'lo-trinh',
     title: 'Lộ trình',
-    body: 'Năm học được trình bày như một bản đồ tuyến; kế hoạch cá nhân được kiểm tra trùng lịch và quỹ giờ mỗi tuần.',
+    body: 'Năm học được trình bày như một bản đồ lộ trình; kế hoạch cá nhân được kiểm tra trùng lịch và quỹ giờ mỗi tuần.',
     line: 'TN',
   },
   {
     id: 'ho-so-nang-luc',
     title: 'Hồ sơ năng lực',
-    body: 'Hoạt động đã tham gia được tổng hợp theo lĩnh vực, kèm vai trò, số giờ, phần tự đánh giá và minh chứng, sẵn sàng xuất bản in.',
+    body: 'Hoạt động đã tham gia được tổng hợp theo lĩnh vực, kèm vai trò, số giờ, phần tự đánh giá và minh chứng, sẵn sàng in trên khổ A4.',
     line: 'CN',
   },
 ];
@@ -73,7 +73,7 @@ export const PARTICIPATION: ParticipantStep[] = [
     id: 'hdhs',
     actor: 'Hội đồng Học sinh',
     title: 'Kiểm duyệt',
-    body: 'Thành viên phụ trách phê duyệt, yêu cầu chỉnh sửa hoặc từ chối kèm lý do. Chỉ sự kiện đã phê duyệt được hiển thị với học sinh.',
+    body: 'Thành viên phụ trách phê duyệt, yêu cầu chỉnh sửa hoặc từ chối kèm lý do. Chỉ sự kiện đã được phê duyệt mới được hiển thị với học sinh.',
   },
   {
     id: 'hoc-sinh',

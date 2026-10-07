@@ -99,7 +99,7 @@ describe('validateDraft', () => {
 
   it('requires a location and at least one grade', () => {
     expect(check({ location: '   ' }).location).toBe('Vui lòng nhập địa điểm tổ chức.');
-    expect(check({ eligibleGrades: [] }).eligibleGrades).toBe('Vui lòng chọn ít nhất một khối được tham gia.');
+    expect(check({ eligibleGrades: [] }).eligibleGrades).toBe('Vui lòng chọn ít nhất một khối được phép tham gia.');
   });
 
   it('requires an integer capacity from 1 to 2000', () => {

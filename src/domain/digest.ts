@@ -77,7 +77,7 @@ export function weeklyDigest(events: readonly SchoolEvent[], ctx: DigestContext)
   const exam = ctx.periods.find((p) => p.kind === 'exam' && toMillis(p.start) >= startOfIsoWeek(ctx.now) && toMillis(p.start) < lookahead);
   if (exam) {
     paragraphs.push(
-      `${exam.label} bắt đầu từ ngày ${formatDate(toMillis(exam.start))}; bạn nên cân nhắc quỹ giờ tham gia hoạt động trong giai đoạn này.`,
+      `${exam.label} bắt đầu từ ngày ${formatDate(toMillis(exam.start))}; bạn nên cân nhắc điều chỉnh quỹ giờ tham gia hoạt động trong giai đoạn này.`,
     );
   }
 

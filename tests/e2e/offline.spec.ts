@@ -20,9 +20,9 @@ test.describe('voting day without a network', () => {
     await expect(page.locator('#main-heading')).toHaveText('Lịch của tôi');
 
     await page.getByRole('button', { name: 'Hỏi Mochi' }).click();
-    await page.getByRole('textbox', { name: 'Nhắn Mochi' }).fill('Gợi ý sự kiện tuần tới');
+    await page.getByRole('textbox', { name: 'Nội dung gửi Mochi' }).fill('Gợi ý sự kiện tuần tới');
     await page.getByRole('button', { name: 'Gửi' }).click();
-    await expect(page.getByText('Kết nối tới Mochi tạm thời gián đoạn, vì vậy Mochi trả lời ở chế độ ngoại tuyến.')).toBeVisible();
+    await expect(page.getByText('Kết nối đến Mochi tạm thời bị gián đoạn, vì vậy Mochi trả lời ở chế độ ngoại tuyến.')).toBeVisible();
     await expect(page.getByText('Mochi · ngoại tuyến').first()).toBeVisible();
   });
 });

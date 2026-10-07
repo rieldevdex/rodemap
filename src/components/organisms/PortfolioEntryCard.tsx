@@ -135,7 +135,7 @@ export function PortfolioEntryCard({
               Chỉnh sửa
             </Button>
             <Button size="sm" variant="quiet" onClick={onAskMochi}>
-              Nhờ Mochi đề xuất bản nháp
+              Đề nghị Mochi soạn bản nháp
             </Button>
             <Button
               size="sm"

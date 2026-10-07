@@ -21,11 +21,11 @@ export function ClubDetailPage() {
       <PageHead
         eyebrow="Câu lạc bộ"
         title="Không tìm thấy câu lạc bộ"
-        lead="Đường dẫn không tương ứng với câu lạc bộ nào trong danh bạ Rodemap."
+        lead="Đường dẫn không tương ứng với câu lạc bộ nào trong danh sách câu lạc bộ của Rodemap."
       >
         <div className="cluster">
           <Button to="/cau-lac-bo" variant="primary">
-            Xem danh bạ câu lạc bộ
+            Xem danh sách câu lạc bộ
           </Button>
         </div>
       </PageHead>

@@ -198,7 +198,7 @@ export function EventSubmissionForm({ clubId, defaultCategory, tags, initial, su
       </div>
 
       <fieldset className="submission-form__field submission-form__fieldset" aria-describedby={describedBy('eligibleGrades')} id={id('eligibleGrades')}>
-        <legend>Khối được tham gia</legend>
+        <legend>Khối được phép tham gia</legend>
         <div className="submission-form__choices">
           {GRADES.map((g) => (
             <label key={g} className="submission-form__choice">
@@ -262,7 +262,7 @@ export function EventSubmissionForm({ clubId, defaultCategory, tags, initial, su
           </Button>
         ) : (
           <Button variant="quiet" onClick={reset}>
-            Làm mới biểu mẫu
+            Đặt lại biểu mẫu
           </Button>
         )}
       </div>

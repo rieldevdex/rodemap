@@ -175,14 +175,14 @@ export function HomePage() {
             </h2>
             <p className="home-split__body">{MOCHI_INTRO}</p>
             <ul className="home-mochi__rules">
-              <li>Mochi chỉ sử dụng dữ liệu của Rodemap và không tự tạo sự kiện.</li>
+              <li>Mochi chỉ sử dụng dữ liệu của Rodemap và không tự tạo thông tin.</li>
               <li>Mọi thao tác đăng ký đều cần bạn nhấn Xác nhận.</li>
               <li>Mochi không yêu cầu thông tin cá nhân nhạy cảm.</li>
             </ul>
           </div>
           <figure className="home-demo" aria-labelledby="home-demo-caption">
             <figcaption id="home-demo-caption" className="home-demo__caption">
-              Đoạn trao đổi minh họa · tạo từ dữ liệu minh họa ở chế độ ngoại tuyến
+              Đoạn trao đổi mẫu · được tạo từ dữ liệu minh họa ở chế độ ngoại tuyến
             </figcaption>
             <ol className="home-demo__log">
               <li className="home-demo__entry home-demo__entry--student">

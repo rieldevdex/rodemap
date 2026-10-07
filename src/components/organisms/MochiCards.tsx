@@ -233,7 +233,7 @@ export function MochiCardView({
               setDraft(ev.target.value);
             }}
           />
-          <p className="mochi-card__meta">Đây là bản nháp; bạn cần chỉnh sửa để phản ánh trải nghiệm của chính mình.</p>
+          <p className="mochi-card__meta">Đây là bản nháp; bạn cần chỉnh sửa để phản ánh trải nghiệm của bản thân.</p>
           {pending ? (
             <div className="mochi-card__actions">
               <Button

@@ -197,7 +197,7 @@ export function ExplorePage() {
           size="lg"
           label="Tìm kiếm sự kiện"
           placeholder="Tên sự kiện, câu lạc bộ, địa điểm"
-          hint="Kết quả không phân biệt chữ hoa, chữ thường và dấu tiếng Việt, ví dụ: tranh bien."
+          hint="Tìm kiếm không phân biệt chữ hoa, chữ thường và dấu tiếng Việt, ví dụ: tranh bien."
           shortcut="Ctrl K"
           maxLength={QUERY_MAX_LENGTH}
           value={filter.query}
@@ -305,7 +305,7 @@ export function ExplorePage() {
                 </h2>
                 <p className="explore-empty__body">
                   {anyActive
-                    ? 'Chưa có sự kiện nào đáp ứng đồng thời từ khóa và các bộ lọc đang áp dụng. Vui lòng xóa bớt bộ lọc, thử từ khóa khác hoặc xem toàn bộ sự kiện của năm học trên Lộ trình.'
+                    ? 'Chưa có sự kiện nào đáp ứng đồng thời từ khóa và các bộ lọc đang áp dụng. Vui lòng xóa bớt bộ lọc, sử dụng từ khóa khác hoặc xem toàn bộ sự kiện của năm học trên Lộ trình.'
                     : 'Các sự kiện đã phê duyệt sẽ được hiển thị tại đây. Vui lòng xem toàn bộ năm học trên Lộ trình hoặc quay lại sau khi các câu lạc bộ công bố sự kiện mới.'}
                 </p>
                 {hiddenPast > 0 ? (

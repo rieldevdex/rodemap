@@ -31,7 +31,7 @@ describe('weeklyDigest', () => {
     expect(d.paragraphs[1]).toBe('Bạn đã đăng ký 1 sự kiện trong tuần: “Hội thảo A” (Th 5 · 15/10, 16:45).');
     expect(d.paragraphs[2]).toBe('Có 2 hạn đăng ký kết thúc trong tuần, sớm nhất là “Buổi C” vào 23:59 ngày 15/10/2026.');
     expect(d.paragraphs[3]).toMatch(/chỉ còn 3 chỗ/);
-    expect(d.paragraphs[4]).toBe('Kiểm tra định kỳ giữa học kỳ I bắt đầu từ ngày 26/10/2026; bạn nên cân nhắc quỹ giờ tham gia hoạt động trong giai đoạn này.');
+    expect(d.paragraphs[4]).toBe('Kiểm tra định kỳ giữa học kỳ I bắt đầu từ ngày 26/10/2026; bạn nên cân nhắc điều chỉnh quỹ giờ tham gia hoạt động trong giai đoạn này.');
     expect(d.highlights).toEqual([
       { eventId: 'l', reason: 'deadline' },
       { eventId: 'o', reason: 'deadline' },

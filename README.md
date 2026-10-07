@@ -56,7 +56,7 @@ Tùy chọn: để giới hạn tần suất truy cập Mochi một cách bền 
 2. Mở **Tài khoản minh họa** (góc trên bên phải) → **Khôi phục dữ liệu minh họa** → **Xác nhận** để đưa dữ liệu về trạng thái ban đầu.
 3. Tùy chọn trong cùng trình đơn:
    - **Ngày minh họa**: cố định "hôm nay" (ví dụ ngày bầu cử) để bảng tin, hạn đăng ký và lộ trình hiển thị ổn định;
-   - **Buộc Mochi hoạt động ngoại tuyến**: Mochi sử dụng phản hồi chuẩn bị sẵn, không phụ thuộc mạng.
+   - **Chuyển Mochi sang chế độ ngoại tuyến**: Mochi sử dụng phản hồi chuẩn bị sẵn, không phụ thuộc mạng.
 4. Thực hiện thử luồng trình diễn: Trang chủ → Bắt đầu thiết lập lộ trình → hoàn tất bốn bước → nhận đề xuất của Mochi → Xác nhận đăng ký → kiểm tra sự kiện trên Lộ trình và Lịch của tôi → Xuất toàn bộ lịch.
 
 ## 5. Thay dữ liệu minh họa bằng dữ liệu thật

@@ -78,7 +78,7 @@ export function PortfolioPage() {
             <dd>{formatDate(now)}</dd>
           </div>
         </dl>
-        <p className="portfolio__sheet-note">Bản trình diễn · Dữ liệu minh họa. Các phần đánh dấu “Bản nháp do Mochi đề xuất” chưa được học sinh xác nhận.</p>
+        <p className="portfolio__sheet-note">Bản trình diễn · Dữ liệu minh họa. Các phần được đánh dấu “Bản nháp do Mochi đề xuất” chưa được học sinh xác nhận.</p>
       </section>
 
       <section className="band band--surface portfolio__summary-band" aria-labelledby="portfolio-summary">
@@ -156,7 +156,7 @@ export function PortfolioPage() {
                 Khám phá sự kiện
               </Button>
               <Button to="/lich" variant="secondary">
-                Xem lịch của tôi
+                Xem Lịch của tôi
               </Button>
             </div>
           </div>
@@ -190,7 +190,7 @@ export function PortfolioPage() {
                         dispatch({ type: 'portfolio/remove', id: entry.id });
                       }}
                       onAskMochi={() => {
-                        requestMochi({ kind: 'prompt', text: `Mochi đề xuất bản nháp phần tự đánh giá cho sự kiện “${event?.title ?? entry.eventId}”.` });
+                        requestMochi({ kind: 'prompt', text: `Đề nghị Mochi soạn bản nháp phần tự đánh giá cho sự kiện “${event?.title ?? entry.eventId}”.` });
                       }}
                     />
                   );

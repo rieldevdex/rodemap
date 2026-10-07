@@ -170,7 +170,7 @@ export function RegistrationControl({
         ) : null}
         <p className="registration-control__note">
           {dialog === 'unregister'
-            ? 'Sau khi hủy, chỗ của bạn được trả lại cho học sinh khác.'
+            ? 'Sau khi hủy, chỗ của bạn sẽ được mở lại cho học sinh khác đăng ký.'
             : 'Thao tác chỉ được thực hiện sau khi bạn nhấn Xác nhận.'}
         </p>
       </ConfirmDialog>

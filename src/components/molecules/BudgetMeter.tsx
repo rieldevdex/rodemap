@@ -32,7 +32,7 @@ export function BudgetMeter({ used, budget, label }: BudgetMeterProps) {
         ))}
       </svg>
       <p className="budget-meter__note">
-        {over ? `Vượt ${formatHours(used - budget)} giờ so với quỹ giờ trong tuần.` : `Còn ${formatHours(Math.max(0, budget - used))} giờ trong quỹ giờ tuần này.`}
+        {over ? `Vượt ${formatHours(used - budget)} giờ so với quỹ giờ tuần này.` : `Còn ${formatHours(Math.max(0, budget - used))} giờ trong quỹ giờ tuần này.`}
       </p>
     </div>
   );

@@ -54,8 +54,8 @@ export const PROPOSAL_SECTIONS: ProposalSection[] = [
     bullets: [
       'Tổng hợp: một nguồn thông tin duy nhất cho toàn bộ sự kiện đã được Hội đồng Học sinh phê duyệt.',
       'Phân loại: bảy lĩnh vực, mỗi lĩnh vực có mã hai chữ cái và màu tuyến riêng; bộ lọc theo câu lạc bộ, khối, thời gian, hình thức và hạn đăng ký.',
-      'Lộ trình: dòng thời gian toàn năm học, phát hiện trùng lịch, quỹ giờ hằng tuần, xuất lịch định dạng .ics và liên kết Google Calendar.',
-      'Hồ sơ năng lực: tổng hợp hoạt động đã tham gia theo lĩnh vực, kèm vai trò, số giờ, phần tự đánh giá và minh chứng; xuất bản in khổ A4.',
+      'Lộ trình: dòng thời gian toàn năm học, phát hiện trùng lịch, quỹ giờ mỗi tuần, xuất lịch định dạng .ics và liên kết Google Calendar.',
+      'Hồ sơ năng lực: tổng hợp hoạt động đã tham gia theo lĩnh vực, kèm vai trò, số giờ, phần tự đánh giá và minh chứng; hỗ trợ in trên khổ A4.',
     ],
   },
   {
@@ -63,9 +63,9 @@ export const PROPOSAL_SECTIONS: ProposalSection[] = [
     numeral: 'IV',
     title: 'Nguồn lực và tính khả thi',
     paragraphs: [
-      'Rodemap được phát triển dưới dạng ứng dụng web, có thể truy cập trên máy tính và điện thoại mà không cần cài đặt. Bản trình diễn hiện tại đã vận hành đầy đủ các chức năng chính với dữ liệu minh họa, qua đó chứng minh tính khả thi về mặt kỹ thuật.',
+      'Rodemap được phát triển dưới dạng ứng dụng web, có thể truy cập trên máy tính và điện thoại mà không cần cài đặt. Bản trình diễn hiện tại đã có đầy đủ các chức năng chính, vận hành với dữ liệu minh họa, qua đó chứng minh tính khả thi về mặt kỹ thuật.',
       'Việc vận hành cần ba nhóm nguồn lực: nhóm học sinh phụ trách kỹ thuật thuộc Hội đồng Học sinh; đại diện các câu lạc bộ phụ trách cập nhật sự kiện; và thành viên Hội đồng Học sinh phụ trách kiểm duyệt. Hạ tầng lưu trữ sử dụng dịch vụ có gói miễn phí phù hợp với quy mô một trường học.',
-      'Trợ lý Mochi sử dụng dịch vụ trí tuệ nhân tạo có tính phí theo lượt sử dụng. Khi chưa có kinh phí được phê duyệt, Mochi hoạt động ở chế độ ngoại tuyến với các phản hồi được chuẩn bị sẵn; mọi chức năng tổng hợp, lộ trình và hồ sơ năng lực vẫn sử dụng được đầy đủ.',
+      'Trợ lý Mochi sử dụng dịch vụ trí tuệ nhân tạo có tính phí theo lượt sử dụng. Khi chưa có kinh phí được phê duyệt, Mochi hoạt động ở chế độ ngoại tuyến với các phản hồi được chuẩn bị sẵn; mọi chức năng tổng hợp, lộ trình và hồ sơ năng lực vẫn hoạt động đầy đủ.',
     ],
   },
   {
@@ -84,7 +84,7 @@ export const PROPOSAL_SECTIONS: ProposalSection[] = [
     title: 'Cam kết',
     paragraphs: [
       'Nếu được tín nhiệm, tôi cam kết triển khai Rodemap theo đúng các giai đoạn đã trình bày, báo cáo tiến độ định kỳ với Hội đồng Học sinh và Phòng Công tác Học sinh, đồng thời tiếp nhận góp ý của học sinh và các câu lạc bộ để điều chỉnh nền tảng.',
-      'Đề án được xây dựng trên tinh thần cụ thể, khả thi và trung thực: mọi chức năng nêu trong đề án đều đã có trong bản trình diễn, và những nội dung cần nhà trường phê duyệt được trình bày rõ là kế hoạch của giai đoạn sau.',
+      'Đề án được xây dựng trên tinh thần cụ thể, khả thi và trung thực: mọi chức năng nêu trong đề án đều đã có trong bản trình diễn, và những nội dung cần nhà trường phê duyệt được trình bày rõ là kế hoạch của các giai đoạn sau.',
     ],
   },
 ];
@@ -98,7 +98,7 @@ export const PROPOSAL_PHASES: ProposalPhase[] = [
     goals: [
       'Lựa chọn một số câu lạc bộ đăng ký tham gia thí điểm.',
       'Hướng dẫn đại diện câu lạc bộ gửi sự kiện và Hội đồng Học sinh kiểm duyệt.',
-      'Thu thập ý kiến phản hồi của học sinh về khả năng sử dụng.',
+      'Thu thập ý kiến phản hồi của học sinh về mức độ thuận tiện khi sử dụng.',
     ],
     outputs: ['Danh sách sự kiện của các câu lạc bộ thí điểm được cập nhật trên Rodemap.', 'Báo cáo đánh giá thí điểm.'],
   },
@@ -121,7 +121,7 @@ export const PROPOSAL_PHASES: ProposalPhase[] = [
     timing: '[thời gian dự kiến]',
     goals: [
       'Triển khai đồng bộ hai chiều với Google Calendar sau khi được nhà trường phê duyệt phương án tài khoản.',
-      'Hoàn thiện hồ sơ năng lực với xác nhận tham gia từ câu lạc bộ phụ trách.',
+      'Bổ sung xác nhận tham gia của câu lạc bộ phụ trách vào hồ sơ năng lực.',
       'Đánh giá hiệu quả sau một năm học và đề xuất phương án duy trì.',
     ],
     outputs: ['Lịch cá nhân của học sinh được cập nhật tự động.', 'Hồ sơ năng lực có xác nhận của câu lạc bộ.'],

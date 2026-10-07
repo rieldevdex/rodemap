@@ -108,7 +108,7 @@ export function MochiProvider({ children }: { children: ReactNode }) {
             ? 'Mochi đang hoạt động ở chế độ ngoại tuyến với các phản hồi được chuẩn bị sẵn.'
             : result.error === 'rate_limited'
               ? 'Mochi đang nhận nhiều yêu cầu, vì vậy tạm thời trả lời ở chế độ ngoại tuyến.'
-              : 'Kết nối tới Mochi tạm thời gián đoạn, vì vậy Mochi trả lời ở chế độ ngoại tuyến.';
+              : 'Kết nối đến Mochi tạm thời bị gián đoạn, vì vậy Mochi trả lời ở chế độ ngoại tuyến.';
         setConv(runOfflineTurn(addNotice(current, notice), text, context()));
         setFigure('answering');
       }
@@ -129,7 +129,7 @@ export function MochiProvider({ children }: { children: ReactNode }) {
           const event = selectEventById(latest.current.state, request.eventId);
           if (!event) return;
           setConv((c) => ({ ...c, focusEventId: event.id }));
-          void send(`Mochi cung cấp thông tin về sự kiện “${event.title}”.`);
+          void send(`Đề nghị Mochi cung cấp thông tin về sự kiện “${event.title}”.`);
         } else if (request.kind === 'prompt') {
           void send(request.text);
         }

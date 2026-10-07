@@ -124,7 +124,7 @@ export function MochiPanel({
         <div className="mochi-panel__tools">
           {mode === 'offline' ? <StatusTag tone="neutral">Chế độ ngoại tuyến</StatusTag> : null}
           <Button size="sm" variant="quiet" onClick={onNewConversation}>
-            Cuộc trò chuyện mới
+            Bắt đầu cuộc trò chuyện mới
           </Button>
         </div>
       </header>
@@ -135,11 +135,11 @@ export function MochiPanel({
             <p className="mochi-panel__who">Mochi</p>
             <div className="mochi-panel__text">
               <p>
-                Xin chào, Mochi là trợ lý đồng hành của Rodemap. Mochi có thể đề xuất sự kiện phù hợp, chuẩn bị thẻ xác
+                Xin chào bạn. Mochi là trợ lý đồng hành của Rodemap. Mochi có thể đề xuất sự kiện phù hợp, chuẩn bị thẻ xác
                 nhận đăng ký, tổng hợp lịch cá nhân, tóm tắt sự kiện và đề xuất bản nháp cho hồ sơ năng lực.
               </p>
               <p className="mochi-panel__fine">
-                Mochi chỉ sử dụng dữ liệu của Rodemap, không lưu nội dung trò chuyện và không yêu cầu thông tin cá nhân.
+                Mochi chỉ sử dụng dữ liệu của Rodemap, không lưu nội dung trò chuyện và không yêu cầu thông tin cá nhân nhạy cảm.
                 Mọi thao tác đăng ký đều cần bạn nhấn Xác nhận.
               </p>
             </div>
@@ -212,7 +212,7 @@ export function MochiPanel({
           }}
         >
           <label className="mochi-panel__label" htmlFor={fieldId}>
-            Nhắn Mochi
+            Nội dung gửi Mochi
           </label>
           <textarea
             id={fieldId}

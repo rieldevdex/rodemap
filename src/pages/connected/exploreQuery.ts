@@ -262,7 +262,7 @@ export function activeFilters(
     });
   }
   if (filter.includePast) {
-    items.push({ id: 'past', label: 'Gồm sự kiện đã diễn ra', without: { ...filter, includePast: false } });
+    items.push({ id: 'past', label: 'Bao gồm sự kiện đã diễn ra', without: { ...filter, includePast: false } });
   }
   return items;
 }

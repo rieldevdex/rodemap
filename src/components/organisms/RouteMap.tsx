@@ -710,7 +710,7 @@ export function RouteMap({
       <span className="visually-hidden" id={helpId}>
         {stations.length === 0
           ? 'Chưa có điểm dừng trên bản đồ.'
-          : `Có ${stations.length} điểm dừng. Dùng phím mũi tên để di chuyển giữa các sự kiện, Enter để mở chi tiết, Escape để đóng thẻ thông tin.`}
+          : `Có ${stations.length} điểm dừng. Sử dụng phím mũi tên để di chuyển giữa các sự kiện, Enter để mở chi tiết, Escape để đóng thẻ thông tin.`}
       </span>
     </div>
   );
