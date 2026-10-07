@@ -120,7 +120,9 @@ export function proposePlan(candidates: readonly SchoolEvent[], ctx: PlanContext
 /**
  * Onboarding's first route: the top `size * 2` recommendations go through proposePlan with the
  * profile's weekly budget (6 hours without a profile), then accepted is trimmed to `size`
- * (default 4) and the weekly hours are recomputed for the trimmed plan.
+ * (default 4). Drops are checked again against the trimmed route (a candidate that only clashed
+ * with, or only went over budget because of, a trimmed event is no longer dropped), and the
+ * weekly hours are recomputed for it.
  */
 export function firstRoute(
   events: readonly SchoolEvent[],
@@ -129,7 +131,13 @@ export function firstRoute(
 ): PlanProposal {
   const candidates = recommendEvents(events, ctx, { limit: size * 2 }).map((r) => r.event);
   const budget = ctx.profile?.weeklyHourBudget ?? DEFAULT_WEEKLY_HOUR_BUDGET;
-  const proposal = proposePlan(candidates, { ...ctx, allEvents: [...events], budget });
+  const planCtx: PlanContext = { ...ctx, allEvents: [...events], budget };
+  const proposal = proposePlan(candidates, planCtx);
   const accepted = proposal.accepted.slice(0, Math.max(0, size));
-  return { ...proposal, accepted, hoursByWeek: Object.fromEntries(hoursByWeek([...ctx.plan, ...accepted])) };
+  if (accepted.length === proposal.accepted.length) return proposal;
+  const committed = [...ctx.plan, ...accepted];
+  const dropped = proposal.dropped.flatMap((d) => dropReason(d.event, planCtx, committed) ?? []);
+  const droppedIds = new Set(dropped.map((d) => d.event.id));
+  const alternatives = proposal.alternatives.filter((a) => droppedIds.has(a.forEventId));
+  return { accepted, dropped, alternatives, hoursByWeek: Object.fromEntries(hoursByWeek(committed)) };
 }

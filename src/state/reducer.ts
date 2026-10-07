@@ -136,5 +136,9 @@ export function reducer(state: AppState, action: Action): AppState {
       const seed = createSeedState();
       return { ...seed, theme: state.theme, demoToday: state.demoToday, mochiForcedOffline: state.mochiForcedOffline };
     }
+
+    default:
+      // Unknown actions (e.g. from an older persisted build) leave the state untouched.
+      return state;
   }
 }

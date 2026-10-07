@@ -325,7 +325,7 @@ describe('recommendEvents: without a profile', () => {
 
   it('lists no interest, goal, time or grade reasons and no availability warning', () => {
     expect(byId(recs, 'n-school')).toStrictEqual({ event: events[1], score: 0, reasons: [], warnings: [] });
-    expect(byId(recs, 'n-late').reasons).toEqual(['balances_categories', 'deadline_soon']);
+    expect(byId(recs, 'n-late').reasons).toEqual(['deadline_soon']);
   });
 
   it('still warns about conflicts, seats and the default 6-hour budget', () => {

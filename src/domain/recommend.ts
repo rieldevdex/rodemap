@@ -158,7 +158,8 @@ export function recommendEvents(
       ['interest', facts.interest, POINTS.interest],
       ['goal', facts.matchedGoals.length > 0, POINTS.goal],
       ['fits_time', facts.fitsTime === true, POINTS.fitsTime],
-      ['balances_categories', countOf(e.category) <= balanceCeiling, POINTS.balancesCategories],
+      // Without a profile there is no plan shape to balance, so the reason is never claimed.
+      ['balances_categories', profile !== null && countOf(e.category) <= balanceCeiling, POINTS.balancesCategories],
       ['deadline_soon', deadlineDaysLeft(e, now) <= DEADLINE_SOON_DAYS, POINTS.deadlineSoon],
       ['grade_eligible', profile !== null, 0],
     ];

@@ -77,7 +77,7 @@ export function isAppStateV1(x: unknown): x is AppState {
     Array.isArray(x.submissions) &&
     typeof x.theme === 'string' &&
     THEMES.includes(x.theme) &&
-    (x.demoToday === null || typeof x.demoToday === 'string') &&
+    (x.demoToday === null || (typeof x.demoToday === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.demoToday))) &&
     typeof x.mochiForcedOffline === 'boolean'
   );
 }
