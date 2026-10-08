@@ -219,10 +219,11 @@ cycle) ·
   from 1080 units up the search control shows its icon only, keeping its name
   and the Ctrl K shortcut, so eight sections fit.)
 - Bản tin Hội đồng Học sinh reads as a wall newspaper: the page head is a
-  nameplate between double rules, issues are numbered by month (Số 1 = Tháng
-  9/2026), articles sit in ruled columns, the lead story faces "Trong số N",
-  and quotes carry a thick signal rule. Articles are signed by a council
-  department, never by a student.
+  nameplate closed by a double rule, issues are numbered by month (Số 1 = Tháng
+  9/2026) and marked by an interchange station (ink ring; signal stays reserved
+  for the student's own route), articles sit in ruled columns, the lead story
+  faces "Trong số N", and quotes carry a thick signal rule. Articles are signed
+  by a council department (body face, never mono), never by a student.
 - Landing hero: left 7 columns for the headline and actions; right 5 columns a
   live, animated RouteMap fragment with real sample events. No stock imagery.
 - App screens: a left filter rail (240 px) on desktop that becomes a bottom

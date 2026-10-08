@@ -114,7 +114,7 @@ export function ClubDetailPage() {
         </div>
       </section>
 
-      <NewsRelated posts={selectNewsForClub(state, club.id, now)} title={`Bản tin Hội đồng Học sinh về ${club.shortName}`} headingId="club-news" surface />
+      <NewsRelated posts={selectNewsForClub(state, club.id, now)} title="Bài viết liên quan trên Bản tin Hội đồng Học sinh" headingId="club-news" surface />
     </>
   );
 }

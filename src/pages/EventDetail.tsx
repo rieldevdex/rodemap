@@ -230,8 +230,6 @@ export function EventDetailPage() {
         </div>
       </section>
 
-      <NewsRelated posts={selectNewsForEvent(state, event.id, now)} title="Bản tin Hội đồng Học sinh nhắc đến sự kiện này" headingId="event-news" />
-
       {related.length > 0 ? (
         <section className="band" aria-labelledby="event-related">
           <div className="container stack stack--md">
@@ -254,6 +252,14 @@ export function EventDetailPage() {
           </div>
         </section>
       ) : null}
+
+      {/* Bands alternate: after the surface facts band and the ground "Sự kiện khác" band when it shows. */}
+      <NewsRelated
+        posts={selectNewsForEvent(state, event.id, now)}
+        title="Bài viết trên Bản tin Hội đồng Học sinh về sự kiện này"
+        headingId="event-news"
+        surface={related.length > 0}
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '../components/atoms/Button';
 import { DemoLabel } from '../components/atoms/DemoLabel';
+import { Icon } from '../components/atoms/Icon';
 import { LineBadge } from '../components/atoms/LineBadge';
 import { MonoTime } from '../components/atoms/MonoTime';
 import { ConfirmDialog } from '../components/molecules/ConfirmDialog';
@@ -23,7 +24,7 @@ export function NewsArticlePage() {
   const { params } = useRoute();
   const navigate = useNavigate();
   const { state, dispatch, now, eventById, clubById, clubName } = useCatalog();
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState<{ ok: boolean; text: string } | null>(null);
   const [confirmRemove, setConfirmRemove] = useState(false);
   const post = selectNewsBySlug(state, params.slug ?? '', now);
   useDocumentTitle(post?.title ?? null);
@@ -33,11 +34,11 @@ export function NewsArticlePage() {
       <PageHead
         eyebrow="Bản tin Hội đồng Học sinh"
         title="Không tìm thấy bài viết"
-        lead="Bài viết không tồn tại, chưa đến ngày phát hành hoặc đã được gỡ khỏi bản tin."
+        lead="Bài viết không tồn tại, chưa đến ngày phát hành hoặc đã được gỡ khỏi Bản tin."
       >
         <div className="cluster">
           <Button to="/ban-tin" variant="primary">
-            Xem toàn bộ bản tin
+            Xem toàn bộ Bản tin
           </Button>
         </div>
       </PageHead>
@@ -52,8 +53,13 @@ export function NewsArticlePage() {
   const ownDemoPost = state.newsPosts.some((p) => p.id === post.id);
 
   const copyLink = () => {
+    // Emptied first, so a repeated copy is announced again.
+    setStatus(null);
     void copyText(`${window.location.origin}/ban-tin/${post.slug}`).then((ok) => {
-      setStatus(ok ? 'Đã sao chép liên kết bài viết.' : 'Trình duyệt không cho phép sao chép; vui lòng sao chép địa chỉ trên thanh địa chỉ.');
+      setStatus({
+        ok,
+        text: ok ? 'Đã sao chép liên kết bài viết.' : 'Trình duyệt không cho phép sao chép; vui lòng sao chép địa chỉ trên thanh địa chỉ.',
+      });
     });
   };
 
@@ -109,10 +115,16 @@ export function NewsArticlePage() {
             </Button>
           ) : null}
           <DemoLabel />
+          {/* Always rendered, so the first message lands in an existing live region. */}
+          <p className="news-article__status" role="status">
+            {status ? (
+              <span className={status.ok ? 'news-article__status-text' : 'news-article__status-text news-article__status-text--warn'}>
+                <Icon name={status.ok ? 'check' : 'alert'} size="sm" />
+                <span>{status.text}</span>
+              </span>
+            ) : null}
+          </p>
         </div>
-        <p className="news-article__status" role="status">
-          {status}
-        </p>
       </PageHead>
 
       <div className="band band--surface">
@@ -188,7 +200,7 @@ export function NewsArticlePage() {
               ))}
             </ul>
             <Link to="/ban-tin" className="news-article__all">
-              Xem toàn bộ bản tin
+              Xem toàn bộ Bản tin
             </Link>
           </div>
         </section>
@@ -196,7 +208,7 @@ export function NewsArticlePage() {
 
       <ConfirmDialog
         open={confirmRemove}
-        title="Gỡ bài viết khỏi bản tin?"
+        title="Gỡ bài viết khỏi Bản tin"
         confirmLabel="Gỡ bài viết"
         tone="stop"
         onCancel={() => {

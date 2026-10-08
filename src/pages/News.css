@@ -144,6 +144,14 @@
   color: var(--color-ink-2);
 }
 
+.news__count:focus {
+  outline: none;
+}
+
+.news__count:focus-visible {
+  outline: var(--focus-w) solid var(--color-signal);
+}
+
 .news__empty {
   display: grid;
   gap: var(--space-3);
@@ -168,15 +176,6 @@
   padding-block-end: var(--space-3);
   font-size: var(--text-xl);
   border-block-end: var(--rule-hair) solid var(--color-rule);
-}
-
-.news__issue-station {
-  box-sizing: border-box;
-  inline-size: var(--station-interchange);
-  block-size: var(--station-interchange);
-  background: var(--color-surface);
-  border: var(--station-ring) solid var(--color-signal);
-  border-radius: var(--radius-pill);
 }
 
 .news__issue-month {

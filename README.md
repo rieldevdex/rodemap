@@ -65,7 +65,7 @@ Dữ liệu nằm trong `src/data/` (mỗi tệp đều ghi chú là dữ liệu
 
 ## 6. Bản tin Hội đồng Học sinh
 
-Trang **Bản tin** (`/ban-tin`) trình bày các bài viết của Hội đồng Học sinh theo từng số hằng tháng. Để đăng bài trong bản trình diễn: mở **Tài khoản minh họa** → chọn vai trò **HĐHS** → **Bản tin** → **Soạn bài viết**. Bài viết hiển thị ngay sau khi nhấn **Đăng bài**, xuất hiện tại trang Tổng quan, trang các sự kiện được liên kết, và Mochi có thể giới thiệu bài viết khi học sinh hỏi về thông báo mới. Bài viết đăng trong bản trình diễn được lưu trên trình duyệt và có thể gỡ bằng nút **Gỡ bài viết**.
+Trang **Bản tin** (`/ban-tin`) trình bày các bài viết của Hội đồng Học sinh theo từng số hằng tháng. Để đăng bài trong bản trình diễn: mở **Tài khoản minh họa** → chọn vai trò **HĐHS** → **Bản tin** → **Soạn bài viết**. Bài viết được hiển thị ngay sau khi nhấn **Đăng bài**, đồng thời xuất hiện tại trang Tổng quan, trang của các sự kiện được liên kết và trang của câu lạc bộ tổ chức các sự kiện đó. Mochi có thể giới thiệu bài viết khi học sinh hỏi về thông báo mới. Bài viết đăng trong bản trình diễn được lưu trên trình duyệt, luôn hiển thị dù ngày minh họa được đặt là ngày nào, và có thể gỡ bằng nút **Gỡ bài viết**.
 
 ## 7. Cấu trúc mã nguồn
 

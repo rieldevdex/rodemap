@@ -4,6 +4,7 @@ import {
   bodyToText,
   filterPosts,
   groupByIssue,
+  groupThousands,
   isPublished,
   issueNumber,
   leadPost,
@@ -17,6 +18,7 @@ import {
   publishedPosts,
   readingMinutes,
   relatedPosts,
+  sortNews,
   uniqueNewsSlug,
   validateNewsDraft,
 } from './news';
@@ -100,6 +102,15 @@ describe('body text', () => {
     expect(parseNewsBody('- \n- ')).toEqual([]);
   });
 
+  it('takes the source after the last spaced em dash only', () => {
+    expect(parseNewsBody('> Sinh hoạt từ 7 - 9 giờ – phòng A1.')).toEqual([{ kind: 'quote', text: 'Sinh hoạt từ 7 - 9 giờ – phòng A1.', source: '' }]);
+    expect(parseNewsBody('> Năm học 2026-2027 — mở đầu — Ban chủ nhiệm, Khối 10-11')).toEqual([
+      { kind: 'quote', text: 'Năm học 2026-2027 — mở đầu', source: 'Ban chủ nhiệm, Khối 10-11' },
+    ]);
+    const hyphens: NewsBlock[] = [{ kind: 'quote', text: 'Từ 7 - 9 giờ, năm học 2026–2027.', source: 'Ban chủ nhiệm, Khối 10-11' }];
+    expect(parseNewsBody(bodyToText(hyphens))).toEqual(hyphens);
+  });
+
   it('round-trips through the compose text', () => {
     const withBare: NewsBlock[] = [...blocks, { kind: 'quote', text: 'Không nguồn.', source: '' }];
     expect(parseNewsBody(bodyToText(withBare))).toEqual(withBare);
@@ -112,14 +123,16 @@ describe('publication', () => {
   const c = post({ id: 'c', publishedAt: '2026-10-05T08:00:00+07:00', pinned: true });
   const later = post({ id: 'later', publishedAt: '2026-10-20T08:00:00+07:00' });
 
-  it('hides scheduled posts and sorts newest first, then by id', () => {
+  it('hides scheduled posts and sorts newest first; at the same instant the later one in the list first', () => {
     expect(isPublished(later, now)).toBe(false);
     expect(publishedPosts([a, later, c, b], now).map((p) => p.id)).toEqual(['b', 'c', 'a']);
+    expect(sortNews([b, c]).map((p) => p.id)).toEqual(['c', 'b']);
+    expect(sortNews([later, a]).map((p) => p.id)).toEqual(['later', 'a']);
   });
 
-  it('keeps the last copy of a repeated id', () => {
-    const edited = { ...a, title: 'Đã chỉnh sửa' };
-    expect(publishedPosts([a, edited], now).map((p) => p.title)).toEqual(['Đã chỉnh sửa']);
+  it('keeps the last copy of a repeated id, in its place', () => {
+    const edited = { ...b, title: 'Đã chỉnh sửa' };
+    expect(publishedPosts([a, b, c, edited], now).map((p) => p.title)).toEqual(['Đã chỉnh sửa', c.title, a.title]);
   });
 
   it('leads with the newest pinned post, else the newest', () => {
@@ -196,6 +209,10 @@ describe('compose', () => {
     expect(validateNewsDraft(valid, known)).toEqual({});
   });
 
+  it('groups thousands with a dot', () => {
+    expect([0, 120, 6000, 1234567, 999.9].map(groupThousands)).toEqual(['0', '120', '6.000', '1.234.567', '999']);
+  });
+
   it('reports every field', () => {
     const L = NEWS_LIMITS;
     expect(
@@ -205,7 +222,7 @@ describe('compose', () => {
       category: 'Vui lòng chọn chuyên mục.',
       author: 'Vui lòng chọn ban phụ trách bài viết.',
       summary: `Phần tóm tắt cần có từ ${String(L.summaryMin)} đến ${String(L.summaryMax)} ký tự.`,
-      bodyText: `Nội dung cần có từ ${String(L.bodyMin)} đến ${String(L.bodyMax)} ký tự.`,
+      bodyText: 'Nội dung cần có từ 120 đến 6.000 ký tự.',
       eventIds: 'Danh sách sự kiện liên quan không hợp lệ.',
     });
     expect(validateNewsDraft({ ...valid, eventIds: ['ev-018', 'ev-018'] }, known).eventIds).toBe('Danh sách sự kiện liên quan không hợp lệ.');

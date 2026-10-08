@@ -98,8 +98,9 @@ export function draftToProfile(draft, now): Profile | null;    // null until eve
 // news.ts — Bản tin Hội đồng Học sinh
 export const NEWS_CATEGORY_LABELS: Record<NewsCategory, string>; // Thông báo, Tin hoạt động, Câu lạc bộ, Hướng dẫn
 export const NEWS_LIMITS; export const RESERVED_NEWS_SLUGS = ['soan-bai'];
-export function publishedPosts(posts, now): NewsPost[];       // publishedAt <= now, newest first; later ones are scheduled
-export function leadPost(posts): NewsPost | undefined;        // newest pinned, else newest
+export function sortNews(posts): NewsPost[];                  // newest first; same instant: later in the list first; last copy of a repeated id
+export function publishedPosts(posts, now): NewsPost[];       // sortNews, publishedAt <= now; later ones are scheduled
+export function leadPost(posts): NewsPost | undefined;        // newest pinned, else newest (ties keep input order)
 export function issueNumber(ms): number; export function groupByIssue(posts): NewsIssue[]; // Số 1 = Tháng 9/2026
 export function filterPosts(posts, { category, query }): NewsPost[];
 export function relatedPosts(post, posts, limit = 3): NewsPost[]; // shared events/clubs ×2, same column ×1
@@ -108,6 +109,7 @@ export function parseNewsBody(text): NewsBlock[]; export function bodyToText(blo
 export function newsBodyText(blocks): string; export function readingMinutes(post): number;
 export function validateNewsDraft(draft, knownEventIds): NewsDraftErrors;
 export function uniqueNewsSlug(title, taken): string; export function postFromDraft(draft, { id, now, takenSlugs, clubOfEvent }): NewsPost;
+export function groupThousands(n): string;                    // 6000 -> '6.000'
 
 // calendar-view.ts — Lịch của tôi
 export function monthGrid(ms): Millis[][];                    // Monday-first weeks covering the month
@@ -237,6 +239,7 @@ export function applyReview(sub: Submission, status: EventStatus, action: Review
 //   reject → rejected (reason required). Throws Error on invalid transition or missing reason.
 export function canTransition(from: EventStatus, action: ReviewAction): boolean;
 export function slugify(title: string): string; // folded, ascii, hyphenated, ≤ 60 chars
+export function charCount(s: string): number;   // graphemes after trim (Intl.Segmenter), used by every length limit
 ```
 
 ## Data (`src/data/*.ts`)
@@ -305,6 +308,7 @@ selectRecommendations(state, now, opts?)
 selectFirstRoute(state, now, size?)  // planner.firstRoute: best event of each top interest first, then by score
 selectPlanBudget(state, now)
 selectNews(state, now) / selectNewsBySlug(state, slug, now) / selectNewsSlugs(state)
+//   sample articles published by now + every article published in the demo (the demo cannot schedule)
 selectNewsForEvent(state, eventId, now) / selectNewsForClub(state, clubId, now)
 selectDeadlinesThisWeek(state, now)
 selectPendingAttendance(state, now)
@@ -316,7 +320,8 @@ saveState(storage: Storage | null, s: AppState): void;  // try/catch
 // hooks.ts (React): useAppState(), useDispatch(), useSelector(fn), useNow()
 // routeMemory.ts: "your route" as last seen on the Lộ trình map in this session; onboarding and
 //   Mochi call rememberRouteBefore(ids) before registering, so the map grows to the new stations.
-// effects.ts: applyTheme, downloadFile, printPage, newId, registerServiceWorker (production only).
+// effects.ts: applyTheme, downloadFile, printPage, newId, registerServiceWorker (production only),
+//   copyText(text): Promise<boolean> (the only clipboard access; false when the browser refuses).
 ```
 
 ## Router (`src/router`)

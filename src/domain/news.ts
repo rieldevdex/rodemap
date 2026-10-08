@@ -47,7 +47,8 @@ export function readingMinutes(post: Pick<NewsPost, 'title' | 'summary' | 'body'
   return Math.max(1, Math.ceil(words / WORDS_PER_MINUTE));
 }
 
-const QUOTE_SOURCE = /\s+[—–-]\s+(?=[^—–-]+$)/;
+/** The last em dash with spaces around it; hyphens and en dashes ("7 - 9 giờ", "2026–2027") never split a quote. */
+const QUOTE_SOURCE = /\s+—\s+(?=[^—]*$)/;
 
 /**
  * Parses the compose text: blank lines separate blocks; "## " starts a heading; consecutive
@@ -102,17 +103,31 @@ export function isPublished(post: NewsPost, now: Millis): boolean {
   return toMillis(post.publishedAt) <= now;
 }
 
+/** Newest first; a stable sort, so posts published at the same instant keep their order. */
 function newestFirst(a: NewsPost, b: NewsPost): number {
-  return toMillis(b.publishedAt) - toMillis(a.publishedAt) || a.id.localeCompare(b.id);
+  return toMillis(b.publishedAt) - toMillis(a.publishedAt);
 }
 
-/** Posts published at or before `now`, newest first (then id); a repeated id keeps its last copy. */
+/**
+ * Posts newest first. Of posts published at the same instant (every article published on one
+ * demo day is stamped 09:00), the later one in `posts` comes first. A repeated id keeps its
+ * last copy, in the last copy's place.
+ */
+export function sortNews(posts: readonly NewsPost[]): NewsPost[] {
+  const byId = new Map<string, NewsPost>();
+  for (const p of posts) {
+    byId.delete(p.id);
+    byId.set(p.id, p);
+  }
+  return [...byId.values()].reverse().sort(newestFirst);
+}
+
+/** The posts of sortNews published at or before `now`. */
 export function publishedPosts(posts: readonly NewsPost[], now: Millis): NewsPost[] {
-  const byId = new Map(posts.map((p) => [p.id, p]));
-  return [...byId.values()].filter((p) => isPublished(p, now)).sort(newestFirst);
+  return sortNews(posts).filter((p) => isPublished(p, now));
 }
 
-/** The post that leads the index: the newest pinned one, otherwise the newest. */
+/** The post that leads the index: the newest pinned one, otherwise the newest (ties keep input order). */
 export function leadPost(posts: readonly NewsPost[]): NewsPost | undefined {
   const sorted = [...posts].sort(newestFirst);
   return sorted.find((p) => p.pinned === true) ?? sorted[0];
@@ -137,7 +152,7 @@ export function issueNumber(ms: Millis): number {
   return Math.max(1, (p.year - s.year) * 12 + (p.month - s.month) + 1);
 }
 
-/** Posts grouped by month of publication, newest month first, posts newest first. */
+/** Posts grouped by month of publication, newest month first, posts newest first (ties keep input order). */
 export function groupByIssue(posts: readonly NewsPost[]): NewsIssue[] {
   const issues = new Map<string, NewsIssue>();
   for (const post of [...posts].sort(newestFirst)) {
@@ -199,6 +214,11 @@ export function postsAboutClub(posts: readonly NewsPost[], clubId: string): News
 
 export type NewsDraftErrors = Partial<Record<keyof NewsDraft, string>>;
 
+/** A whole number with Vietnamese thousands separators: 6000 → "6.000". */
+export function groupThousands(n: number): string {
+  return String(Math.trunc(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
 /** Formal Vietnamese messages per field; an empty object means the draft can be published. */
 export function validateNewsDraft(d: NewsDraft, knownEventIds: ReadonlySet<string>): NewsDraftErrors {
   const L = NEWS_LIMITS;
@@ -213,7 +233,7 @@ export function validateNewsDraft(d: NewsDraft, knownEventIds: ReadonlySet<strin
     errors.summary = `Phần tóm tắt cần có từ ${String(L.summaryMin)} đến ${String(L.summaryMax)} ký tự.`;
   }
   const body = charCount(newsBodyText(parseNewsBody(d.bodyText)));
-  if (body < L.bodyMin || body > L.bodyMax) errors.bodyText = `Nội dung cần có từ ${String(L.bodyMin)} đến ${String(L.bodyMax)} ký tự.`;
+  if (body < L.bodyMin || body > L.bodyMax) errors.bodyText = `Nội dung cần có từ ${groupThousands(L.bodyMin)} đến ${groupThousands(L.bodyMax)} ký tự.`;
   if (d.eventIds.length > L.maxEvents) {
     errors.eventIds = `Mỗi bài viết liên kết tối đa ${String(L.maxEvents)} sự kiện.`;
   } else if (d.eventIds.some((id) => !knownEventIds.has(id)) || new Set(d.eventIds).size !== d.eventIds.length) {

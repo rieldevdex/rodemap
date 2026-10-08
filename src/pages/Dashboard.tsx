@@ -307,7 +307,7 @@ export function DashboardPage() {
             {latestNews.length > 0 ? (
               <section className="dashboard__panel" aria-labelledby="dash-news">
                 <h2 id="dash-news" className="dashboard__h3">
-                  Từ Hội đồng Học sinh
+                  Bản tin Hội đồng Học sinh
                 </h2>
                 <ul className="dashboard__list">
                   {latestNews.map((p) => (
@@ -317,7 +317,7 @@ export function DashboardPage() {
                   ))}
                 </ul>
                 <Link className="dashboard__small-link" to="/ban-tin">
-                  Xem Bản tin Hội đồng Học sinh
+                  Xem toàn bộ Bản tin
                 </Link>
               </section>
             ) : null}

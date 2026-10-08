@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Button } from '../components/atoms/Button';
 import { DemoLabel } from '../components/atoms/DemoLabel';
 import { MonoTime } from '../components/atoms/MonoTime';
+import { Station } from '../components/atoms/Station';
 import { NewsCard } from '../components/molecules/NewsCard';
 import { PageHead } from '../components/molecules/PageHead';
 import { SearchField } from '../components/molecules/SearchField';
@@ -19,6 +20,7 @@ export function NewsPage() {
   const [category, setCategory] = useState<NewsCategory | null>(null);
   const [query, setQuery] = useState('');
   const news = useMemo(() => selectNews(state, now), [state, now]);
+  const countRef = useRef<HTMLParagraphElement>(null);
 
   const filtering = category !== null || query.trim() !== '';
   const lead = filtering ? undefined : leadPost(news);
@@ -124,7 +126,7 @@ export function NewsPage() {
               ))}
             </div>
             <SearchField
-              label="Tìm trong bản tin"
+              label="Tìm kiếm bài viết"
               value={query}
               onChange={setQuery}
               placeholder="Tiêu đề, nội dung, ban phụ trách"
@@ -132,12 +134,13 @@ export function NewsPage() {
             />
           </div>
 
-          <p className="news__count" role="status">
+          {/* The live text names the count and the column, never the query, so typing is not announced letter by letter. */}
+          <p ref={countRef} className="news__count" role="status" tabIndex={-1}>
             {filtering ? (
               <>
                 <span className="mono">{shown.length}</span> bài viết
                 {category ? ` thuộc chuyên mục ${NEWS_CATEGORY_LABELS[category]}` : ''}
-                {query.trim() === '' ? '' : ` phù hợp với “${query.trim()}”`}
+                {query.trim() === '' ? '' : ' phù hợp với từ khóa tìm kiếm'}
               </>
             ) : (
               <>
@@ -146,7 +149,8 @@ export function NewsPage() {
             )}
           </p>
 
-          {issues.length === 0 ? (
+          {/* Without a filter, no issue below the lead only means the lead is the only article. */}
+          {issues.length === 0 && (filtering || news.length === 0) ? (
             <div className="news__empty">
               <p>
                 {news.length === 0
@@ -158,11 +162,13 @@ export function NewsPage() {
                   variant="secondary"
                   size="sm"
                   onClick={() => {
+                    // The button disappears with the filter; the result count keeps keyboard focus on the page.
+                    countRef.current?.focus();
                     setCategory(null);
                     setQuery('');
                   }}
                 >
-                  Xem toàn bộ bản tin
+                  Xem toàn bộ Bản tin
                 </Button>
               ) : null}
             </div>
@@ -170,7 +176,7 @@ export function NewsPage() {
             issues.map((issue) => (
               <section key={issue.key} className="news__issue" aria-labelledby={`issue-${issue.key}`}>
                 <h2 id={`issue-${issue.key}`} className="news__issue-title">
-                  <span className="news__issue-station" aria-hidden="true" />
+                  <Station variant="interchange" />
                   <span>Số {issue.number}</span>
                   <span className="news__issue-month">{issue.label}</span>
                 </h2>

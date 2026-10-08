@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { EVENTS } from '../data/events';
+import { NEWS } from '../data/news';
 import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS, SEED_SUBMISSIONS } from '../data/seed';
 import { makeEvent, makePost, makeProfile, reg } from '../domain/test-fixtures';
 import type { PortfolioEntry, SchoolEvent, Submission } from '../domain/types';
@@ -501,9 +502,13 @@ describe('newsletter', () => {
     expect(reducer(s1, { type: 'news/publish', post: { ...post, id: 'bt-demo-2' } })).toBe(s1);
   });
 
-  it('refuses reserved slugs', () => {
+  it('refuses reserved slugs and the id or slug of a sample article', () => {
     const s = createSeedState();
+    const seed = NEWS[0];
+    if (!seed) throw new Error('The sample newsletter is empty');
     expect(reducer(s, { type: 'news/publish', post: { ...post, slug: 'soan-bai' } })).toBe(s);
+    expect(reducer(s, { type: 'news/publish', post: { ...post, id: seed.id } })).toBe(s);
+    expect(reducer(s, { type: 'news/publish', post: { ...post, slug: seed.slug } })).toBe(s);
   });
 
   it('removes only articles published in the demo', () => {

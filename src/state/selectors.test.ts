@@ -529,33 +529,46 @@ describe('selectModerationQueue', () => {
 
 describe('newsletter selectors', () => {
   const published = makePost({ id: 'bt-demo-a', slug: 'bai-a', publishedAt: '2026-10-06T08:00:00+07:00', eventIds: ['ev-018'], clubIds: ['tranh-bien'] });
-  const scheduled = makePost({ id: 'bt-demo-b', slug: 'bai-b', publishedAt: '2026-10-20T08:00:00+07:00', eventIds: ['ev-018'] });
-  const state: AppState = { ...createSeedState(), newsPosts: [published, scheduled] };
+  // Published in the demo by the real clock later on the demo day (the demo clock reads 09:00).
+  const laterToday = makePost({ id: 'bt-demo-b', slug: 'bai-b', publishedAt: '2026-10-07T13:51:00+07:00', eventIds: ['ev-018'] });
+  const state: AppState = { ...createSeedState(), newsPosts: [published, laterToday] };
+  const scheduledSeed = NEWS.filter((p) => toMillis(p.publishedAt) > NOW);
 
-  it('merges seed and council articles visible at now, newest first', () => {
+  it('merges seed articles published by now with every council article, newest first', () => {
     const news = selectNews(state, NOW);
-    expect(news.map((p) => p.id)).toContain('bt-demo-a');
-    expect(news.map((p) => p.id)).not.toContain('bt-demo-b');
-    expect(news.length).toBe(NEWS.filter((p) => toMillis(p.publishedAt) <= NOW).length + 1);
+    expect(news.map((p) => p.id)).toEqual(expect.arrayContaining(['bt-demo-a', 'bt-demo-b']));
+    expect(scheduledSeed.length).toBeGreaterThan(0);
+    for (const p of scheduledSeed) expect(news.map((x) => x.id)).not.toContain(p.id);
+    expect(news.length).toBe(NEWS.length - scheduledSeed.length + 2);
     const times = news.map((p) => toMillis(p.publishedAt));
     expect([...times].sort((a, b) => b - a)).toEqual(times);
   });
 
-  it('finds published articles by slug only', () => {
+  it('puts the later of two articles published at the same instant first', () => {
+    const first = makePost({ id: 'bt-zzzz', slug: 'bai-mot', publishedAt: AT });
+    const second = makePost({ id: 'bt-0000', slug: 'bai-hai', publishedAt: AT });
+    const news = selectNews({ ...createSeedState(), newsPosts: [first, second] }, NOW);
+    expect(news.slice(0, 2).map((p) => p.id)).toEqual(['bt-0000', 'bt-zzzz']);
+  });
+
+  it('finds visible articles by slug only', () => {
     expect(selectNewsBySlug(state, 'bai-a', NOW)?.id).toBe('bt-demo-a');
-    expect(selectNewsBySlug(state, 'bai-b', NOW)).toBeUndefined();
+    expect(selectNewsBySlug(state, 'bai-b', NOW)?.id).toBe('bt-demo-b');
+    const seed = scheduledSeed[0];
+    if (seed) expect(selectNewsBySlug(state, seed.slug, NOW)).toBeUndefined();
   });
 
   it('lists every slug in use, scheduled included', () => {
     const slugs = selectNewsSlugs(state);
     expect(slugs.has('bai-a')).toBe(true);
     expect(slugs.has('bai-b')).toBe(true);
+    for (const p of scheduledSeed) expect(slugs.has(p.slug)).toBe(true);
     expect(slugs.size).toBe(NEWS.length + 2);
   });
 
-  it('finds published articles about an event or a club', () => {
-    expect(selectNewsForEvent(state, 'ev-018', NOW).map((p) => p.id)).toContain('bt-demo-a');
-    expect(selectNewsForEvent(state, 'ev-018', NOW).map((p) => p.id)).not.toContain('bt-demo-b');
+  it('finds visible articles about an event or a club', () => {
+    expect(selectNewsForEvent(state, 'ev-018', NOW).map((p) => p.id)).toEqual(expect.arrayContaining(['bt-demo-a', 'bt-demo-b']));
     expect(selectNewsForClub(state, 'tranh-bien', NOW).map((p) => p.id)).toContain('bt-demo-a');
+    expect(selectNewsForClub(state, 'tranh-bien', NOW).map((p) => p.id)).not.toContain('bt-demo-b');
   });
 });

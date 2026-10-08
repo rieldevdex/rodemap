@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { toMillis } from '../domain/dates';
 import { EVENTS } from '../data/events';
+import { NEWS } from '../data/news';
 import { makePost } from '../domain/test-fixtures';
 import { createSeedState, type AppState } from '../state/schema';
 import { addNotice, emptyConversation, needsRestart, runOfflineTurn, runOnlineTurn, setCardStatus, addStudentItem } from './conversation';
@@ -291,9 +292,9 @@ describe('Bản tin Hội đồng Học sinh', () => {
     newsPosts: [
       makePost({ id: 'bt-x1', slug: 'thong-bao-x', title: 'Thông báo kế hoạch tháng 10', category: 'announcement', publishedAt: '2026-10-06T08:00:00+07:00', eventIds: ['ev-018'] }),
       makePost({ id: 'bt-x2', slug: 'huong-dan-x', title: 'Hướng dẫn xuất lịch cá nhân', category: 'guide', publishedAt: '2026-10-05T08:00:00+07:00' }),
-      makePost({ id: 'bt-x3', slug: 'sap-toi', title: 'Bài viết chưa phát hành', publishedAt: '2026-10-20T08:00:00+07:00' }),
     ],
   });
+  const scheduled = NEWS.filter((p) => toMillis(p.publishedAt) > now).map((p) => p.title);
 
   it('list_news returns published articles with links and a card', () => {
     const out = executeTool('list_news', { limit: 5, category: 'guide' }, ctx(withNews()));
@@ -301,10 +302,17 @@ describe('Bản tin Hội đồng Học sinh', () => {
     expect(r.status).toBe('ok');
     expect(r.posts.map((p) => p.title)).toContain('Hướng dẫn xuất lịch cá nhân');
     expect(r.posts.every((p) => p.url.startsWith('/ban-tin/'))).toBe(true);
-    expect(r.posts.map((p) => p.title)).not.toContain('Bài viết chưa phát hành');
     expect(out.card?.kind).toBe('news');
-    const all = executeTool('list_news', {}, ctx(withNews())).result as { posts: { title: string; related_events: string[] }[] };
+    const all = executeTool('list_news', {}, ctx(withNews())).result as { total_published: number; total_matching: number; posts: { title: string; related_events: string[] }[] };
     expect(all.posts.length).toBeLessThanOrEqual(3);
+    expect(all.total_matching).toBe(all.total_published);
+    const guides = out.result as { total_published: number; total_matching: number };
+    expect(guides.total_matching).toBe(NEWS.filter((p) => p.category === 'guide' && !scheduled.includes(p.title)).length + 1);
+    expect(guides.total_matching).toBeLessThan(guides.total_published);
+    // Scheduled sample articles stay out until their date.
+    const newest = executeTool('list_news', { limit: 5 }, ctx(withNews())).result as { posts: { title: string }[] };
+    expect(scheduled.length).toBeGreaterThan(0);
+    for (const title of scheduled) expect(newest.posts.map((p) => p.title)).not.toContain(title);
     const own = all.posts.find((p) => p.title === 'Thông báo kế hoạch tháng 10');
     expect(own?.related_events).toEqual([EVENTS.find((e) => e.id === 'ev-018')?.title]);
   });
@@ -324,10 +332,28 @@ describe('Bản tin Hội đồng Học sinh', () => {
   it('classifies council news questions and answers offline from the data', () => {
     expect(classify('HĐHS có thông báo gì mới không?')).toBe('news');
     expect(classify('Bản tin Hội đồng Học sinh')).toBe('news');
+    expect(classify('Xem bản tin')).toBe('news');
     expect(classify('Tóm tắt bản tin tuần này')).toBe('summary');
+    expect(classify('Bản tin tuần')).toBe('summary');
+    // Ordinary questions that only share words with the newsletter keep their own intent.
+    expect(classify('Sự kiện này có thông tin mới về địa điểm không?')).toBe('event_question');
+    expect(classify('Có thông báo của câu lạc bộ về thời gian không?')).toBe('event_question');
+    expect(classify('Thêm bài viết mới vào hồ sơ năng lực')).toBe('portfolio');
     const reply = respondOffline('Bản tin Hội đồng Học sinh có hướng dẫn nào?', ctx(withNews()));
     expect(reply.intent).toBe('news');
-    expect(reply.text).toContain('Hướng dẫn xuất lịch cá nhân');
+    expect(reply.text).toContain('Chuyên mục Hướng dẫn của Bản tin Hội đồng Học sinh hiện có');
+    expect(reply.text).toContain('Hướng dẫn xuất lịch cá nhân (Hướng dẫn · ');
+    expect(reply.text).not.toContain('Thông báo kế hoạch tháng 10');
     expect(reply.cards[0]?.kind).toBe('news');
+    const all = respondOffline('Xem bản tin', ctx(withNews()));
+    expect(all.text).toContain('Bản tin Hội đồng Học sinh hiện có');
+    expect(all.text).toContain('Thông báo kế hoạch tháng 10');
+  });
+
+  it('answers honestly offline when a column has no article', () => {
+    const reply = respondOffline('Bản tin có bài viết về câu lạc bộ không?', { state: seed(), now: toMillis('2026-09-01T09:00:00+07:00') });
+    expect(reply.intent).toBe('news');
+    expect(reply.text).toBe('Bản tin Hội đồng Học sinh hiện chưa có bài viết phù hợp. Bạn có thể xem toàn bộ bài viết tại trang Bản tin.');
+    expect(reply.cards).toEqual([]);
   });
 });

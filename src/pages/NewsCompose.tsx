@@ -2,11 +2,12 @@ import { useEffect, useMemo, useRef, useState, type SyntheticEvent } from 'react
 import { Button } from '../components/atoms/Button';
 import { DemoLabel } from '../components/atoms/DemoLabel';
 import { Icon } from '../components/atoms/Icon';
+import { MonoTime } from '../components/atoms/MonoTime';
 import { ConfirmDialog } from '../components/molecules/ConfirmDialog';
 import { PageHead } from '../components/molecules/PageHead';
 import { NewsArticleBody } from '../components/organisms/NewsArticleBody';
 import { NEWS_DEPARTMENTS } from '../data/news';
-import { formatDate, formatLongDate, toMillis } from '../domain/dates';
+import { formatDate, formatLongDate, toIsoDateTime, toMillis } from '../domain/dates';
 import { NEWS_CATEGORY_LABELS, NEWS_LIMITS, newsBodyText, parseNewsBody, postFromDraft, readingMinutes, validateNewsDraft, type NewsDraftErrors } from '../domain/news';
 import { charCount } from '../domain/moderation';
 import { NEWS_CATEGORIES, type NewsCategory, type NewsDraft } from '../domain/types';
@@ -27,28 +28,36 @@ export function NewsComposePage() {
   const { state, dispatch, now, publicEvents, eventById } = useCatalog();
   const navigate = useNavigate();
   const [draft, setDraft] = useState<NewsDraft>(emptyDraft);
-  const [attempted, setAttempted] = useState(false);
+  // Errors of the last "Đăng bài", kept until the next one (the summary is not re-announced while typing).
+  const [errors, setErrors] = useState<NewsDraftErrors>({});
   const [pick, setPick] = useState('');
   const [confirmReset, setConfirmReset] = useState(false);
   const summaryRef = useRef<HTMLDivElement>(null);
-  const focusSummary = useRef(false);
+  const chosenRef = useRef<HTMLUListElement>(null);
+  const pickRef = useRef<HTMLSelectElement>(null);
+  /** After adding or removing a related event: index of the "Bỏ" button to focus (-1 = the event picker). */
+  const pendingEventFocus = useRef<number | null>(null);
 
   const known = useMemo(() => new Set(publicEvents.map((e) => e.id)), [publicEvents]);
   const blocks = useMemo(() => parseNewsBody(draft.bodyText), [draft.bodyText]);
-  const live: NewsDraftErrors = attempted ? validateNewsDraft(draft, known) : {};
-  const errorList = FIELDS.filter((f) => live[f] !== undefined);
+  const errorList = FIELDS.filter((f) => errors[f] !== undefined);
 
+  // Keep keyboard focus inside "Sự kiện liên quan" when its buttons are disabled or removed.
   useEffect(() => {
-    if (!focusSummary.current) return;
-    focusSummary.current = false;
-    summaryRef.current?.focus();
-  });
+    const index = pendingEventFocus.current;
+    if (index === null) return;
+    pendingEventFocus.current = null;
+    const buttons = chosenRef.current?.querySelectorAll<HTMLButtonElement>('button');
+    const picker = pickRef.current;
+    if (index >= 0 && buttons && buttons.length > 0) buttons[Math.min(index, buttons.length - 1)]?.focus();
+    else if (picker && !picker.disabled) picker.focus();
+  }, [draft.eventIds]);
 
   if (state.role !== 'moderator') {
     return (
       <>
         <PageHead
-          eyebrow="Dành cho Hội đồng Học sinh"
+          eyebrow="Bản tin · Dành cho Hội đồng Học sinh"
           title="Soạn bài viết"
           lead="Thành viên Hội đồng Học sinh soạn và phát hành bài viết cho Bản tin Hội đồng Học sinh."
         />
@@ -68,7 +77,7 @@ export function NewsComposePage() {
                   Chuyển sang vai trò HĐHS
                 </Button>
                 <Button to="/ban-tin" variant="secondary">
-                  Xem Bản tin
+                  Xem toàn bộ Bản tin
                 </Button>
               </div>
             </div>
@@ -85,9 +94,10 @@ export function NewsComposePage() {
   const submit = (ev: SyntheticEvent) => {
     ev.preventDefault();
     const found = validateNewsDraft(draft, known);
-    setAttempted(true);
+    setErrors(found);
     if (Object.keys(found).length > 0) {
-      focusSummary.current = true;
+      // Every failed attempt, the first or a later one, moves focus to the summary.
+      window.requestAnimationFrame(() => summaryRef.current?.focus());
       return;
     }
     const post = postFromDraft(draft, {
@@ -100,12 +110,12 @@ export function NewsComposePage() {
     navigate(`/ban-tin/${post.slug}`);
   };
 
-  const describedBy = (f: keyof NewsDraft, hint?: string) => [hint, live[f] === undefined ? null : `${fieldId(f)}-error`].filter(Boolean).join(' ') || undefined;
+  const describedBy = (f: keyof NewsDraft, hint?: string) => [hint, errors[f] === undefined ? null : `${fieldId(f)}-error`].filter(Boolean).join(' ') || undefined;
   const errorText = (f: keyof NewsDraft) =>
-    live[f] === undefined ? null : (
+    errors[f] === undefined ? null : (
       <p id={`${fieldId(f)}-error`} className="news-compose__error">
         <Icon name="alert" size="sm" />
-        <span>{live[f]}</span>
+        <span>{errors[f]}</span>
       </p>
     );
 
@@ -120,7 +130,7 @@ export function NewsComposePage() {
   return (
     <div className="news-compose">
       <PageHead
-        eyebrow="Bản tin Hội đồng Học sinh · Dành cho Hội đồng Học sinh"
+        eyebrow="Bản tin · Dành cho Hội đồng Học sinh"
         title="Soạn bài viết"
         lead="Bài viết được phát hành ngay sau khi bạn nhấn Đăng bài và hiển thị với toàn bộ học sinh tại trang Bản tin."
       >
@@ -134,13 +144,13 @@ export function NewsComposePage() {
               Nội dung bài viết
             </h2>
 
-            {attempted && errorList.length > 0 ? (
+            {errorList.length > 0 ? (
               <div className="news-compose__summary" ref={summaryRef} tabIndex={-1} role="alert">
                 <p className="news-compose__summary-title">Bài viết còn {errorList.length} nội dung cần điều chỉnh:</p>
                 <ul>
                   {errorList.map((f) => (
                     <li key={f}>
-                      <a href={`#${f === 'eventIds' ? 'nc-event-pick' : fieldId(f)}`}>{live[f]}</a>
+                      <a href={`#${f === 'eventIds' ? 'nc-event-pick' : fieldId(f)}`}>{errors[f]}</a>
                     </li>
                   ))}
                 </ul>
@@ -153,7 +163,7 @@ export function NewsComposePage() {
                 id={fieldId('title')}
                 value={draft.title}
                 maxLength={NEWS_LIMITS.titleMax + 20}
-                aria-invalid={live.title === undefined ? undefined : true}
+                aria-invalid={errors.title === undefined ? undefined : true}
                 aria-describedby={describedBy('title')}
                 onChange={(e) => {
                   update({ title: e.target.value });
@@ -208,7 +218,7 @@ export function NewsComposePage() {
                 id={fieldId('summary')}
                 rows={3}
                 value={draft.summary}
-                aria-invalid={live.summary === undefined ? undefined : true}
+                aria-invalid={errors.summary === undefined ? undefined : true}
                 aria-describedby={describedBy('summary', 'nc-summary-hint nc-summary-count')}
                 onChange={(e) => {
                   update({ summary: e.target.value });
@@ -240,7 +250,7 @@ export function NewsComposePage() {
                 id={fieldId('bodyText')}
                 rows={14}
                 value={draft.bodyText}
-                aria-invalid={live.bodyText === undefined ? undefined : true}
+                aria-invalid={errors.bodyText === undefined ? undefined : true}
                 aria-describedby={describedBy('bodyText', 'nc-body-hint nc-body-count')}
                 onChange={(e) => {
                   update({ bodyText: e.target.value });
@@ -259,8 +269,8 @@ export function NewsComposePage() {
               </p>
               {errorText('eventIds')}
               {chosen.length > 0 ? (
-                <ul className="news-compose__chosen">
-                  {chosen.map((e) => (
+                <ul className="news-compose__chosen" ref={chosenRef}>
+                  {chosen.map((e, i) => (
                     <li key={e.id}>
                       <span className="news-compose__chosen-date">{formatDate(toMillis(e.start))}</span>
                       <span className="news-compose__chosen-title">{e.title}</span>
@@ -269,6 +279,7 @@ export function NewsComposePage() {
                         size="sm"
                         aria-label={`Bỏ sự kiện “${e.title}”`}
                         onClick={() => {
+                          pendingEventFocus.current = draft.eventIds.length > 1 ? i : -1;
                           update({ eventIds: draft.eventIds.filter((id) => id !== e.id) });
                         }}
                       >
@@ -284,6 +295,7 @@ export function NewsComposePage() {
                 </label>
                 <select
                   id="nc-event-pick"
+                  ref={pickRef}
                   value={pick}
                   disabled={full}
                   onChange={(e) => {
@@ -304,6 +316,8 @@ export function NewsComposePage() {
                   disabled={full || pick === ''}
                   onClick={() => {
                     if (pick === '') return;
+                    // The picker while it can take another event, else the new event's "Bỏ".
+                    pendingEventFocus.current = draft.eventIds.length + 1 < NEWS_LIMITS.maxEvents ? -1 : draft.eventIds.length;
                     update({ eventIds: [...draft.eventIds, pick] });
                     setPick('');
                   }}
@@ -337,9 +351,13 @@ export function NewsComposePage() {
               <p className="news-compose__preview-title">{draft.title.trim() === '' ? 'Tiêu đề bài viết' : draft.title}</p>
               <p className="news-compose__preview-summary">{draft.summary.trim() === '' ? 'Phần tóm tắt hiển thị tại đây.' : draft.summary}</p>
               <p className="news-compose__preview-meta">
-                {draft.author}, Hội đồng Học sinh · {formatLongDate(now)}
+                {draft.author}, Hội đồng Học sinh · <MonoTime dateTime={toIsoDateTime(now)}>{formatLongDate(now)}</MonoTime>
               </p>
-              {blocks.length > 0 ? <NewsArticleBody blocks={blocks} /> : <p className="news-compose__hint">Nội dung bài viết hiển thị tại đây.</p>}
+              {blocks.length > 0 ? (
+                <NewsArticleBody blocks={blocks} headingLevel={3} />
+              ) : (
+                <p className="news-compose__hint">Nội dung bài viết hiển thị tại đây.</p>
+              )}
             </div>
           </aside>
         </div>
@@ -347,7 +365,7 @@ export function NewsComposePage() {
 
       <ConfirmDialog
         open={confirmReset}
-        title="Xóa toàn bộ nội dung đang soạn?"
+        title="Xóa nội dung đang soạn"
         confirmLabel="Xóa nội dung"
         tone="stop"
         onCancel={() => {
@@ -356,10 +374,11 @@ export function NewsComposePage() {
         onConfirm={() => {
           setConfirmReset(false);
           setDraft(emptyDraft());
-          setAttempted(false);
+          setErrors({});
+          setPick('');
         }}
       >
-        <p>Tiêu đề, tóm tắt, nội dung và sự kiện liên quan đang soạn sẽ bị xóa.</p>
+        <p>Tiêu đề, tóm tắt, nội dung và sự kiện liên quan đang soạn sẽ bị xóa; chuyên mục và ban phụ trách được đặt lại về giá trị mặc định.</p>
       </ConfirmDialog>
     </div>
   );

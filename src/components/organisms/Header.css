@@ -328,7 +328,9 @@
   }
 
   .site-nav__link {
+    justify-content: center;
     height: 100%;
+    min-width: var(--size-touch);
     min-height: var(--header-h);
     padding-inline: var(--space-2);
   }

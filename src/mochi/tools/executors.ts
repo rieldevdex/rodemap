@@ -457,7 +457,8 @@ function listNews(input: Record<string, unknown>, ctx: ToolContext): ToolOutcome
   const limit = optInt(input, 'limit', 1, 5) ?? 3;
   const category = optEnum(input, 'category', NEWS_CATEGORIES);
   const all = selectNews(ctx.state, ctx.now);
-  const posts = (category ? all.filter((p) => p.category === category) : all).slice(0, limit);
+  const matching = category ? all.filter((p) => p.category === category) : all;
+  const posts = matching.slice(0, limit);
   if (posts.length === 0) {
     return { result: { status: 'empty', note: 'Bản tin Hội đồng Học sinh chưa có bài viết phù hợp.' } };
   }
@@ -466,6 +467,7 @@ function listNews(input: Record<string, unknown>, ctx: ToolContext): ToolOutcome
     result: {
       status: 'ok',
       total_published: all.length,
+      total_matching: matching.length,
       posts: posts.map((p) => ({
         id: p.id,
         title: p.title,

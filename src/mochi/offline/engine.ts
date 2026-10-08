@@ -8,6 +8,7 @@ import { addDays, formatDate, formatLongDate, formatTimeRange, toIsoDate } from 
 import { eventEnd, eventStart, isPast } from '../../domain/events';
 import { windowRange, type DateWindow } from '../../domain/filters';
 import { groupByCategory, totalHours } from '../../domain/portfolio';
+import { NEWS_CATEGORY_LABELS } from '../../domain/news';
 import { foldVietnamese, formatHours } from '../../domain/text';
 import type { SchoolEvent } from '../../domain/types';
 import { CLUBS } from '../../data/clubs';
@@ -45,10 +46,11 @@ const PATTERNS: [OfflineIntent, RegExp][] = [
   ['privacy', /(\b0\d{9}\b|so dien thoai cua (minh|em|toi)|dia chi nha|mat khau)/],
   ['unregister', /\b(huy dang ky|huy ghi danh|rut dang ky|khong tham gia nua)\b/],
   ['register', /\b(dang ky|ghi danh|dang ki)\b/],
-  ['news', /\b(ban tin hoi dong|ban tin hdhs|ban tin cua hoi dong|thong bao moi|co thong bao|thong bao gi|thong bao cua|tin tuc|tin moi|bai viet moi|bao tuong)\b/],
+  // "Bản tin" alone is the council newsletter (the nav item); "bản tin tuần" is Mochi's weekly summary.
+  ['news', /\b(ban tin(?! tuan)|bao tuong|tin tuc|thong bao moi|thong bao gi|thong bao nao|bai viet cua hoi dong|bai viet cua hdhs)\b/],
   ['portfolio', /\b(ho so nang luc|ho so|tu danh gia|minh chung|nang luc|phan anh|bai viet)\b/],
   ['calendar', /\b(lich cua|lich ca nhan|xem lich|lich|xuat lich|ics|google calendar|trung lich)\b/],
-  ['summary', /\b(tom tat|ban tin|tong hop|tuan nay co|thang nay co)\b/],
+  ['summary', /\b(tom tat|ban tin tuan|tong hop|tuan nay co|thang nay co)\b/],
   ['recommend', /\b(goi y|de xuat|nen tham gia|phu hop|tham gia gi|su kien nao|hoat dong nao)\b/],
   ['event_question', /\b(khi nao|o dau|bao gio|dia diem|con cho|han dang ky|may gio|thoi gian|danh cho khoi)\b/],
   ['help', /\b(xin chao|chao mochi|chao|giup|ho tro|lam duoc gi|huong dan|mochi la ai)\b/],
@@ -183,15 +185,18 @@ function newsReply(text: string, ctx: OfflineContext): OfflineReply {
   const t = foldVietnamese(text);
   const category = t.includes('huong dan') ? 'guide' : t.includes('cau lac bo') ? 'club' : undefined;
   const out = executeTool('list_news', category ? { limit: 3, category } : { limit: 3 }, ctx);
-  const r = out.result as { status: string; total_published?: number; posts?: { title: string; category: string; published: string; summary: string }[] };
+  const r = out.result as { status: string; total_matching?: number; posts?: { title: string; category: string; published: string; summary: string }[] };
   if (r.status !== 'ok' || !r.posts) {
-    return { intent: 'news', text: 'Bản tin Hội đồng Học sinh hiện chưa có bài viết phù hợp. Bạn có thể xem toàn bộ bản tin tại trang Bản tin.', cards: [] };
+    return { intent: 'news', text: 'Bản tin Hội đồng Học sinh hiện chưa có bài viết phù hợp. Bạn có thể xem toàn bộ bài viết tại trang Bản tin.', cards: [] };
   }
-  const items = r.posts.map((p) => `– ${p.title} (${p.category}, ${p.published}): ${p.summary}`);
+  const total = String(r.total_matching ?? r.posts.length);
+  const items = r.posts.map((p) => `– ${p.title} (${p.category} · ${p.published}): ${p.summary}`);
   return {
     intent: 'news',
     text: [
-      `Bản tin Hội đồng Học sinh hiện có ${String(r.total_published ?? r.posts.length)} bài viết đã phát hành. Các bài viết mới nhất:`,
+      category
+        ? `Chuyên mục ${NEWS_CATEGORY_LABELS[category]} của Bản tin Hội đồng Học sinh hiện có ${total} bài viết đã phát hành. Các bài viết mới nhất trong chuyên mục:`
+        : `Bản tin Hội đồng Học sinh hiện có ${total} bài viết đã phát hành. Các bài viết mới nhất:`,
       items.join('\n'),
       'Bạn có thể đọc toàn văn từng bài viết từ thẻ bên dưới hoặc tại trang Bản tin.',
     ].join('\n\n'),

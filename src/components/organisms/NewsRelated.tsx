@@ -22,7 +22,7 @@ export function NewsRelated({ posts, title, headingId, surface = false }: NewsRe
             {title}
           </h2>
           <Link to="/ban-tin" className="news-related__all">
-            Xem Bản tin
+            Xem toàn bộ Bản tin
           </Link>
         </div>
         <ul className="news-related__list">

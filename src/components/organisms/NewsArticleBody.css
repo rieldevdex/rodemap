@@ -6,7 +6,7 @@
   line-height: var(--leading-body);
 }
 
-.news-body h2 {
+.news-body :is(h2, h3) {
   margin-block-start: var(--space-4);
   font-size: var(--text-xl);
 }

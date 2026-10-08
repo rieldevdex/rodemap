@@ -189,7 +189,7 @@ export const MOCHI_TOOLS: readonly ToolDefinition[] = [
   {
     name: 'list_news',
     description:
-      'List the newest articles of the Bản tin Hội đồng Học sinh (the student council\'s newsletter: announcements, activity reports, club introductions, how-to guides). Call this when the student asks about council news or announcements. Returns at most `limit` published articles (newest first) with title, column, department, date, summary, related event titles and the article link; also shows them as a card. Quote only these facts and invite the student to read the full article.',
+      'List the newest articles of the Bản tin Hội đồng Học sinh (the student council\'s newsletter: announcements, activity reports, club introductions, how-to guides). Call this when the student asks about council news or announcements. Returns at most `limit` published articles (newest first) with title, column, department, date, summary, related event titles and the article link, plus total_published (every column) and total_matching (the requested column); also shows them as a card. Quote only these facts and invite the student to read the full article.',
     strict: true,
     input_schema: {
       type: 'object',

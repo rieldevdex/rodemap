@@ -10,7 +10,7 @@ import { budgetStatus, DEFAULT_WEEKLY_HOUR_BUDGET, type BudgetStatus } from '../
 import { allConflicts } from '../domain/conflicts';
 import { addDays, startOfIsoWeek, toMillis } from '../domain/dates';
 import { findRegistration, isPast, isRegistered, sortByStart } from '../domain/events';
-import { postsAboutClub, postsAboutEvent, publishedPosts } from '../domain/news';
+import { isPublished, postsAboutClub, postsAboutEvent, sortNews } from '../domain/news';
 import { firstRoute, type PlanProposal } from '../domain/planner';
 import { pendingAttendance } from '../domain/portfolio';
 import { recommendEvents, type RecommendContext, type RecommendOptions } from '../domain/recommend';
@@ -207,12 +207,16 @@ export function selectModerationQueue(state: AppState): ModerationQueueItem[] {
 
 /* ── Bản tin Hội đồng Học sinh ──────────────────────────────────────── */
 
-/** Seed and council-published articles visible at `now`, newest first. */
+/**
+ * The newsletter, newest first: sample articles published by `now`, then every article the
+ * council published in the demo, whatever the demo date. The demo cannot schedule, and an
+ * article stamped later on the same day by the real clock must stay readable and removable.
+ */
 export function selectNews(state: AppState, now: Millis): NewsPost[] {
-  return publishedPosts([...NEWS, ...state.newsPosts], now);
+  return sortNews([...NEWS.filter((p) => isPublished(p, now)), ...state.newsPosts]);
 }
 
-/** A published article by slug (scheduled articles are not found before their date). */
+/** A visible article by slug (scheduled sample articles are not found before their date). */
 export function selectNewsBySlug(state: AppState, slug: string, now: Millis): NewsPost | undefined {
   return selectNews(state, now).find((p) => p.slug === slug);
 }
