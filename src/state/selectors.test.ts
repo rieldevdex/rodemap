@@ -6,7 +6,8 @@ import { toMillis } from '../domain/dates';
 import { sortByStart } from '../domain/events';
 import { firstRoute } from '../domain/planner';
 import { recommendEvents } from '../domain/recommend';
-import { makeEvent, makeProfile, reg } from '../domain/test-fixtures';
+import { NEWS } from '../data/news';
+import { makeEvent, makePost, makeProfile, reg } from '../domain/test-fixtures';
 import type { SchoolEvent, Submission } from '../domain/types';
 import { reducer } from './reducer';
 import { createSeedState, type AppState } from './schema';
@@ -22,6 +23,11 @@ import {
   selectFirstRoute,
   selectModerationQueue,
   selectMyEvents,
+  selectNews,
+  selectNewsBySlug,
+  selectNewsForClub,
+  selectNewsForEvent,
+  selectNewsSlugs,
   selectNow,
   selectPendingAttendance,
   selectPlanBudget,
@@ -518,5 +524,38 @@ describe('selectModerationQueue', () => {
   it('is empty when nothing is pending', () => {
     const s = stateWith({ moderation: { 'ev-046': 'approved', 'ev-047': 'approved', 'ev-048': 'rejected' } });
     expect(selectModerationQueue(s)).toEqual([]);
+  });
+});
+
+describe('newsletter selectors', () => {
+  const published = makePost({ id: 'bt-demo-a', slug: 'bai-a', publishedAt: '2026-10-06T08:00:00+07:00', eventIds: ['ev-018'], clubIds: ['tranh-bien'] });
+  const scheduled = makePost({ id: 'bt-demo-b', slug: 'bai-b', publishedAt: '2026-10-20T08:00:00+07:00', eventIds: ['ev-018'] });
+  const state: AppState = { ...createSeedState(), newsPosts: [published, scheduled] };
+
+  it('merges seed and council articles visible at now, newest first', () => {
+    const news = selectNews(state, NOW);
+    expect(news.map((p) => p.id)).toContain('bt-demo-a');
+    expect(news.map((p) => p.id)).not.toContain('bt-demo-b');
+    expect(news.length).toBe(NEWS.filter((p) => toMillis(p.publishedAt) <= NOW).length + 1);
+    const times = news.map((p) => toMillis(p.publishedAt));
+    expect([...times].sort((a, b) => b - a)).toEqual(times);
+  });
+
+  it('finds published articles by slug only', () => {
+    expect(selectNewsBySlug(state, 'bai-a', NOW)?.id).toBe('bt-demo-a');
+    expect(selectNewsBySlug(state, 'bai-b', NOW)).toBeUndefined();
+  });
+
+  it('lists every slug in use, scheduled included', () => {
+    const slugs = selectNewsSlugs(state);
+    expect(slugs.has('bai-a')).toBe(true);
+    expect(slugs.has('bai-b')).toBe(true);
+    expect(slugs.size).toBe(NEWS.length + 2);
+  });
+
+  it('finds published articles about an event or a club', () => {
+    expect(selectNewsForEvent(state, 'ev-018', NOW).map((p) => p.id)).toContain('bt-demo-a');
+    expect(selectNewsForEvent(state, 'ev-018', NOW).map((p) => p.id)).not.toContain('bt-demo-b');
+    expect(selectNewsForClub(state, 'tranh-bien', NOW).map((p) => p.id)).toContain('bt-demo-a');
   });
 });

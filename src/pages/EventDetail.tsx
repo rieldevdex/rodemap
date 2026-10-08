@@ -7,6 +7,7 @@ import { StatusTag } from '../components/atoms/StatusTag';
 import { MochiNote } from '../components/molecules/MochiNote';
 import { PageHead } from '../components/molecules/PageHead';
 import { StationCard } from '../components/molecules/StationCard';
+import { NewsRelated } from '../components/organisms/NewsRelated';
 import { STATUS_LABELS } from '../content/moderation';
 import { CATEGORY_LABELS } from '../domain/category-labels';
 import { formatDate, formatDayLabel, formatLongDate, formatTime, formatTimeRange, toMillis } from '../domain/dates';
@@ -18,7 +19,7 @@ import { tagLabel } from '../data/tags';
 import { Link, useRoute } from '../router';
 import { downloadFile } from '../state/effects';
 import { requestMochi } from '../state/mochiBridge';
-import { selectEventBySlug, selectEventsForClub } from '../state/selectors';
+import { selectEventBySlug, selectEventsForClub, selectNewsForEvent } from '../state/selectors';
 import { useCatalog } from '../state/useCatalog';
 import { useRegistration } from '../state/useRegistration';
 import { EventRegistration } from './connected/EventRegistration';
@@ -228,6 +229,8 @@ export function EventDetailPage() {
           </div>
         </div>
       </section>
+
+      <NewsRelated posts={selectNewsForEvent(state, event.id, now)} title="Bản tin Hội đồng Học sinh nhắc đến sự kiện này" headingId="event-news" />
 
       {related.length > 0 ? (
         <section className="band" aria-labelledby="event-related">

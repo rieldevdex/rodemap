@@ -77,7 +77,7 @@ describe('POST /api/mochi', () => {
     expect(params.betas).toContain('server-side-fallback-2026-07-01');
     expect(params.output_config).toEqual({ effort: 'medium' });
     expect(params.tool_choice).toEqual({ type: 'auto' });
-    expect((params.tools as unknown[]).length).toBe(10);
+    expect((params.tools as unknown[]).length).toBe(11);
   });
 
   it('uses MOCHI_MODEL when set and low effort by default', async () => {

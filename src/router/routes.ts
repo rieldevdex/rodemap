@@ -14,6 +14,9 @@ export type RouteName =
   | 'clubPortal'
   | 'moderation'
   | 'proposal'
+  | 'news'
+  | 'newsCompose'
+  | 'newsArticle'
   | 'notFound';
 
 export interface RouteDef {
@@ -40,6 +43,10 @@ export const ROUTES: RouteDef[] = [
   { name: 'clubPortal', path: '/cong-cau-lac-bo', title: 'Cổng câu lạc bộ' },
   { name: 'moderation', path: '/kiem-duyet', title: 'Kiểm duyệt' },
   { name: 'proposal', path: '/de-an', title: 'Đề án' },
+  { name: 'news', path: '/ban-tin', title: 'Bản tin Hội đồng Học sinh' },
+  // Before newsArticle, so /ban-tin/soan-bai is never read as an article slug.
+  { name: 'newsCompose', path: '/ban-tin/soan-bai', title: 'Soạn bài viết' },
+  { name: 'newsArticle', path: '/ban-tin/:slug', title: 'Bản tin Hội đồng Học sinh' },
   { name: 'notFound', path: '/khong-tim-thay', title: 'Không tìm thấy trang' },
 ];
 

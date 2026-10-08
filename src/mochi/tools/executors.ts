@@ -31,8 +31,9 @@ import {
 } from '../../domain/events';
 import { filterEvents } from '../../domain/filters';
 import { proposePlan } from '../../domain/planner';
+import { NEWS_CATEGORY_LABELS } from '../../domain/news';
 import { foldVietnamese } from '../../domain/text';
-import type { Club, Millis, SchoolEvent } from '../../domain/types';
+import { NEWS_CATEGORIES, type Club, type Millis, type SchoolEvent } from '../../domain/types';
 import { CLUBS } from '../../data/clubs';
 import { GOALS } from '../../data/goals';
 import { PERIODS } from '../../data/calendar';
@@ -41,6 +42,7 @@ import { describeReasons, describeWarnings } from '../../content/reasons';
 import type { AppState } from '../../state/schema';
 import {
   selectMyEvents,
+  selectNews,
   selectPublicEvents,
   selectRecommendations,
   selectUpcomingMine,
@@ -451,6 +453,43 @@ function exportCalendar(input: Record<string, unknown>, ctx: ToolContext): ToolO
   };
 }
 
+function listNews(input: Record<string, unknown>, ctx: ToolContext): ToolOutcome {
+  const limit = optInt(input, 'limit', 1, 5) ?? 3;
+  const category = optEnum(input, 'category', NEWS_CATEGORIES);
+  const all = selectNews(ctx.state, ctx.now);
+  const posts = (category ? all.filter((p) => p.category === category) : all).slice(0, limit);
+  if (posts.length === 0) {
+    return { result: { status: 'empty', note: 'Bản tin Hội đồng Học sinh chưa có bài viết phù hợp.' } };
+  }
+  const titleOf = (id: string) => publicEvent(ctx, id)?.title;
+  return {
+    result: {
+      status: 'ok',
+      total_published: all.length,
+      posts: posts.map((p) => ({
+        id: p.id,
+        title: p.title,
+        category: NEWS_CATEGORY_LABELS[p.category],
+        author: `${p.author}, Hội đồng Học sinh`,
+        published: formatLongDate(toMillis(p.publishedAt)),
+        summary: p.summary,
+        related_events: p.eventIds.flatMap((id) => titleOf(id) ?? []),
+        url: `/ban-tin/${p.slug}`,
+      })),
+    },
+    card: {
+      kind: 'news',
+      posts: posts.map((p) => ({
+        id: p.id,
+        title: p.title,
+        category: NEWS_CATEGORY_LABELS[p.category],
+        date: formatDate(toMillis(p.publishedAt)),
+        href: `/ban-tin/${p.slug}`,
+      })),
+    },
+  };
+}
+
 const EXECUTORS: Record<ToolName, (input: Record<string, unknown>, ctx: ToolContext) => ToolOutcome> = {
   search_events: searchEvents,
   get_event: getEvent,
@@ -462,6 +501,7 @@ const EXECUTORS: Record<ToolName, (input: Record<string, unknown>, ctx: ToolCont
   summarize_events: summarize,
   draft_portfolio_entry: draftPortfolioEntry,
   export_calendar: exportCalendar,
+  list_news: listNews,
 };
 
 /** Runs one tool call. Unknown tools and invalid inputs become error results the model can correct. */

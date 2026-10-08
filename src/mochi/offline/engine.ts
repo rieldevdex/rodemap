@@ -20,6 +20,7 @@ export type OfflineIntent =
   | 'privacy'
   | 'unregister'
   | 'register'
+  | 'news'
   | 'portfolio'
   | 'calendar'
   | 'summary'
@@ -44,6 +45,7 @@ const PATTERNS: [OfflineIntent, RegExp][] = [
   ['privacy', /(\b0\d{9}\b|so dien thoai cua (minh|em|toi)|dia chi nha|mat khau)/],
   ['unregister', /\b(huy dang ky|huy ghi danh|rut dang ky|khong tham gia nua)\b/],
   ['register', /\b(dang ky|ghi danh|dang ki)\b/],
+  ['news', /\b(ban tin hoi dong|ban tin hdhs|ban tin cua hoi dong|thong bao moi|co thong bao|thong bao gi|thong bao cua|tin tuc|tin moi|bai viet moi|bao tuong)\b/],
   ['portfolio', /\b(ho so nang luc|ho so|tu danh gia|minh chung|nang luc|phan anh|bai viet)\b/],
   ['calendar', /\b(lich cua|lich ca nhan|xem lich|lich|xuat lich|ics|google calendar|trung lich)\b/],
   ['summary', /\b(tom tat|ban tin|tong hop|tuan nay co|thang nay co)\b/],
@@ -104,7 +106,7 @@ const clubName = (id: string) => CLUBS.find((c) => c.id === id)?.name ?? '';
 const lowerFirst = (text: string) => text.charAt(0).toLocaleLowerCase('vi') + text.slice(1);
 
 const SUGGESTION_HINT =
-  'Bạn có thể nhập: “Gợi ý sự kiện tuần tới”, “Đăng ký …”, “Lịch của tôi”, “Tóm tắt tuần này” hoặc “Hồ sơ năng lực”.';
+  'Bạn có thể nhập: “Gợi ý sự kiện tuần tới”, “Đăng ký …”, “Lịch của tôi”, “Tóm tắt tuần này”, “Bản tin Hội đồng Học sinh” hoặc “Hồ sơ năng lực”.';
 
 function recommendReply(text: string, ctx: OfflineContext): OfflineReply {
   const window = windowInText(text);
@@ -174,6 +176,26 @@ function registrationReply(intent: 'register' | 'unregister', text: string, ctx:
     text: `Mochi không thể chuẩn bị thẻ xác nhận cho ${facts}: ${lowerFirst(r.reason ?? '')} Bạn có thể nhập “Gợi ý sự kiện” để xem các sự kiện còn mở đăng ký.`,
     cards: [],
     focusEventId: event.id,
+  };
+}
+
+function newsReply(text: string, ctx: OfflineContext): OfflineReply {
+  const t = foldVietnamese(text);
+  const category = t.includes('huong dan') ? 'guide' : t.includes('cau lac bo') ? 'club' : undefined;
+  const out = executeTool('list_news', category ? { limit: 3, category } : { limit: 3 }, ctx);
+  const r = out.result as { status: string; total_published?: number; posts?: { title: string; category: string; published: string; summary: string }[] };
+  if (r.status !== 'ok' || !r.posts) {
+    return { intent: 'news', text: 'Bản tin Hội đồng Học sinh hiện chưa có bài viết phù hợp. Bạn có thể xem toàn bộ bản tin tại trang Bản tin.', cards: [] };
+  }
+  const items = r.posts.map((p) => `– ${p.title} (${p.category}, ${p.published}): ${p.summary}`);
+  return {
+    intent: 'news',
+    text: [
+      `Bản tin Hội đồng Học sinh hiện có ${String(r.total_published ?? r.posts.length)} bài viết đã phát hành. Các bài viết mới nhất:`,
+      items.join('\n'),
+      'Bạn có thể đọc toàn văn từng bài viết từ thẻ bên dưới hoặc tại trang Bản tin.',
+    ].join('\n\n'),
+    cards: out.card ? [out.card] : [],
   };
 }
 
@@ -317,6 +339,8 @@ export function respondOffline(text: string, ctx: OfflineContext): OfflineReply 
     case 'unregister':
     case 'register':
       return registrationReply(intent, text, ctx);
+    case 'news':
+      return newsReply(text, ctx);
     case 'portfolio':
       return portfolioReply(text, ctx);
     case 'calendar':

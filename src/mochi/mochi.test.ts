@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { toMillis } from '../domain/dates';
 import { EVENTS } from '../data/events';
+import { makePost } from '../domain/test-fixtures';
 import { createSeedState, type AppState } from '../state/schema';
 import { addNotice, emptyConversation, needsRestart, runOfflineTurn, runOnlineTurn, setCardStatus, addStudentItem } from './conversation';
 import { classify, findEventInText, offlineDraft, respondOffline, windowInText } from './offline/engine';
@@ -17,8 +18,8 @@ const upcoming = approved.filter((e) => toMillis(e.end) > now);
 const firstOpen = upcoming.find((e) => e.capacity - e.seatsTaken > 5 && toMillis(e.registrationDeadline) > now && e.eligibleGrades.includes(11));
 
 describe('tool schemas', () => {
-  it('defines ten strict tools with closed object schemas', () => {
-    expect(TOOL_NAMES).toHaveLength(10);
+  it('defines eleven strict tools with closed object schemas', () => {
+    expect(TOOL_NAMES).toHaveLength(11);
     for (const tool of MOCHI_TOOLS) {
       expect(tool.strict).toBe(true);
       expect(tool.input_schema.additionalProperties).toBe(false);
@@ -281,5 +282,52 @@ describe('conversation', () => {
     expect(conv.items.some((i) => i.role === 'mochi' && i.mode === 'offline')).toBe(true);
     expect(needsRestart(emptyConversation())).toBe(false);
     expect(needsRestart({ ...emptyConversation(), wire: Array.from({ length: 40 }, () => ({ role: 'user' as const, content: [] })) })).toBe(true);
+  });
+});
+
+describe('Bản tin Hội đồng Học sinh', () => {
+  const withNews = (): AppState => ({
+    ...seed(),
+    newsPosts: [
+      makePost({ id: 'bt-x1', slug: 'thong-bao-x', title: 'Thông báo kế hoạch tháng 10', category: 'announcement', publishedAt: '2026-10-06T08:00:00+07:00', eventIds: ['ev-018'] }),
+      makePost({ id: 'bt-x2', slug: 'huong-dan-x', title: 'Hướng dẫn xuất lịch cá nhân', category: 'guide', publishedAt: '2026-10-05T08:00:00+07:00' }),
+      makePost({ id: 'bt-x3', slug: 'sap-toi', title: 'Bài viết chưa phát hành', publishedAt: '2026-10-20T08:00:00+07:00' }),
+    ],
+  });
+
+  it('list_news returns published articles with links and a card', () => {
+    const out = executeTool('list_news', { limit: 5, category: 'guide' }, ctx(withNews()));
+    const r = out.result as { status: string; posts: { title: string; url: string; author: string; related_events: string[] }[] };
+    expect(r.status).toBe('ok');
+    expect(r.posts.map((p) => p.title)).toContain('Hướng dẫn xuất lịch cá nhân');
+    expect(r.posts.every((p) => p.url.startsWith('/ban-tin/'))).toBe(true);
+    expect(r.posts.map((p) => p.title)).not.toContain('Bài viết chưa phát hành');
+    expect(out.card?.kind).toBe('news');
+    const all = executeTool('list_news', {}, ctx(withNews())).result as { posts: { title: string; related_events: string[] }[] };
+    expect(all.posts.length).toBeLessThanOrEqual(3);
+    const own = all.posts.find((p) => p.title === 'Thông báo kế hoạch tháng 10');
+    expect(own?.related_events).toEqual([EVENTS.find((e) => e.id === 'ev-018')?.title]);
+  });
+
+  it('list_news reports an empty column honestly', () => {
+    const empty = executeTool('list_news', { category: 'club' }, ctx({ ...seed(), newsPosts: [] }));
+    const r = empty.result as { status: string };
+    if (r.status === 'empty') expect(empty.card).toBeUndefined();
+    else expect(empty.card?.kind).toBe('news');
+    // Out-of-range limits are clamped; wrong types and categories are errors the model can correct.
+    const many = executeTool('list_news', { limit: 9 }, ctx(withNews())).result as { posts: unknown[] };
+    expect(many.posts.length).toBeLessThanOrEqual(5);
+    expect(executeTool('list_news', { limit: 'ba' }, ctx())).toMatchObject({ isError: true });
+    expect(executeTool('list_news', { category: 'sports' }, ctx())).toMatchObject({ isError: true });
+  });
+
+  it('classifies council news questions and answers offline from the data', () => {
+    expect(classify('HĐHS có thông báo gì mới không?')).toBe('news');
+    expect(classify('Bản tin Hội đồng Học sinh')).toBe('news');
+    expect(classify('Tóm tắt bản tin tuần này')).toBe('summary');
+    const reply = respondOffline('Bản tin Hội đồng Học sinh có hướng dẫn nào?', ctx(withNews()));
+    expect(reply.intent).toBe('news');
+    expect(reply.text).toContain('Hướng dẫn xuất lịch cá nhân');
+    expect(reply.cards[0]?.kind).toBe('news');
   });
 });

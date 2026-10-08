@@ -24,6 +24,9 @@ const LOADERS: Record<LazyRoute, () => PageModule> = {
   clubPortal: () => import('./pages/ClubPortal').then((m) => ({ default: m.ClubPortalPage })),
   moderation: () => import('./pages/Moderation').then((m) => ({ default: m.ModerationPage })),
   proposal: () => import('./pages/Proposal').then((m) => ({ default: m.ProposalPage })),
+  news: () => import('./pages/News').then((m) => ({ default: m.NewsPage })),
+  newsCompose: () => import('./pages/NewsCompose').then((m) => ({ default: m.NewsComposePage })),
+  newsArticle: () => import('./pages/NewsArticle').then((m) => ({ default: m.NewsArticlePage })),
   notFound: () => import('./pages/NotFound').then((m) => ({ default: m.NotFoundPage })),
 };
 
@@ -41,6 +44,9 @@ const PAGES: Record<RouteName, ComponentType> = {
   clubPortal: lazy(LOADERS.clubPortal),
   moderation: lazy(LOADERS.moderation),
   proposal: lazy(LOADERS.proposal),
+  news: lazy(LOADERS.news),
+  newsCompose: lazy(LOADERS.newsCompose),
+  newsArticle: lazy(LOADERS.newsArticle),
   notFound: lazy(LOADERS.notFound),
 };
 

@@ -61,8 +61,12 @@ Tùy chọn: để giới hạn tần suất truy cập Mochi một cách bền 
 
 ## 5. Thay dữ liệu minh họa bằng dữ liệu thật
 
-Dữ liệu nằm trong `src/data/` (mỗi tệp đều ghi chú là dữ liệu minh họa): `clubs.ts`, `events.ts`, `calendar.ts` (các đợt kiểm tra định kỳ, ngày nghỉ), `seed.ts` (hồ sơ minh họa), `school.ts` (tên trường). Thông tin ứng cử viên (`[Họ và tên]`, `[Lớp]`, `[Vị trí ứng tuyển]`, `[Thông điệp tranh cử]`) và thời gian dự kiến của từng giai đoạn trên trang Đề án nằm trong `src/content/proposal.ts`. Sau khi thay, thực hiện `npm run check` để đảm bảo dữ liệu hợp lệ.
+Dữ liệu nằm trong `src/data/` (mỗi tệp đều ghi chú là dữ liệu minh họa): `clubs.ts`, `events.ts`, `calendar.ts` (các đợt kiểm tra định kỳ, ngày nghỉ), `seed.ts` (hồ sơ minh họa), `school.ts` (tên trường), `news.ts` (các bài viết của Bản tin Hội đồng Học sinh; mỗi bài viết ký tên một ban, không ghi họ tên học sinh). Thông tin ứng cử viên (`[Họ và tên]`, `[Lớp]`, `[Vị trí ứng tuyển]`, `[Thông điệp tranh cử]`) và thời gian dự kiến của từng giai đoạn trên trang Đề án nằm trong `src/content/proposal.ts`. Sau khi thay, thực hiện `npm run check` để đảm bảo dữ liệu hợp lệ.
 
-## 6. Cấu trúc mã nguồn
+## 6. Bản tin Hội đồng Học sinh
+
+Trang **Bản tin** (`/ban-tin`) trình bày các bài viết của Hội đồng Học sinh theo từng số hằng tháng. Để đăng bài trong bản trình diễn: mở **Tài khoản minh họa** → chọn vai trò **HĐHS** → **Bản tin** → **Soạn bài viết**. Bài viết hiển thị ngay sau khi nhấn **Đăng bài**, xuất hiện tại trang Tổng quan, trang các sự kiện được liên kết, và Mochi có thể giới thiệu bài viết khi học sinh hỏi về thông báo mới. Bài viết đăng trong bản trình diễn được lưu trên trình duyệt và có thể gỡ bằng nút **Gỡ bài viết**.
+
+## 7. Cấu trúc mã nguồn
 
 Xem `docs/ARCHITECTURE.md` (kiến trúc và giao kèo giữa các lớp) và `DESIGN.md` (hệ thống thiết kế).

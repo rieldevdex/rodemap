@@ -1,5 +1,7 @@
 /** The single pure reducer for AppState. Invalid actions return the same state object. */
 import { EVENTS } from '../data/events';
+import { NEWS } from '../data/news';
+import { RESERVED_NEWS_SLUGS } from '../domain/news';
 import { applyReview, canTransition } from '../domain/moderation';
 import type { EventStatus, Registration, SchoolEvent } from '../domain/types';
 import type { Action } from './actions';
@@ -115,6 +117,16 @@ export function reducer(state: AppState, action: Action): AppState {
         submissions: state.submissions.map((s) => (s.id === sub.id ? result.submission : s)),
       };
     }
+
+    case 'news/publish': {
+      const all = [...NEWS, ...state.newsPosts];
+      const { post } = action;
+      if (all.some((p) => p.id === post.id || p.slug === post.slug) || RESERVED_NEWS_SLUGS.includes(post.slug)) return state;
+      return { ...state, newsPosts: [...state.newsPosts, post] };
+    }
+
+    case 'news/remove':
+      return state.newsPosts.some((p) => p.id === action.id) ? { ...state, newsPosts: state.newsPosts.filter((p) => p.id !== action.id) } : state;
 
     case 'role/set':
       return state.role === action.role ? state : { ...state, role: action.role };

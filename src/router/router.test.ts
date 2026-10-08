@@ -16,7 +16,7 @@ describe('ROUTES', () => {
   it('lists every screen once with a Vietnamese title', () => {
     const names = ROUTES.map((r) => r.name);
     expect(new Set(names).size).toBe(names.length);
-    expect(names).toHaveLength(14);
+    expect(names).toHaveLength(17);
     for (const r of ROUTES) expect(r.title.length).toBeGreaterThan(0);
   });
 
@@ -36,6 +36,9 @@ describe('ROUTES', () => {
       clubPortal: '/cong-cau-lac-bo',
       moderation: '/kiem-duyet',
       proposal: '/de-an',
+      news: '/ban-tin',
+      newsCompose: '/ban-tin/soan-bai',
+      newsArticle: '/ban-tin/:slug',
     });
   });
 });
@@ -62,6 +65,8 @@ describe('matchRoute', () => {
 
   it('prefers the static route over the parameterised one', () => {
     expect(matchRoute('/cau-lac-bo')).toEqual({ name: 'clubs', params: {} });
+    expect(matchRoute('/ban-tin/soan-bai')).toEqual({ name: 'newsCompose', params: {} });
+    expect(matchRoute('/ban-tin/tong-ket-le-khai-giang')).toEqual({ name: 'newsArticle', params: { slug: 'tong-ket-le-khai-giang' } });
   });
 
   it('tolerates trailing and repeated slashes, query strings and hashes', () => {

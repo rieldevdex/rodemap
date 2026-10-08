@@ -2,6 +2,7 @@
 import type {
   IsoDate,
   IsoDateTime,
+  NewsPost,
   PortfolioEntry,
   Profile,
   Role,
@@ -24,6 +25,8 @@ export type Action =
   | { type: 'submission/create'; event: SchoolEvent; submission: Submission }
   | { type: 'submission/resubmit'; submissionId: string; event: SchoolEvent; at: IsoDateTime }
   | { type: 'moderation/review'; submissionId: string; action: ModerationDecision; reason?: string; at: IsoDateTime }
+  | { type: 'news/publish'; post: NewsPost }
+  | { type: 'news/remove'; id: string }
   | { type: 'role/set'; role: Role }
   | { type: 'club/setActive'; clubId: string }
   | { type: 'theme/set'; theme: ThemePreference }

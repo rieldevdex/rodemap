@@ -72,8 +72,8 @@ export const PARTICIPATION: ParticipantStep[] = [
   {
     id: 'hdhs',
     actor: 'Hội đồng Học sinh',
-    title: 'Kiểm duyệt',
-    body: 'Thành viên phụ trách phê duyệt, yêu cầu chỉnh sửa hoặc từ chối kèm lý do. Chỉ sự kiện đã được phê duyệt mới được hiển thị với học sinh.',
+    title: 'Kiểm duyệt và phát hành bản tin',
+    body: 'Thành viên phụ trách phê duyệt, yêu cầu chỉnh sửa hoặc từ chối kèm lý do. Chỉ sự kiện đã được phê duyệt mới được hiển thị với học sinh. Hội đồng Học sinh đồng thời phát hành Bản tin hằng tháng với thông báo, tin hoạt động và hướng dẫn.',
   },
   {
     id: 'hoc-sinh',

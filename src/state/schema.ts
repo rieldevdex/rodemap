@@ -3,6 +3,7 @@ import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS, SEED_SUBMISSIONS } fr
 import type {
   EventStatus,
   IsoDate,
+  NewsPost,
   PortfolioEntry,
   Profile,
   Registration,
@@ -29,6 +30,8 @@ export interface AppState {
   /** Status overrides for any event id (seed or submitted). */
   moderation: Record<string, EventStatus>;
   submissions: Submission[];
+  /** Articles published through Soạn bài viết (the seed articles live in src/data/news.ts). */
+  newsPosts: NewsPost[];
   theme: ThemePreference;
   /** Overrides "today" for the demo; null follows the real clock. */
   demoToday: IsoDate | null;
@@ -48,6 +51,7 @@ export function createSeedState(): AppState {
     submittedEvents: [],
     moderation: {},
     submissions: structuredClone(SEED_SUBMISSIONS),
+    newsPosts: [],
     theme: 'system',
     demoToday: null,
     mochiForcedOffline: false,
@@ -75,6 +79,7 @@ export function isAppStateV1(x: unknown): x is AppState {
     Array.isArray(x.submittedEvents) &&
     isRecord(x.moderation) &&
     Array.isArray(x.submissions) &&
+    Array.isArray(x.newsPosts) &&
     typeof x.theme === 'string' &&
     THEMES.includes(x.theme) &&
     (x.demoToday === null || (typeof x.demoToday === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.demoToday))) &&
@@ -87,6 +92,8 @@ export function isAppStateV1(x: unknown): x is AppState {
  * Returns null for unknown or corrupt data (the caller falls back to the seed).
  */
 export function migrate(raw: unknown): AppState | null {
-  if (isAppStateV1(raw)) return raw;
+  // v1 states saved before the newsletter existed have no newsPosts yet.
+  const upgraded = isRecord(raw) && raw.version === 1 && !('newsPosts' in raw) ? { ...raw, newsPosts: [] } : raw;
+  if (isAppStateV1(upgraded)) return upgraded;
   return null;
 }

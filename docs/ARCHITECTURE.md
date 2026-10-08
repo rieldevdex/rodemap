@@ -95,6 +95,20 @@ export function toggleInterest(list, code) / moveInterest(list, code, -1 | 1) / 
 export function clampBudget(hours): number;
 export function draftToProfile(draft, now): Profile | null;    // null until every step is complete; topInterests = first 3
 
+// news.ts — Bản tin Hội đồng Học sinh
+export const NEWS_CATEGORY_LABELS: Record<NewsCategory, string>; // Thông báo, Tin hoạt động, Câu lạc bộ, Hướng dẫn
+export const NEWS_LIMITS; export const RESERVED_NEWS_SLUGS = ['soan-bai'];
+export function publishedPosts(posts, now): NewsPost[];       // publishedAt <= now, newest first; later ones are scheduled
+export function leadPost(posts): NewsPost | undefined;        // newest pinned, else newest
+export function issueNumber(ms): number; export function groupByIssue(posts): NewsIssue[]; // Số 1 = Tháng 9/2026
+export function filterPosts(posts, { category, query }): NewsPost[];
+export function relatedPosts(post, posts, limit = 3): NewsPost[]; // shared events/clubs ×2, same column ×1
+export function postsAboutEvent(posts, eventId) / postsAboutClub(posts, clubId);
+export function parseNewsBody(text): NewsBlock[]; export function bodyToText(blocks): string; // "## ", "- ", "> … — nguồn"
+export function newsBodyText(blocks): string; export function readingMinutes(post): number;
+export function validateNewsDraft(draft, knownEventIds): NewsDraftErrors;
+export function uniqueNewsSlug(title, taken): string; export function postFromDraft(draft, { id, now, takenSlugs, clubOfEvent }): NewsPost;
+
 // calendar-view.ts — Lịch của tôi
 export function monthGrid(ms): Millis[][];                    // Monday-first weeks covering the month
 export function weekDays(ms): Millis[]; export function isInMonth(day, monthMs): boolean;
@@ -235,6 +249,7 @@ clubs.ts        export const CLUBS: Club[]           // 14, incl. Inkstep (id 'i
 events.ts       export const EVENTS: SchoolEvent[]    // ~45 approved + 4–6 pending/changes_requested/rejected
 calendar.ts     export const PERIODS: CalendarPeriod[]
 seed.ts         export const SEED_PROFILE: Profile; SEED_REGISTRATIONS; SEED_PORTFOLIO; SEED_SUBMISSIONS
+news.ts         export const NEWS: NewsPost[]; NEWS_DEPARTMENTS   // council articles (one scheduled), signed by a department
 school.ts       export const SCHOOL = { name: '[Tên trường]', schoolYear: '2026–2027' }
 ```
 
@@ -251,6 +266,7 @@ export interface AppState {
   submittedEvents: SchoolEvent[];             // created via Cổng câu lạc bộ (status lives in moderation)
   moderation: Record<string, EventStatus>;    // status overrides for any event id
   submissions: Submission[];
+  newsPosts: NewsPost[];                      // articles published through Soạn bài viết (v1 states without it migrate to [])
   theme: ThemePreference;
   demoToday: IsoDate | null;                  // overrides the clock for the demo
   mochiForcedOffline: boolean;
@@ -267,6 +283,8 @@ export type Action =
   | { type: 'submission/create'; event: SchoolEvent; submission: Submission }
   | { type: 'submission/resubmit'; submissionId: string; event: SchoolEvent; at: IsoDateTime }
   | { type: 'moderation/review'; submissionId: string; action: 'approve'|'request_changes'|'reject'; reason?: string; at: IsoDateTime }
+  | { type: 'news/publish'; post: NewsPost }    // refused when the id or slug exists or the slug is reserved
+  | { type: 'news/remove'; id: string }         // only demo-published articles
   | { type: 'role/set'; role: Role }
   | { type: 'club/setActive'; clubId: string }
   | { type: 'theme/set'; theme: ThemePreference }
@@ -286,6 +304,8 @@ selectConflictsInPlan(state)
 selectRecommendations(state, now, opts?)
 selectFirstRoute(state, now, size?)  // planner.firstRoute: best event of each top interest first, then by score
 selectPlanBudget(state, now)
+selectNews(state, now) / selectNewsBySlug(state, slug, now) / selectNewsSlugs(state)
+selectNewsForEvent(state, eventId, now) / selectNewsForClub(state, clubId, now)
 selectDeadlinesThisWeek(state, now)
 selectPendingAttendance(state, now)
 selectSubmissionsForClub(state, clubId) / selectModerationQueue(state)
@@ -303,10 +323,11 @@ saveState(storage: Storage | null, s: AppState): void;  // try/catch
 
 ```ts
 export type RouteName = 'home'|'onboarding'|'dashboard'|'explore'|'event'|'route'|'calendar'
-  |'portfolio'|'clubs'|'club'|'clubPortal'|'moderation'|'proposal'|'notFound';
+  |'portfolio'|'clubs'|'club'|'clubPortal'|'moderation'|'proposal'|'news'|'newsCompose'|'newsArticle'|'notFound';
 export const ROUTES: { name: RouteName; path: string; title: string }[];
 // paths: / · /thiet-lap · /tong-quan · /kham-pha · /su-kien/:slug · /lo-trinh · /lich · /ho-so
 //        /cau-lac-bo · /cau-lac-bo/:slug · /cong-cau-lac-bo · /kiem-duyet · /de-an
+//        /ban-tin · /ban-tin/soan-bai (before the slug route) · /ban-tin/:slug
 export function matchRoute(pathname: string): { name: RouteName; params: Record<string, string> };
 export function pathFor(name: RouteName, params?: Record<string, string>): string;
 export function RouterProvider(props: { children: ReactNode }): JSX.Element;
@@ -322,4 +343,8 @@ Tools run in the browser against app state; propose_* tools never mutate.
 Server function `functions/api/mochi.ts` holds the system prompt + tool
 schemas (imported from `src/mochi/system-prompt.ts`, `src/mochi/tools/schemas.ts`)
 and the API key (`ANTHROPIC_API_KEY`), model from `MOCHI_MODEL`
-(default `claude-sonnet-5-5`). Details in milestone 4.
+(default `claude-opus-5-5`). Eleven strict tools: search_events, get_event, get_club,
+recommend_events, check_conflicts, propose_registration, propose_calendar_plan,
+summarize_events, draft_portfolio_entry, export_calendar, list_news (published
+articles of the Bản tin Hội đồng Học sinh, shown as a `news` card). The offline
+engine answers the same intents, including `news`.

@@ -24,6 +24,7 @@ describe('createSeedState', () => {
       submittedEvents: [],
       moderation: {},
       submissions: SEED_SUBMISSIONS,
+      newsPosts: [],
       theme: 'system',
       demoToday: null,
       mochiForcedOffline: false,
@@ -104,6 +105,8 @@ describe('isAppStateV1 / migrate', () => {
     ['moderation that is an array', { moderation: [] }],
     ['moderation that is null', { moderation: null }],
     ['submissions that are not an array', { submissions: {} }],
+    ['news posts that are not an array', { newsPosts: {} }],
+    ['news posts set to undefined', { newsPosts: undefined }],
     ['a non-string theme', { theme: 0 }],
     ['an unknown theme', { theme: 'sepia' }],
     ['a numeric demo date', { demoToday: 20261007 }],
@@ -111,6 +114,14 @@ describe('isAppStateV1 / migrate', () => {
     ['a missing demo date', { demoToday: undefined }],
     ['a non-boolean Mochi offline flag', { mochiForcedOffline: 'false' }],
   ];
+
+  it('upgrades a v1 state saved before the newsletter existed', () => {
+    const older: Partial<ReturnType<typeof createSeedState>> = createSeedState();
+    delete older.newsPosts;
+    const migrated = migrate(older);
+    expect(migrated?.newsPosts).toEqual([]);
+    expect(migrated?.registrations).toEqual(older.registrations);
+  });
 
   it.each(malformed)('rejects a state with %s', (_label, patch) => {
     const raw: unknown = { ...createSeedState(), ...patch };

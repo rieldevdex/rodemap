@@ -26,6 +26,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Lịch', to: 'calendar', section: ['calendar'] },
   { label: 'Hồ sơ', to: 'portfolio', section: ['portfolio'] },
   { label: 'Câu lạc bộ', to: 'clubs', section: ['clubs', 'club'] },
+  { label: 'Bản tin', to: 'news', section: ['news', 'newsArticle', 'newsCompose'] },
   { label: 'Cổng CLB', to: 'clubPortal', section: ['clubPortal'], role: 'club' },
   { label: 'Kiểm duyệt', to: 'moderation', section: ['moderation'], role: 'moderator' },
 ];
@@ -148,6 +149,8 @@ export function Header() {
           <button
             type="button"
             className="site-header__search"
+            title="Tìm kiếm sự kiện (Ctrl K)"
+            aria-keyshortcuts="Control+K Meta+K"
             onClick={() => {
               navigate(searchTarget);
             }}

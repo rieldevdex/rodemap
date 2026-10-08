@@ -3,10 +3,11 @@ import { LineBadge } from '../components/atoms/LineBadge';
 import { MonoTime } from '../components/atoms/MonoTime';
 import { PageHead } from '../components/molecules/PageHead';
 import { StationCard } from '../components/molecules/StationCard';
+import { NewsRelated } from '../components/organisms/NewsRelated';
 import { formatDate, toMillis } from '../domain/dates';
 import { deadlineDaysLeft, isPast, registrationState, seatsLeft } from '../domain/events';
 import { Link, useRoute } from '../router';
-import { selectClubBySlug, selectEventsForClub } from '../state/selectors';
+import { selectClubBySlug, selectEventsForClub, selectNewsForClub } from '../state/selectors';
 import { useCatalog } from '../state/useCatalog';
 import { EventRegistration } from './connected/EventRegistration';
 import './Clubs.css';
@@ -112,6 +113,8 @@ export function ClubDetailPage() {
           )}
         </div>
       </section>
+
+      <NewsRelated posts={selectNewsForClub(state, club.id, now)} title={`Bản tin Hội đồng Học sinh về ${club.shortName}`} headingId="club-news" surface />
     </>
   );
 }

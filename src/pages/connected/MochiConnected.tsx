@@ -21,7 +21,7 @@ const STATUS: Record<string, string> = {
   past: 'Đã diễn ra',
 };
 
-const SUGGESTIONS = ['Gợi ý sự kiện tuần tới', 'Lịch của tôi', 'Tóm tắt tuần này', 'Hồ sơ năng lực'];
+const SUGGESTIONS = ['Gợi ý sự kiện tuần tới', 'Lịch của tôi', 'Tóm tắt tuần này', 'Bản tin Hội đồng Học sinh', 'Hồ sơ năng lực'];
 
 /** Mounts the dock and the panel, wiring Mochi's cards to the store. */
 export function MochiConnected() {

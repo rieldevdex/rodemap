@@ -287,5 +287,26 @@ export function MochiCardView({
         </section>
       );
     }
+    case 'news':
+      return (
+        <section className="mochi-card" aria-label="Bản tin Hội đồng Học sinh">
+          <p className="mochi-card__kicker">Bản tin Hội đồng Học sinh</p>
+          <ul className="mochi-card__news">
+            {card.posts.map((p) => (
+              <li key={p.id}>
+                <span className="mochi-card__when">
+                  {p.category} · {p.date}
+                </span>
+                <Link className="mochi-card__title" to={p.href}>
+                  {p.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <Link className="mochi-card__more" to="/ban-tin">
+            Xem toàn bộ Bản tin
+          </Link>
+        </section>
+      );
   }
 }
