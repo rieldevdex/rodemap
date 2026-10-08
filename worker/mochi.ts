@@ -1,7 +1,7 @@
 /**
- * POST /api/mochi — Cloudflare Pages Function relaying Mochi's conversation to
+ * POST /api/mochi — handler (routed by worker/index.ts) relaying Mochi's conversation to
  * the Claude API. The API key never leaves the server. Tools run in the browser:
- * this function only adds the fixed system prompt and tool list, validates and
+ * this handler only adds the fixed system prompt and tool list, validates and
  * rate-limits the request, and returns the next assistant turn verbatim.
  *
  * Environment:
@@ -11,13 +11,13 @@
  *   MOCHI_RATE_LIMIT   (KV, optional) — durable rate-limit windows across isolates
  */
 import Anthropic from '@anthropic-ai/sdk';
-import { MAX_BODY_BYTES, RATE_LIMIT, type MochiResponse } from '../../src/mochi/protocol';
-import { checkRateLimit, memoryStore, type RateStore, type RateWindow } from '../../src/mochi/server/rate-limit';
-import { validateMochiRequest } from '../../src/mochi/server/validate';
-import { MOCHI_SYSTEM_PROMPT } from '../../src/mochi/system-prompt';
-import { MOCHI_TOOLS } from '../../src/mochi/tools/schemas';
+import { MAX_BODY_BYTES, RATE_LIMIT, type MochiResponse } from '../src/mochi/protocol';
+import { checkRateLimit, memoryStore, type RateStore, type RateWindow } from '../src/mochi/server/rate-limit';
+import { validateMochiRequest } from '../src/mochi/server/validate';
+import { MOCHI_SYSTEM_PROMPT } from '../src/mochi/system-prompt';
+import { MOCHI_TOOLS } from '../src/mochi/tools/schemas';
 
-interface Env {
+export interface Env {
   ANTHROPIC_API_KEY?: string;
   MOCHI_MODEL?: string;
   MOCHI_EFFORT?: string;
@@ -45,7 +45,7 @@ function json(body: MochiResponse, status: number, extra: Record<string, string>
   });
 }
 
-export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+export async function handleMochi(request: Request, env: Env): Promise<Response> {
   if (!env.ANTHROPIC_API_KEY) return json({ ok: false, error: 'offline' }, 503);
 
   const length = Number(request.headers.get('content-length') ?? '0');
@@ -123,4 +123,4 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     console.error('Mochi: unexpected failure', error instanceof Error ? error.message : 'unknown');
     return json({ ok: false, error: 'upstream' }, 502);
   }
-};
+}

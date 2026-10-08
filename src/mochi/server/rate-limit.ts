@@ -1,4 +1,4 @@
-/** Fixed-window rate limiting for the Mochi Pages Function. Pure apart from the injected store. */
+/** Fixed-window rate limiting for the Mochi Worker endpoint. Pure apart from the injected store. */
 
 export interface RateWindow {
   count: number;

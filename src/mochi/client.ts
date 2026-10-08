@@ -15,7 +15,7 @@ export async function sendToMochi(req: MochiRequest, endpoint = '/api/mochi'): P
       body: JSON.stringify(req),
       signal: controller.signal,
     });
-    // No Pages Function (local preview, static hosting): behave as "no key configured".
+    // No Worker behind /api (local preview, static hosting): behave as "no key configured".
     if (res.status === 404 || res.status === 405) return { ok: false, error: 'offline' };
     const type = res.headers.get('content-type') ?? '';
     if (!type.includes('application/json')) return { ok: false, error: res.ok ? 'upstream' : 'offline' };

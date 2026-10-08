@@ -23,12 +23,11 @@ vi.mock('@anthropic-ai/sdk', () => {
   return { default: Anthropic };
 });
 
-const { onRequestPost } = await import('./mochi');
+const { handleMochi } = await import('./mochi');
 const { default: Anthropic } = await import('@anthropic-ai/sdk');
 type ErrorClass = new (status: number) => Error;
 const E = Anthropic as unknown as Record<'AuthenticationError' | 'PermissionDeniedError' | 'RateLimitError' | 'BadRequestError' | 'APIError', ErrorClass>;
 
-type Ctx = Parameters<typeof onRequestPost>[0];
 let ipCounter = 0;
 
 function call(body: unknown, env: Record<string, unknown> = { ANTHROPIC_API_KEY: 'test-key' }, raw?: string) {
@@ -38,7 +37,7 @@ function call(body: unknown, env: Record<string, unknown> = { ANTHROPIC_API_KEY:
     headers: { 'content-type': 'application/json', 'cf-connecting-ip': `10.0.0.${ipCounter}` },
     body: raw ?? JSON.stringify(body),
   });
-  return onRequestPost({ request, env } as unknown as Ctx);
+  return handleMochi(request, env);
 }
 
 const valid = (sessionId = `session-${ipCounter + 1}-abc`) => ({

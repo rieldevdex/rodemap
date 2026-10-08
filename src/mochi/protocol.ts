@@ -1,5 +1,5 @@
 /**
- * Wire protocol between the browser and the Mochi Pages Function (/api/mochi).
+ * Wire protocol between the browser and the Mochi Worker endpoint (/api/mochi).
  *
  * The browser owns the conversation: it sends the full, append-only message
  * history (assistant turns replayed verbatim, including thinking blocks) and
