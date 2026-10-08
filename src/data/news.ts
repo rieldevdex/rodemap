@@ -20,11 +20,11 @@ export const NEWS: NewsPost[] = [
     author: 'Ban Tổ chức',
     publishedAt: '2026-09-03T07:30:00+07:00',
     summary:
-      'Hội đồng Học sinh thông báo kế hoạch tổ chức Lễ khai giảng năm học 2026–2027 vào Thứ Bảy, 05/09/2026 tại sân trường, dành cho học sinh các khối 10, 11 và 12.',
+      'Hội đồng Học sinh thông báo kế hoạch tổ chức Lễ khai giảng năm học 2026–2027 vào Thứ Bảy, 05/09/2026, tại sân trường, dành cho học sinh các khối 10, 11 và 12.',
     body: [
       {
         kind: 'paragraph',
-        text: 'Lễ khai giảng năm học 2026–2027 là sự kiện toàn trường chính thức mở đầu năm học mới, dành cho toàn thể học sinh nhà trường. Tại buổi lễ, học sinh được phổ biến kế hoạch năm học và các nhiệm vụ trọng tâm, đồng thời tham dự lễ tuyên dương học sinh tiêu biểu.',
+        text: 'Lễ khai giảng năm học 2026–2027 là sự kiện chính thức mở đầu năm học mới, dành cho toàn thể học sinh nhà trường. Tại buổi lễ, học sinh được phổ biến kế hoạch năm học và các nhiệm vụ trọng tâm, đồng thời tham dự lễ tuyên dương học sinh tiêu biểu.',
       },
       { kind: 'heading', text: 'Thông tin sự kiện' },
       {
@@ -43,18 +43,18 @@ export const NEWS: NewsPost[] = [
         kind: 'paragraph',
         text: 'Chương trình gồm nghi thức chào cờ, diễn văn khai giảng của Ban Giám hiệu, tuyên dương học sinh đạt thành tích xuất sắc năm học trước và phần văn nghệ chào mừng do các câu lạc bộ phụ trách.',
       },
-      { kind: 'heading', text: 'Yêu cầu đối với học sinh' },
+      { kind: 'heading', text: 'Lưu ý đối với học sinh' },
       {
         kind: 'list',
         items: [
           'Có mặt tại sân trường trước 06:45 và tập trung theo vị trí của lớp.',
           'Mặc đồng phục theo quy định.',
-          'Hoàn tất đăng ký trên Rodemap trước thời hạn: tại trang sự kiện, chọn Đăng ký và nhấn Xác nhận.',
+          'Đăng ký trên Rodemap trong thời hạn nêu trên để buổi lễ được bổ sung vào Lộ trình và Lịch: tại trang sự kiện, chọn Đăng ký và nhấn Xác nhận.',
         ],
       },
       {
         kind: 'paragraph',
-        text: 'Kể từ số này, Bản tin Hội đồng Học sinh được phát hành hằng tháng tại mục Bản tin trên Rodemap nhằm cung cấp thông báo, tin hoạt động, giới thiệu câu lạc bộ và hướng dẫn sử dụng Rodemap tới học sinh toàn trường.',
+        text: 'Kể từ số này, Bản tin Hội đồng Học sinh được phát hành hằng tháng tại mục Bản tin trên Rodemap nhằm cung cấp cho học sinh toàn trường các thông báo, tin hoạt động, bài giới thiệu câu lạc bộ và hướng dẫn sử dụng ứng dụng.',
       },
     ],
     eventIds: ['ev-001'],
@@ -72,7 +72,7 @@ export const NEWS: NewsPost[] = [
     body: [
       {
         kind: 'paragraph',
-        text: 'Sáng Thứ Bảy, 05/09/2026, từ 07:00 đến 09:30, Lễ khai giảng năm học 2026–2027 do Hội đồng Học sinh phụ trách tổ chức đã diễn ra tại sân trường. Buổi lễ dành cho học sinh các khối 10, 11 và 12, chính thức mở đầu năm học 2026–2027.',
+        text: 'Sáng Thứ Bảy, 05/09/2026, từ 07:00 đến 09:30, Lễ khai giảng năm học 2026–2027 do Hội đồng Học sinh tổ chức đã diễn ra tại sân trường. Buổi lễ dành cho học sinh các khối 10, 11 và 12, chính thức mở đầu năm học mới.',
       },
       { kind: 'heading', text: 'Chương trình buổi lễ' },
       {
@@ -86,7 +86,7 @@ export const NEWS: NewsPost[] = [
       },
       {
         kind: 'paragraph',
-        text: 'Thông qua buổi lễ, học sinh được phổ biến kế hoạch năm học và các nhiệm vụ trọng tâm, đồng thời tham dự lễ tuyên dương học sinh tiêu biểu.',
+        text: 'Thông qua buổi lễ, học sinh được phổ biến kế hoạch năm học và các nhiệm vụ trọng tâm.',
       },
       {
         kind: 'quote',
@@ -110,7 +110,7 @@ export const NEWS: NewsPost[] = [
     author: 'Ban Truyền thông',
     publishedAt: '2026-09-09T07:30:00+07:00',
     summary:
-      'Bài viết hướng dẫn học sinh thiết lập lộ trình, đăng ký sự kiện, xác nhận thao tác và đưa lịch hoạt động sang ứng dụng lịch cá nhân trên Rodemap.',
+      'Bài viết hướng dẫn học sinh thiết lập lộ trình, đăng ký và xác nhận đăng ký sự kiện trên Rodemap, đồng thời xuất lịch hoạt động sang ứng dụng lịch cá nhân.',
     body: [
       {
         kind: 'paragraph',
@@ -119,7 +119,7 @@ export const NEWS: NewsPost[] = [
       { kind: 'heading', text: 'Bước 1. Thiết lập lộ trình' },
       {
         kind: 'paragraph',
-        text: 'Tại trang Tổng quan, học sinh chưa thiết lập hồ sơ chọn Bắt đầu thiết lập lộ trình, sau đó khai báo khối lớp, lĩnh vực quan tâm, mục tiêu, khoảng thời gian có thể tham gia và quỹ giờ mỗi tuần. Trên cơ sở đó, Mochi đề xuất các sự kiện phù hợp; học sinh xem xét đề xuất và nhấn Xác nhận lộ trình để đăng ký các sự kiện đã chọn.',
+        text: 'Trường hợp chưa thiết lập hồ sơ, học sinh chọn Bắt đầu thiết lập lộ trình tại trang Tổng quan, sau đó khai báo khối lớp, lĩnh vực quan tâm, mục tiêu, khoảng thời gian có thể tham gia và quỹ giờ mỗi tuần. Trên cơ sở đó, Mochi đề xuất các sự kiện phù hợp; học sinh xem xét đề xuất và nhấn Xác nhận lộ trình để đăng ký các sự kiện đã chọn.',
       },
       { kind: 'heading', text: 'Bước 2. Đăng ký từng sự kiện' },
       {
@@ -127,17 +127,17 @@ export const NEWS: NewsPost[] = [
         items: [
           'Mở mục Khám phá, sử dụng các bộ lọc Lĩnh vực, Khối được phép tham gia hoặc Hạn đăng ký để tìm sự kiện phù hợp.',
           'Tại trang chi tiết sự kiện, chọn Đăng ký.',
-          'Kiểm tra bảng xác nhận gồm thời gian, địa điểm, số chỗ còn lại và hạn đăng ký; Rodemap cảnh báo khi sự kiện trùng lịch hoặc vượt quỹ giờ trong tuần.',
+          'Kiểm tra thông tin tại hộp thoại Xác nhận đăng ký, gồm thời gian, địa điểm, số chỗ còn lại và hạn đăng ký; Rodemap cảnh báo khi sự kiện trùng lịch hoặc vượt quỹ giờ trong tuần.',
           'Nhấn Xác nhận để hoàn tất đăng ký.',
         ],
       },
       {
         kind: 'paragraph',
-        text: 'Sự kiện đã đăng ký được bổ sung vào Lộ trình và Lịch của học sinh. Trường hợp không thể tham gia, học sinh chọn Hủy đăng ký và nhấn Xác nhận; chỗ của học sinh được mở lại cho học sinh khác đăng ký.',
+        text: 'Sự kiện đã đăng ký được bổ sung vào Lộ trình và Lịch của học sinh. Trường hợp không thể tham gia, học sinh chọn Hủy đăng ký và nhấn Xác nhận; chỗ đã đăng ký được mở lại cho học sinh khác.',
       },
       {
         kind: 'quote',
-        text: 'Mochi chỉ đề xuất sự kiện; mọi thao tác đăng ký hoặc hủy đăng ký đều chỉ được thực hiện sau khi học sinh nhấn Xác nhận.',
+        text: 'Mochi có vai trò đề xuất sự kiện; mọi thao tác đăng ký hoặc hủy đăng ký chỉ được thực hiện sau khi học sinh nhấn Xác nhận.',
         source: 'Ban Truyền thông, Hội đồng Học sinh',
       },
       { kind: 'heading', text: 'Bước 3. Xuất lịch hoạt động' },
@@ -164,11 +164,11 @@ export const NEWS: NewsPost[] = [
     author: 'Ban Tổ chức',
     publishedAt: '2026-09-10T07:30:00+07:00',
     summary:
-      'Ngày hội Câu lạc bộ năm học 2026–2027 diễn ra vào Thứ Bảy, 19/09/2026 tại Sân trường và Nhà thi đấu đa năng; học sinh đăng ký trên Rodemap trước 23:59 ngày 17/09/2026.',
+      'Ngày hội Câu lạc bộ năm học 2026–2027 diễn ra vào Thứ Bảy, 19/09/2026, tại Sân trường và Nhà thi đấu đa năng; hạn đăng ký trên Rodemap là 23:59, Thứ Năm, 17/09/2026.',
     body: [
       {
         kind: 'paragraph',
-        text: 'Hội đồng Học sinh thông báo tổ chức Ngày hội Câu lạc bộ năm học 2026–2027 nhằm giới thiệu hoạt động của các câu lạc bộ trong trường tới học sinh toàn trường, đặc biệt là học sinh khối 10. Tại ngày hội, học sinh được tìm hiểu kế hoạch hoạt động, trao đổi trực tiếp với ban chủ nhiệm và đăng ký tham gia câu lạc bộ phù hợp.',
+        text: 'Hội đồng Học sinh thông báo tổ chức Ngày hội Câu lạc bộ năm học 2026–2027 nhằm giới thiệu hoạt động của các câu lạc bộ tới học sinh toàn trường, đặc biệt là học sinh khối 10. Tại ngày hội, học sinh được tìm hiểu kế hoạch hoạt động, trao đổi trực tiếp với ban chủ nhiệm và đăng ký tham gia câu lạc bộ phù hợp.',
       },
       { kind: 'heading', text: 'Thông tin sự kiện' },
       {
@@ -267,7 +267,7 @@ export const NEWS: NewsPost[] = [
         items: [
           'Chương trình Chủ nhật Xanh: Vệ sinh khuôn viên trường và tuyến phố lân cận (từ 07:30 đến 10:00, Chủ nhật, 27/09/2026, tại Cổng trường và tuyến phố lân cận; hạn đăng ký 23:59, Thứ Sáu, 25/09/2026).',
           'Chương trình Quyên góp sách cho thư viện trường vùng cao (từ 08:30 đến 11:00, Thứ Bảy, 10/10/2026, tại Thư viện trường; hạn đăng ký 23:59, Thứ Năm, 08/10/2026).',
-          'Hoạt động trồng cây xanh tại công viên khu vực (từ 07:30 đến 11:00, Thứ Bảy, 24/10/2026, tại Công viên khu vực lân cận trường; hạn đăng ký 23:59, Thứ Tư, 21/10/2026).',
+          'Hoạt động trồng cây xanh tại công viên khu vực (từ 07:30 đến 11:00, Thứ Bảy, 24/10/2026, tại Công viên khu vực lân cận trường; học sinh tập trung tại cổng trường lúc 07:30 và di chuyển cùng thành viên ban chủ nhiệm đến địa điểm hoạt động; hạn đăng ký 23:59, Thứ Tư, 21/10/2026).',
           'Chương trình Áo ấm mùa đông: Tiếp nhận và phân loại hiện vật quyên góp (từ 08:00 đến 11:30, Thứ Bảy, 28/11/2026, tại Nhà thi đấu đa năng; hạn đăng ký 23:59, Thứ Tư, 25/11/2026).',
         ],
       },
@@ -319,7 +319,7 @@ export const NEWS: NewsPost[] = [
       },
       {
         kind: 'paragraph',
-        text: 'Học sinh quan tâm theo dõi sự kiện của câu lạc bộ tại mục Câu lạc bộ trên Rodemap và đăng ký vòng loại tại trang sự kiện trước thời hạn nêu trên.',
+        text: 'Học sinh quan tâm có thể theo dõi sự kiện của câu lạc bộ tại mục Câu lạc bộ trên Rodemap và đăng ký vòng loại tại trang sự kiện trước thời hạn nêu trên.',
       },
     ],
     eventIds: ['ev-004', 'ev-018', 'ev-042'],
@@ -328,7 +328,7 @@ export const NEWS: NewsPost[] = [
   {
     id: 'bt-008',
     slug: 'hoc-sinh-tim-hieu-to-hop-mon-hoc-va-nganh-hoc',
-    title: 'Học sinh tìm hiểu mối liên hệ giữa tổ hợp môn học và ngành học tại Hội trường A',
+    title: 'Hội thảo Định hướng lựa chọn tổ hợp môn học và ngành học đã diễn ra tại Hội trường A',
     category: 'activity',
     author: 'Ban Học tập',
     publishedAt: '2026-10-05T16:30:00+07:00',
@@ -346,7 +346,7 @@ export const NEWS: NewsPost[] = [
           'Chương trình có sự tham gia của chuyên viên tư vấn tuyển sinh và cựu học sinh đang theo học tại các trường đại học.',
           'Học sinh tham gia phần trắc nghiệm sở thích nghề nghiệp.',
           'Học sinh trao đổi trực tiếp với diễn giả về yêu cầu tuyển sinh của từng nhóm ngành.',
-          'Học sinh được tư vấn cách xác định thế mạnh cá nhân và xây dựng kế hoạch học tập phù hợp với định hướng nghề nghiệp.',
+          'Học sinh được tư vấn cách xác định thế mạnh cá nhân và lập kế hoạch học tập theo định hướng nghề nghiệp.',
         ],
       },
       { kind: 'heading', text: 'Về đơn vị tổ chức' },
@@ -357,7 +357,7 @@ export const NEWS: NewsPost[] = [
       { kind: 'heading', text: 'Đề nghị đối với học sinh đã tham dự' },
       {
         kind: 'paragraph',
-        text: 'Học sinh đã đăng ký và tham dự hội thảo chọn Xác nhận đã tham gia tại mục Xác nhận tham gia trên trang Tổng quan hoặc tại trang Hồ sơ. Sau khi xác nhận, hội thảo được bổ sung vào Hồ sơ năng lực cùng vai trò, số giờ và phần tự đánh giá, qua đó góp phần hoàn thiện hồ sơ hoạt động của học sinh trong năm học.',
+        text: 'Đề nghị học sinh đã đăng ký và tham dự hội thảo chọn Xác nhận đã tham gia tại mục Xác nhận tham gia trên trang Tổng quan hoặc tại trang Hồ sơ. Sau khi xác nhận, hội thảo được bổ sung vào Hồ sơ năng lực với vai trò Thành viên tham gia và số giờ theo thời lượng sự kiện; học sinh chọn Chỉnh sửa để cập nhật vai trò, số giờ và trình bày phần tự đánh giá, qua đó góp phần hoàn thiện hồ sơ trong năm học.',
       },
     ],
     eventIds: ['ev-009'],
@@ -371,13 +371,13 @@ export const NEWS: NewsPost[] = [
     author: 'Ban Tổ chức',
     publishedAt: '2026-10-06T07:00:00+07:00',
     summary:
-      'Hội đồng Học sinh tổng hợp hạn đăng ký của một số sự kiện trong tháng 10/2026 và lưu ý lịch Kiểm tra định kỳ giữa học kỳ I từ 02/11/2026 đến 07/11/2026.',
+      'Hội đồng Học sinh tổng hợp hạn đăng ký của một số sự kiện trong tháng 10/2026, đồng thời lưu ý học sinh về lịch Kiểm tra định kỳ giữa học kỳ I từ 02/11/2026 đến 07/11/2026.',
     body: [
       {
         kind: 'paragraph',
-        text: 'Trong tháng 10/2026, nhiều sự kiện của các câu lạc bộ đã được Hội đồng Học sinh phê duyệt và mở đăng ký trên Rodemap. Nhằm giúp học sinh chủ động sắp xếp thời gian, Ban Tổ chức tổng hợp thông tin các sự kiện có hạn đăng ký trong tháng như sau.',
+        text: 'Nhiều sự kiện của các câu lạc bộ diễn ra trong tháng 10/2026 đã được Hội đồng Học sinh phê duyệt và mở đăng ký trên Rodemap. Nhằm giúp học sinh chủ động sắp xếp thời gian, Ban Tổ chức tổng hợp một số sự kiện có hạn đăng ký trong tháng như sau; danh sách đầy đủ xem tại mục Khám phá.',
       },
-      { kind: 'heading', text: 'Sự kiện sắp đóng đăng ký' },
+      { kind: 'heading', text: 'Sự kiện sắp hết hạn đăng ký' },
       {
         kind: 'list',
         items: [
@@ -389,7 +389,7 @@ export const NEWS: NewsPost[] = [
       },
       {
         kind: 'paragraph',
-        text: 'Cuộc thi Phân tích dữ liệu học đường cấp trường được tổ chức theo đội, mỗi đội gồm ba học sinh. Học sinh kiểm tra số chỗ còn lại tại bảng xác nhận trước khi nhấn Xác nhận để hoàn tất đăng ký.',
+        text: 'Cuộc thi Phân tích dữ liệu học đường cấp trường được tổ chức theo đội, mỗi đội gồm ba học sinh. Trước khi nhấn Xác nhận, học sinh kiểm tra số chỗ còn lại tại hộp thoại Xác nhận đăng ký.',
       },
       { kind: 'heading', text: 'Lịch Kiểm tra định kỳ giữa học kỳ I' },
       {
@@ -430,22 +430,22 @@ export const NEWS: NewsPost[] = [
         kind: 'list',
         items: [
           'Chọn Chỉnh sửa tại mục hoạt động để cập nhật vai trò và số giờ.',
-          'Trình bày phần tự đánh giá bằng lời văn của học sinh, gồm vai trò, điều đã học được và kế hoạch tiếp theo.',
+          'Trình bày phần tự đánh giá bằng lời văn của bản thân, gồm vai trò, điều đã học được và kế hoạch tiếp theo.',
           'Bổ sung minh chứng, mỗi dòng một đường dẫn, sau đó chọn Lưu thay đổi.',
         ],
       },
       {
         kind: 'paragraph',
-        text: 'Học sinh có thể chọn Đề nghị Mochi soạn bản nháp để tham khảo. Nội dung này được đánh dấu Bản nháp do Mochi đề xuất và chỉ trở thành nội dung của học sinh sau khi được chỉnh sửa.',
+        text: 'Học sinh có thể chọn Đề nghị Mochi soạn bản nháp để tham khảo. Bản nháp được lưu vào hồ sơ khi học sinh nhấn Lưu bản nháp vào hồ sơ trên thẻ của Mochi, hoặc được loại bỏ khi học sinh chọn Không lưu. Văn bản đã lưu được đánh dấu Bản nháp do Mochi đề xuất và chỉ trở thành nội dung của học sinh sau khi học sinh chỉnh sửa.',
       },
       { kind: 'heading', text: 'Bước 3. In và xuất hồ sơ' },
       {
         kind: 'paragraph',
-        text: 'Tại trang Hồ sơ, học sinh chọn In hồ sơ (khổ A4) để in hồ sơ trình bày theo khổ giấy A4, hoặc chọn Xuất tệp JSON để lưu dữ liệu hồ sơ dưới dạng tệp. Phần tóm tắt của hồ sơ tổng hợp số hoạt động, tổng số giờ và số lĩnh vực đã tham gia.',
+        text: 'Tại trang Hồ sơ, học sinh chọn In hồ sơ (khổ A4) để in hồ sơ, hoặc chọn Xuất tệp JSON để lưu trữ dữ liệu hồ sơ. Phần tóm tắt của hồ sơ tổng hợp số hoạt động, tổng số giờ và số lĩnh vực đã tham gia.',
       },
       {
         kind: 'quote',
-        text: 'Học sinh xác nhận tham gia ngay sau mỗi sự kiện, qua đó đảm bảo Hồ sơ năng lực được cập nhật đầy đủ và chính xác.',
+        text: 'Đề nghị học sinh xác nhận tham gia ngay sau mỗi sự kiện, qua đó đảm bảo Hồ sơ năng lực được cập nhật đầy đủ và chính xác.',
         source: 'Ban Truyền thông, Hội đồng Học sinh',
       },
     ],
