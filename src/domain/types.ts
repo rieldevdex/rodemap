@@ -213,3 +213,49 @@ export interface Conflict {
 }
 
 export type ThemePreference = 'system' | 'light' | 'dark';
+
+/* ── Council newsletter (Bản tin Hội đồng Học sinh) ────────────────── */
+
+export const NEWS_CATEGORIES = ['announcement', 'activity', 'club', 'guide'] as const;
+/** Thông báo, Tin hoạt động, Câu lạc bộ, Hướng dẫn. */
+export type NewsCategory = (typeof NEWS_CATEGORIES)[number];
+
+/** One block of an article body. */
+export type NewsBlock =
+  | { kind: 'paragraph'; text: string }
+  | { kind: 'heading'; text: string }
+  | { kind: 'list'; items: string[] }
+  /** Attributed to a role ("Đại diện Ban chủ nhiệm CLB Tranh biện"), never to a named student. */
+  | { kind: 'quote'; text: string; source: string };
+
+/** An article written by the Hội đồng Học sinh. */
+export interface NewsPost {
+  id: string;
+  /** ASCII slug used in URLs (/ban-tin/<slug>). */
+  slug: string;
+  title: string;
+  category: NewsCategory;
+  /** The council department that wrote it, e.g. "Ban Truyền thông". Never a student's name. */
+  author: string;
+  publishedAt: IsoDateTime;
+  /** One or two sentences shown on the index and as the article lead. */
+  summary: string;
+  body: NewsBlock[];
+  /** Related events (ids in EVENTS or submitted events). */
+  eventIds: string[];
+  /** Related clubs (ids in CLUBS). */
+  clubIds: string[];
+  /** Pinned posts lead the index while they are published. */
+  pinned?: boolean;
+}
+
+/** Fields the council fills in Soạn bài viết. */
+export interface NewsDraft {
+  title: string;
+  category: NewsCategory;
+  author: string;
+  summary: string;
+  /** Plain text: blank lines separate paragraphs, "## " starts a heading, "- " a list item, "> " a quote. */
+  bodyText: string;
+  eventIds: string[];
+}

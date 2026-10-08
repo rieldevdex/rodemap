@@ -1,13 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { addDays, isoWeekKey, overlaps, SCHOOL_YEAR, toMillis, vnParts } from '../domain/dates';
+import { addDays, formatDate, formatTime, isoWeekKey, overlaps, SCHOOL_YEAR, toMillis, vnParts } from '../domain/dates';
 import { AFTER_SCHOOL_MINUTE, eventEnd, eventHours, eventStart } from '../domain/events';
-import { applyReview, canTransition } from '../domain/moderation';
-import { CATEGORY_CODES, type EventStatus, type SchoolEvent, type Submission } from '../domain/types';
+import { applyReview, canTransition, charCount } from '../domain/moderation';
+import { NEWS_LIMITS, newsBodyText, publishedPosts, RESERVED_NEWS_SLUGS } from '../domain/news';
+import { CATEGORY_CODES, NEWS_CATEGORIES, type EventStatus, type NewsPost, type SchoolEvent, type Submission } from '../domain/types';
 import { PERIODS } from './calendar';
 import { CATEGORIES, categoryByCode } from './categories';
 import { CLUBS } from './clubs';
 import { EVENTS } from './events';
 import { GOALS } from './goals';
+import { NEWS, NEWS_DEPARTMENTS } from './news';
 import { SCHOOL } from './school';
 import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS, SEED_SUBMISSIONS } from './seed';
 import { TAGS, tagLabel } from './tags';
@@ -96,7 +98,7 @@ describe('data files', () => {
 
   it('every data file starts with the illustrative comment', () => {
     expect(Object.keys(sources).sort()).toEqual(
-      ['calendar', 'categories', 'clubs', 'events', 'goals', 'school', 'seed', 'tags'].map((n) => `./${n}.ts`),
+      ['calendar', 'categories', 'clubs', 'events', 'goals', 'news', 'school', 'seed', 'tags'].map((n) => `./${n}.ts`),
     );
     for (const [file, source] of Object.entries(sources)) {
       expect(source.startsWith(`${HEADER}\n`), file).toBe(true);
@@ -138,6 +140,7 @@ describe('data files', () => {
         SEED_REGISTRATIONS,
         SEED_PORTFOLIO,
         SEED_SUBMISSIONS,
+        NEWS,
       },
       'data',
       [],
@@ -148,7 +151,7 @@ describe('data files', () => {
   });
 
   it('stores every string NFC-normalised (precomposed diacritics)', () => {
-    const raw = JSON.stringify([CATEGORIES, TAGS, GOALS, CLUBS, EVENTS, PERIODS, SEED_PORTFOLIO, SEED_SUBMISSIONS]);
+    const raw = JSON.stringify([CATEGORIES, TAGS, GOALS, CLUBS, EVENTS, PERIODS, SEED_PORTFOLIO, SEED_SUBMISSIONS, NEWS]);
     expect(raw).toBe(raw.normalize('NFC'));
   });
 });
@@ -589,5 +592,152 @@ describe('seed submissions', () => {
       expect(status, sub.id).toBe(e.status);
       expect(replay.history, sub.id).toEqual(sub.history);
     }
+  });
+});
+
+describe('news', () => {
+  const ids = (posts: readonly NewsPost[]) => posts.map((p) => p.id);
+  const text = (p: NewsPost) => `${p.title}\n${p.summary}\n${newsBodyText(p.body)}`;
+  const departments: readonly string[] = NEWS_DEPARTMENTS;
+  const VISIBLE_AT = ms('2026-10-07T09:00:00+07:00');
+  const ASCII_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+  it('has 9–10 articles with ids bt-NNN in chronological order of publication', () => {
+    expect(NEWS.length).toBeGreaterThanOrEqual(9);
+    expect(NEWS.length).toBeLessThanOrEqual(10);
+    expect(ids(NEWS)).toEqual(Array.from({ length: NEWS.length }, (_, i) => `bt-${String(i + 1).padStart(3, '0')}`));
+    for (const p of NEWS) expect(p.publishedAt, p.id).toMatch(ISO_DATE_TIME);
+    NEWS.slice(1).forEach((p, i) => {
+      const prev = NEWS[i]!;
+      expect(ms(prev.publishedAt) < ms(p.publishedAt), `${prev.id} before ${p.id}`).toBe(true);
+    });
+  });
+
+  it('uses unique ASCII slugs that are never reserved', () => {
+    expect(isUnique(NEWS.map((p) => p.slug))).toBe(true);
+    for (const p of NEWS) {
+      expect(p.slug, p.id).toMatch(ASCII_SLUG);
+      expect(p.slug.length, p.id).toBeLessThanOrEqual(60);
+      expect(RESERVED_NEWS_SLUGS, p.id).not.toContain(p.slug);
+    }
+  });
+
+  it('is signed by a council department and covers every category', () => {
+    for (const p of NEWS) {
+      expect(departments, p.id).toContain(p.author);
+      expect(NEWS_CATEGORIES, p.id).toContain(p.category);
+    }
+    for (const c of NEWS_CATEGORIES) expect(NEWS.some((p) => p.category === c), c).toBe(true);
+  });
+
+  it('keeps title, summary and body within NEWS_LIMITS, with 150–450 words and at most one quote', () => {
+    const L = NEWS_LIMITS;
+    for (const p of NEWS) {
+      const body = newsBodyText(p.body);
+      expect(charCount(p.title) >= L.titleMin && charCount(p.title) <= L.titleMax, `${p.id} title`).toBe(true);
+      expect(charCount(p.summary) >= L.summaryMin && charCount(p.summary) <= L.summaryMax, `${p.id} summary`).toBe(true);
+      expect(charCount(body) >= L.bodyMin && charCount(body) <= L.bodyMax, `${p.id} body`).toBe(true);
+      const words = body.split(/\s+/u).filter((w) => w !== '').length;
+      expect(words >= 150 && words <= 450, `${p.id} has ${words} words`).toBe(true);
+      const sentences = sentenceCount(p.summary);
+      expect(sentences >= 1 && sentences <= 2, `${p.id} summary sentences`).toBe(true);
+      expect(p.body.filter((b) => b.kind === 'quote').length, p.id).toBeLessThanOrEqual(1);
+      expect(p.eventIds.length, p.id).toBeLessThanOrEqual(L.maxEvents);
+    }
+  });
+
+  it('attributes every quote to a non-empty source and keeps list items unique', () => {
+    for (const p of NEWS) {
+      for (const b of p.body) {
+        if (b.kind === 'quote') {
+          expect(b.text.trim().length, p.id).toBeGreaterThan(0);
+          expect(b.source.trim().length, p.id).toBeGreaterThan(0);
+        }
+        if (b.kind === 'list') {
+          expect(b.items.length, p.id).toBeGreaterThan(0);
+          expect(isUnique(b.items), p.id).toBe(true);
+        }
+      }
+    }
+  });
+
+  it('references approved events and existing clubs, including every organiser', () => {
+    for (const p of NEWS) {
+      expect(isUnique(p.eventIds), p.id).toBe(true);
+      expect(isUnique(p.clubIds), p.id).toBe(true);
+      for (const id of p.eventIds) expect(getEvent(id).status, `${p.id} → ${id}`).toBe('approved');
+      for (const id of p.clubIds) expect(clubById.has(id), `${p.id} → ${id}`).toBe(true);
+      for (const id of p.eventIds) expect(p.clubIds, `${p.id} → ${id}`).toContain(getEvent(id).clubId);
+      if (p.category === 'club') {
+        expect(p.clubIds.length, p.id).toBeGreaterThan(0);
+        expect(p.clubIds, p.id).not.toContain('inkstep');
+      }
+    }
+  });
+
+  it('quotes the exact title of every referenced event', () => {
+    for (const p of NEWS) {
+      for (const id of p.eventIds) expect(text(p), `${p.id} → ${id}`).toContain(getEvent(id).title);
+    }
+  });
+
+  it('recaps in activity articles only events that ended before publication', () => {
+    for (const p of NEWS.filter((post) => post.category === 'activity')) {
+      expect(p.eventIds.length, p.id).toBeGreaterThan(0);
+      for (const id of p.eventIds) expect(eventEnd(getEvent(id)) < ms(p.publishedAt), `${p.id} → ${id}`).toBe(true);
+    }
+  });
+
+  it('announces upcoming events before their deadline with the exact date, time, place and deadline', () => {
+    for (const p of NEWS.filter((post) => post.category === 'announcement')) {
+      const upcoming = p.eventIds.map(getEvent).filter((e) => eventStart(e) > ms(p.publishedAt));
+      expect(upcoming.length, p.id).toBeGreaterThan(0);
+      const body = newsBodyText(p.body);
+      for (const e of upcoming) {
+        const deadline = ms(e.registrationDeadline);
+        expect(ms(p.publishedAt) < deadline, `${p.id} → ${e.id}`).toBe(true);
+        for (const fact of [formatDate(eventStart(e)), formatTime(eventStart(e)), formatTime(eventEnd(e)), e.location, formatDate(deadline), formatTime(deadline)]) {
+          expect(body, `${p.id} → ${e.id}`).toContain(fact);
+        }
+      }
+    }
+  });
+
+  it('gives exam and holiday periods the dates of the school calendar', () => {
+    for (const p of NEWS) {
+      for (const period of PERIODS.filter((x) => text(p).includes(x.label))) {
+        expect(text(p), `${p.id} → ${period.id}`).toContain(formatDate(ms(period.start)));
+        expect(text(p), `${p.id} → ${period.id}`).toContain(formatDate(ms(period.end)));
+      }
+    }
+  });
+
+  it('publishes inside the school year, with one pinned article visible on 07/10 and one scheduled after 08/10', () => {
+    const yearStart = ms(SCHOOL_YEAR.start);
+    const yearEnd = addDays(ms(SCHOOL_YEAR.end), 1);
+    for (const p of NEWS) expect(ms(p.publishedAt) >= yearStart && ms(p.publishedAt) < yearEnd, p.id).toBe(true);
+
+    const visible = publishedPosts(NEWS, VISIBLE_AT);
+    expect(visible.filter((p) => p.pinned === true)).toHaveLength(1);
+    expect(NEWS.filter((p) => p.pinned === true)).toHaveLength(1);
+    for (const p of visible) {
+      expect(ms(p.publishedAt) >= ms('2026-09-03') && ms(p.publishedAt) <= ms('2026-10-07T07:00:00+07:00'), p.id).toBe(true);
+    }
+
+    const scheduled = NEWS.filter((p) => ms(p.publishedAt) > ms('2026-10-08'));
+    expect(scheduled).toHaveLength(1);
+    expect(visible.length + scheduled.length).toBe(NEWS.length);
+    expect(ms(scheduled[0]!.publishedAt) < ms('2026-11-01')).toBe(true);
+  });
+
+  it('uses no banned copy and stores every string NFC-normalised', () => {
+    const all = collectStrings(NEWS, 'NEWS', []);
+    const violations = all.flatMap(({ path, text: s }) => copyViolations(s).map((label) => `${path}: ${label}`));
+    expect(violations).toEqual([]);
+    for (const p of NEWS) {
+      for (const s of collectStrings(p, p.id, [])) expect(s.text.includes('!'), s.path).toBe(false);
+    }
+    const raw = JSON.stringify(NEWS);
+    expect(raw).toBe(raw.normalize('NFC'));
   });
 });

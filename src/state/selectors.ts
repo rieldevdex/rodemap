@@ -5,14 +5,17 @@
 import { CLUBS } from '../data/clubs';
 import { EVENTS } from '../data/events';
 import { GOALS } from '../data/goals';
+import { NEWS } from '../data/news';
 import { budgetStatus, DEFAULT_WEEKLY_HOUR_BUDGET, type BudgetStatus } from '../domain/budget';
 import { allConflicts } from '../domain/conflicts';
 import { addDays, startOfIsoWeek, toMillis } from '../domain/dates';
 import { findRegistration, isPast, isRegistered, sortByStart } from '../domain/events';
+import { postsAboutClub, postsAboutEvent, publishedPosts } from '../domain/news';
 import { firstRoute, type PlanProposal } from '../domain/planner';
 import { pendingAttendance } from '../domain/portfolio';
 import { recommendEvents, type RecommendContext, type RecommendOptions } from '../domain/recommend';
 import type {
+  NewsPost,
   Club,
   Conflict,
   EventStatus,
@@ -200,4 +203,29 @@ export function selectModerationQueue(state: AppState): ModerationQueueItem[] {
     .filter(({ event }) => event.status === 'pending')
     .sort((a, b) => a.submittedAt - b.submittedAt || a.submission.id.localeCompare(b.submission.id))
     .map(({ submission, event }) => ({ submission, event, club: clubById.get(submission.clubId) ?? null }));
+}
+
+/* ── Bản tin Hội đồng Học sinh ──────────────────────────────────────── */
+
+/** Seed and council-published articles visible at `now`, newest first. */
+export function selectNews(state: AppState, now: Millis): NewsPost[] {
+  return publishedPosts([...NEWS, ...state.newsPosts], now);
+}
+
+/** A published article by slug (scheduled articles are not found before their date). */
+export function selectNewsBySlug(state: AppState, slug: string, now: Millis): NewsPost | undefined {
+  return selectNews(state, now).find((p) => p.slug === slug);
+}
+
+/** Every slug in use, published or scheduled (for unique slugs when composing). */
+export function selectNewsSlugs(state: AppState): Set<string> {
+  return new Set([...NEWS, ...state.newsPosts].map((p) => p.slug));
+}
+
+export function selectNewsForEvent(state: AppState, eventId: string, now: Millis): NewsPost[] {
+  return postsAboutEvent(selectNews(state, now), eventId);
+}
+
+export function selectNewsForClub(state: AppState, clubId: string, now: Millis): NewsPost[] {
+  return postsAboutClub(selectNews(state, now), clubId);
 }

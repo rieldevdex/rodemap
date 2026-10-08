@@ -56,6 +56,7 @@ export const PROPOSAL_SECTIONS: ProposalSection[] = [
       'Phân loại: bảy lĩnh vực, mỗi lĩnh vực có mã hai chữ cái và màu tuyến riêng; bộ lọc theo câu lạc bộ, khối, thời gian, hình thức và hạn đăng ký.',
       'Lộ trình: dòng thời gian toàn năm học, phát hiện trùng lịch, quỹ giờ mỗi tuần, xuất lịch định dạng .ics và liên kết Google Calendar.',
       'Hồ sơ năng lực: tổng hợp hoạt động đã tham gia theo lĩnh vực, kèm vai trò, số giờ, phần tự đánh giá và minh chứng; hỗ trợ in trên khổ A4.',
+      'Bản tin: Hội đồng Học sinh phát hành thông báo, tin hoạt động, bài giới thiệu câu lạc bộ và hướng dẫn sử dụng theo từng số hằng tháng, liên kết trực tiếp với sự kiện liên quan.',
     ],
   },
   {

@@ -16,7 +16,8 @@ export type ToolName =
   | 'propose_calendar_plan'
   | 'summarize_events'
   | 'draft_portfolio_entry'
-  | 'export_calendar';
+  | 'export_calendar'
+  | 'list_news';
 
 export interface ToolDefinition {
   name: ToolName;
@@ -182,6 +183,21 @@ export const MOCHI_TOOLS: readonly ToolDefinition[] = [
         event_ids: { type: 'array', items: eventId },
       },
       required: ['scope'],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'list_news',
+    description:
+      'List the newest articles of the Bản tin Hội đồng Học sinh (the student council\'s newsletter: announcements, activity reports, club introductions, how-to guides). Call this when the student asks about council news or announcements. Returns at most `limit` published articles (newest first) with title, column, department, date, summary, related event titles and the article link; also shows them as a card. Quote only these facts and invite the student to read the full article.',
+    strict: true,
+    input_schema: {
+      type: 'object',
+      properties: {
+        limit: { type: 'integer', minimum: 1, maximum: 5, description: 'Default 3.' },
+        category: { type: 'string', enum: ['announcement', 'activity', 'club', 'guide'], description: 'announcement Thông báo, activity Tin hoạt động, club Câu lạc bộ, guide Hướng dẫn.' },
+      },
+      required: [],
       additionalProperties: false,
     },
   },

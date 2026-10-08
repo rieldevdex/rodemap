@@ -78,7 +78,7 @@ export const DRAFT_LIMITS = {
 const graphemes = new Intl.Segmenter('vi', { granularity: 'grapheme' });
 
 /** User-perceived characters after trimming (a Vietnamese letter with its marks counts once). */
-function charCount(s: string): number {
+export function charCount(s: string): number {
   return Array.from(graphemes.segment(s.trim())).length;
 }
 

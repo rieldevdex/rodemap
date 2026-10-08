@@ -1,0 +1,51 @@
+.news-body {
+  display: grid;
+  gap: var(--space-4);
+  max-inline-size: var(--measure);
+  font-size: var(--text-lg);
+  line-height: var(--leading-body);
+}
+
+.news-body h2 {
+  margin-block-start: var(--space-4);
+  font-size: var(--text-xl);
+}
+
+.news-body ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding-inline-start: var(--space-5);
+  list-style: disc;
+}
+
+.news-body__quote {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-2) 0;
+  padding-inline-start: var(--space-5);
+  border-inline-start: var(--route-w-you) solid var(--color-signal);
+}
+
+.news-body__quote blockquote {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+}
+
+.news-body__quote figcaption {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+}
+
+@media (width < 720px) {
+  .news-body {
+    font-size: var(--text-md);
+  }
+}

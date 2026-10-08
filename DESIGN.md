@@ -212,10 +212,17 @@ cycle) ·
 ## 7. Layout and placement
 
 - Header: wordmark left, primary nav (Tổng quan, Khám phá, Lộ trình, Lịch, Hồ
-  sơ, Câu lạc bộ), right side: search (⌘K / Ctrl K), theme toggle, account.
-  When the demo role is Câu lạc bộ the nav adds "Cổng CLB"; when it is HĐHS it
-  adds "Kiểm duyệt". (Tổng quan added 2026-10-07: the dashboard needs a
-  permanent entry point.)
+  sơ, Câu lạc bộ, Bản tin), right side: search (⌘K / Ctrl K), theme toggle,
+  account. When the demo role is Câu lạc bộ the nav adds "Cổng CLB"; when it is
+  HĐHS it adds "Kiểm duyệt". (Tổng quan added 2026-10-07: the dashboard needs a
+  permanent entry point. Bản tin added 2026-10-08 for the council's newsletter;
+  from 1080 units up the search control shows its icon only, keeping its name
+  and the Ctrl K shortcut, so eight sections fit.)
+- Bản tin Hội đồng Học sinh reads as a wall newspaper: the page head is a
+  nameplate between double rules, issues are numbered by month (Số 1 = Tháng
+  9/2026), articles sit in ruled columns, the lead story faces "Trong số N",
+  and quotes carry a thick signal rule. Articles are signed by a council
+  department, never by a student.
 - Landing hero: left 7 columns for the headline and actions; right 5 columns a
   live, animated RouteMap fragment with real sample events. No stock imagery.
 - App screens: a left filter rail (240 px) on desktop that becomes a bottom

@@ -1,0 +1,144 @@
+.news-article .page-head {
+  border-block-end: calc(var(--rule-strong) * 2) double var(--color-ink);
+}
+
+.news-article .page-head + .band {
+  border-top: 0;
+}
+
+.news-article .page-head__title {
+  max-inline-size: calc(var(--measure) + var(--space-8));
+}
+
+.news-article__crumb {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: var(--rule-hair);
+  text-underline-offset: var(--space-1);
+}
+
+.news-article__category {
+  color: var(--color-signal);
+}
+
+.news-article__byline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.news-article__status:empty {
+  display: none;
+}
+
+.news-article__status {
+  font-size: var(--text-sm);
+  color: var(--color-ok);
+}
+
+.news-article__layout {
+  display: grid;
+  gap: var(--space-7);
+}
+
+.news-article__body {
+  display: grid;
+  gap: var(--space-6);
+  min-inline-size: 0;
+}
+
+.news-article__sign {
+  justify-self: start;
+  padding-block-start: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  border-block-start: var(--rule-strong) solid var(--color-ink);
+}
+
+.news-article__aside {
+  display: grid;
+  align-content: start;
+  gap: var(--space-6);
+}
+
+.news-article__panel {
+  display: grid;
+  gap: var(--space-3);
+  padding-block-start: var(--space-4);
+  border-block-start: var(--rule-strong) solid var(--color-ink);
+}
+
+.news-article__h2 {
+  font-size: var(--text-xl);
+}
+
+.news-article__events,
+.news-article__clubs,
+.news-article__related-list {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.news-article__clubs li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-block-end: var(--space-3);
+  border-block-end: var(--rule-hair) solid var(--color-rule);
+}
+
+.news-article__clubs a,
+.news-article__all {
+  font-weight: var(--weight-semibold);
+  color: var(--color-ink);
+}
+
+.news-article__club-lines {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.news-article__related {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.news-article__related-list > li {
+  padding-block-end: var(--space-4);
+  border-block-end: var(--rule-hair) solid var(--color-rule);
+}
+
+@media (min-width: 720px) {
+  .news-article__related-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: var(--space-6);
+  }
+}
+
+@media (min-width: 1080px) {
+  .news-article__layout {
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+    align-items: start;
+  }
+}
+
+@media print {
+  .news-article__layout {
+    display: block;
+  }
+
+  .news-article .page-head {
+    padding-block: 0 var(--space-4);
+    background: var(--color-surface);
+  }
+}

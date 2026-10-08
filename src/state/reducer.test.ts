@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { EVENTS } from '../data/events';
 import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS, SEED_SUBMISSIONS } from '../data/seed';
-import { makeEvent, makeProfile, reg } from '../domain/test-fixtures';
+import { makeEvent, makePost, makeProfile, reg } from '../domain/test-fixtures';
 import type { PortfolioEntry, SchoolEvent, Submission } from '../domain/types';
 import type { Action } from './actions';
 import { effectiveStatus, reducer } from './reducer';
@@ -488,5 +488,27 @@ describe('unknown actions', () => {
   it('return the same state object', () => {
     const s = createSeedState();
     expect(reducer(s, { type: 'legacy/unknown' } as unknown as Parameters<typeof reducer>[1])).toBe(s);
+  });
+});
+
+describe('newsletter', () => {
+  const post = makePost({ id: 'bt-demo-1', slug: 'thong-bao-thu-nghiem' });
+
+  it('publishes a council article once', () => {
+    const s1 = reducer(createSeedState(), { type: 'news/publish', post });
+    expect(s1.newsPosts).toEqual([post]);
+    expect(reducer(s1, { type: 'news/publish', post })).toBe(s1);
+    expect(reducer(s1, { type: 'news/publish', post: { ...post, id: 'bt-demo-2' } })).toBe(s1);
+  });
+
+  it('refuses reserved slugs', () => {
+    const s = createSeedState();
+    expect(reducer(s, { type: 'news/publish', post: { ...post, slug: 'soan-bai' } })).toBe(s);
+  });
+
+  it('removes only articles published in the demo', () => {
+    const s1 = reducer(createSeedState(), { type: 'news/publish', post });
+    expect(reducer(s1, { type: 'news/remove', id: post.id }).newsPosts).toEqual([]);
+    expect(reducer(s1, { type: 'news/remove', id: 'bt-001' })).toBe(s1);
   });
 });

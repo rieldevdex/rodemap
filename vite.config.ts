@@ -1,7 +1,7 @@
 /// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import { serviceWorkerPlugin } from './scripts/sw-plugin';
+import { serviceWorkerPlugin } from './scripts/sw-plugin.ts';
 
 export default defineConfig({
   plugins: [react(), serviceWorkerPlugin()],

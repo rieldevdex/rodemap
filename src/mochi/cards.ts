@@ -20,7 +20,9 @@ export type MochiCard =
       budget: number;
     }
   | { kind: 'draft'; eventId: string; reflection: string; role: string }
-  | { kind: 'export'; eventIds: string[] };
+  | { kind: 'export'; eventIds: string[] }
+  /** Articles of the Bản tin Hội đồng Học sinh, already formatted for the card. */
+  | { kind: 'news'; posts: { id: string; title: string; category: string; date: string; href: string }[] };
 
 /** What happened to a card that needs the student's decision. */
 export type CardStatus = 'pending' | 'confirmed' | 'dismissed';

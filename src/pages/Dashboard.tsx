@@ -6,6 +6,7 @@ import { MonoTime } from '../components/atoms/MonoTime';
 import { StatusTag } from '../components/atoms/StatusTag';
 import { BudgetMeter } from '../components/molecules/BudgetMeter';
 import { MochiNote } from '../components/molecules/MochiNote';
+import { NewsCard } from '../components/molecules/NewsCard';
 import { PageHead } from '../components/molecules/PageHead';
 import { StationCard, eventStatus } from '../components/molecules/StationCard';
 import { DepartureBoard, type DepartureRow } from '../components/organisms/DepartureBoard';
@@ -23,6 +24,7 @@ import {
   selectConflictsInPlan,
   selectDeadlinesThisWeek,
   selectMyEvents,
+  selectNews,
   selectPendingAttendance,
   selectPlanBudget,
   selectRecommendations,
@@ -45,6 +47,7 @@ export function DashboardPage() {
   const pending = selectPendingAttendance(state, now);
   const deadlines = selectDeadlinesThisWeek(state, now).slice(0, 5);
   const recs = selectRecommendations(state, now, { limit: 3 });
+  const latestNews = selectNews(state, now).slice(0, 3);
   const digest = weeklyDigest(publicEvents, { now, regs: state.registrations, periods: PERIODS });
   const covered = CATEGORY_CODES.filter((c) => myEvents.some((e) => e.category === c));
   const next = upcomingMine[0];
@@ -300,6 +303,24 @@ export function DashboardPage() {
                 </ul>
               )}
             </section>
+
+            {latestNews.length > 0 ? (
+              <section className="dashboard__panel" aria-labelledby="dash-news">
+                <h2 id="dash-news" className="dashboard__h3">
+                  Từ Hội đồng Học sinh
+                </h2>
+                <ul className="dashboard__list">
+                  {latestNews.map((p) => (
+                    <li key={p.id}>
+                      <NewsCard post={p} variant="compact" />
+                    </li>
+                  ))}
+                </ul>
+                <Link className="dashboard__small-link" to="/ban-tin">
+                  Xem Bản tin Hội đồng Học sinh
+                </Link>
+              </section>
+            ) : null}
           </aside>
         </div>
       </div>
