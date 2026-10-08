@@ -21,8 +21,7 @@ npm run dev          # máy chủ phát triển tại http://localhost:5173
 
 ```bash
 echo 'ANTHROPIC_API_KEY=sk-ant-...' > .dev.vars   # tệp này không được đưa lên Git
-npm run build
-npm run dev:api      # Pages Function tại http://localhost:8788 (Vite chuyển tiếp /api tới đây)
+npm run dev:api      # Worker tại http://localhost:8788, tự thực hiện npm run build (Vite chuyển tiếp /api tới đây)
 ```
 
 Các lệnh kiểm tra chất lượng:
@@ -38,15 +37,15 @@ Các lệnh kiểm tra chất lượng:
 | `npm run size` | Kiểm tra dung lượng JavaScript tải lần đầu (giới hạn 200 KB sau nén gzip) |
 | `npm run screens` | Chụp ảnh màn hình mọi trang ở 390 px và 1440 px, giao diện sáng và tối |
 
-## 3. Triển khai lên Cloudflare Pages
+## 3. Triển khai lên Cloudflare Workers
+
+Rodemap được triển khai dưới dạng một Cloudflare Worker kèm tài nguyên tĩnh: bản dựng trong thư mục `dist/` được phục vụ trực tiếp, còn `worker/index.ts` chỉ tiếp nhận các yêu cầu `/api/*` (Mochi tại `/api/mochi`). Toàn bộ cấu hình nằm trong `wrangler.toml`.
 
 1. Đưa mã nguồn lên GitHub.
-2. Trong Cloudflare: **Workers & Pages → Create → Pages → Connect to Git**, chọn kho mã.
-3. Cấu hình bản dựng: *Build command* `npm run build`, *Build output directory* `dist`.
-4. Mục **Settings → Variables and Secrets**:
-   - thêm **Secret** `ANTHROPIC_API_KEY` (khóa API Claude);
-   - tùy chọn biến `MOCHI_MODEL` (mặc định `claude-opus-5-5`) và `MOCHI_EFFORT` (`low`, `medium` hoặc `high`, mặc định `low`).
-5. Triển khai. Thư mục `functions/` được Cloudflare tự động triển khai thành Pages Function `/api/mochi`. Khóa API chỉ nằm trên máy chủ và không bao giờ được gửi tới trình duyệt.
+2. Trong Cloudflare: **Workers & Pages → Create → Import a repository**, chọn kho mã.
+3. Đặt tên Worker trùng với giá trị `name` trong `wrangler.toml` (`rodemap`). Giữ nguyên *Deploy command* mặc định `npx wrangler deploy`; không cần khai báo *Build command* vì lệnh này tự thực hiện `npm run build` (mục `[build]` trong `wrangler.toml`).
+4. Mục **Settings → Variables and Secrets** của Worker: thêm **Secret** `ANTHROPIC_API_KEY` (khóa API Claude), hoặc thực hiện `npx wrangler secret put ANTHROPIC_API_KEY`. Các biến `MOCHI_MODEL` (mặc định `claude-opus-5-5`) và `MOCHI_EFFORT` (`low`, `medium` hoặc `high`, mặc định `low`) được khai báo tại mục `[vars]` trong `wrangler.toml`; mỗi lần triển khai, giá trị trong tệp này được áp dụng, do đó cần điều chỉnh trực tiếp trong tệp.
+5. Triển khai. Khóa API chỉ nằm trên máy chủ và không bao giờ được gửi tới trình duyệt.
 
 Tùy chọn: để giới hạn tần suất truy cập Mochi một cách bền vững giữa các máy chủ, tạo một KV namespace và gắn với tên `MOCHI_RATE_LIMIT` (xem `wrangler.toml`).
 

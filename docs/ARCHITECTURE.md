@@ -14,7 +14,8 @@ src/mochi/       system prompt, tool schemas, tool executors, offline engine, AP
 src/router/      tiny History-API router.
 src/components/  atoms | molecules | organisms — presentational, props only.
 src/pages/       one file per screen; may read the store through hooks from src/state/hooks.ts.
-functions/api/   Cloudflare Pages Function for Mochi.
+worker/          Cloudflare Worker entry (index.ts routes /api/*) and the Mochi handler (mochi.ts);
+                 dist/ is served as the Worker's static assets (wrangler.toml).
 scripts/         token lint, copy lint, size check, service-worker build plugin (sw-plugin.ts).
 tests/e2e        Playwright smoke, demo path, offline (service worker) + axe; tests/screens screenshots.
 ```
@@ -345,7 +346,7 @@ export function Link(props: AnchorHTMLAttributes & { to: string }): JSX.Element;
 ## Mochi (`src/mochi`)
 
 Tools run in the browser against app state; propose_* tools never mutate.
-Server function `functions/api/mochi.ts` holds the system prompt + tool
+Server handler `worker/mochi.ts` holds the system prompt + tool
 schemas (imported from `src/mochi/system-prompt.ts`, `src/mochi/tools/schemas.ts`)
 and the API key (`ANTHROPIC_API_KEY`), model from `MOCHI_MODEL`
 (default `claude-opus-5-5`). Eleven strict tools: search_events, get_event, get_club,

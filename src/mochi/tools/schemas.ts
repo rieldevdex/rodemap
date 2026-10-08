@@ -1,5 +1,5 @@
 /**
- * Mochi's tool definitions (JSON Schema). Shared by the Pages Function, which
+ * Mochi's tool definitions (JSON Schema). Shared by the Worker (worker/mochi.ts), which
  * sends them to the Claude API, and by the browser, which executes them.
  * The array order and content must stay stable within a conversation.
  */

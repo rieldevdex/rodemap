@@ -1,7 +1,7 @@
 /**
  * `npm run lint:copy` — formal administrative Vietnamese only (văn phong hành chính).
  * Scans string literals, template literals, JSX text and JSX attribute strings in
- * src/**\/*.{ts,tsx} and functions/**\/*.ts (except tests and src/domain/test-fixtures.ts),
+ * src/**\/*.{ts,tsx} and worker/**\/*.ts (except tests and src/domain/test-fixtures.ts),
  * plus the text of index.html. Rules live in scripts/banned-copy.ts.
  * Prints `path:line:col  rule  message`, a summary, and exits 1 on any finding.
  */
@@ -18,7 +18,7 @@ function main(): number {
   const root = repoRoot();
   const accept = (exts: readonly string[]) => (p: string) =>
     exts.some((e) => p.endsWith(e)) && !p.endsWith('.d.ts') && !TEST_FILE.test(p) && !EXCLUDED.has(p);
-  const files = [...walkFiles(root, 'src', accept(['.ts', '.tsx'])), ...walkFiles(root, 'functions', accept(['.ts']))];
+  const files = [...walkFiles(root, 'src', accept(['.ts', '.tsx'])), ...walkFiles(root, 'worker', accept(['.ts']))];
   const indexHtml = path.join(root, 'index.html');
   if (existsSync(indexHtml)) files.push(indexHtml);
 

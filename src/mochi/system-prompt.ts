@@ -1,5 +1,5 @@
 /**
- * Mochi's system prompt (Vietnamese). Sent by the Pages Function on every
+ * Mochi's system prompt (Vietnamese). Sent by the Worker (worker/mochi.ts) on every
  * request; it must stay byte-identical across a conversation. Included in the
  * copy lint like any other Vietnamese string.
  */

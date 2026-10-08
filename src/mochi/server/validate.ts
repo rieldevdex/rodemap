@@ -1,5 +1,5 @@
 /**
- * Request validation for the Mochi Pages Function. Pure; unit tested.
+ * Request validation for the Mochi Worker endpoint. Pure; unit tested.
  * User turns are rebuilt from an allow-list of fields; assistant turns are kept
  * verbatim because the Claude API requires replayed thinking blocks unchanged.
  */
