@@ -33,7 +33,7 @@ type FocusTarget = 'confirm' | 'reset' | null;
 
 /**
  * "Tài khoản minh họa": the demo control panel (role, club, demo date, Mochi offline,
- * theme, reset). A disclosure: Escape or a click outside closes it; Escape returns focus
+ * theme, clearing the data so the profile is set up again). A disclosure: Escape or a click outside closes it; Escape returns focus
  * to the button.
  */
 export function AccountMenu() {
@@ -130,7 +130,7 @@ export function AccountMenu() {
     dispatch({ type: 'demo/reset' });
     focusAfterRender.current = 'reset';
     setConfirming(false);
-    setStatus('Đã khôi phục dữ liệu minh họa.');
+    setStatus('Đã xóa dữ liệu trên trình duyệt này.');
   };
 
   const dateLabel = state.demoToday === null ? null : demoDateLabel(state.demoToday);
@@ -277,12 +277,12 @@ export function AccountMenu() {
             {confirming ? (
               <div className="account-menu__confirm" role="group" aria-labelledby={confirmTextId}>
                 <p id={confirmTextId} className="account-menu__confirm-text">
-                  Hồ sơ, thông tin đăng ký, hồ sơ năng lực và sự kiện đã gửi trên trình duyệt này sẽ được đưa về dữ liệu minh
-                  họa ban đầu. Bạn có xác nhận khôi phục không?
+                  Hồ sơ, thông tin đăng ký, hồ sơ năng lực và sự kiện đã gửi trên trình duyệt này sẽ bị xóa; bạn cần thiết lập lại
+                  hồ sơ để tiếp tục sử dụng Rodemap. Bạn có xác nhận xóa không?
                 </p>
                 <div className="account-menu__row">
                   <Button ref={confirmRef} variant="primary" size="sm" onClick={confirmReset}>
-                    Xác nhận khôi phục
+                    Xác nhận xóa
                   </Button>
                   <Button variant="secondary" size="sm" onClick={cancelReset}>
                     Quay lại
@@ -291,7 +291,7 @@ export function AccountMenu() {
               </div>
             ) : (
               <Button ref={resetRef} variant="secondary" size="sm" block onClick={startReset}>
-                Khôi phục dữ liệu minh họa
+                Xóa dữ liệu trên trình duyệt này
               </Button>
             )}
             <p className="account-menu__status" role="status">

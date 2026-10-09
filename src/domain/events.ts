@@ -1,6 +1,6 @@
 /** Event-level facts derived from an event, the student's registrations and the clock. Pure. */
 import { calendarDaysBetween, durationHours, toMillis, vnParts } from './dates';
-import type { Availability, Grade, Millis, Registration, SchoolEvent } from './types';
+import { GRADES, type Availability, type Grade, type Millis, type Registration, type SchoolEvent } from './types';
 
 /** Weekday events starting at or after this minute of the day count as "after school". */
 export const AFTER_SCHOOL_MINUTE = 16 * 60 + 30;
@@ -47,6 +47,31 @@ export function isPast(e: SchoolEvent, now: Millis): boolean {
 /** A null grade (no profile yet) is treated as eligible. */
 export function isEligible(e: SchoolEvent, grade: Grade | null): boolean {
   return grade === null || e.eligibleGrades.includes(grade);
+}
+
+/** Open to every grade of the school (khối 6–12). */
+export function isOpenToAll(grades: readonly Grade[]): boolean {
+  return GRADES.every((g) => grades.includes(g));
+}
+
+/**
+ * The grades as Vietnamese text, in order, without "Khối": runs of three or more become a
+ * range ("6–12", "8–12"), shorter runs stay a list ("11, 12"; "6, 7, 10").
+ */
+export function formatGrades(grades: readonly Grade[]): string {
+  const sorted = [...new Set(grades)].sort((a, b) => a - b);
+  const runs: Grade[][] = [];
+  for (const g of sorted) {
+    const run = runs.at(-1);
+    if (run?.at(-1) === g - 1) run.push(g);
+    else runs.push([g]);
+  }
+  return runs.map((run) => (run.length >= 3 ? `${String(run[0])}–${String(run.at(-1))}` : run.join(', '))).join(', ');
+}
+
+/** "Khối 6–12 (toàn trường)", "Khối 10–12", "Khối 11, 12". */
+export function gradesLabel(grades: readonly Grade[]): string {
+  return isOpenToAll(grades) ? `Khối ${formatGrades(grades)} (toàn trường)` : `Khối ${formatGrades(grades)}`;
 }
 
 /** Calendar days until the registration deadline (0 = today, negative = passed). */

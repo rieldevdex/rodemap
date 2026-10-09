@@ -27,8 +27,13 @@ export type Millis = number;
 
 /* ── Clubs and events ───────────────────────────────────────────────── */
 
-export type Grade = 10 | 11 | 12;
-export const GRADES: readonly Grade[] = [10, 11, 12];
+/** Khối 6–9 (trung học cơ sở) and 10–12 (trung học phổ thông). */
+export type Grade = 6 | 7 | 8 | 9 | 10 | 11 | 12;
+export const GRADES: readonly Grade[] = [6, 7, 8, 9, 10, 11, 12];
+export const GRADE_LEVELS: readonly { name: string; grades: readonly Grade[] }[] = [
+  { name: 'Trung học cơ sở', grades: [6, 7, 8, 9] },
+  { name: 'Trung học phổ thông', grades: [10, 11, 12] },
+];
 
 export interface Club {
   id: string;

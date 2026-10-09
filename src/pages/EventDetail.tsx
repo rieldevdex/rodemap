@@ -11,7 +11,7 @@ import { NewsRelated } from '../components/organisms/NewsRelated';
 import { STATUS_LABELS } from '../content/moderation';
 import { CATEGORY_LABELS } from '../domain/category-labels';
 import { formatDate, formatDayLabel, formatLongDate, formatTime, formatTimeRange, toMillis } from '../domain/dates';
-import { deadlineDaysLeft, isPast, registrationState, seatsLeft } from '../domain/events';
+import { deadlineDaysLeft, gradesLabel, isPast, registrationState, seatsLeft } from '../domain/events';
 import { googleCalendarUrl } from '../domain/gcal';
 import { buildIcs, icsFileName } from '../domain/ics';
 import { CLUBS } from '../data/clubs';
@@ -205,7 +205,7 @@ export function EventDetailPage() {
               </div>
               <div>
                 <dt>Khối được phép tham gia</dt>
-                <dd>Khối {event.eligibleGrades.join(', ')}</dd>
+                <dd>{gradesLabel(event.eligibleGrades)}</dd>
               </div>
               <div>
                 <dt>Số chỗ còn lại</dt>

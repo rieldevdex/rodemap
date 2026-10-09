@@ -53,7 +53,7 @@ export function EventSubmissionForm({ clubId, defaultCategory, tags, initial, su
   const [end, setEnd] = useState(toLocalInput(initial?.end));
   const [deadline, setDeadline] = useState(toLocalInput(initial?.registrationDeadline));
   const [location, setLocation] = useState(initial?.location ?? '');
-  const [grades, setGrades] = useState<Grade[]>(initial?.eligibleGrades ?? [10, 11, 12]);
+  const [grades, setGrades] = useState<Grade[]>(initial?.eligibleGrades ?? [...GRADES]);
   const [capacity, setCapacity] = useState(initial ? String(initial.capacity) : '');
   const [summary, setSummary] = useState(initial?.summary ?? '');
   const [description, setDescription] = useState(initial?.description ?? '');
@@ -78,7 +78,7 @@ export function EventSubmissionForm({ clubId, defaultCategory, tags, initial, su
     setEnd('');
     setDeadline('');
     setLocation('');
-    setGrades([10, 11, 12]);
+    setGrades([...GRADES]);
     setCapacity('');
     setSummary('');
     setDescription('');
@@ -96,7 +96,7 @@ export function EventSubmissionForm({ clubId, defaultCategory, tags, initial, su
       end: fromLocalInput(end),
       registrationDeadline: fromLocalInput(deadline),
       location: location.trim(),
-      eligibleGrades: [...grades].sort(),
+      eligibleGrades: [...grades].sort((a, b) => a - b),
       capacity: capacity.trim() === '' ? Number.NaN : Number(capacity),
       summary: summary.trim(),
       description: description.trim(),

@@ -3,8 +3,9 @@ import { Footer } from './components/organisms/Footer';
 import { Header } from './components/organisms/Header';
 import { HomePage } from './pages/Home';
 import { MochiConnected } from './pages/connected/MochiConnected';
-import { useRoute } from './router/Router';
-import type { RouteName } from './router/routes';
+import { useNavigate, useRoute } from './router/Router';
+import { requiresProfile, setupPathFor, type RouteName } from './router/routes';
+import { useSelector } from './state/hooks';
 import './App.css';
 
 type PageModule = Promise<{ default: ComponentType }>;
@@ -69,9 +70,7 @@ function PageError() {
         <h1 id="main-heading" className="page-head__title" tabIndex={-1}>
           Không thể hiển thị nội dung
         </h1>
-        <p className="page-head__lead">
-          Rodemap không thể tải màn hình này, có thể do kết nối mạng bị gián đoạn. Vui lòng tải lại trang để tiếp tục.
-        </p>
+        <p className="page-head__lead">Rodemap không thể tải màn hình này, có thể do kết nối mạng bị gián đoạn. Vui lòng tải lại trang để tiếp tục.</p>
         <div className="cluster">
           <button
             type="button"
@@ -89,6 +88,17 @@ function PageError() {
       </div>
     </section>
   );
+}
+
+/** A page that needs the student profile, opened without one: on to Thiết lập hồ sơ, then back. */
+function ProfileRequired() {
+  const route = useRoute();
+  const navigate = useNavigate();
+  useEffect(() => {
+    const query = route.search.toString();
+    navigate(setupPathFor(`${route.pathname}${query === '' ? '' : `?${query}`}${route.hash}`), { replace: true });
+  }, [navigate, route]);
+  return <PageLoading />;
 }
 
 interface BoundaryProps {
@@ -123,6 +133,8 @@ function skipToMain(e: MouseEvent<HTMLAnchorElement>): void {
 export function App() {
   const route = useRoute();
   const Page = PAGES[route.name];
+  const hasProfile = useSelector((s) => s.profile !== null);
+  const profileRequired = !hasProfile && requiresProfile(route.name);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -141,13 +153,18 @@ export function App() {
       <Header />
       <main id="main" className="app__main" tabIndex={-1}>
         <PageErrorBoundary key={route.pathname}>
-          <Suspense fallback={<PageLoading />}>
-            <Page />
-          </Suspense>
+          {profileRequired ? (
+            <ProfileRequired />
+          ) : (
+            <Suspense fallback={<PageLoading />}>
+              <Page />
+            </Suspense>
+          )}
         </PageErrorBoundary>
       </main>
       <Footer />
-      <MochiConnected />
+      {/* Mochi works from the student's profile, so it appears once one is set up. */}
+      {hasProfile ? <MochiConnected /> : null}
     </div>
   );
 }

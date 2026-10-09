@@ -144,7 +144,8 @@ export function reducer(state: AppState, action: Action): AppState {
       return state.mochiForcedOffline === action.offline ? state : { ...state, mochiForcedOffline: action.offline };
 
     case 'demo/reset': {
-      // Presentation settings survive a reset; demo data returns to the illustrative seed.
+      // Presentation settings survive a reset; the profile and the student's data are cleared,
+      // so Rodemap asks for a new profile before anything else.
       const seed = createSeedState();
       return { ...seed, theme: state.theme, demoToday: state.demoToday, mochiForcedOffline: state.mochiForcedOffline };
     }

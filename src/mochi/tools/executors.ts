@@ -24,6 +24,8 @@ import {
   eventEnd,
   eventStart,
   findRegistration,
+  formatGrades,
+  gradesLabel,
   isPast,
   registrationState,
   seatsLeft,
@@ -130,7 +132,7 @@ export function eventDetail(e: SchoolEvent, ctx: ToolContext) {
     ...eventBrief(e, ctx),
     summary: e.summary,
     description: e.description,
-    eligible_grades: `Khối ${e.eligibleGrades.join(', ')}`,
+    eligible_grades: gradesLabel(e.eligibleGrades),
     eligible_for_student: info.eligible,
     capacity: e.capacity,
     tags: e.tags.map(tagLabel),
@@ -306,7 +308,7 @@ function proposeRegistration(input: Record<string, unknown>, ctx: ToolContext): 
   const brief = eventBrief(e, ctx);
   if (action === 'register') {
     if (info.state === 'registered') return { result: { status: 'already_registered', event: brief } };
-    if (!info.eligible) return { result: { status: 'not_possible', reason: `Sự kiện chỉ dành cho khối ${e.eligibleGrades.join(', ')}.`, event: brief } };
+    if (!info.eligible) return { result: { status: 'not_possible', reason: `Sự kiện chỉ dành cho khối ${formatGrades(e.eligibleGrades)}.`, event: brief } };
     if (!info.canRegister) return { result: { status: 'not_possible', reason: NOT_POSSIBLE[info.state] ?? 'Sự kiện hiện không mở đăng ký.', event: brief } };
     return {
       result: {

@@ -4,6 +4,7 @@ import { Link } from '../../router/Link';
 import { useNavigate, useRoute } from '../../router/Router';
 import { pathFor, type RouteName } from '../../router/routes';
 import { useSelector } from '../../state/hooks';
+import { Button } from '../atoms/Button';
 import { Icon } from '../atoms/Icon';
 import { Wordmark } from '../atoms/Wordmark';
 import { AccountMenu } from './AccountMenu';
@@ -50,10 +51,12 @@ function searchHref(explorePath: string, current: URLSearchParams | null): strin
 /**
  * Site header (DESIGN.md §7): wordmark, primary nav, search, theme toggle, account.
  * The active section is marked by a 4-unit signal route segment on the header's rule.
- * Phones (< 720px) fold the nav into the "Danh mục" disclosure.
+ * Phones (< 720px) fold the nav into the "Danh mục" disclosure. Before the student has a
+ * profile, the nav and search give way to "Thiết lập hồ sơ" (every other page needs one).
  */
 export function Header() {
   const role = useSelector((s) => s.role);
+  const hasProfile = useSelector((s) => s.profile !== null);
   const route = useRoute();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -75,6 +78,7 @@ export function Header() {
 
   // Ctrl K / ⌘K opens the search, except while the user is typing in a field.
   useEffect(() => {
+    if (!hasProfile) return undefined;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.defaultPrevented || isTypingTarget(e.target)) return;
       if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key.toLowerCase() === 'k') {
@@ -86,7 +90,7 @@ export function Header() {
     return () => {
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [navigate, searchTarget]);
+  }, [navigate, searchTarget, hasProfile]);
 
   // Phone menu: Escape returns focus to "Danh mục"; a click outside the header folds it.
   useEffect(() => {
@@ -117,63 +121,69 @@ export function Header() {
           <Wordmark />
         </Link>
 
-        <nav id={navId} className="site-nav" data-open={menuOpen} aria-label="Điều hướng chính">
-          <ul className="site-nav__list">
-            <li className="site-nav__item site-nav__item--search">
-              <Link to={explorePath} className="site-nav__link" aria-current={false}>
-                <Icon name="search" />
-                <span>Tìm kiếm sự kiện</span>
-              </Link>
-            </li>
-            {items.map((item) => {
-              const exact = route.name === item.to;
-              const active = item.section.includes(route.name);
-              return (
-                <li key={item.to} className="site-nav__item">
-                  <Link
-                    to={pathFor(item.to)}
-                    className="site-nav__link"
-                    data-active={active}
-                    aria-current={exact ? 'page' : active ? 'true' : undefined}
-                  >
-                    <span className="site-nav__label">{item.label}</span>
-                    <span className="site-nav__track" aria-hidden="true" />
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
+        {hasProfile ? (
+          <nav id={navId} className="site-nav" data-open={menuOpen} aria-label="Điều hướng chính">
+            <ul className="site-nav__list">
+              <li className="site-nav__item site-nav__item--search">
+                <Link to={explorePath} className="site-nav__link" aria-current={false}>
+                  <Icon name="search" />
+                  <span>Tìm kiếm sự kiện</span>
+                </Link>
+              </li>
+              {items.map((item) => {
+                const exact = route.name === item.to;
+                const active = item.section.includes(route.name);
+                return (
+                  <li key={item.to} className="site-nav__item">
+                    <Link to={pathFor(item.to)} className="site-nav__link" data-active={active} aria-current={exact ? 'page' : active ? 'true' : undefined}>
+                      <span className="site-nav__label">{item.label}</span>
+                      <span className="site-nav__track" aria-hidden="true" />
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+        ) : null}
 
         <div className="site-header__actions">
-          <button
-            type="button"
-            className="site-header__search"
-            title="Tìm kiếm sự kiện (Ctrl K)"
-            aria-keyshortcuts="Control+K Meta+K"
-            onClick={() => {
-              navigate(searchTarget);
-            }}
-          >
-            <Icon name="search" />
-            <span className="site-header__search-label">Tìm kiếm</span>
-            <kbd className="site-header__kbd">Ctrl K</kbd>
-          </button>
+          {hasProfile ? null : route.name === 'onboarding' ? null : (
+            <Button to={pathFor('onboarding')} variant="primary" size="sm">
+              Thiết lập hồ sơ
+            </Button>
+          )}
+          {hasProfile ? (
+            <button
+              type="button"
+              className="site-header__search"
+              title="Tìm kiếm sự kiện (Ctrl K)"
+              aria-keyshortcuts="Control+K Meta+K"
+              onClick={() => {
+                navigate(searchTarget);
+              }}
+            >
+              <Icon name="search" />
+              <span className="site-header__search-label">Tìm kiếm</span>
+              <kbd className="site-header__kbd">Ctrl K</kbd>
+            </button>
+          ) : null}
           <ThemeToggle />
           <AccountMenu />
-          <button
-            ref={menuButtonRef}
-            type="button"
-            className="site-header__menu-button"
-            aria-expanded={menuOpen}
-            aria-controls={navId}
-            onClick={() => {
-              setMenuOpen((v) => !v);
-            }}
-          >
-            <Icon name={menuOpen ? 'x' : 'menu'} />
-            <span>Danh mục</span>
-          </button>
+          {hasProfile ? (
+            <button
+              ref={menuButtonRef}
+              type="button"
+              className="site-header__menu-button"
+              aria-expanded={menuOpen}
+              aria-controls={navId}
+              onClick={() => {
+                setMenuOpen((v) => !v);
+              }}
+            >
+              <Icon name={menuOpen ? 'x' : 'menu'} />
+              <span>Danh mục</span>
+            </button>
+          ) : null}
         </div>
       </div>
     </header>

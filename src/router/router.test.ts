@@ -7,7 +7,11 @@ import {
   matchRoute,
   normalizePath,
   pathFor,
+  PUBLIC_ROUTES,
+  requiresProfile,
+  returnPathAfterSetup,
   routeTitle,
+  setupPathFor,
   stripPath,
   type RouteName,
 } from './routes';
@@ -141,5 +145,31 @@ describe('titles and path helpers', () => {
     expect(isExternalHref('//cdn.example.org/x')).toBe(true);
     expect(isExternalHref('/kham-pha')).toBe(false);
     expect(isExternalHref('#muc-1')).toBe(false);
+  });
+});
+
+describe('profile gate', () => {
+  it('keeps only Trang chủ, Thiết lập hồ sơ, Đề án and 404 open without a profile', () => {
+    expect([...PUBLIC_ROUTES].sort()).toEqual(['home', 'notFound', 'onboarding', 'proposal']);
+    for (const r of ROUTES) expect(requiresProfile(r.name), r.name).toBe(!PUBLIC_ROUTES.includes(r.name));
+  });
+
+  it('sends the visitor to /thiet-lap with the page to return to', () => {
+    expect(setupPathFor('/ban-tin/thong-bao?x=1#muc')).toBe('/thiet-lap?tiep-theo=%2Fban-tin%2Fthong-bao%3Fx%3D1%23muc');
+    expect(new URLSearchParams(setupPathFor('/kham-pha?linh-vuc=CN').split('?')[1]).get('tiep-theo')).toBe('/kham-pha?linh-vuc=CN');
+  });
+
+  it('returns only to in-app pages that need the profile', () => {
+    expect(returnPathAfterSetup('/kham-pha?linh-vuc=CN')).toBe('/kham-pha?linh-vuc=CN');
+    expect(returnPathAfterSetup('/ban-tin/thong-bao')).toBe('/ban-tin/thong-bao');
+    expect(returnPathAfterSetup(null)).toBeNull();
+    expect(returnPathAfterSetup('')).toBeNull();
+    expect(returnPathAfterSetup('https://example.org/tong-quan')).toBeNull();
+    expect(returnPathAfterSetup('//example.org/tong-quan')).toBeNull();
+    expect(returnPathAfterSetup('/\\example.org')).toBeNull();
+    expect(returnPathAfterSetup('/thiet-lap')).toBeNull();
+    expect(returnPathAfterSetup('/')).toBeNull();
+    expect(returnPathAfterSetup('/de-an')).toBeNull();
+    expect(returnPathAfterSetup('/khong-co-trang-nay')).toBeNull();
   });
 });

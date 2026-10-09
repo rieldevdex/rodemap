@@ -3,7 +3,7 @@ import { toMillis } from '../domain/dates';
 import { EVENTS } from '../data/events';
 import { NEWS } from '../data/news';
 import { makePost } from '../domain/test-fixtures';
-import { createSeedState, type AppState } from '../state/schema';
+import { createDemoState, type AppState } from '../state/schema';
 import { addNotice, emptyConversation, needsRestart, runOfflineTurn, runOnlineTurn, setCardStatus, addStudentItem } from './conversation';
 import { classify, findEventInText, offlineDraft, respondOffline, windowInText } from './offline/engine';
 import type { MochiResponse } from './protocol';
@@ -12,7 +12,7 @@ import { MOCHI_TOOLS, TOOL_NAMES } from './tools/schemas';
 import { eventBrief, executeTool, resolveClub } from './tools/executors';
 
 const now = toMillis('2026-10-07T09:00:00+07:00');
-const seed = (): AppState => ({ ...createSeedState(), demoToday: '2026-10-07' });
+const seed = (): AppState => ({ ...createDemoState(), demoToday: '2026-10-07' });
 const ctx = (state: AppState = seed()) => ({ state, now });
 const approved = EVENTS.filter((e) => e.status === 'approved');
 const upcoming = approved.filter((e) => toMillis(e.end) > now);

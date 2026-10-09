@@ -7,6 +7,7 @@ import { ConfirmDialog } from '../components/molecules/ConfirmDialog';
 import { PageHead } from '../components/molecules/PageHead';
 import { ACTION_LABELS, STATUS_LABELS } from '../content/moderation';
 import { formatDate, formatLongDate, formatTime, formatTimeRange, toIsoDateTime, toMillis } from '../domain/dates';
+import { gradesLabel } from '../domain/events';
 import type { ModerationDecision } from '../state/actions';
 import { selectAllEvents, selectModerationQueue } from '../state/selectors';
 import { useCatalog } from '../state/useCatalog';
@@ -152,7 +153,7 @@ export function ModerationPage() {
                         <div>
                           <dt>Khối · số chỗ</dt>
                           <dd>
-                            Khối {event.eligibleGrades.join(', ')} · <span className="mono">{event.capacity}</span> chỗ
+                            {gradesLabel(event.eligibleGrades)} · <span className="mono">{event.capacity}</span> chỗ
                           </dd>
                         </div>
                         <div>

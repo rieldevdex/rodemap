@@ -6,7 +6,7 @@ import { makeEvent, makePost, makeProfile, reg } from '../domain/test-fixtures';
 import type { PortfolioEntry, SchoolEvent, Submission } from '../domain/types';
 import type { Action } from './actions';
 import { effectiveStatus, reducer } from './reducer';
-import { createSeedState, type AppState } from './schema';
+import { createDemoState, createSeedState, type AppState } from './schema';
 
 const AT = '2026-10-07T09:00:00+07:00';
 const LATER = '2026-10-08T10:30:00+07:00';
@@ -46,7 +46,7 @@ function submission(id: string, eventId: string, overrides: Partial<Submission> 
 }
 
 function stateWith(overrides: Partial<AppState>): AppState {
-  return { ...createSeedState(), ...overrides };
+  return { ...createDemoState(), ...overrides };
 }
 
 /** Freezes the whole tree so any mutation inside the reducer throws (ES modules run in strict mode). */
@@ -63,7 +63,7 @@ const subOf = (s: AppState, id: string) => s.submissions.find((x) => x.id === id
 
 describe('effectiveStatus', () => {
   it('falls back to the seed event status', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(effectiveStatus(s, 'ev-001')).toBe('approved');
     expect(effectiveStatus(s, 'ev-046')).toBe('pending');
     expect(effectiveStatus(s, 'ev-049')).toBe('changes_requested');
@@ -78,13 +78,13 @@ describe('effectiveStatus', () => {
   });
 
   it('returns undefined for an unknown event', () => {
-    expect(effectiveStatus(createSeedState(), 'ev-ghost')).toBeUndefined();
+    expect(effectiveStatus(createDemoState(), 'ev-ghost')).toBeUndefined();
   });
 });
 
 describe('reducer purity', () => {
   it('never mutates a deep-frozen input state', () => {
-    const frozen = deepFreeze(createSeedState());
+    const frozen = deepFreeze(createDemoState());
     const actions: Action[] = [
       { type: 'profile/complete', profile: makeProfile() },
       { type: 'profile/clear' },
@@ -108,7 +108,7 @@ describe('reducer purity', () => {
     for (const action of actions) {
       expect(() => reducer(frozen, action), action.type).not.toThrow();
     }
-    expect(frozen).toEqual(createSeedState());
+    expect(frozen).toEqual(createDemoState());
   });
 });
 
@@ -122,7 +122,7 @@ describe('profile/complete', () => {
   });
 
   it('replaces an existing profile and keeps the rest of the state', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const profile = makeProfile({ weeklyHourBudget: 10 });
     const next = reducer(s, { type: 'profile/complete', profile });
     expect(next.profile).toEqual(profile);
@@ -133,7 +133,7 @@ describe('profile/complete', () => {
 
 describe('profile/clear', () => {
   it('removes the profile', () => {
-    const next = reducer(createSeedState(), { type: 'profile/clear' });
+    const next = reducer(createDemoState(), { type: 'profile/clear' });
     expect(next.profile).toBeNull();
   });
 
@@ -145,7 +145,7 @@ describe('profile/clear', () => {
 
 describe('registration/register', () => {
   it('adds a new registration', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const next = reducer(s, { type: 'registration/register', eventId: 'ev-016', at: AT });
     expect(next.registrations).toHaveLength(SEED_REGISTRATIONS.length + 1);
     expect(next.registrations.at(-1)).toEqual({ eventId: 'ev-016', registeredAt: AT, status: 'registered' });
@@ -162,7 +162,7 @@ describe('registration/register', () => {
   });
 
   it('is a no-op for a duplicate registration or an attended event', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(reducer(s, { type: 'registration/register', eventId: 'ev-014', at: LATER })).toBe(s);
     expect(reducer(s, { type: 'registration/register', eventId: 'ev-005', at: LATER })).toBe(s);
   });
@@ -170,7 +170,7 @@ describe('registration/register', () => {
 
 describe('registration/unregister', () => {
   it('removes a registered event', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const next = reducer(s, { type: 'registration/unregister', eventId: 'ev-014' });
     expect(regOf(next, 'ev-014')).toBeUndefined();
     expect(next.registrations).toHaveLength(SEED_REGISTRATIONS.length - 1);
@@ -186,7 +186,7 @@ describe('registration/unregister', () => {
 
 describe('registration/markAttended', () => {
   it('marks the event attended and adds the portfolio entry', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const e = entry('pf-009', 'ev-009', { category: 'KN' });
     const next = reducer(s, { type: 'registration/markAttended', eventId: 'ev-009', entry: e });
     expect(regOf(next, 'ev-009')?.status).toBe('attended');
@@ -209,7 +209,7 @@ describe('registration/markAttended', () => {
   });
 
   it('is a no-op when already attended or not registered', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(reducer(s, { type: 'registration/markAttended', eventId: 'ev-005', entry: entry('pf-x', 'ev-005') })).toBe(s);
     expect(reducer(s, { type: 'registration/markAttended', eventId: 'ev-016', entry: entry('pf-y', 'ev-016') })).toBe(s);
   });
@@ -217,7 +217,7 @@ describe('registration/markAttended', () => {
 
 describe('registration/markAbsent', () => {
   it('marks a registered event absent without touching the portfolio', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const next = reducer(s, { type: 'registration/markAbsent', eventId: 'ev-009' });
     expect(regOf(next, 'ev-009')?.status).toBe('absent');
     expect(regOf(next, 'ev-009')?.registeredAt).toBe(regOf(s, 'ev-009')?.registeredAt);
@@ -234,7 +234,7 @@ describe('registration/markAbsent', () => {
 
 describe('portfolio/upsert', () => {
   it('appends a new entry', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const e = entry('pf-new', 'ev-009');
     const next = reducer(s, { type: 'portfolio/upsert', entry: e });
     expect(next.portfolio).toEqual([...SEED_PORTFOLIO, e]);
@@ -242,7 +242,7 @@ describe('portfolio/upsert', () => {
   });
 
   it('replaces an entry with the same id in place, leaving the previous state intact', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const edited = { ...SEED_PORTFOLIO[1]!, reflection: 'Nội dung do học sinh biên soạn lại.', reflectionSource: 'student' as const };
     const next = reducer(s, { type: 'portfolio/upsert', entry: edited });
     expect(next.portfolio.map((p) => p.id)).toEqual(['pf-001', 'pf-002', 'pf-003']);
@@ -254,12 +254,12 @@ describe('portfolio/upsert', () => {
 
 describe('portfolio/remove', () => {
   it('removes the entry', () => {
-    const next = reducer(createSeedState(), { type: 'portfolio/remove', id: 'pf-002' });
+    const next = reducer(createDemoState(), { type: 'portfolio/remove', id: 'pf-002' });
     expect(next.portfolio.map((p) => p.id)).toEqual(['pf-001', 'pf-003']);
   });
 
   it('is a no-op for an unknown id', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(reducer(s, { type: 'portfolio/remove', id: 'pf-404' })).toBe(s);
   });
 });
@@ -269,7 +269,7 @@ describe('submission/create', () => {
   const sub = submission('sub-created', 'ev-created');
 
   it('stores the event as pending and records the submission', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const next = reducer(s, { type: 'submission/create', event: created, submission: sub });
     expect(next.submittedEvents).toEqual([{ ...created, status: 'pending' }]);
     expect(next.moderation).toEqual({ 'ev-created': 'pending' });
@@ -279,7 +279,7 @@ describe('submission/create', () => {
   });
 
   it('forces pending even when the event arrives approved', () => {
-    const next = reducer(createSeedState(), {
+    const next = reducer(createDemoState(), {
       type: 'submission/create',
       event: { ...created, status: 'approved' },
       submission: sub,
@@ -288,7 +288,7 @@ describe('submission/create', () => {
   });
 
   it('replaces an earlier copy of the same event id', () => {
-    const s = reducer(createSeedState(), { type: 'submission/create', event: created, submission: sub });
+    const s = reducer(createDemoState(), { type: 'submission/create', event: created, submission: sub });
     const retitled = { ...created, title: 'Buổi chia sẻ phát triển sản phẩm học tập' };
     const next = reducer(s, { type: 'submission/create', event: retitled, submission: submission('sub-2', 'ev-created') });
     expect(next.submittedEvents).toHaveLength(1);
@@ -297,7 +297,7 @@ describe('submission/create', () => {
   });
 
   it('is a no-op for a duplicate submission id', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(reducer(s, { type: 'submission/create', event: created, submission: submission('sub-001', 'ev-created') })).toBe(s);
   });
 });
@@ -306,7 +306,7 @@ describe('submission/resubmit', () => {
   const edited: SchoolEvent = { ...seedEvent('ev-049'), location: 'Phòng Tin học 2', capacity: 30 };
 
   it('resubmits after changes were requested: stores the edited copy as pending and logs the note', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const next = reducer(s, { type: 'submission/resubmit', submissionId: 'sub-004', event: edited, at: LATER });
     expect(next.submittedEvents).toEqual([{ ...edited, status: 'pending' }]);
     expect(next.moderation).toEqual({ 'ev-049': 'pending' });
@@ -320,7 +320,7 @@ describe('submission/resubmit', () => {
 
   it('replaces an existing edited copy in place', () => {
     const created = makeEvent({ id: 'ev-c', clubId: 'inkstep' });
-    let s = reducer(createSeedState(), { type: 'submission/create', event: created, submission: submission('sub-c', 'ev-c') });
+    let s = reducer(createDemoState(), { type: 'submission/create', event: created, submission: submission('sub-c', 'ev-c') });
     s = reducer(s, { type: 'moderation/review', submissionId: 'sub-c', action: 'request_changes', reason: REASON, at: AT });
     expect(effectiveStatus(s, 'ev-c')).toBe('changes_requested');
     const fixed = { ...created, capacity: 25 };
@@ -330,7 +330,7 @@ describe('submission/resubmit', () => {
   });
 
   it('is a no-op unless the event is waiting for changes', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     // sub-001 → ev-046 is pending, sub-005 → ev-050 is rejected.
     expect(reducer(s, { type: 'submission/resubmit', submissionId: 'sub-001', event: seedEvent('ev-046'), at: LATER })).toBe(s);
     expect(reducer(s, { type: 'submission/resubmit', submissionId: 'sub-005', event: seedEvent('ev-050'), at: LATER })).toBe(s);
@@ -339,7 +339,7 @@ describe('submission/resubmit', () => {
   });
 
   it('is a no-op for an unknown submission, a different event id or an unknown event', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(reducer(s, { type: 'submission/resubmit', submissionId: 'sub-404', event: edited, at: LATER })).toBe(s);
     expect(
       reducer(s, { type: 'submission/resubmit', submissionId: 'sub-004', event: { ...edited, id: 'ev-other' }, at: LATER }),
@@ -353,7 +353,7 @@ describe('submission/resubmit', () => {
 
 describe('moderation/review', () => {
   it('approves a pending submission', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const next = reducer(s, { type: 'moderation/review', submissionId: 'sub-001', action: 'approve', at: LATER });
     expect(next.moderation).toEqual({ 'ev-046': 'approved' });
     expect(effectiveStatus(next, 'ev-046')).toBe('approved');
@@ -363,7 +363,7 @@ describe('moderation/review', () => {
   });
 
   it('requests changes with a trimmed reason', () => {
-    const next = reducer(createSeedState(), {
+    const next = reducer(createDemoState(), {
       type: 'moderation/review',
       submissionId: 'sub-002',
       action: 'request_changes',
@@ -380,7 +380,7 @@ describe('moderation/review', () => {
   });
 
   it('rejects with a reason', () => {
-    const next = reducer(createSeedState(), {
+    const next = reducer(createDemoState(), {
       type: 'moderation/review',
       submissionId: 'sub-003',
       action: 'reject',
@@ -392,7 +392,7 @@ describe('moderation/review', () => {
   });
 
   it('is a no-op when changes or a rejection come without a reason', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(reducer(s, { type: 'moderation/review', submissionId: 'sub-001', action: 'request_changes', at: LATER })).toBe(s);
     expect(
       reducer(s, { type: 'moderation/review', submissionId: 'sub-001', action: 'request_changes', reason: '   ', at: LATER }),
@@ -401,7 +401,7 @@ describe('moderation/review', () => {
   });
 
   it('is a no-op for an invalid transition', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     // sub-004 → ev-049 waits for changes, sub-005 → ev-050 is rejected.
     expect(reducer(s, { type: 'moderation/review', submissionId: 'sub-004', action: 'approve', at: LATER })).toBe(s);
     expect(reducer(s, { type: 'moderation/review', submissionId: 'sub-005', action: 'reject', reason: REASON, at: LATER })).toBe(s);
@@ -410,7 +410,7 @@ describe('moderation/review', () => {
   });
 
   it('is a no-op for an unknown submission or an unknown event', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(reducer(s, { type: 'moderation/review', submissionId: 'sub-404', action: 'approve', at: LATER })).toBe(s);
     const ghost = stateWith({ submissions: [submission('sub-ghost', 'ev-ghost')] });
     expect(reducer(ghost, { type: 'moderation/review', submissionId: 'sub-ghost', action: 'approve', at: LATER })).toBe(ghost);
@@ -419,25 +419,25 @@ describe('moderation/review', () => {
 
 describe('setters', () => {
   it('role/set changes the role; the same role returns the identical state', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(reducer(s, { type: 'role/set', role: 'moderator' }).role).toBe('moderator');
     expect(reducer(s, { type: 'role/set', role: 'student' })).toBe(s);
   });
 
   it('club/setActive changes the club; the same club returns the identical state', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(reducer(s, { type: 'club/setActive', clubId: 'robotics' }).activeClubId).toBe('robotics');
     expect(reducer(s, { type: 'club/setActive', clubId: 'inkstep' })).toBe(s);
   });
 
   it('theme/set changes the theme; the same theme returns the identical state', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(reducer(s, { type: 'theme/set', theme: 'dark' }).theme).toBe('dark');
     expect(reducer(s, { type: 'theme/set', theme: 'system' })).toBe(s);
   });
 
   it('demo/setToday sets and clears the demo date; the same value returns the identical state', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const dated = reducer(s, { type: 'demo/setToday', date: '2026-10-07' });
     expect(dated.demoToday).toBe('2026-10-07');
     expect(reducer(dated, { type: 'demo/setToday', date: '2026-10-07' })).toBe(dated);
@@ -446,15 +446,15 @@ describe('setters', () => {
   });
 
   it('demo/setMochiOffline toggles the flag; the same value returns the identical state', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(reducer(s, { type: 'demo/setMochiOffline', offline: true }).mochiForcedOffline).toBe(true);
     expect(reducer(s, { type: 'demo/setMochiOffline', offline: false })).toBe(s);
   });
 });
 
 describe('demo/reset', () => {
-  it('restores the seed data and keeps the presentation settings', () => {
-    let s = createSeedState();
+  it('clears the student data (a new profile is needed) and keeps the presentation settings', () => {
+    let s = createDemoState();
     const actions: Action[] = [
       { type: 'role/set', role: 'moderator' },
       { type: 'club/setActive', clubId: 'robotics' },
@@ -473,8 +473,9 @@ describe('demo/reset', () => {
     expect(next).toEqual({ ...createSeedState(), theme: 'dark', demoToday: '2026-11-02', mochiForcedOffline: true });
     expect(next.role).toBe('student');
     expect(next.activeClubId).toBe('inkstep');
-    expect(next.registrations).not.toBe(SEED_REGISTRATIONS);
-    expect(next.portfolio).not.toBe(SEED_PORTFOLIO);
+    expect(next.profile).toBeNull();
+    expect(next.registrations).toEqual([]);
+    expect(next.portfolio).toEqual([]);
   });
 
   it('returns an equal fresh state when nothing changed', () => {
@@ -487,7 +488,7 @@ describe('demo/reset', () => {
 
 describe('unknown actions', () => {
   it('return the same state object', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(reducer(s, { type: 'legacy/unknown' } as unknown as Parameters<typeof reducer>[1])).toBe(s);
   });
 });
@@ -496,14 +497,14 @@ describe('newsletter', () => {
   const post = makePost({ id: 'bt-demo-1', slug: 'thong-bao-thu-nghiem' });
 
   it('publishes a council article once', () => {
-    const s1 = reducer(createSeedState(), { type: 'news/publish', post });
+    const s1 = reducer(createDemoState(), { type: 'news/publish', post });
     expect(s1.newsPosts).toEqual([post]);
     expect(reducer(s1, { type: 'news/publish', post })).toBe(s1);
     expect(reducer(s1, { type: 'news/publish', post: { ...post, id: 'bt-demo-2' } })).toBe(s1);
   });
 
   it('refuses reserved slugs and the id or slug of a sample article', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const seed = NEWS[0];
     if (!seed) throw new Error('The sample newsletter is empty');
     expect(reducer(s, { type: 'news/publish', post: { ...post, slug: 'soan-bai' } })).toBe(s);
@@ -512,7 +513,7 @@ describe('newsletter', () => {
   });
 
   it('removes only articles published in the demo', () => {
-    const s1 = reducer(createSeedState(), { type: 'news/publish', post });
+    const s1 = reducer(createDemoState(), { type: 'news/publish', post });
     expect(reducer(s1, { type: 'news/remove', id: post.id }).newsPosts).toEqual([]);
     expect(reducer(s1, { type: 'news/remove', id: 'bt-001' })).toBe(s1);
   });

@@ -218,6 +218,12 @@ cycle) ·
   permanent entry point. Bản tin added 2026-10-08 for the council's newsletter;
   from 1080 units up the search control shows its icon only, keeping its name
   and the Ctrl K shortcut, so eight sections fit.)
+- Before the student has set up a profile, every page except Trang chủ, Thiết lập
+  hồ sơ and Đề án leads to Thiết lập hồ sơ; the header then drops the nav,
+  search and Danh mục for a primary "Thiết lập hồ sơ" button (not shown on that
+  page), and MochiDock stays hidden until the profile exists. Grades run from
+  khối 6 to khối 12, grouped as Trung học cơ sở and Trung học phổ thông; an
+  event open to every grade reads "Khối 6–12 (toàn trường)".
 - Bản tin Hội đồng Học sinh reads as a wall newspaper: the page head is a
   nameplate closed by a double rule, issues are numbered by month (Số 1 = Tháng
   9/2026) and marked by an interchange station (ink ring; signal stays reserved

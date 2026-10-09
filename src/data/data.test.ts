@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { addDays, formatDate, formatTime, isoWeekKey, overlaps, SCHOOL_YEAR, toMillis, vnParts } from '../domain/dates';
-import { AFTER_SCHOOL_MINUTE, eventEnd, eventHours, eventStart } from '../domain/events';
+import { AFTER_SCHOOL_MINUTE, eventEnd, eventHours, eventStart, isOpenToAll } from '../domain/events';
 import { applyReview, canTransition, charCount } from '../domain/moderation';
 import { NEWS_LIMITS, newsBodyText, publishedPosts, RESERVED_NEWS_SLUGS } from '../domain/news';
-import { CATEGORY_CODES, NEWS_CATEGORIES, type EventStatus, type NewsPost, type SchoolEvent, type Submission } from '../domain/types';
+import { CATEGORY_CODES, GRADES, NEWS_CATEGORIES, type EventStatus, type NewsPost, type SchoolEvent, type Submission } from '../domain/types';
 import { PERIODS } from './calendar';
 import { CATEGORIES, categoryByCode } from './categories';
 import { CLUBS } from './clubs';
@@ -158,7 +158,7 @@ describe('data files', () => {
 
 describe('school', () => {
   it('uses the placeholder name and the 2026–2027 school year', () => {
-    expect(SCHOOL).toEqual({ name: '[Tên trường]', schoolYear: '2026–2027' });
+    expect(SCHOOL).toEqual({ name: 'Vinschool Smart City', schoolYear: '2026–2027' });
   });
 });
 
@@ -375,6 +375,9 @@ describe('events: shape and integrity', () => {
       expect(sentenceCount(e.description), e.id).toBeGreaterThanOrEqual(2);
       expect(e.location.trim().length, e.id).toBeGreaterThan(0);
       expect(e.eligibleGrades.length, e.id).toBeGreaterThan(0);
+      expect(e.eligibleGrades.every((g) => GRADES.includes(g)), e.id).toBe(true);
+      expect([...e.eligibleGrades].sort((a, b) => a - b), e.id).toEqual(e.eligibleGrades);
+      expect(new Set(e.eligibleGrades).size, e.id).toBe(e.eligibleGrades.length);
     }
   });
 
@@ -436,9 +439,17 @@ describe('events: distribution for the demo', () => {
     expect(eventStart(full[0]!) > DEMO_TODAY).toBe(true);
   });
 
-  it('has a few grade-restricted events', () => {
-    const restricted = approved.filter((e) => e.eligibleGrades.length < 3);
-    expect(restricted.length).toBeGreaterThanOrEqual(3);
+  it('serves every grade from 6 to 12, with school-wide and grade-restricted events', () => {
+    const openToAll = approved.filter((e) => isOpenToAll(e.eligibleGrades));
+    expect(openToAll.length).toBeGreaterThanOrEqual(15);
+    expect(openToAll.filter((e) => e.category === 'TS').length).toBeGreaterThanOrEqual(3);
+    for (const g of GRADES) {
+      expect(approved.filter((e) => e.eligibleGrades.includes(g) && eventStart(e) > DEMO_TODAY).length, `khối ${String(g)}`).toBeGreaterThanOrEqual(10);
+    }
+    // Lower secondary only (khối 6–9) and upper secondary only (khối 10–12) events both exist.
+    expect(approved.some((e) => e.eligibleGrades.every((g) => g <= 9))).toBe(true);
+    expect(approved.some((e) => e.eligibleGrades.every((g) => g >= 10))).toBe(true);
+    const restricted = approved.filter((e) => !isOpenToAll(e.eligibleGrades));
     expect(restricted.some((e) => !e.eligibleGrades.includes(11) && eventStart(e) > DEMO_TODAY)).toBe(true);
   });
 

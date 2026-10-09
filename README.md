@@ -52,7 +52,7 @@ Tùy chọn: để giới hạn tần suất truy cập Mochi một cách bền 
 ## 4. Chuẩn bị trước Ngày bầu cử
 
 1. Mở trang đã triển khai trên máy dùng để trình chiếu **ít nhất một lần khi có kết nối mạng**: service worker lưu toàn bộ ứng dụng vào bộ nhớ đệm, nhờ đó các trang vẫn mở được khi mạng tại hội trường gián đoạn và Mochi tự động trả lời ở chế độ ngoại tuyến.
-2. Mở **Tài khoản minh họa** (góc trên bên phải) → **Khôi phục dữ liệu minh họa** → **Xác nhận** để đưa dữ liệu về trạng thái ban đầu.
+2. Mở **Tài khoản minh họa** (góc trên bên phải) → **Xóa dữ liệu trên trình duyệt này** → **Xác nhận xóa** để đưa ứng dụng về trạng thái của người dùng mới (cần thiết lập hồ sơ trước khi sử dụng).
 3. Tùy chọn trong cùng trình đơn:
    - **Ngày minh họa**: cố định "hôm nay" (ví dụ ngày bầu cử) để bảng tin, hạn đăng ký và lộ trình hiển thị ổn định;
    - **Chuyển Mochi sang chế độ ngoại tuyến**: Mochi sử dụng phản hồi chuẩn bị sẵn, không phụ thuộc mạng.
@@ -60,12 +60,16 @@ Tùy chọn: để giới hạn tần suất truy cập Mochi một cách bền 
 
 ## 5. Thay dữ liệu minh họa bằng dữ liệu thật
 
-Dữ liệu nằm trong `src/data/` (mỗi tệp đều ghi chú là dữ liệu minh họa): `clubs.ts`, `events.ts`, `calendar.ts` (các đợt kiểm tra định kỳ, ngày nghỉ), `seed.ts` (hồ sơ minh họa), `school.ts` (tên trường), `news.ts` (các bài viết của Bản tin Hội đồng Học sinh; mỗi bài viết ký tên một ban, không ghi họ tên học sinh). Thông tin ứng cử viên (`[Họ và tên]`, `[Lớp]`, `[Vị trí ứng tuyển]`, `[Thông điệp tranh cử]`) và thời gian dự kiến của từng giai đoạn trên trang Đề án nằm trong `src/content/proposal.ts`. Sau khi thay, thực hiện `npm run check` để đảm bảo dữ liệu hợp lệ.
+Dữ liệu nằm trong `src/data/` (mỗi tệp đều ghi chú là dữ liệu minh họa): `clubs.ts`, `events.ts`, `calendar.ts` (các đợt kiểm tra định kỳ, ngày nghỉ), `seed.ts` (hồ sơ học sinh minh họa, chỉ dùng cho kiểm thử và ảnh chụp màn hình), `school.ts` (tên trường: Vinschool Smart City), `news.ts` (các bài viết của Bản tin Hội đồng Học sinh; mỗi bài viết ký tên một ban, không ghi họ tên học sinh). Thông tin ứng cử viên (`[Họ và tên]`, `[Lớp]`, `[Vị trí ứng tuyển]`, `[Thông điệp tranh cử]`) và thời gian dự kiến của từng giai đoạn trên trang Đề án nằm trong `src/content/proposal.ts`. Sau khi thay, thực hiện `npm run check` để đảm bảo dữ liệu hợp lệ.
 
-## 6. Bản tin Hội đồng Học sinh
+## 6. Hồ sơ học sinh và khối lớp
+
+Rodemap dành cho học sinh từ khối 6 đến khối 12 (trung học cơ sở và trung học phổ thông). Trước khi sử dụng, học sinh cần thiết lập hồ sơ gồm bốn bước (khối và lớp, lĩnh vực quan tâm, mục tiêu, thời gian có thể tham gia); khi chưa có hồ sơ, mọi trang ngoài Trang chủ, Thiết lập hồ sơ và Đề án đều chuyển tới trang Thiết lập hồ sơ, sau đó trở lại trang học sinh đã chọn. Mỗi sự kiện ghi rõ các khối được phép tham gia (`eligibleGrades` trong `src/data/events.ts`); sự kiện dành cho mọi khối được hiển thị là "Khối 6–12 (toàn trường)".
+
+## 7. Bản tin Hội đồng Học sinh
 
 Trang **Bản tin** (`/ban-tin`) trình bày các bài viết của Hội đồng Học sinh theo từng số hằng tháng. Để đăng bài trong bản trình diễn: mở **Tài khoản minh họa** → chọn vai trò **HĐHS** → **Bản tin** → **Soạn bài viết**. Bài viết được hiển thị ngay sau khi nhấn **Đăng bài**, đồng thời xuất hiện tại trang Tổng quan, trang của các sự kiện được liên kết và trang của câu lạc bộ tổ chức các sự kiện đó. Mochi có thể giới thiệu bài viết khi học sinh hỏi về thông báo mới. Bài viết đăng trong bản trình diễn được lưu trên trình duyệt, luôn hiển thị dù ngày minh họa được đặt là ngày nào, và có thể gỡ bằng nút **Gỡ bài viết**.
 
-## 7. Cấu trúc mã nguồn
+## 8. Cấu trúc mã nguồn
 
 Xem `docs/ARCHITECTURE.md` (kiến trúc và giao kèo giữa các lớp) và `DESIGN.md` (hệ thống thiết kế).

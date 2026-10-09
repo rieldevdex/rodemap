@@ -8,8 +8,11 @@ import {
   findRegistration,
   fitsAvailability,
   isDeadlinePassed,
+  formatGrades,
+  gradesLabel,
   isEligible,
   isFull,
+  isOpenToAll,
   isPast,
   isRegistered,
   registrationState,
@@ -47,7 +50,24 @@ describe('basic facts', () => {
     expect(isPast(e, now)).toBe(false);
     expect(isEligible(makeEvent({ eligibleGrades: [12] }), 11)).toBe(false);
     expect(isEligible(makeEvent({ eligibleGrades: [12] }), null)).toBe(true);
+    expect(isEligible(makeEvent({ eligibleGrades: [6, 7] }), 6)).toBe(true);
     expect(deadlineDaysLeft(makeEvent({ registrationDeadline: '2026-10-12T23:59:00+07:00' }), now)).toBe(2);
+  });
+});
+
+describe('grade labels', () => {
+  it('writes runs of three or more as ranges and marks the whole school', () => {
+    expect(formatGrades([6, 7, 8, 9, 10, 11, 12])).toBe('6–12');
+    expect(formatGrades([12, 10, 11, 10])).toBe('10–12');
+    expect(formatGrades([11, 12])).toBe('11, 12');
+    expect(formatGrades([6, 7, 10])).toBe('6, 7, 10');
+    expect(formatGrades([6, 7, 8, 10, 12])).toBe('6–8, 10, 12');
+    expect(formatGrades([])).toBe('');
+    expect(isOpenToAll([6, 7, 8, 9, 10, 11, 12])).toBe(true);
+    expect(isOpenToAll([10, 11, 12])).toBe(false);
+    expect(gradesLabel([6, 7, 8, 9, 10, 11, 12])).toBe('Khối 6–12 (toàn trường)');
+    expect(gradesLabel([8, 9, 10, 11, 12])).toBe('Khối 8–12');
+    expect(gradesLabel([12])).toBe('Khối 12');
   });
 });
 

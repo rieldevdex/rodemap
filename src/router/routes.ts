@@ -124,6 +124,31 @@ export function pathFor(name: RouteName, params: Record<string, string> = {}): s
   return `/${parts.join('/')}`;
 }
 
+/** Pages open before the student has set up a profile: Trang chủ, Thiết lập hồ sơ, Đề án and 404. */
+export const PUBLIC_ROUTES: readonly RouteName[] = ['home', 'onboarding', 'proposal', 'notFound'];
+
+/** Every other page asks for the student profile first (Rodemap sends the visitor to /thiet-lap). */
+export function requiresProfile(name: RouteName): boolean {
+  return !PUBLIC_ROUTES.includes(name);
+}
+
+/** Query parameter of /thiet-lap holding the page to open once the profile is set up. */
+export const RETURN_PARAM = 'tiep-theo';
+
+/** /thiet-lap?tiep-theo=… for a page the visitor tried to open (path, query and hash kept). */
+export function setupPathFor(returnTo: string): string {
+  return `${pathFor('onboarding')}?${RETURN_PARAM}=${encodeURIComponent(returnTo)}`;
+}
+
+/**
+ * The page to open after profile setup: only an in-app path ("/…", never "//…" or a full URL)
+ * of a page that needs the profile. Anything else is ignored (null).
+ */
+export function returnPathAfterSetup(value: string | null): string | null {
+  if (value === null || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return null;
+  return requiresProfile(matchRoute(value).name) ? value : null;
+}
+
 export function routeTitle(name: RouteName): string {
   return ROUTE_BY_NAME.get(name)?.title ?? APP_NAME;
 }

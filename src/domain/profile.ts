@@ -11,8 +11,8 @@ export const BUDGET_LIMITS = { min: 2, max: 12, step: 1 } as const;
 /** How many interests are ranked as priorities. */
 export const TOP_INTEREST_COUNT = 3;
 
-/** Class names: the grade, one letter, then up to three letters or digits ("11A2", "10CT"). */
-const CLASS_NAME_PATTERN = /^(10|11|12)[A-Z][A-Z0-9]{0,3}$/;
+/** Class names: the grade (6–12), one letter, then up to three letters or digits ("6A1", "11A2", "10CT"). */
+const CLASS_NAME_PATTERN = /^(1[0-2]|[6-9])[A-Z][A-Z0-9]{0,3}$/;
 
 export interface ProfileDraft {
   grade: Grade | null;
@@ -54,7 +54,7 @@ export function stepErrors(draft: ProfileDraft, step: OnboardingStep): DraftErro
     if (name === '') {
       errors.className = 'Vui lòng nhập lớp.';
     } else if (!CLASS_NAME_PATTERN.test(name)) {
-      errors.className = 'Tên lớp gồm khối và ký hiệu lớp, ví dụ 11A2.';
+      errors.className = 'Tên lớp gồm khối và ký hiệu lớp, ví dụ 7A1 hoặc 11A2.';
     } else if (draft.grade !== null && !name.startsWith(String(draft.grade))) {
       errors.className = `Tên lớp cần bắt đầu bằng khối đã chọn (Khối ${String(draft.grade)}), ví dụ ${String(draft.grade)}A2.`;
     }

@@ -20,7 +20,7 @@ export const NEWS: NewsPost[] = [
     author: 'Ban Tổ chức',
     publishedAt: '2026-09-03T07:30:00+07:00',
     summary:
-      'Hội đồng Học sinh thông báo kế hoạch tổ chức Lễ khai giảng năm học 2026–2027 vào Thứ Bảy, 05/09/2026, tại sân trường, dành cho học sinh các khối 10, 11 và 12.',
+      'Hội đồng Học sinh thông báo kế hoạch tổ chức Lễ khai giảng năm học 2026–2027 vào Thứ Bảy, 05/09/2026, tại sân trường, dành cho học sinh toàn trường từ khối 6 đến khối 12.',
     body: [
       {
         kind: 'paragraph',
@@ -33,7 +33,7 @@ export const NEWS: NewsPost[] = [
           'Sự kiện: Lễ khai giảng năm học 2026–2027.',
           'Thời gian: từ 07:00 đến 09:30, Thứ Bảy, 05/09/2026.',
           'Địa điểm: Sân trường.',
-          'Đối tượng: học sinh các khối 10, 11 và 12.',
+          'Đối tượng: học sinh toàn trường, từ khối 6 đến khối 12.',
           'Đơn vị tổ chức: Hội đồng Học sinh.',
           'Hạn đăng ký: 23:59, Thứ Năm, 03/09/2026.',
         ],
@@ -72,7 +72,7 @@ export const NEWS: NewsPost[] = [
     body: [
       {
         kind: 'paragraph',
-        text: 'Sáng Thứ Bảy, 05/09/2026, từ 07:00 đến 09:30, Lễ khai giảng năm học 2026–2027 do Hội đồng Học sinh tổ chức đã diễn ra tại sân trường. Buổi lễ dành cho học sinh các khối 10, 11 và 12, chính thức mở đầu năm học mới.',
+        text: 'Sáng Thứ Bảy, 05/09/2026, từ 07:00 đến 09:30, Lễ khai giảng năm học 2026–2027 do Hội đồng Học sinh tổ chức đã diễn ra tại sân trường. Buổi lễ dành cho học sinh toàn trường, từ khối 6 đến khối 12, chính thức mở đầu năm học mới.',
       },
       { kind: 'heading', text: 'Chương trình buổi lễ' },
       {
@@ -168,7 +168,7 @@ export const NEWS: NewsPost[] = [
     body: [
       {
         kind: 'paragraph',
-        text: 'Hội đồng Học sinh thông báo tổ chức Ngày hội Câu lạc bộ năm học 2026–2027 nhằm giới thiệu hoạt động của các câu lạc bộ tới học sinh toàn trường, đặc biệt là học sinh khối 10. Tại ngày hội, học sinh được tìm hiểu kế hoạch hoạt động, trao đổi trực tiếp với ban chủ nhiệm và đăng ký tham gia câu lạc bộ phù hợp.',
+        text: 'Hội đồng Học sinh thông báo tổ chức Ngày hội Câu lạc bộ năm học 2026–2027 nhằm giới thiệu hoạt động của các câu lạc bộ tới học sinh toàn trường, đặc biệt là học sinh khối 6 và khối 10. Tại ngày hội, học sinh được tìm hiểu kế hoạch hoạt động, trao đổi trực tiếp với ban chủ nhiệm và đăng ký tham gia câu lạc bộ phù hợp.',
       },
       { kind: 'heading', text: 'Thông tin sự kiện' },
       {
@@ -177,7 +177,7 @@ export const NEWS: NewsPost[] = [
           'Sự kiện: Ngày hội Câu lạc bộ năm học 2026–2027.',
           'Thời gian: từ 07:30 đến 11:00, Thứ Bảy, 19/09/2026.',
           'Địa điểm: Sân trường và Nhà thi đấu đa năng.',
-          'Đối tượng: học sinh các khối 10, 11 và 12.',
+          'Đối tượng: học sinh toàn trường, từ khối 6 đến khối 12.',
           'Đơn vị tổ chức: Hội đồng Học sinh.',
           'Hạn đăng ký: 23:59, Thứ Năm, 17/09/2026.',
         ],
@@ -194,7 +194,7 @@ export const NEWS: NewsPost[] = [
       },
       {
         kind: 'quote',
-        text: 'Ngày hội là dịp để học sinh khối 10 tìm hiểu các câu lạc bộ và lựa chọn hoạt động phù hợp ngay từ đầu năm học.',
+        text: 'Ngày hội là dịp để học sinh khối 6 và khối 10 tìm hiểu các câu lạc bộ và lựa chọn hoạt động phù hợp ngay từ đầu năm học.',
         source: 'Ban Tổ chức, Hội đồng Học sinh',
       },
     ],
@@ -213,7 +213,7 @@ export const NEWS: NewsPost[] = [
     body: [
       {
         kind: 'paragraph',
-        text: 'Sáng Thứ Bảy, 19/09/2026, từ 07:30 đến 11:00, Ngày hội Câu lạc bộ năm học 2026–2027 do Hội đồng Học sinh tổ chức đã diễn ra tại Sân trường và Nhà thi đấu đa năng. Ngày hội dành cho học sinh các khối 10, 11 và 12, đặc biệt là học sinh khối 10.',
+        text: 'Sáng Thứ Bảy, 19/09/2026, từ 07:30 đến 11:00, Ngày hội Câu lạc bộ năm học 2026–2027 do Hội đồng Học sinh tổ chức đã diễn ra tại Sân trường và Nhà thi đấu đa năng. Ngày hội dành cho học sinh toàn trường, từ khối 6 đến khối 12, đặc biệt là học sinh khối 6 và khối 10.',
       },
       { kind: 'heading', text: 'Hoạt động tại ngày hội' },
       {
@@ -260,7 +260,7 @@ export const NEWS: NewsPost[] = [
       { kind: 'heading', text: 'Các chương trình trong học kỳ I' },
       {
         kind: 'paragraph',
-        text: 'Theo lịch sự kiện đã được Hội đồng Học sinh phê duyệt, câu lạc bộ tổ chức các chương trình sau, dành cho học sinh các khối 10, 11 và 12:',
+        text: 'Theo lịch sự kiện đã được Hội đồng Học sinh phê duyệt, câu lạc bộ tổ chức các chương trình sau, dành cho học sinh toàn trường, từ khối 6 đến khối 12:',
       },
       {
         kind: 'list',
@@ -333,11 +333,11 @@ export const NEWS: NewsPost[] = [
     author: 'Ban Học tập',
     publishedAt: '2026-10-05T16:30:00+07:00',
     summary:
-      'Sáng Thứ Bảy, 03/10/2026, Câu lạc bộ Hướng nghiệp tổ chức Hội thảo Định hướng lựa chọn tổ hợp môn học và ngành học tại Hội trường A, dành cho học sinh các khối.',
+      'Sáng Thứ Bảy, 03/10/2026, Câu lạc bộ Hướng nghiệp tổ chức Hội thảo Định hướng lựa chọn tổ hợp môn học và ngành học tại Hội trường A, dành cho học sinh từ khối 9 đến khối 12.',
     body: [
       {
         kind: 'paragraph',
-        text: 'Sáng Thứ Bảy, 03/10/2026, từ 08:00 đến 11:30, Câu lạc bộ Hướng nghiệp đã tổ chức Hội thảo Định hướng lựa chọn tổ hợp môn học và ngành học tại Hội trường A. Hội thảo dành cho học sinh các khối 10, 11 và 12, nhằm cung cấp thông tin về mối liên hệ giữa tổ hợp môn học ở bậc trung học phổ thông và các nhóm ngành đào tạo đại học.',
+        text: 'Sáng Thứ Bảy, 03/10/2026, từ 08:00 đến 11:30, Câu lạc bộ Hướng nghiệp đã tổ chức Hội thảo Định hướng lựa chọn tổ hợp môn học và ngành học tại Hội trường A. Hội thảo dành cho học sinh từ khối 9 đến khối 12, nhằm cung cấp thông tin về mối liên hệ giữa tổ hợp môn học ở bậc trung học phổ thông và các nhóm ngành đào tạo đại học.',
       },
       { kind: 'heading', text: 'Nội dung hội thảo' },
       {
@@ -381,10 +381,10 @@ export const NEWS: NewsPost[] = [
       {
         kind: 'list',
         items: [
-          'Buổi thực hành: Lắp ráp và lập trình robot dò đường, do Câu lạc bộ Robotics tổ chức (từ 08:00 đến 11:30, Thứ Bảy, 10/10/2026, tại Phòng Công nghệ; dành cho học sinh các khối 10, 11 và 12; hạn đăng ký 23:59, Thứ Năm, 08/10/2026).',
-          'Buổi luyện tập trực tuyến: Thuyết trình học thuật bằng tiếng Anh, do Câu lạc bộ Hùng biện Tiếng Anh tổ chức (từ 19:30 đến 21:00, Thứ Ba, 13/10/2026, Trực tuyến – Google Meet; dành cho học sinh các khối 10, 11 và 12; hạn đăng ký 23:59, Thứ Hai, 12/10/2026).',
+          'Buổi thực hành: Lắp ráp và lập trình robot dò đường, do Câu lạc bộ Robotics tổ chức (từ 08:00 đến 11:30, Thứ Bảy, 10/10/2026, tại Phòng Công nghệ; dành cho học sinh từ khối 6 đến khối 12; hạn đăng ký 23:59, Thứ Năm, 08/10/2026).',
+          'Buổi luyện tập trực tuyến: Thuyết trình học thuật bằng tiếng Anh, do Câu lạc bộ Hùng biện Tiếng Anh tổ chức (từ 19:30 đến 21:00, Thứ Ba, 13/10/2026, Trực tuyến – Google Meet; dành cho học sinh từ khối 8 đến khối 12; hạn đăng ký 23:59, Thứ Hai, 12/10/2026).',
           'Cuộc thi Phân tích dữ liệu học đường cấp trường, do Câu lạc bộ Khoa học Dữ liệu tổ chức (từ 08:00 đến 11:30, Thứ Bảy, 17/10/2026, tại Phòng Tin học 1 và Phòng Tin học 2; dành cho học sinh khối 11 và khối 12; hạn đăng ký 23:59, Thứ Tư, 14/10/2026).',
-          'Buổi ôn tập trực tuyến: Hệ thống hóa kiến thức Toán giữa học kỳ I, do Câu lạc bộ Toán học tổ chức (từ 19:30 đến 21:00, Thứ Năm, 29/10/2026, Trực tuyến – Google Meet; dành cho học sinh các khối 10, 11 và 12; hạn đăng ký 23:59, Thứ Tư, 28/10/2026).',
+          'Buổi ôn tập trực tuyến: Hệ thống hóa kiến thức Toán giữa học kỳ I, do Câu lạc bộ Toán học tổ chức (từ 19:30 đến 21:00, Thứ Năm, 29/10/2026, Trực tuyến – Google Meet; dành cho học sinh từ khối 6 đến khối 9; hạn đăng ký 23:59, Thứ Tư, 28/10/2026).',
         ],
       },
       {

@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 import { CLUBS } from '../../src/data/clubs';
 import { EVENTS } from '../../src/data/events';
 import { NEWS } from '../../src/data/news';
-import { createSeedState, STORAGE_KEY } from '../../src/state/schema';
+import { createDemoState, STORAGE_KEY } from '../../src/state/schema';
 
 /** The fixed demo date used by every browser test, so screens and flows are deterministic. */
 export const DEMO_TODAY = '2026-10-07';
@@ -33,11 +33,12 @@ export const ROUTES: { name: string; path: string }[] = [
 ];
 
 /**
- * Seeds localStorage with the illustrative state pinned to DEMO_TODAY, once per
- * browser context (later navigations keep whatever the app saved).
+ * Seeds localStorage with the illustrative grade 11 student pinned to DEMO_TODAY, once per
+ * browser context (later navigations keep whatever the app saved). Pass { profile: null } to
+ * start as a new visitor who has not set up a profile yet.
  */
 export async function seedDemo(page: Page, overrides: Record<string, unknown> = {}): Promise<void> {
-  const state = { ...createSeedState(), demoToday: DEMO_TODAY, ...overrides };
+  const state = { ...createDemoState(), demoToday: DEMO_TODAY, ...overrides };
   await page.addInitScript(
     ([key, value]) => {
       try {

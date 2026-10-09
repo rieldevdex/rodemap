@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS, SEED_SUBMISSIONS } from '../data/seed';
 import { makeEvent } from '../domain/test-fixtures';
-import { createSeedState, DEFAULT_CLUB_ID, isAppStateV1, migrate, STATE_VERSION, STORAGE_KEY } from './schema';
+import { createDemoState, createSeedState, DEFAULT_CLUB_ID, isAppStateV1, migrate, STATE_VERSION, STORAGE_KEY } from './schema';
 
 describe('constants', () => {
   it('pins the storage key, version and default club', () => {
@@ -12,8 +12,26 @@ describe('constants', () => {
 });
 
 describe('createSeedState', () => {
-  it('builds the illustrative demo state', () => {
-    const s = createSeedState();
+  it('starts a new visitor without a profile, registrations or portfolio', () => {
+    expect(createSeedState()).toEqual({
+      version: 1,
+      role: 'student',
+      activeClubId: 'inkstep',
+      profile: null,
+      registrations: [],
+      portfolio: [],
+      submittedEvents: [],
+      moderation: {},
+      submissions: SEED_SUBMISSIONS,
+      newsPosts: [],
+      theme: 'system',
+      demoToday: null,
+      mochiForcedOffline: false,
+    });
+  });
+
+  it('builds the illustrative grade 11 student for tests and screenshots', () => {
+    const s = createDemoState();
     expect(s).toEqual({
       version: 1,
       role: 'student',
@@ -32,7 +50,7 @@ describe('createSeedState', () => {
   });
 
   it('returns deep copies: mutating one state affects neither the next one nor the seed constants', () => {
-    const first = createSeedState();
+    const first = createDemoState();
     expect(first.profile).not.toBe(SEED_PROFILE);
     expect(first.registrations).not.toBe(SEED_REGISTRATIONS);
     expect(first.portfolio).not.toBe(SEED_PORTFOLIO);
@@ -47,7 +65,7 @@ describe('createSeedState', () => {
     first.submittedEvents.push(makeEvent({ id: 'ev-new' }));
     first.moderation['ev-001'] = 'rejected';
 
-    const second = createSeedState();
+    const second = createDemoState();
     expect(second.profile).toEqual(SEED_PROFILE);
     expect(second.registrations).toEqual(SEED_REGISTRATIONS);
     expect(second.portfolio).toEqual(SEED_PORTFOLIO);

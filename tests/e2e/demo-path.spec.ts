@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { EVENTS } from '../../src/data/events';
 import { SEED_REGISTRATIONS } from '../../src/data/seed';
 import { toMillis } from '../../src/domain/dates';
+import { formatGrades, isOpenToAll } from '../../src/domain/events';
 import { escapeText } from '../../src/domain/ics';
 import type { MochiResponse } from '../../src/mochi/protocol';
 import { DEMO_TODAY, seedDemo, trackErrors } from '../support/app';
@@ -41,12 +42,19 @@ test.describe('demo path', () => {
   test('onboarding → first route → confirm → Lộ trình and Lịch → .ics', async ({ page }) => {
     const errors = trackErrors(page);
     await seedDemo(page, { profile: null, registrations: [], portfolio: [] });
+    // Without a profile, the app pages lead to Thiết lập hồ sơ first and come back afterwards.
+    await page.goto('/kham-pha');
+    await expect(page).toHaveURL('/thiet-lap?tiep-theo=%2Fkham-pha');
+    await expect(page.locator('#main-heading')).toHaveText('Thiết lập hồ sơ');
+    await expect(page.getByText('Học sinh cần thiết lập hồ sơ trước khi sử dụng Rodemap.', { exact: false })).toBeVisible();
+    await expect(page.getByRole('navigation', { name: 'Điều hướng chính' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Hỏi Mochi' })).toHaveCount(0);
     await page.goto('/thiet-lap');
 
     // Step 1 validates before moving on.
     await page.getByRole('button', { name: 'Tiếp tục' }).click();
     await expect(page.getByText('Vui lòng chọn khối.')).toBeVisible();
-    await expect(page.getByRole('radio', { name: 'Khối 10' })).toBeFocused();
+    await expect(page.getByRole('radio', { name: 'Khối 6' })).toBeFocused();
     await page.getByRole('radio', { name: 'Khối 11' }).check();
     await page.getByRole('textbox', { name: 'Lớp' }).fill('11a2');
     await page.getByRole('button', { name: 'Tiếp tục' }).click();
@@ -82,6 +90,44 @@ test.describe('demo path', () => {
     const october = EVENTS.filter((e) => titles.includes(e.title) && e.start.startsWith('2026-10')).map((e) => e.title);
     expect(october.length).toBeGreaterThan(0);
     await expectInCalendar(page, october);
+    expect(errors).toEqual([]);
+  });
+
+  test('a grade 7 student opens a deep link, sets up a profile, and sees which events are open to every grade', async ({ page }) => {
+    const errors = trackErrors(page);
+    const upcoming = (e: (typeof EVENTS)[number]) => e.status === 'approved' && toMillis(e.registrationDeadline) > today && e.seatsTaken < e.capacity;
+    const wholeSchool = EVENTS.find((e) => upcoming(e) && isOpenToAll(e.eligibleGrades));
+    const upperOnly = EVENTS.find((e) => upcoming(e) && !e.eligibleGrades.includes(7));
+    if (!wholeSchool || !upperOnly) throw new Error('Sample data needs open whole-school and upper-secondary events');
+    await seedDemo(page, { profile: null, registrations: [], portfolio: [] });
+
+    await page.goto('/ban-tin');
+    await expect(page).toHaveURL('/thiet-lap?tiep-theo=%2Fban-tin');
+    await expect(page.getByText('Sau khi hoàn tất bốn bước, Rodemap mở trang bạn đã chọn.', { exact: false })).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Trung học cơ sở' }).getByRole('radio')).toHaveCount(4);
+    await expect(page.getByRole('group', { name: 'Trung học phổ thông' }).getByRole('radio')).toHaveCount(3);
+    await page.getByRole('radio', { name: 'Khối 7' }).check();
+    await page.getByRole('textbox', { name: 'Lớp' }).fill('6a1');
+    await page.getByRole('button', { name: 'Tiếp tục' }).click();
+    await expect(page.getByText('Tên lớp cần bắt đầu bằng khối đã chọn (Khối 7), ví dụ 7A2.')).toBeVisible();
+    await page.getByRole('textbox', { name: 'Lớp' }).fill('7a1');
+    await page.getByRole('button', { name: 'Tiếp tục' }).click();
+    await page.getByRole('checkbox', { name: /^[A-Z]{2} Nghệ thuật – Văn hóa/ }).check();
+    await page.getByRole('button', { name: 'Tiếp tục' }).click();
+    await page.getByRole('checkbox', { name: 'Phát triển năng lực công nghệ' }).check();
+    await page.getByRole('button', { name: 'Tiếp tục' }).click();
+    await page.getByRole('checkbox', { name: /Cuối tuần/ }).check();
+    await page.getByRole('button', { name: /^(Chỉ lưu|Lưu) hồ sơ$/ }).click();
+
+    // Back on the page the student asked for, now with the full navigation.
+    await expect(page).toHaveURL('/ban-tin');
+    await expect(page.locator('#main-heading')).toHaveText('Bản tin Hội đồng Học sinh');
+    await expect(page.getByRole('navigation', { name: 'Điều hướng chính' })).toBeVisible();
+
+    await page.goto(`/su-kien/${wholeSchool.slug}`);
+    await expect(page.getByText('Khối 6–12 (toàn trường)').first()).toBeVisible();
+    await page.goto(`/su-kien/${upperOnly.slug}`);
+    await expect(page.getByText(`Sự kiện dành cho khối ${formatGrades(upperOnly.eligibleGrades)}`).first()).toBeVisible();
     expect(errors).toEqual([]);
   });
 

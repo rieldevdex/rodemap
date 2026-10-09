@@ -28,8 +28,8 @@ import {
   type OnboardingStep,
   type ProfileDraft,
 } from '../domain/profile';
-import { GRADES, type CategoryCode } from '../domain/types';
-import { useNavigate } from '../router';
+import { GRADE_LEVELS, GRADES, type CategoryCode } from '../domain/types';
+import { RETURN_PARAM, returnPathAfterSetup, useNavigate, useRoute } from '../router';
 import { rememberRouteBefore } from '../state/routeMemory';
 import { selectFirstRoute, selectMyEvents, selectRecommendations } from '../state/selectors';
 import { useCatalog } from '../state/useCatalog';
@@ -65,7 +65,7 @@ const STEPS = ONBOARDING_STEPS.map((id) => ({
 
 /** The control that receives focus when a field has an error. */
 const FIELD_FOCUS: Record<DraftField, string> = {
-  grade: 'ob-grade-10',
+  grade: `ob-grade-${String(GRADES[0])}`,
   className: 'ob-class',
   interests: 'ob-int-HT',
   goals: 'ob-goal-leadership',
@@ -85,6 +85,8 @@ function ErrorText({ id, message }: { id: string; message: string | undefined })
 export function OnboardingPage() {
   const { state, dispatch, now } = useCatalog();
   const navigate = useNavigate();
+  // The page the visitor tried to open before setting up a profile (?tiep-theo=…).
+  const returnTo = returnPathAfterSetup(useRoute().search.get(RETURN_PARAM));
   const [draft, setDraft] = useState<ProfileDraft>(emptyDraft);
   const [stepIndex, setStepIndex] = useState(0);
   const [attempted, setAttempted] = useState<ReadonlySet<OnboardingStep>>(new Set());
@@ -167,9 +169,9 @@ export function OnboardingPage() {
       rememberRouteBefore(selectMyEvents(state).map((e) => e.id));
       const at = toIsoDateTime(now);
       for (const e of chosen) dispatch({ type: 'registration/register', eventId: e.id, at });
-      navigate('/lo-trinh?pham-vi=cua-toi');
+      navigate(returnTo ?? '/lo-trinh?pham-vi=cua-toi');
     } else {
-      navigate('/tong-quan');
+      navigate(returnTo ?? '/tong-quan');
     }
   };
 
@@ -186,11 +188,20 @@ export function OnboardingPage() {
           <p className="onboarding__existing">
             <Icon name="info" size="sm" />
             <span>
-              Bạn đã thiết lập hồ sơ cho lớp {state.profile.className}. Sau khi hoàn tất bốn bước dưới đây, hồ sơ hiện tại sẽ được cập nhật; các sự kiện đã đăng ký được giữ
-              nguyên.
+              Bạn đã thiết lập hồ sơ cho lớp {state.profile.className}. Sau khi hoàn tất bốn bước dưới đây, hồ sơ hiện tại sẽ được cập nhật; các sự kiện đã đăng
+              ký được giữ nguyên.
             </span>
           </p>
-        ) : null}
+        ) : (
+          <p className="onboarding__existing">
+            <Icon name="info" size="sm" />
+            <span>
+              {returnTo === null
+                ? 'Học sinh cần thiết lập hồ sơ trước khi sử dụng Rodemap.'
+                : 'Học sinh cần thiết lập hồ sơ trước khi sử dụng Rodemap. Sau khi hoàn tất bốn bước, Rodemap mở trang bạn đã chọn.'}
+            </span>
+          </p>
+        )}
       </PageHead>
 
       <div className="band band--surface">
@@ -217,29 +228,36 @@ export function OnboardingPage() {
                 <fieldset className="onboarding__fieldset" aria-describedby={describedBy(errors.grade !== undefined && 'ob-grade-error')}>
                   <legend className="onboarding__legend">Khối</legend>
                   <ErrorText id="ob-grade-error" message={errors.grade} />
-                  <div className="onboarding__grades">
-                    {GRADES.map((g) => (
-                      <label key={g} className="onboarding__grade">
-                        <input
-                          id={`ob-grade-${String(g)}`}
-                          type="radio"
-                          name="grade"
-                          checked={draft.grade === g}
-                          onChange={() => {
-                            update({ grade: g });
-                          }}
-                        />
-                        <span>Khối {g}</span>
-                      </label>
-                    ))}
-                  </div>
+                  {GRADE_LEVELS.map((level) => (
+                    <div key={level.name} className="onboarding__grade-level" role="group" aria-label={level.name}>
+                      <p className="onboarding__small" aria-hidden="true">
+                        {level.name}
+                      </p>
+                      <div className="onboarding__grades">
+                        {level.grades.map((g) => (
+                          <label key={g} className="onboarding__grade">
+                            <input
+                              id={`ob-grade-${String(g)}`}
+                              type="radio"
+                              name="grade"
+                              checked={draft.grade === g}
+                              onChange={() => {
+                                update({ grade: g });
+                              }}
+                            />
+                            <span>Khối {g}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </fieldset>
                 <div className="onboarding__field">
                   <label htmlFor="ob-class" className="onboarding__legend">
                     Lớp
                   </label>
                   <p id="ob-class-hint" className="onboarding__small">
-                    Ví dụ: 10A1, 11A2, 12CT.
+                    Ví dụ: 6A1, 9A3, 11A2, 12CT.
                   </p>
                   <input
                     id="ob-class"

@@ -10,7 +10,7 @@ import { NEWS } from '../data/news';
 import { makeEvent, makePost, makeProfile, reg } from '../domain/test-fixtures';
 import type { SchoolEvent, Submission } from '../domain/types';
 import { reducer } from './reducer';
-import { createSeedState, type AppState } from './schema';
+import { createDemoState, type AppState } from './schema';
 import {
   selectAllEvents,
   selectClub,
@@ -52,7 +52,7 @@ function seedEvent(id: string): SchoolEvent {
 }
 
 function stateWith(overrides: Partial<AppState>): AppState {
-  return { ...createSeedState(), ...overrides };
+  return { ...createDemoState(), ...overrides };
 }
 
 function submission(id: string, eventId: string, overrides: Partial<Submission> = {}): Submission {
@@ -70,7 +70,7 @@ const approvedSeed = EVENTS.filter((e) => e.status === 'approved');
 
 describe('selectNow', () => {
   it('follows the real clock without a demo date', () => {
-    expect(selectNow(createSeedState(), 1_234_567)).toBe(1_234_567);
+    expect(selectNow(createDemoState(), 1_234_567)).toBe(1_234_567);
   });
 
   it('pins the clock to 09:00 in Vietnam on the demo date', () => {
@@ -87,7 +87,7 @@ describe('selectNow', () => {
 
 describe('selectAllEvents', () => {
   it('returns the seed events untouched without submissions or overrides', () => {
-    const all = selectAllEvents(createSeedState());
+    const all = selectAllEvents(createDemoState());
     expect(all).toHaveLength(EVENTS.length);
     all.forEach((e, i) => {
       expect(e).toBe(EVENTS[i]);
@@ -128,7 +128,7 @@ describe('selectAllEvents', () => {
 
 describe('selectPublicEvents', () => {
   it('lists approved events only, sorted by start', () => {
-    const pub = selectPublicEvents(createSeedState());
+    const pub = selectPublicEvents(createDemoState());
     expect(ids(pub)).toEqual(ids(sortByStart(approvedSeed)));
     expect(pub.every((e) => e.status === 'approved')).toBe(true);
     expect(ids(pub)).not.toContain('ev-046');
@@ -149,7 +149,7 @@ describe('selectPublicEvents', () => {
 
 describe('selectEventBySlug / selectEventById', () => {
   it('finds events by slug or id, whatever their status', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const ev014 = seedEvent('ev-014');
     expect(selectEventBySlug(s, ev014.slug)).toBe(ev014);
     expect(selectEventBySlug(s, seedEvent('ev-046').slug)?.status).toBe('pending');
@@ -158,7 +158,7 @@ describe('selectEventBySlug / selectEventById', () => {
   });
 
   it('returns undefined for unknown slugs and ids', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(selectEventBySlug(s, 'khong-ton-tai')).toBeUndefined();
     expect(selectEventById(s, 'ev-404')).toBeUndefined();
   });
@@ -185,7 +185,7 @@ describe('selectEventBySlug / selectEventById', () => {
 
 describe('selectEventsForClub', () => {
   it('lists the club approved events sorted by start', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const inkstep = selectEventsForClub(s, 'inkstep');
     expect(ids(inkstep)).toEqual(ids(sortByStart(approvedSeed.filter((e) => e.clubId === 'inkstep'))));
     expect(ids(inkstep)).toContain('ev-014');
@@ -202,7 +202,7 @@ describe('selectEventsForClub', () => {
 
 describe('selectClub / selectClubBySlug', () => {
   it('finds clubs by id and slug', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const inkstep = CLUBS.find((c) => c.id === 'inkstep');
     expect(inkstep).toBeDefined();
     expect(selectClub(s, 'inkstep')).toBe(inkstep);
@@ -212,7 +212,7 @@ describe('selectClub / selectClubBySlug', () => {
   });
 
   it('returns undefined for unknown clubs', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(selectClub(s, 'khong-ton-tai')).toBeUndefined();
     expect(selectClubBySlug(s, 'khong-ton-tai')).toBeUndefined();
   });
@@ -220,7 +220,7 @@ describe('selectClub / selectClubBySlug', () => {
 
 describe('selectRegistration', () => {
   it('returns the registration for an event, or undefined', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(selectRegistration(s, 'ev-014')?.status).toBe('registered');
     expect(selectRegistration(s, 'ev-005')?.status).toBe('attended');
     expect(selectRegistration(s, 'ev-016')).toBeUndefined();
@@ -229,7 +229,7 @@ describe('selectRegistration', () => {
 
 describe('selectMyEvents / selectUpcomingMine', () => {
   it('lists registered and attended approved events, sorted by start', () => {
-    expect(ids(selectMyEvents(createSeedState()))).toEqual(['ev-005', 'ev-006', 'ev-007', 'ev-009', 'ev-014', 'ev-020']);
+    expect(ids(selectMyEvents(createDemoState()))).toEqual(['ev-005', 'ev-006', 'ev-007', 'ev-009', 'ev-014', 'ev-020']);
   });
 
   it('leaves out absences, unknown events and events that are not approved', () => {
@@ -240,7 +240,7 @@ describe('selectMyEvents / selectUpcomingMine', () => {
   });
 
   it('keeps upcoming events only (an event in progress is still upcoming)', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(ids(selectUpcomingMine(s, NOW))).toEqual(['ev-014', 'ev-020']);
     expect(ids(selectUpcomingMine(s, toMillis('2026-10-15T17:00:00+07:00')))).toEqual(['ev-014', 'ev-020']);
     expect(ids(selectUpcomingMine(s, toMillis('2026-10-15T18:30:00+07:00')))).toEqual(['ev-020']);
@@ -250,18 +250,18 @@ describe('selectMyEvents / selectUpcomingMine', () => {
 
 describe('selectConflictsInPlan', () => {
   it('is empty for the seed plan', () => {
-    expect(selectConflictsInPlan(createSeedState())).toEqual([]);
+    expect(selectConflictsInPlan(createDemoState())).toEqual([]);
   });
 
   it('reports overlapping registrations', () => {
-    const s = reducer(createSeedState(), { type: 'registration/register', eventId: 'ev-015', at: AT });
+    const s = reducer(createDemoState(), { type: 'registration/register', eventId: 'ev-015', at: AT });
     expect(selectConflictsInPlan(s)).toEqual([{ a: 'ev-014', b: 'ev-015', overlapMinutes: 90 }]);
   });
 });
 
 describe('selectPlanBudget', () => {
   it('counts my upcoming events in the current ISO week against the profile budget', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(selectPlanBudget(s, NOW)).toEqual({ weekKey: '2026-W41', used: 0, budget: 6, remaining: 6 });
     // ev-014 (16:45–18:30) falls in 2026-W42.
     const tuesday = toMillis('2026-10-13T09:00:00+07:00');
@@ -270,7 +270,7 @@ describe('selectPlanBudget', () => {
 
   it('stops counting an event once it has ended', () => {
     const after = toMillis('2026-10-15T19:00:00+07:00');
-    expect(selectPlanBudget(createSeedState(), after).used).toBe(0);
+    expect(selectPlanBudget(createDemoState(), after).used).toBe(0);
   });
 
   it('uses the profile budget, or 6 hours without a profile', () => {
@@ -283,7 +283,7 @@ describe('selectPlanBudget', () => {
 
 describe('selectRecommendations', () => {
   it('wires recommendEvents with the public events, my upcoming plan and GOALS', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const plan = selectUpcomingMine(s, NOW);
     const expected = recommendEvents(selectPublicEvents(s), {
       profile: s.profile,
@@ -303,7 +303,7 @@ describe('selectRecommendations', () => {
   });
 
   it('passes options through', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(selectRecommendations(s, NOW, { limit: 2 })).toHaveLength(2);
     const tn = selectRecommendations(s, NOW, { category: 'TN', limit: 50 });
     expect(tn.length).toBeGreaterThan(0);
@@ -326,7 +326,7 @@ describe('selectRecommendations', () => {
 
   it('only recommends events approved through moderation', () => {
     const range = { from: toMillis('2026-11-26T00:00:00+07:00'), to: toMillis('2026-11-27T00:00:00+07:00'), limit: 50 };
-    expect(ids(selectRecommendations(createSeedState(), NOW, range).map((r) => r.event))).not.toContain('ev-046');
+    expect(ids(selectRecommendations(createDemoState(), NOW, range).map((r) => r.event))).not.toContain('ev-046');
     const approved = stateWith({ moderation: { 'ev-046': 'approved' } });
     expect(ids(selectRecommendations(approved, NOW, range).map((r) => r.event))).toContain('ev-046');
   });
@@ -334,7 +334,7 @@ describe('selectRecommendations', () => {
 
 describe('selectFirstRoute', () => {
   it('wires planner.firstRoute with my upcoming plan and GOALS', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const ctx = { profile: s.profile, plan: selectUpcomingMine(s, NOW), regs: s.registrations, now: NOW, goals: GOALS };
     const route = selectFirstRoute(s, NOW);
     expect(route).toEqual(firstRoute(selectPublicEvents(s), ctx));
@@ -344,7 +344,7 @@ describe('selectFirstRoute', () => {
   });
 
   it('accepts a route size', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     expect(selectFirstRoute(s, NOW, 1).accepted).toHaveLength(1);
   });
 
@@ -357,11 +357,11 @@ describe('selectFirstRoute', () => {
 describe('selectDeadlinesThisWeek', () => {
   it('lists unregistered approved events closing before next Monday, by deadline', () => {
     // ev-011 and ev-012 close 08/10 23:59; ev-013 closes 12/10 23:59 (next week).
-    expect(ids(selectDeadlinesThisWeek(createSeedState(), NOW))).toEqual(['ev-011', 'ev-012']);
+    expect(ids(selectDeadlinesThisWeek(createDemoState(), NOW))).toEqual(['ev-011', 'ev-012']);
   });
 
   it('leaves out registered events', () => {
-    const s = reducer(createSeedState(), { type: 'registration/register', eventId: 'ev-012', at: AT });
+    const s = reducer(createDemoState(), { type: 'registration/register', eventId: 'ev-012', at: AT });
     expect(ids(selectDeadlinesThisWeek(s, NOW))).toEqual(['ev-011']);
   });
 
@@ -387,7 +387,7 @@ describe('selectDeadlinesThisWeek', () => {
 
   it('keeps the start order for equal deadlines and is empty late on Sunday', () => {
     const lateSunday = toMillis('2026-10-11T23:00:00+07:00');
-    expect(selectDeadlinesThisWeek(createSeedState(), lateSunday)).toEqual([]);
+    expect(selectDeadlinesThisWeek(createDemoState(), lateSunday)).toEqual([]);
     // Same deadline as ev-011/ev-012 but a later start: start order wins over the id order.
     const twin = makeEvent({
       id: 'ev-000',
@@ -401,11 +401,11 @@ describe('selectDeadlinesThisWeek', () => {
 
 describe('selectPendingAttendance', () => {
   it('lists past registered events without an entry', () => {
-    expect(ids(selectPendingAttendance(createSeedState(), NOW))).toEqual(['ev-009']);
+    expect(ids(selectPendingAttendance(createDemoState(), NOW))).toEqual(['ev-009']);
   });
 
   it('drops events once attendance is confirmed, marked absent or already in the portfolio', () => {
-    const s = createSeedState();
+    const s = createDemoState();
     const attended = reducer(s, {
       type: 'registration/markAttended',
       eventId: 'ev-009',
@@ -429,13 +429,13 @@ describe('selectPendingAttendance', () => {
 
   it('adds upcoming registrations once they have ended', () => {
     const later = toMillis('2026-10-16T09:00:00+07:00');
-    expect(ids(selectPendingAttendance(createSeedState(), later))).toEqual(['ev-009', 'ev-014']);
+    expect(ids(selectPendingAttendance(createDemoState(), later))).toEqual(['ev-009', 'ev-014']);
   });
 });
 
 describe('selectSubmissionsForClub', () => {
   it('joins each submission with its event and effective status, newest first', () => {
-    const rows = selectSubmissionsForClub(createSeedState(), 'inkstep');
+    const rows = selectSubmissionsForClub(createDemoState(), 'inkstep');
     expect(rows.map((r) => [r.submission.id, r.event.id, r.status])).toEqual([
       ['sub-003', 'ev-048', 'pending'],
       ['sub-004', 'ev-049', 'changes_requested'],
@@ -444,7 +444,7 @@ describe('selectSubmissionsForClub', () => {
   });
 
   it('reflects reviews, resubmitted copies and new submissions', () => {
-    let s = reducer(createSeedState(), { type: 'moderation/review', submissionId: 'sub-003', action: 'approve', at: AT });
+    let s = reducer(createDemoState(), { type: 'moderation/review', submissionId: 'sub-003', action: 'approve', at: AT });
     const edited = { ...seedEvent('ev-049'), location: 'Phòng Tin học 2' };
     s = reducer(s, { type: 'submission/resubmit', submissionId: 'sub-004', event: edited, at: AT });
     const created = makeEvent({ id: 'ev-created', clubId: 'inkstep' });
@@ -481,7 +481,7 @@ describe('selectSubmissionsForClub', () => {
 
 describe('selectModerationQueue', () => {
   it('lists pending submissions oldest first, joined with event and club', () => {
-    const queue = selectModerationQueue(createSeedState());
+    const queue = selectModerationQueue(createDemoState());
     expect(queue.map((q) => [q.submission.id, q.event.id, q.club?.id])).toEqual([
       ['sub-001', 'ev-046', 'robotics'],
       ['sub-002', 'ev-047', 'am-nhac'],
@@ -492,7 +492,7 @@ describe('selectModerationQueue', () => {
   });
 
   it('follows reviews and resubmissions', () => {
-    let s = reducer(createSeedState(), { type: 'moderation/review', submissionId: 'sub-001', action: 'approve', at: AT });
+    let s = reducer(createDemoState(), { type: 'moderation/review', submissionId: 'sub-001', action: 'approve', at: AT });
     s = reducer(s, { type: 'moderation/review', submissionId: 'sub-002', action: 'reject', reason: REASON, at: AT });
     expect(selectModerationQueue(s).map((q) => q.submission.id)).toEqual(['sub-003']);
 
@@ -531,7 +531,7 @@ describe('newsletter selectors', () => {
   const published = makePost({ id: 'bt-demo-a', slug: 'bai-a', publishedAt: '2026-10-06T08:00:00+07:00', eventIds: ['ev-018'], clubIds: ['tranh-bien'] });
   // Published in the demo by the real clock later on the demo day (the demo clock reads 09:00).
   const laterToday = makePost({ id: 'bt-demo-b', slug: 'bai-b', publishedAt: '2026-10-07T13:51:00+07:00', eventIds: ['ev-018'] });
-  const state: AppState = { ...createSeedState(), newsPosts: [published, laterToday] };
+  const state: AppState = { ...createDemoState(), newsPosts: [published, laterToday] };
   const scheduledSeed = NEWS.filter((p) => toMillis(p.publishedAt) > NOW);
 
   it('merges seed articles published by now with every council article, newest first', () => {
@@ -547,7 +547,7 @@ describe('newsletter selectors', () => {
   it('puts the later of two articles published at the same instant first', () => {
     const first = makePost({ id: 'bt-zzzz', slug: 'bai-mot', publishedAt: AT });
     const second = makePost({ id: 'bt-0000', slug: 'bai-hai', publishedAt: AT });
-    const news = selectNews({ ...createSeedState(), newsPosts: [first, second] }, NOW);
+    const news = selectNews({ ...createDemoState(), newsPosts: [first, second] }, NOW);
     expect(news.slice(0, 2).map((p) => p.id)).toEqual(['bt-0000', 'bt-zzzz']);
   });
 

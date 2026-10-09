@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { formatDate, formatLongDate, formatTime, formatTimeRange, toMillis } from '../../domain/dates';
-import type { RegistrationState } from '../../domain/events';
+import { formatGrades, type RegistrationState } from '../../domain/events';
 import type { SchoolEvent } from '../../domain/types';
 import { Button } from '../atoms/Button';
 import { LineBadge } from '../atoms/LineBadge';
@@ -94,7 +94,7 @@ export function RegistrationControl({
       </Button>
     );
   } else if (!eligible && state === 'open') {
-    control = <StatusTag tone="neutral">Sự kiện dành cho khối {event.eligibleGrades.join(', ')}</StatusTag>;
+    control = <StatusTag tone="neutral">Sự kiện dành cho khối {formatGrades(event.eligibleGrades)}</StatusTag>;
   } else {
     const reason = BLOCKED[state];
     control = reason ? <StatusTag tone={state === 'attended' ? 'ok' : 'neutral'}>{reason}</StatusTag> : null;

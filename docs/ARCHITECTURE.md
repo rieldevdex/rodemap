@@ -90,7 +90,7 @@ export interface ProfileDraft { grade: Grade | null; className: string; interest
   weekdayAfterSchool: boolean; weekend: boolean; weeklyHourBudget: number }
 export function emptyDraft(): ProfileDraft;
 export function stepErrors(draft, step): Partial<Record<'grade'|'className'|'interests'|'goals'|'availability', string>>;
-//   class names: grade + one letter + ≤ 3 letters/digits ("11A2"), must start with the chosen grade.
+//   class names: grade (6–12) + one letter + ≤ 3 letters/digits ("7A1", "11A2"), must start with the chosen grade.
 export function firstIncompleteStep(draft): OnboardingStep | null;
 export function toggleInterest(list, code) / moveInterest(list, code, -1 | 1) / toggleGoal(list, id);
 export function clampBudget(hours): number;
@@ -130,6 +130,9 @@ export function isFull(e: SchoolEvent, regs: Registration[]): boolean;
 export function isDeadlinePassed(e: SchoolEvent, now: Millis): boolean;
 export function isPast(e: SchoolEvent, now: Millis): boolean;  // end <= now
 export function isEligible(e: SchoolEvent, grade: Grade | null): boolean; // null grade → true
+export function isOpenToAll(grades): boolean;                   // every grade 6–12 (toàn trường)
+export function formatGrades(grades): string;                   // "6–12", "8–12", "11, 12" (runs of 3+ as ranges)
+export function gradesLabel(grades): string;                    // "Khối 6–12 (toàn trường)", "Khối 10–12"
 export function deadlineDaysLeft(e: SchoolEvent, now: Millis): number; // calendar days, negative if passed
 export function fitsAvailability(e: SchoolEvent, a: Availability): boolean;
 //   weekend (Sat/Sun) → a.weekend; weekday starting ≥ 16:30 → a.weekdayAfterSchool;
@@ -254,7 +257,7 @@ events.ts       export const EVENTS: SchoolEvent[]    // ~45 approved + 4–6 pe
 calendar.ts     export const PERIODS: CalendarPeriod[]
 seed.ts         export const SEED_PROFILE: Profile; SEED_REGISTRATIONS; SEED_PORTFOLIO; SEED_SUBMISSIONS
 news.ts         export const NEWS: NewsPost[]; NEWS_DEPARTMENTS   // council articles (one scheduled), signed by a department
-school.ts       export const SCHOOL = { name: '[Tên trường]', schoolYear: '2026–2027' }
+school.ts       export const SCHOOL = { name: 'Vinschool Smart City', schoolYear: '2026–2027' }
 ```
 
 ## State (`src/state`)
@@ -296,7 +299,9 @@ export type Action =
   | { type: 'demo/setMochiOffline'; offline: boolean }
   | { type: 'demo/reset' };
 export function reducer(state: AppState, action: Action): AppState;  // pure; unknown/invalid → same state
-export function createSeedState(): AppState;
+export function createSeedState(): AppState;   // a new visitor: profile null, no registrations or portfolio
+export function createDemoState(): AppState;   // the illustrative grade 11 student (tests, screenshots)
+// demo/reset returns to createSeedState() (presentation settings kept), so a new profile is needed.
 // selectors.ts — pure, (state, now?) → value
 selectAllEvents(state)             // EVENTS + submittedEvents with moderation overrides applied
 selectPublicEvents(state)          // approved only, sorted by start
@@ -336,6 +341,12 @@ export const ROUTES: { name: RouteName; path: string; title: string }[];
 //        /ban-tin · /ban-tin/soan-bai (before the slug route) · /ban-tin/:slug
 export function matchRoute(pathname: string): { name: RouteName; params: Record<string, string> };
 export function pathFor(name: RouteName, params?: Record<string, string>): string;
+export const PUBLIC_ROUTES = ['home', 'onboarding', 'proposal', 'notFound'];
+export function requiresProfile(name: RouteName): boolean;     // every other page needs state.profile
+export function setupPathFor(returnTo: string): string;        // /thiet-lap?tiep-theo=<encoded path>
+export function returnPathAfterSetup(value: string | null): string | null; // in-app path of a gated page, else null
+// App renders <ProfileRequired> (replace-navigates to setupPathFor) instead of a gated page while
+// state.profile is null; the header then shows "Thiết lập hồ sơ" instead of the nav, and Mochi is hidden.
 export function RouterProvider(props: { children: ReactNode }): JSX.Element;
 export function useRoute(): { name: RouteName; params: Record<string, string>; search: URLSearchParams };
 export function useNavigate(): (to: string, opts?: { replace?: boolean }) => void;

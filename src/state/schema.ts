@@ -39,15 +39,19 @@ export interface AppState {
   mochiForcedOffline: boolean;
 }
 
-/** A fresh copy of the illustrative demo state. */
+/**
+ * A new visitor: no student profile yet (every page except Trang chủ, Thiết lập hồ sơ and
+ * Đề án asks for one first), so no registrations or portfolio either. The clubs' submission
+ * history is shared illustrative data.
+ */
 export function createSeedState(): AppState {
   return {
     version: STATE_VERSION,
     role: 'student',
     activeClubId: DEFAULT_CLUB_ID,
-    profile: structuredClone(SEED_PROFILE),
-    registrations: structuredClone(SEED_REGISTRATIONS),
-    portfolio: structuredClone(SEED_PORTFOLIO),
+    profile: null,
+    registrations: [],
+    portfolio: [],
     submittedEvents: [],
     moderation: {},
     submissions: structuredClone(SEED_SUBMISSIONS),
@@ -55,6 +59,16 @@ export function createSeedState(): AppState {
     theme: 'system',
     demoToday: null,
     mochiForcedOffline: false,
+  };
+}
+
+/** The illustrative grade 11 student (profile, registrations, portfolio) used by tests and screenshots. */
+export function createDemoState(): AppState {
+  return {
+    ...createSeedState(),
+    profile: structuredClone(SEED_PROFILE),
+    registrations: structuredClone(SEED_REGISTRATIONS),
+    portfolio: structuredClone(SEED_PORTFOLIO),
   };
 }
 

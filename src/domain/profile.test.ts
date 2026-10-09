@@ -46,13 +46,21 @@ describe('profile draft', () => {
 
   it('validates grade and class', () => {
     expect(stepErrors(emptyDraft(), 'class')).toEqual({ grade: 'Vui lòng chọn khối.', className: 'Vui lòng nhập lớp.' });
-    expect(stepErrors({ ...complete, className: 'A2' }, 'class')).toEqual({ className: 'Tên lớp gồm khối và ký hiệu lớp, ví dụ 11A2.' });
+    expect(stepErrors({ ...complete, className: 'A2' }, 'class')).toEqual({ className: 'Tên lớp gồm khối và ký hiệu lớp, ví dụ 7A1 hoặc 11A2.' });
+    expect(stepErrors({ ...complete, className: '5A1' }, 'class')).toHaveProperty('className');
+    expect(stepErrors({ ...complete, className: '13A1' }, 'class')).toHaveProperty('className');
     expect(stepErrors({ ...complete, className: '10A1' }, 'class')).toEqual({
       className: 'Tên lớp cần bắt đầu bằng khối đã chọn (Khối 11), ví dụ 11A2.',
     });
     expect(stepErrors({ ...complete, grade: null, className: '10A1' }, 'class')).toEqual({ grade: 'Vui lòng chọn khối.' });
     expect(stepErrors({ ...complete, className: '12CT' }, 'class')).toHaveProperty('className');
     expect(stepErrors({ ...complete, grade: 12, className: '12ct' }, 'class')).toEqual({});
+    // Lower secondary grades (khối 6–9) use one-digit class names.
+    expect(stepErrors({ ...complete, grade: 6, className: '6a1' }, 'class')).toEqual({});
+    expect(stepErrors({ ...complete, grade: 9, className: '9CLC' }, 'class')).toEqual({});
+    expect(stepErrors({ ...complete, grade: 7, className: '6A1' }, 'class')).toEqual({
+      className: 'Tên lớp cần bắt đầu bằng khối đã chọn (Khối 7), ví dụ 7A2.',
+    });
   });
 
   it('requires an interest, a goal and a time slot', () => {
