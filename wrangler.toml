@@ -1,8 +1,11 @@
 # Cloudflare Workers configuration for Rodemap (Worker with static assets).
 # `npx wrangler deploy` runs `npm run build` ([build]), uploads dist/ as static assets and deploys
 # worker/index.ts, which only handles /api/* (Mochi). Everything else is served from dist/.
-# Secret (set under the Worker's Settings → Variables and Secrets, or with `npx wrangler secret put ANTHROPIC_API_KEY`):
-#   ANTHROPIC_API_KEY — without it Mochi runs in offline mode.
+#
+# Mochi reaches Claude through the Supabase Edge Function "rodemap-mochi" (MOCHI_RELAY_URL),
+# which holds the Claude API key as a Supabase secret; nothing secret is stored here.
+# Optional direct mode: set the secret ANTHROPIC_API_KEY on this Worker (Settings → Variables
+# and Secrets, or `npx wrangler secret put ANTHROPIC_API_KEY`) and the Worker calls Claude itself.
 name = "rodemap"
 main = "worker/index.ts"
 compatibility_date = "2026-09-01"
@@ -17,8 +20,12 @@ not_found_handling = "single-page-application"
 run_worker_first = ["/api/*"]
 
 [vars]
-MOCHI_MODEL = "claude-opus-5-5"
+# Direct mode only; in relay mode the Supabase function chooses (RODEMAP_MOCHI_MODEL, default claude-haiku-5-5).
+MOCHI_MODEL = "claude-haiku-5-5"
 MOCHI_EFFORT = "low"
+MOCHI_RELAY_URL = "https://zanfzylebhprtkgdwvpd.supabase.co/functions/v1/rodemap-mochi"
+# The Supabase project's public anon key (safe to publish; the function checks a JWT, not a secret).
+MOCHI_RELAY_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphbmZ6eWxlYmhwcnRrZ2R3dnBkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0MDcxNDQsImV4cCI6MjEwNTk4MzE0NH0.WlU1vaP2DnyXToim9ux7cBnNxnhS_qzOvBmuVWJe4HU"
 
 # Optional: durable rate limits across isolates. Create a KV namespace, then uncomment.
 # [[kv_namespaces]]

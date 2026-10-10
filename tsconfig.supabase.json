@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.supabase.tsbuildinfo",
+    "lib": ["ES2023", "DOM"],
+    "types": []
+  },
+  "include": ["supabase/functions", "src/mochi/system-prompt.ts", "src/mochi/tools/schemas.ts", "src/mochi/protocol.ts", "src/mochi/server/*.ts"],
+  "exclude": ["src/mochi/server/*.test.ts"]
+}

@@ -65,25 +65,28 @@ describe('POST /api/mochi', () => {
     expect(long.status).toBe(413);
   });
 
-  it('relays to Claude with the fixed prompt, tools, fallbacks and returns the turn', async () => {
-    create.mockResolvedValue({ content: [{ type: 'text', text: 'Xin chào.' }], stop_reason: 'end_turn', model: 'claude-opus-5-5' });
+  it('relays to Claude Haiku 5.5 with the fixed prompt and tools, without a server-side fallback', async () => {
+    create.mockResolvedValue({ content: [{ type: 'text', text: 'Xin chào.' }], stop_reason: 'end_turn', model: 'claude-haiku-5-5' });
     const res = await call(valid(), { ANTHROPIC_API_KEY: 'k', MOCHI_EFFORT: 'medium' });
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ ok: true, content: [{ type: 'text', text: 'Xin chào.' }], stopReason: 'end_turn', model: 'claude-opus-5-5' });
+    expect(await res.json()).toEqual({ ok: true, content: [{ type: 'text', text: 'Xin chào.' }], stopReason: 'end_turn', model: 'claude-haiku-5-5' });
     const params = create.mock.calls[0]?.[0] as Record<string, unknown>;
-    expect(params.model).toBe('claude-opus-5-5');
-    expect(params.fallbacks).toBe('default');
-    expect(params.betas).toContain('server-side-fallback-2026-07-01');
+    expect(params.model).toBe('claude-haiku-5-5');
+    expect(params).not.toHaveProperty('fallbacks');
+    expect(params.betas).toEqual(['thinking-binding-controls-2026-08-01']);
+    expect(params.thinking).toEqual({ type: 'adaptive', block_binding: { prefix_mismatch_behavior: 'drop_block' } });
     expect(params.output_config).toEqual({ effort: 'medium' });
     expect(params.tool_choice).toEqual({ type: 'auto' });
     expect((params.tools as unknown[]).length).toBe(11);
   });
 
-  it('uses MOCHI_MODEL when set and low effort by default', async () => {
+  it('uses MOCHI_MODEL when set (with the fallback where the model has one) and low effort by default', async () => {
     create.mockResolvedValue({ content: [], stop_reason: 'end_turn', model: 'claude-sonnet-5-5' });
     await call(valid(), { ANTHROPIC_API_KEY: 'k', MOCHI_MODEL: ' claude-sonnet-5-5 ', MOCHI_EFFORT: 'extreme' });
     const params = create.mock.calls[0]?.[0] as Record<string, unknown>;
     expect(params.model).toBe('claude-sonnet-5-5');
+    expect(params.fallbacks).toBe('default');
+    expect(params.betas).toContain('server-side-fallback-2026-07-01');
     expect(params.output_config).toEqual({ effort: 'low' });
   });
 
@@ -126,5 +129,68 @@ describe('POST /api/mochi', () => {
     expect(res.status).toBe(status);
     expect((await res.json<{ error: string }>()).error).toBe(code);
     spy.mockRestore();
+  });
+});
+
+describe('POST /api/mochi through the Supabase relay', () => {
+  const RELAY = { MOCHI_RELAY_URL: 'https://relay.test/functions/v1/rodemap-mochi', MOCHI_RELAY_KEY: 'anon-key' };
+  const reply = (body: unknown, status = 200, headers: Record<string, string> = {}) =>
+    new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', ...headers } });
+
+  it('forwards the validated request with the anon key and the client address, then passes the turn through', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(reply({ ok: true, content: [{ type: 'text', text: 'Chào bạn.' }], stopReason: 'end_turn', model: 'claude-haiku-5-5' }));
+    vi.stubGlobal('fetch', fetchMock);
+    const res = await call(valid('relay-session-1'), RELAY);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ ok: true, content: [{ type: 'text', text: 'Chào bạn.' }], stopReason: 'end_turn', model: 'claude-haiku-5-5' });
+    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit & { headers: Record<string, string> }];
+    expect(url).toBe(RELAY.MOCHI_RELAY_URL);
+    expect(init.headers.authorization).toBe('Bearer anon-key');
+    expect(init.headers.apikey).toBe('anon-key');
+    expect(init.headers['x-rodemap-client-ip']).toMatch(/^10\.0\.0\.\d+$/);
+    expect(JSON.parse(init.body as string)).toEqual(valid('relay-session-1'));
+    expect(create).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
+  });
+
+  it('validates and rate-limits before forwarding', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(reply({ ok: true, content: [], stopReason: 'end_turn', model: 'm' }));
+    vi.stubGlobal('fetch', fetchMock);
+    expect((await call({ sessionId: 'x', messages: [] }, RELAY)).status).toBe(400);
+    let last: Response | undefined;
+    for (let i = 0; i < 41; i += 1) last = await call(valid('relay-same-session'), RELAY);
+    expect(last?.status).toBe(429);
+    expect(fetchMock).toHaveBeenCalledTimes(40);
+    vi.unstubAllGlobals();
+  });
+
+  it('passes relay errors through and maps broken or missing relays safely', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const cases: [Response | Error, number, string][] = [
+      [reply({ ok: false, error: 'rate_limited', retryAfterSeconds: 12 }, 429, { 'retry-after': '12' }), 429, 'rate_limited'],
+      [reply({ ok: false, error: 'offline' }, 503), 503, 'offline'],
+      [reply({ msg: 'Invalid JWT' }, 401), 503, 'offline'],
+      [reply({ message: 'Function not found' }, 404), 503, 'offline'],
+      [new Response('Internal error', { status: 500 }), 502, 'upstream'],
+      [new TypeError('fetch failed'), 502, 'upstream'],
+    ];
+    for (const [outcome, status, code] of cases) {
+      vi.stubGlobal('fetch', outcome instanceof Error ? vi.fn().mockRejectedValue(outcome) : vi.fn().mockResolvedValue(outcome));
+      const res = await call(valid(), RELAY);
+      expect(res.status, code).toBe(status);
+      expect((await res.json<{ error: string }>()).error).toBe(code);
+      if (code === 'rate_limited') expect(res.headers.get('retry-after')).toBe('12');
+    }
+    vi.unstubAllGlobals();
+    spy.mockRestore();
+  });
+
+  it('prefers a key set on the Worker over the relay', async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+    create.mockResolvedValue({ content: [], stop_reason: 'end_turn', model: 'claude-haiku-5-5' });
+    expect((await call(valid(), { ...RELAY, ANTHROPIC_API_KEY: 'k' })).status).toBe(200);
+    expect(fetchMock).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
   });
 });

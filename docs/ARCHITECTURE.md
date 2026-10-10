@@ -16,6 +16,8 @@ src/components/  atoms | molecules | organisms — presentational, props only.
 src/pages/       one file per screen; may read the store through hooks from src/state/hooks.ts.
 worker/          Cloudflare Worker entry (index.ts routes /api/*) and the Mochi handler (mochi.ts);
                  dist/ is served as the Worker's static assets (wrangler.toml).
+supabase/        Edge Function "rodemap-mochi" (Deno): Mochi's Claude relay holding the API key as a
+                 Supabase secret; bundled by scripts/build-supabase-function.ts (npm run build:supabase).
 scripts/         token lint, copy lint, size check, service-worker build plugin (sw-plugin.ts).
 tests/e2e        Playwright smoke, demo path, offline (service worker) + axe; tests/screens screenshots.
 ```
@@ -357,10 +359,14 @@ export function Link(props: AnchorHTMLAttributes & { to: string }): JSX.Element;
 ## Mochi (`src/mochi`)
 
 Tools run in the browser against app state; propose_* tools never mutate.
-Server handler `worker/mochi.ts` holds the system prompt + tool
-schemas (imported from `src/mochi/system-prompt.ts`, `src/mochi/tools/schemas.ts`)
-and the API key (`ANTHROPIC_API_KEY`), model from `MOCHI_MODEL`
-(default `claude-opus-5-5`). Eleven strict tools: search_events, get_event, get_club,
+`src/mochi/server/relay.ts` is the relay shared by both servers: body limits and validation,
+rate limits, the fixed system prompt + tool schemas (`src/mochi/system-prompt.ts`,
+`src/mochi/tools/schemas.ts`) and the Claude call; default model `claude-haiku-5-5` at effort
+`low` (no server-side refusal fallback on Haiku; `fallbacks: "default"` is sent only for models
+that support it). `worker/mochi.ts` calls Claude itself when the Worker has `ANTHROPIC_API_KEY`;
+otherwise it validates, rate-limits and forwards to `MOCHI_RELAY_URL`, the Supabase Edge Function
+`rodemap-mochi` (project secret `RODEMAP_ANTHROPIC_API_KEY` or `ANTHROPIC_API_KEY`, optional
+`RODEMAP_MOCHI_MODEL` / `RODEMAP_MOCHI_EFFORT`). Neither configured → `offline`. Eleven strict tools: search_events, get_event, get_club,
 recommend_events, check_conflicts, propose_registration, propose_calendar_plan,
 summarize_events, draft_portfolio_entry, export_calendar, list_news (published
 articles of the Bản tin Hội đồng Học sinh, shown as a `news` card). The offline

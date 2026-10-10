@@ -8,3 +8,4 @@ screenshots
 .wrangler
 .dev.vars
 .DS_Store
+dist-supabase
