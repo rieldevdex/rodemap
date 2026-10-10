@@ -54,19 +54,19 @@ export function ProposalPage() {
         <dl className="proposal__candidate">
           <div>
             <dt>Ứng cử viên</dt>
-            <dd>{CANDIDATE.name}</dd>
+            <dd>Nguyễn Thanh Lâm</dd>
           </div>
           <div>
             <dt>Lớp</dt>
-            <dd>{CANDIDATE.className}</dd>
+            <dd>12A1</dd>
           </div>
           <div>
             <dt>Vị trí ứng tuyển</dt>
-            <dd>{CANDIDATE.position}</dd>
+            <dd>Chủ Tịch</dd>
           </div>
           <div className="proposal__candidate-message">
             <dt>Thông điệp tranh cử</dt>
-            <dd>{CANDIDATE.message}</dd>
+            <dd>"Vì tương lai của bạn."</dd>
           </div>
         </dl>
         <div className="cluster no-print">
