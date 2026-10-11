@@ -148,9 +148,9 @@ export function ProposalPage() {
 
             <footer className="proposal__signature">
               <p className="proposal__label">Người đề xuất</p>
-              <p className="proposal__signature-name">{CANDIDATE.name}</p>
+              <p className="proposal__signature-name">Nguyễn Thanh Lâm</p>
               <p>
-                Lớp {CANDIDATE.className} · {SCHOOL.name}
+                Lớp 12A1 · {SCHOOL.name}
               </p>
             </footer>
           </article>
