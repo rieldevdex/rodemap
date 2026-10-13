@@ -7,7 +7,9 @@
  *   1. ANTHROPIC_API_KEY set on this Worker → the Worker calls the Claude API itself.
  *   2. Otherwise MOCHI_RELAY_URL → the Worker validates and rate-limits the request, then
  *      forwards it to the Supabase Edge Function "rodemap-mochi", which holds the key as a
- *      Supabase secret (supabase/functions/rodemap-mochi).
+ *      Supabase secret and enforces the weekly question quota (supabase/functions/rodemap-mochi).
+ *      Its answers (quota, scope, limit, resetsAt) are passed through unchanged.
+ *   Direct mode has no database, so only the short-term limits apply there.
  * With neither, the browser switches Mochi to its offline mode.
  *
  * Environment:

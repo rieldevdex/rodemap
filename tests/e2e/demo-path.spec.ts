@@ -191,6 +191,48 @@ test.describe('demo path', () => {
     expect(errors).toEqual([]);
   });
 
+  test('Mochi weekly quota (mocked API): remaining questions, then the weekly stop answers offline', async ({ page }) => {
+    const errors = trackErrors(page);
+    const resetsAt = '2099-01-05T00:00:00+07:00';
+    const bodies: { sessionId: string }[] = [];
+    await page.route('**/api/mochi', async (route) => {
+      bodies.push(JSON.parse(route.request().postData() ?? '{}') as { sessionId: string });
+      const response: MochiResponse =
+        bodies.length === 1
+          ? { ok: true, model: 'test', stopReason: 'end_turn', content: [{ type: 'text', text: 'Mochi đã ghi nhận câu hỏi của bạn.' }], quota: { remaining: 1, limit: 20, resetsAt } }
+          : { ok: false, error: 'rate_limited', scope: 'weekly_browser', limit: 20, retryAfterSeconds: 3600, resetsAt };
+      await route.fulfill({ status: bodies.length === 1 ? 200 : 429, contentType: 'application/json', body: JSON.stringify(response) });
+    });
+    await seedDemo(page);
+    await page.goto('/tong-quan');
+    await page.getByRole('button', { name: 'Hỏi Mochi' }).click();
+    const field = page.getByRole('textbox', { name: 'Nội dung gửi Mochi' });
+    await field.fill('Lịch của tôi tuần này');
+    await page.getByRole('button', { name: 'Gửi' }).click();
+    await expect(page.getByText('Mochi đã ghi nhận câu hỏi của bạn.')).toBeVisible();
+    await expect(page.getByText('Còn 1/20 câu hỏi trong tuần này')).toBeVisible();
+    await expect(field).toHaveAccessibleDescription(/Còn 1\/20 câu hỏi trong tuần này/);
+
+    await field.fill('Gợi ý sự kiện tuần tới');
+    await page.getByRole('button', { name: 'Gửi' }).click();
+    const notice = page.getByText('Bạn đã sử dụng hết 20 câu hỏi dành cho Mochi trong tuần này', { exact: false });
+    await expect(notice).toBeVisible();
+    await expect(page.getByText('Đã sử dụng hết 20 câu hỏi trong tuần này')).toBeVisible();
+    await expect(page.getByText('Chế độ ngoại tuyến', { exact: true })).toBeVisible();
+
+    // Until Monday the browser answers offline without asking the server, and explains it only once.
+    await field.fill('Tóm tắt tuần này');
+    await page.getByRole('button', { name: 'Gửi' }).click();
+    await expect(page.locator('.mochi-panel__who', { hasText: 'ngoại tuyến' })).toHaveCount(2);
+    expect(bodies).toHaveLength(2);
+    await expect(notice).toHaveCount(1);
+    // The same random id is used for every request and kept in this browser.
+    expect(bodies[1]?.sessionId).toBe(bodies[0]?.sessionId);
+    expect(await page.evaluate(() => window.localStorage.getItem('rodemap:mochi-id'))).toBe(bodies[0]?.sessionId);
+    // The browser itself logs the refused (429) request; nothing else may fail.
+    expect(errors.filter((e) => !e.includes('status of 429'))).toEqual([]);
+  });
+
   test('Mochi offline: the rule-based mode proposes the registration and waits for Xác nhận', async ({ page }) => {
     if (!target) throw new Error('Sample data has no open October event for the demo student');
     const errors = trackErrors(page);

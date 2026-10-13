@@ -66,7 +66,7 @@ export const PROPOSAL_SECTIONS: ProposalSection[] = [
     paragraphs: [
       'Rodemap được phát triển dưới dạng ứng dụng web, có thể truy cập trên máy tính và điện thoại mà không cần cài đặt. Bản trình diễn hiện tại đã có đầy đủ các chức năng chính, vận hành với dữ liệu minh họa, qua đó chứng minh tính khả thi về mặt kỹ thuật.',
       'Danh sách câu lạc bộ và lịch sự kiện được tiếp nhận từ Phòng Công tác Học sinh; thông tin các cuộc thi học thuật ngoài trường do Phòng Cố vấn Học tập cập nhật trực tiếp trên Rodemap. Việc vận hành cần thêm ba nhóm nguồn lực: nhóm học sinh phụ trách kỹ thuật thuộc Hội đồng Học sinh; đại diện các câu lạc bộ phụ trách cập nhật sự kiện phát sinh; và thành viên Hội đồng Học sinh phụ trách kiểm duyệt. Hạ tầng lưu trữ sử dụng dịch vụ có gói miễn phí phù hợp với quy mô một trường học.',
-      'Trợ lý Mochi sử dụng dịch vụ trí tuệ nhân tạo có tính phí theo lượt sử dụng. Khi chưa có kinh phí được phê duyệt, Mochi hoạt động ở chế độ ngoại tuyến với các phản hồi được chuẩn bị sẵn; mọi chức năng tổng hợp, lộ trình và hồ sơ năng lực vẫn hoạt động đầy đủ.',
+      'Trợ lý Mochi sử dụng dịch vụ trí tuệ nhân tạo có tính phí theo lượt sử dụng. Để kiểm soát chi phí, mỗi trình duyệt được hỏi Mochi 20 câu mỗi tuần và toàn trường tối đa 500 câu mỗi tuần; khi hết lượt hoặc khi chưa có kinh phí được phê duyệt, Mochi hoạt động ở chế độ ngoại tuyến với các phản hồi được chuẩn bị sẵn, còn mọi chức năng tổng hợp, lộ trình và hồ sơ năng lực vẫn hoạt động đầy đủ.',
     ],
   },
   {
@@ -76,7 +76,7 @@ export const PROPOSAL_SECTIONS: ProposalSection[] = [
     paragraphs: [
       'Rodemap áp dụng nguyên tắc thu thập tối thiểu: hồ sơ học sinh chỉ gồm khối, lớp, lĩnh vực quan tâm, mục tiêu trong năm học và thời gian có thể tham gia. Nền tảng không thu thập số điện thoại, địa chỉ, thông tin sức khỏe hay thông tin tài chính.',
       'Trong bản trình diễn, toàn bộ dữ liệu được lưu trên thiết bị của người dùng và có thể xóa bằng chức năng khôi phục dữ liệu minh họa. Khi triển khai chính thức, phương án tài khoản và lưu trữ sẽ được trình Ban Giám hiệu phê duyệt và tuân thủ quy định pháp luật hiện hành về bảo vệ dữ liệu cá nhân.',
-      'Mochi không lưu nội dung trò chuyện, không yêu cầu thông tin cá nhân nhạy cảm và được hướng dẫn từ chối các chủ đề ngoài phạm vi hoạt động của nhà trường.',
+      'Mochi không lưu nội dung trò chuyện, không yêu cầu thông tin cá nhân nhạy cảm và được hướng dẫn từ chối các chủ đề ngoài phạm vi hoạt động của nhà trường. Để tính số câu hỏi mỗi tuần, máy chủ chỉ lưu mã băm của một mã ngẫu nhiên do trình duyệt tạo ra, không gắn với học sinh.',
     ],
   },
   {

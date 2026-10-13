@@ -422,7 +422,23 @@ rate limits, the fixed system prompt + tool schemas (`src/mochi/system-prompt.ts
 that support it). `worker/mochi.ts` calls Claude itself when the Worker has `ANTHROPIC_API_KEY`;
 otherwise it validates, rate-limits and forwards to `MOCHI_RELAY_URL`, the Supabase Edge Function
 `rodemap-mochi` (project secret `RODEMAP_ANTHROPIC_API_KEY` or `ANTHROPIC_API_KEY`, optional
-`RODEMAP_MOCHI_MODEL` / `RODEMAP_MOCHI_EFFORT`). Neither configured → `offline`. Eleven strict tools: search_events, get_event, get_club,
+`RODEMAP_MOCHI_MODEL` / `RODEMAP_MOCHI_EFFORT`). Neither configured → `offline`.
+
+Limits (`src/mochi/protocol.ts`): short-term windows of 40 requests / 10 min per browser id and
+400 per address (a school can share one address), in memory or in the optional KV namespace; and,
+in the Supabase function only, a weekly quota (`src/mochi/server/quota.ts`): 20 questions per
+browser and 500 for the site per ISO week in Asia/Ho_Chi_Minh, at most 5 requests per question
+(tool round-trips), counted by `public.rodemap_mochi_take` over `rodemap.mochi_usage`
+(`supabase/migrations/`) with the service role. Only SHA-256 of the browser id is stored. If the
+count cannot be checked the request is refused (`upstream`), never let through. Answers carry
+`quota: { remaining, limit, resetsAt }`; a refusal is `rate_limited` with `scope`
+(`burst` | `weekly_browser` | `weekly_total`), `limit` and `resetsAt`. The browser keeps its id in
+localStorage (`mochiBrowserId` in `src/state/effects.ts`), shows the remaining questions and, after
+a weekly refusal, answers offline until `resetsAt` (`src/mochi/quota-notice.ts`). The Worker's
+direct mode (`ANTHROPIC_API_KEY` on the Worker) has no database and applies only the short-term
+limits.
+
+Eleven strict tools: search_events, get_event, get_club,
 recommend_events, check_conflicts, propose_registration, propose_calendar_plan,
 summarize_events, draft_portfolio_entry, export_calendar, list_news (published
 articles of the Bản tin Hội đồng Học sinh, shown as a `news` card). The offline

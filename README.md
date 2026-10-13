@@ -47,7 +47,13 @@ Rodemap được triển khai dưới dạng một Cloudflare Worker kèm tài n
 4. Khóa API Claude được lưu trong Supabase: Edge Function `rodemap-mochi` (thư mục `supabase/functions/rodemap-mochi`) đọc secret `RODEMAP_ANTHROPIC_API_KEY`, hoặc `ANTHROPIC_API_KEY` dùng chung của dự án, và sử dụng mô hình Claude Haiku 5.5 (`claude-haiku-5-5`). Worker chuyển tiếp `/api/mochi` tới địa chỉ `MOCHI_RELAY_URL` khai báo trong `wrangler.toml`; không cần khai báo khóa trên Cloudflare. Để cập nhật Edge Function sau khi thay đổi mã Mochi, thực hiện `npm run build:supabase` rồi triển khai tệp `dist-supabase/rodemap-mochi/index.ts` làm `index.ts` của function (Supabase CLI hoặc trang quản trị, bật kiểm tra JWT). Tùy chọn: khai báo secret `RODEMAP_MOCHI_MODEL` hoặc `RODEMAP_MOCHI_EFFORT` (`low`, `medium`, `high`; mặc định `low`) trong Supabase để thay đổi mô hình hoặc mức suy luận; khai báo secret `ANTHROPIC_API_KEY` trực tiếp trên Worker nếu muốn Worker gọi Claude mà không qua Supabase.
 5. Triển khai. Khóa API chỉ nằm trên máy chủ và không bao giờ được gửi tới trình duyệt.
 
-Tùy chọn: để giới hạn tần suất truy cập Mochi một cách bền vững giữa các máy chủ, tạo một KV namespace và gắn với tên `MOCHI_RATE_LIMIT` (xem `wrangler.toml`).
+**Giới hạn câu hỏi của Mochi.** Mỗi trình duyệt được hỏi Mochi 20 câu mỗi tuần, toàn bộ Rodemap tối đa 500 câu mỗi tuần; tuần tính từ 00:00 Thứ Hai đến hết Chủ nhật (giờ Việt Nam). Một câu hỏi là một tin nhắn của học sinh; các lượt Mochi tra cứu dữ liệu sau đó không bị tính thêm nhưng được giới hạn tối đa năm lượt cho mỗi câu hỏi. Khi hết lượt, Mochi thông báo cho học sinh và tiếp tục trả lời ở chế độ ngoại tuyến đến 00:00 Thứ Hai tuần sau; phía dưới ô nhập hiển thị số câu hỏi còn lại trong tuần.
+- Bộ đếm nằm trong cơ sở dữ liệu Supabase: bảng `rodemap.mochi_usage` và hàm `public.rodemap_mochi_take` (tệp `supabase/migrations/20261013120000_rodemap_mochi_usage.sql`). Bảng chỉ lưu mã băm SHA-256 của một mã ngẫu nhiên do trình duyệt tạo ra cùng số lượt theo tuần; không lưu địa chỉ IP hay thông tin của học sinh. Có thể xóa các tuần cũ bằng lệnh ghi trong tệp migration.
+- Đổi giới hạn bằng secret `RODEMAP_MOCHI_WEEKLY_PER_BROWSER` và `RODEMAP_MOCHI_WEEKLY_TOTAL` của Edge Function, không cần sửa mã.
+- Nếu không kiểm tra được bộ đếm, Mochi từ chối yêu cầu thay vì bỏ qua giới hạn.
+- Nên đặt thêm giới hạn chi tiêu hằng tháng cho workspace chứa khóa API trong Claude Console để chặn chi phí ở mức tài khoản.
+
+Ngoài ra, mỗi trình duyệt được gửi tối đa 40 yêu cầu và mỗi địa chỉ mạng tối đa 400 yêu cầu trong 10 phút, nhằm tránh gửi dồn dập mà không chặn cả lớp dùng chung mạng của trường. Tùy chọn: để giới hạn ngắn hạn này bền vững giữa các máy chủ của Worker, tạo một KV namespace và gắn với tên `MOCHI_RATE_LIMIT` (xem `wrangler.toml`). Khi Worker gọi Claude trực tiếp (secret `ANTHROPIC_API_KEY` trên Worker), chỉ có giới hạn ngắn hạn được áp dụng.
 
 ## 4. Chuẩn bị trước Ngày bầu cử
 
