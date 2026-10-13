@@ -5,6 +5,15 @@
   padding-block-start: var(--space-3);
 }
 
+.explore__external {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.explore__external a {
+  color: var(--color-ink);
+}
+
 /* ── Layout: rail + results on desktop, results only below 1080 ─── */
 
 .explore {

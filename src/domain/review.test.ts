@@ -492,6 +492,7 @@ describe('review: buildIcs (RFC 5545)', () => {
   const clubs: Club[] = [
     {
       id: 'tranh-bien',
+      kind: 'club',
       slug: 'tranh-bien',
       name: 'Câu lạc bộ Tranh biện và Hùng biện Tiếng Việt, khối Trung học phổ thông',
       shortName: 'CLB Tranh biện',

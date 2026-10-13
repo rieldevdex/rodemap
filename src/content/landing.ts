@@ -67,7 +67,7 @@ export const PARTICIPATION: ParticipantStep[] = [
     id: 'cau-lac-bo',
     actor: 'Câu lạc bộ',
     title: 'Gửi sự kiện',
-    body: 'Đại diện câu lạc bộ điền biểu mẫu sự kiện với thời gian, địa điểm, đối tượng và hạn đăng ký; hệ thống kiểm tra tính hợp lệ trước khi gửi.',
+    body: 'Đại diện câu lạc bộ điền biểu mẫu sự kiện với thời gian, địa điểm, đối tượng và hạn đăng ký; hệ thống kiểm tra tính hợp lệ trước khi gửi. Phòng Cố vấn Học tập cập nhật các cuộc thi học thuật ngoài trường theo cùng quy trình, kèm tên đơn vị tổ chức.',
   },
   {
     id: 'hdhs',

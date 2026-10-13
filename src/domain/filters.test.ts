@@ -10,6 +10,7 @@ const now = toMillis('2026-10-14T09:00:00+07:00');
 const clubs: Club[] = [
   {
     id: 'tranh-bien',
+    kind: 'club',
     slug: 'tranh-bien',
     name: 'Câu lạc bộ Tranh biện',
     shortName: 'CLB Tranh biện',
@@ -19,6 +20,7 @@ const clubs: Club[] = [
   },
   {
     id: 'robot',
+    kind: 'club',
     slug: 'robot',
     name: 'Câu lạc bộ Kỹ thuật Robot',
     shortName: 'CLB Robot',
@@ -235,6 +237,22 @@ describe('filterEvents: query', () => {
   it('ignores a blank query and returns nothing for no match', () => {
     expect(search('   ')).toEqual(['q-speaking', 'q-coding', 'q-reading']);
     expect(search('thiên văn')).toEqual([]);
+  });
+
+  it('matches the organiser of an external competition and "cuộc thi ngoài trường"', () => {
+    const essay = makeEvent({
+      id: 'q-essay',
+      title: 'Cuộc thi Viết luận',
+      summary: 'Học sinh viết bài luận theo đề của ban tổ chức.',
+      clubId: 'khong-ton-tai',
+      organizer: 'Trường đại học đối tác',
+      start: '2026-10-18T08:00:00+07:00',
+      end: '2026-10-18T10:00:00+07:00',
+    });
+    const all = [...events, essay];
+    expect(ids(filterEvents(all, { query: 'dai hoc doi tac' }, ctx))).toEqual(['q-essay']);
+    expect(ids(filterEvents(all, { query: 'ngoài trường' }, ctx))).toEqual(['q-essay']);
+    expect(search('ngoai truong')).toEqual([]);
   });
 });
 

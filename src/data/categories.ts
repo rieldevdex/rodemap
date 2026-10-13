@@ -5,7 +5,8 @@ const CATEGORY_BY_CODE: Record<CategoryCode, Category> = {
   HT: {
     code: 'HT',
     name: 'Học thuật',
-    description: 'Các buổi chuyên đề, cuộc thi và hoạt động ôn luyện nhằm nâng cao kiến thức và phương pháp học tập.',
+    description:
+      'Các buổi chuyên đề, cuộc thi và hoạt động ôn luyện nhằm nâng cao kiến thức và phương pháp học tập, cùng các cuộc thi học thuật ngoài trường do Phòng Cố vấn Học tập cập nhật.',
   },
   NT: {
     code: 'NT',

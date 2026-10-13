@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { addDays, formatDate, formatTime, isoWeekKey, overlaps, SCHOOL_YEAR, toMillis, vnParts } from '../domain/dates';
-import { AFTER_SCHOOL_MINUTE, eventEnd, eventHours, eventStart, isOpenToAll } from '../domain/events';
-import { applyReview, canTransition, charCount } from '../domain/moderation';
+import { AFTER_SCHOOL_MINUTE, eventEnd, eventHours, eventStart, isExternalCompetition, isOpenToAll } from '../domain/events';
+import { applyReview, canTransition, charCount, validateDraft } from '../domain/moderation';
 import { NEWS_LIMITS, newsBodyText, publishedPosts, RESERVED_NEWS_SLUGS } from '../domain/news';
 import { hasContactDetails, responseError, validateActivityDraft, validateCollaborationDraft } from '../domain/proposals';
 import { CATEGORY_CODES, GRADES, NEWS_CATEGORIES, type EventStatus, type NewsPost, type SchoolEvent, type Submission } from '../domain/types';
@@ -227,11 +227,34 @@ describe('tags and goals', () => {
 });
 
 describe('clubs', () => {
-  it('has exactly 14 clubs with unique ids and ASCII slugs', () => {
-    expect(CLUBS).toHaveLength(14);
+  it('has exactly 15 publishers (13 clubs, the council, one office) with unique ids and ASCII slugs', () => {
+    expect(CLUBS).toHaveLength(15);
     expect(isUnique(CLUBS.map((c) => c.id))).toBe(true);
     expect(isUnique(CLUBS.map((c) => c.slug))).toBe(true);
     for (const c of CLUBS) expect(c.slug, c.id).toMatch(SLUG);
+    expect(CLUBS.filter((c) => c.kind === 'club')).toHaveLength(13);
+    expect(CLUBS.filter((c) => c.kind !== 'club').map((c) => [c.id, c.kind])).toEqual([
+      ['hdhs', 'council'],
+      ['co-van-hoc-tap', 'office'],
+    ]);
+  });
+
+  it('includes Phòng Cố vấn Học tập, which publishes the external academic competitions', () => {
+    expect(clubById.get('co-van-hoc-tap')).toMatchObject({
+      kind: 'office',
+      slug: 'phong-co-van-hoc-tap',
+      name: 'Phòng Cố vấn Học tập',
+      shortName: 'Phòng Cố vấn Học tập',
+      categories: ['HT'],
+      contact: '[Email Phòng Cố vấn Học tập]',
+    });
+    const description = clubById.get('co-van-hoc-tap')?.description ?? '';
+    for (const words of ['cuộc thi học thuật ngoài trường', 'thể lệ', 'hạn đăng ký', 'hồ sơ dự thi']) expect(description).toContain(words);
+    // "Phòng Cố vấn Học tập" is always spelled exactly like that.
+    for (const { path, text } of collectStrings({ CLUBS, EVENTS, CATEGORIES }, 'data', [])) {
+      const mentions = text.match(/phòng cố vấn học tập/giu) ?? [];
+      for (const m of mentions) expect(m, path).toBe('Phòng Cố vấn Học tập');
+    }
   });
 
   it('includes Inkstep as the one real club, without invented product features', () => {
@@ -285,23 +308,30 @@ describe('calendar periods', () => {
 });
 
 describe('events: shape and integrity', () => {
-  it('has 45 approved events and 5 in moderation (3 pending, 1 changes requested, 1 rejected)', () => {
-    expect(EVENTS).toHaveLength(50);
-    expect(approved).toHaveLength(45);
+  it('has 45 approved club events, 5 in moderation (3 pending, 1 changes requested, 1 rejected) and 4 external competitions', () => {
+    expect(EVENTS).toHaveLength(54);
+    expect(approved).toHaveLength(49);
     const count = (s: EventStatus) => EVENTS.filter((e) => e.status === s).length;
     expect(count('pending')).toBe(3);
     expect(count('changes_requested')).toBe(1);
     expect(count('rejected')).toBe(1);
     expect(count('draft')).toBe(0);
+    expect(EVENTS.filter((e) => isExternalCompetition(e))).toHaveLength(4);
   });
 
-  it('uses ids ev-001 … ev-050 (approved ones first, in chronological order) and unique ASCII slugs', () => {
-    expect(EVENTS.map((e) => e.id)).toEqual(Array.from({ length: 50 }, (_, i) => `ev-${String(i + 1).padStart(3, '0')}`));
-    expect(EVENTS.slice(0, 45).every((e) => e.status === 'approved')).toBe(true);
-    approved.slice(1).forEach((e, i) => {
-      const prev = approved[i]!;
-      expect(eventStart(prev) <= eventStart(e), `${prev.id} before ${e.id}`).toBe(true);
-    });
+  it('uses ids ev-001 … ev-054 (approved club events, moderation, external competitions; each run chronological) and unique ASCII slugs', () => {
+    expect(EVENTS.map((e) => e.id)).toEqual(Array.from({ length: 54 }, (_, i) => `ev-${String(i + 1).padStart(3, '0')}`));
+    const clubApproved = EVENTS.slice(0, 45);
+    const external = EVENTS.slice(50);
+    expect(clubApproved.every((e) => e.status === 'approved' && !isExternalCompetition(e))).toBe(true);
+    expect(EVENTS.slice(45, 50).every((e) => e.status !== 'approved' && !isExternalCompetition(e))).toBe(true);
+    expect(external.every((e) => e.status === 'approved' && isExternalCompetition(e))).toBe(true);
+    for (const run of [clubApproved, external]) {
+      run.slice(1).forEach((e, i) => {
+        const prev = run[i]!;
+        expect(eventStart(prev) <= eventStart(e), `${prev.id} before ${e.id}`).toBe(true);
+      });
+    }
     expect(isUnique(EVENTS.map((e) => e.slug))).toBe(true);
     for (const e of EVENTS) {
       expect(e.slug, e.id).toMatch(SLUG);
@@ -470,6 +500,53 @@ describe('events: distribution for the demo', () => {
     const inkstep = approved.filter((e) => e.clubId === 'inkstep');
     expect(inkstep.length).toBeGreaterThanOrEqual(3);
     expect(inkstep.some((e) => e.title === 'Buổi chia sẻ: Quy trình phát triển sản phẩm Eighthundred')).toBe(true);
+  });
+});
+
+describe('events: external academic competitions', () => {
+  const external = EVENTS.filter((e) => isExternalCompetition(e));
+  const office = clubById.get('co-van-hoc-tap');
+
+  it('are published only by Phòng Cố vấn Học tập, and every event it publishes names its organiser', () => {
+    expect(external.length).toBeGreaterThanOrEqual(3);
+    for (const e of external) expect(clubById.get(e.clubId)?.kind, e.id).toBe('office');
+    for (const e of EVENTS.filter((ev) => ev.clubId === office?.id)) expect(isExternalCompetition(e), e.id).toBe(true);
+    for (const e of EVENTS.filter((ev) => clubById.get(ev.clubId)?.kind !== 'office')) expect(e.organizer, e.id).toBeUndefined();
+  });
+
+  it('are approved, upcoming on the demo date and spread from October 2026 to March 2027', () => {
+    for (const e of external) {
+      expect(e.status, e.id).toBe('approved');
+      expect(startsIn(e, '2026-10-08', '2027-04-01'), e.id).toBe(true);
+      expect(ms(e.registrationDeadline) > DEMO_TODAY, e.id).toBe(true);
+      expect(e.seatsTaken < e.capacity, e.id).toBe(true);
+    }
+    expect(external.some((e) => startsIn(e, '2026-10-01', '2026-11-01'))).toBe(true);
+    expect(external.some((e) => startsIn(e, '2027-01-01', '2027-04-01'))).toBe(true);
+    // Mostly upper secondary, with one for lower secondary.
+    expect(external.filter((e) => e.eligibleGrades.every((g) => g >= 10)).length).toBeGreaterThanOrEqual(2);
+    expect(external.some((e) => e.eligibleGrades.every((g) => g <= 9))).toBe(true);
+  });
+
+  it('name a generic organiser (never a real organisation or competition brand)', () => {
+    const REAL = /RMIT|Quốc gia|Bộ Giáo dục|Sở Giáo dục|Olympia|ISEF|Business Idea/iu;
+    for (const e of external) {
+      expect(e.organizer, e.id).toMatch(/đối tác|cấp thành phố/u);
+      for (const { path, text } of collectStrings(e, e.id, [])) expect(REAL.test(text), path).toBe(false);
+    }
+  });
+
+  it('pass the submission rules and say how Phòng Cố vấn Học tập supports the students who register', () => {
+    for (const e of external) {
+      // An event carries every field of the submission form.
+      expect(validateDraft(e, DEMO_TODAY), e.id).toEqual({});
+      expect(e.summary.startsWith('Cuộc thi ngoài trường'), e.id).toBe(true);
+      for (const words of ['Phòng Cố vấn Học tập cập nhật thông tin cuộc thi trên Rodemap', 'sau khi học sinh đăng ký trên Rodemap', 'tổng hợp danh sách', 'hướng dẫn học sinh']) {
+        expect(e.description, e.id).toContain(words);
+      }
+      expect(e.description, e.id).toContain(e.organizer === 'Ban tổ chức cuộc thi cấp thành phố' ? 'ban tổ chức cấp thành phố' : e.organizer);
+    }
+    expect(categoryByCode('HT').description).toContain('cuộc thi học thuật ngoài trường do Phòng Cố vấn Học tập cập nhật');
   });
 });
 

@@ -146,6 +146,9 @@ export function isDeadlinePassed(e: SchoolEvent, now: Millis): boolean;
 export function isPast(e: SchoolEvent, now: Millis): boolean;  // end <= now
 export function isEligible(e: SchoolEvent, grade: Grade | null): boolean; // null grade → true
 export function isOpenToAll(grades): boolean;                   // every grade 6–12 (toàn trường)
+export const EXTERNAL_COMPETITION_LABEL = 'Cuộc thi ngoài trường';
+export function isExternalCompetition(e): e is … & { organizer: string }; // non-blank `organizer` = organised outside the school
+export function publisherLine(e, publisherName): string;       // "CLB Tranh biện" / "Phòng Cố vấn Học tập · Đơn vị tổ chức: Trường đại học đối tác"
 export function formatGrades(grades): string;                   // "6–12", "8–12", "11, 12" (runs of 3+ as ranges)
 export function gradesLabel(grades): string;                    // "Khối 6–12 (toàn trường)", "Khối 10–12"
 export function deadlineDaysLeft(e: SchoolEvent, now: Millis): number; // calendar days, negative if passed
@@ -163,7 +166,8 @@ export interface EventFilter {
   deadline?: 'any' | 'open' | 'closing_7_days'; includePast?: boolean;
 }
 export function filterEvents(events, filter, ctx: { now: Millis; regs: Registration[]; clubs: Club[] }): SchoolEvent[];
-//   query matches title, summary, location, tags (ids), club name/shortName (folded).
+//   query matches title, summary, location, tags (ids), club name/shortName (folded); for an external
+//   competition also its organizer and "Cuộc thi ngoài trường".
 //   grades: event eligible for ANY selected grade. default excludes past events.
 export function windowRange(window: DateWindow, now: Millis): { from: Millis; to: Millis } | null;
 export function countActiveFilters(filter: EventFilter): number;
@@ -230,7 +234,8 @@ export function timeToPos(t: Millis, input: Pick<RouteLayoutInput, 'range'|'pxPe
 export function buildIcs(events: SchoolEvent[], opts: { now: Millis; clubs: Club[]; calendarName?: string; baseUrl?: string }): string;
 //   RFC 5545: CRLF, lines folded at 75 octets (UTF-8 safe), TEXT escaping (\\ \; \, \n), VTIMEZONE
 //   Asia/Ho_Chi_Minh (+0700, no DST), DTSTART/DTEND;TZID=Asia/Ho_Chi_Minh, UID `${event.id}@rodemap.app`
-//   (stable), DTSTAMP from opts.now in UTC, SUMMARY, LOCATION, DESCRIPTION (summary + club + url),
+//   (stable), DTSTAMP from opts.now in UTC, SUMMARY, LOCATION, DESCRIPTION (summary + club + url; an external
+//   competition gives "Đơn vị tổ chức: <organizer>" then "Nguồn thông tin: <publisher>"),
 //   CATEGORIES (category name), URL when baseUrl given. PRODID "-//Rodemap//Ban trinh dien//VI".
 export function icsFileName(now: Millis): string; // "rodemap-lich-ca-nhan-2026-10-14.ics"
 
@@ -245,12 +250,19 @@ export function groupByCategory(entries: PortfolioEntry[]): { category: Category
 export function entryFromEvent(e: SchoolEvent, opts: { id: string; now: Millis }): PortfolioEntry; // role "Thành viên tham gia", hours = eventHours, empty reflection
 export function pendingAttendance(events: SchoolEvent[], regs: Registration[], entries: PortfolioEntry[], now: Millis): SchoolEvent[]; // past + registered (not attended/absent)
 export function attendedWithoutEntry(events, regs, entries): SchoolEvent[];
-export function portfolioJson(entries: PortfolioEntry[], events: SchoolEvent[], clubs: Club[], profile: Profile | null, now: Millis): object; // export shape, version 1, no personal data beyond grade/class
+export function portfolioJson(entries: PortfolioEntry[], events: SchoolEvent[], clubs: Club[], profile: Profile | null, now: Millis): object; // export shape, version 1, no personal data beyond grade/class; event.organizer for external competitions
+
+// clubs.ts — publisher kinds
+export const CLUB_KIND_LABELS: Record<ClubKind, string>;      // Câu lạc bộ, Tổ chức đại diện học sinh, Đơn vị của nhà trường
+export function isStudentClub(club): boolean;                 // kind 'club'
+export function studentClubs(clubs): Club[];                  // the only ones named in Đề xuất (proposal club, collaboration partner)
+export function publisherFactLabel(kind | undefined, external): string; // Câu lạc bộ phụ trách / Đơn vị phụ trách / Nguồn thông tin
 
 // moderation.ts
 export type ValidationErrors = Partial<Record<keyof EventDraft, string>>; // formal Vietnamese messages
 export function validateDraft(d: EventDraft, now: Millis): ValidationErrors;
-//   title 8–120 chars; summary 40–400; description ≥ 80; start < end; end − start ≤ 12 h unless multi-day ok (≤ 3 days);
+//   title 8–120 chars; summary 40–400; description ≥ 80; organizer (only when present) 3–120;
+//   start < end; end − start ≤ 12 h unless multi-day ok (≤ 3 days);
 //   registrationDeadline ≤ start and > now; capacity 1–2000; eligibleGrades non-empty; location non-empty;
 //   start within SCHOOL_YEAR.
 export function applyReview(sub: Submission, status: EventStatus, action: ReviewAction, at: IsoDateTime, reason?: string): { submission: Submission; status: EventStatus };
@@ -267,14 +279,31 @@ export function charCount(s: string): number;   // graphemes after trim (Intl.Se
 categories.ts   export const CATEGORIES: Category[]; export function categoryByCode(c): Category
 tags.ts         export const TAGS: Tag[]; export function tagLabel(id): string
 goals.ts        export const GOALS: Goal[]
-clubs.ts        export const CLUBS: Club[]           // 14, incl. Inkstep (id 'inkstep')
-events.ts       export const EVENTS: SchoolEvent[]    // ~45 approved + 4–6 pending/changes_requested/rejected
+clubs.ts        export const CLUBS: Club[]           // 15: HĐHS ('council'), Phòng Cố vấn Học tập ('office', id 'co-van-hoc-tap'),
+                                                     //     13 clubs ('club') incl. Inkstep (id 'inkstep')
+events.ts       export const EVENTS: SchoolEvent[]    // 45 approved club events, 5 pending/changes_requested/rejected,
+                                                     //     4 approved external competitions (ev-051 … ev-054)
 calendar.ts     export const PERIODS: CalendarPeriod[]
 seed.ts         export const SEED_PROFILE: Profile; SEED_REGISTRATIONS; SEED_PORTFOLIO; SEED_SUBMISSIONS
 news.ts         export const NEWS: NewsPost[]; NEWS_DEPARTMENTS   // council articles (one scheduled), signed by a department
 school.ts       export const SCHOOL = { name: 'Vinschool Smart City', schoolYear: '2026–2027' }
 proposals.ts    export const ACTIVITY_PROPOSALS; COLLABORATIONS; PROPOSAL_RESPONSES // anonymous (grade only) student proposals, club collaborations, sample answers
 ```
+
+Publishers and external competitions (`src/domain/types.ts`):
+
+```ts
+export type ClubKind = 'club' | 'council' | 'office';
+interface Club { …; kind: ClubKind }           // every CLUBS entry is a publisher; only 'club' takes part in Đề xuất
+interface SchoolEvent { …; organizer?: string } // external organiser → "Cuộc thi ngoài trường"; clubId is the relaying office
+type EventDraft = Omit<SchoolEvent, 'id' | 'slug' | 'status' | 'seatsTaken'>; // carries organizer only from Phòng Cố vấn Học tập
+```
+
+Phòng Cố vấn Học tập (`co-van-hoc-tap`, kind `office`) publishes the external academic competitions
+it used to post on its Google Site: every event it publishes names its `organizer`, and only an
+office publishes events with an organizer (`data.test.ts`). The event page shows the tag, "Đơn vị tổ
+chức" and "Nguồn thông tin"; cards and lists add the organiser to the publisher (`publisherLine`).
+In Cổng câu lạc bộ the office's form adds the required field "Đơn vị tổ chức".
 
 ## State (`src/state`)
 
@@ -398,3 +427,9 @@ recommend_events, check_conflicts, propose_registration, propose_calendar_plan,
 summarize_events, draft_portfolio_entry, export_calendar, list_news (published
 articles of the Bản tin Hội đồng Học sinh, shown as a `news` card). The offline
 engine answers the same intents, including `news`.
+
+Event results (search_events, get_event, summarize_events, recommend_events…, all built by
+`eventBrief`) carry `external_competition: true`, `organizer` and `information_source`
+(Phòng Cố vấn Học tập) for an external competition; the snapshot's candidate events carry the flag
+and the organiser. The system prompt tells Mochi to name the organiser and the source, and the
+offline engine does the same.

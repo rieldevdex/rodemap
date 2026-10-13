@@ -7,7 +7,7 @@ import { ConfirmDialog } from '../components/molecules/ConfirmDialog';
 import { PageHead } from '../components/molecules/PageHead';
 import { ACTION_LABELS, STATUS_LABELS } from '../content/moderation';
 import { formatDate, formatLongDate, formatTime, formatTimeRange, toIsoDateTime, toMillis } from '../domain/dates';
-import { gradesLabel } from '../domain/events';
+import { EXTERNAL_COMPETITION_LABEL, gradesLabel, isExternalCompetition } from '../domain/events';
 import type { ModerationDecision } from '../state/actions';
 import { Link } from '../router';
 import { selectAllEvents, selectModerationQueue, selectPendingActivityCount } from '../state/selectors';
@@ -145,6 +145,14 @@ export function ModerationPage() {
                         </h3>
                       </header>
                       <dl className="moderation__facts">
+                        {isExternalCompetition(event) ? (
+                          <div>
+                            <dt>Đơn vị tổ chức</dt>
+                            <dd>
+                              {event.organizer} ({EXTERNAL_COMPETITION_LABEL.toLocaleLowerCase('vi')})
+                            </dd>
+                          </div>
+                        ) : null}
                         <div>
                           <dt>Thời gian</dt>
                           <dd>

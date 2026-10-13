@@ -8,6 +8,11 @@ export type DraftErrors = Partial<Record<keyof EventDraft, string>>;
 
 export interface EventSubmissionFormProps {
   clubId: string;
+  /**
+   * The publisher relays external competitions (Phòng Cố vấn Học tập): ask for the external
+   * organiser ("Đơn vị tổ chức") and send it as `organizer`. Clubs never see this field.
+   */
+  askOrganizer?: boolean;
   defaultCategory: CategoryCode;
   tags: Tag[];
   /** Values to start from (resubmission); dates as IsoDateTime with +07:00. */
@@ -30,6 +35,7 @@ function fromLocalInput(value: string): string {
 
 const FIELD_ORDER: (keyof EventDraft)[] = [
   'title',
+  'organizer',
   'category',
   'format',
   'start',
@@ -43,10 +49,20 @@ const FIELD_ORDER: (keyof EventDraft)[] = [
 ];
 
 /** The club's event submission form, validated before it is sent to HĐHS. */
-export function EventSubmissionForm({ clubId, defaultCategory, tags, initial, submitLabel, onSubmit, onCancel }: EventSubmissionFormProps) {
+export function EventSubmissionForm({
+  clubId,
+  askOrganizer = false,
+  defaultCategory,
+  tags,
+  initial,
+  submitLabel,
+  onSubmit,
+  onCancel,
+}: EventSubmissionFormProps) {
   const uid = useId();
   const summaryRef = useRef<HTMLDivElement>(null);
   const [title, setTitle] = useState(initial?.title ?? '');
+  const [organizer, setOrganizer] = useState(initial?.organizer ?? '');
   const [category, setCategory] = useState<CategoryCode>(initial?.category ?? defaultCategory);
   const [format, setFormat] = useState<EventFormat>(initial?.format ?? 'in_person');
   const [start, setStart] = useState(toLocalInput(initial?.start));
@@ -72,6 +88,7 @@ export function EventSubmissionForm({ clubId, defaultCategory, tags, initial, su
 
   const reset = () => {
     setTitle('');
+    setOrganizer('');
     setCategory(defaultCategory);
     setFormat('in_person');
     setStart('');
@@ -90,6 +107,7 @@ export function EventSubmissionForm({ clubId, defaultCategory, tags, initial, su
     const draft: EventDraft = {
       title: title.trim(),
       clubId,
+      ...(askOrganizer ? { organizer: organizer.trim() } : {}),
       category,
       format,
       start: fromLocalInput(start),
@@ -140,6 +158,26 @@ export function EventSubmissionForm({ clubId, defaultCategory, tags, initial, su
         <input id={id('title')} value={title} aria-invalid={errors.title ? true : undefined} aria-describedby={describedBy('title')} onChange={(e) => { setTitle(e.target.value); }} />
         {errorText('title')}
       </div>
+
+      {askOrganizer ? (
+        <div className="submission-form__field">
+          <label htmlFor={id('organizer')}>Đơn vị tổ chức</label>
+          <input
+            id={id('organizer')}
+            value={organizer}
+            aria-required="true"
+            aria-invalid={errors.organizer ? true : undefined}
+            aria-describedby={describedBy('organizer', id('organizer-hint'))}
+            onChange={(e) => {
+              setOrganizer(e.target.value);
+            }}
+          />
+          <span id={id('organizer-hint')} className="submission-form__hint">
+            Đơn vị ngoài trường tổ chức cuộc thi, ví dụ: Trường đại học đối tác. Thông tin bắt buộc đối với cuộc thi ngoài trường.
+          </span>
+          {errorText('organizer')}
+        </div>
+      ) : null}
 
       <div className="submission-form__grid">
         <div className="submission-form__field">

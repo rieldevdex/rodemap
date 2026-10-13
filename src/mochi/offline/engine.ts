@@ -5,7 +5,7 @@
  */
 import { CATEGORY_LABELS } from '../../domain/category-labels';
 import { addDays, formatDate, formatLongDate, formatTimeRange, toIsoDate } from '../../domain/dates';
-import { eventEnd, eventStart, isPast } from '../../domain/events';
+import { eventEnd, eventStart, isExternalCompetition, isPast } from '../../domain/events';
 import { windowRange, type DateWindow } from '../../domain/filters';
 import { groupByCategory, totalHours } from '../../domain/portfolio';
 import { NEWS_CATEGORY_LABELS } from '../../domain/news';
@@ -269,6 +269,8 @@ function eventQuestionReply(text: string, ctx: OfflineContext): OfflineReply {
   }
   const d = executeTool('get_event', { event_id: event.id }, ctx).result as {
     club: string;
+    organizer?: string;
+    information_source?: string;
     date: string;
     time: string;
     location: string;
@@ -280,12 +282,20 @@ function eventQuestionReply(text: string, ctx: OfflineContext): OfflineReply {
     summary: string;
     conflicts_with_plan: { title: string }[];
   };
+  // An external competition is organised outside the school; its publisher (Phòng Cố vấn Học tập) only relays it.
+  const who = d.organizer === undefined ? `do ${d.club} tổ chức` : `là cuộc thi ngoài trường do ${d.organizer} tổ chức, diễn ra`;
   const parts = [
-    `“${event.title}” do ${d.club} tổ chức vào ${d.date}, ${d.time}, ${event.format === 'online' ? `theo hình thức trực tuyến (${d.location.replace(/^Trực tuyến\s*[–-]\s*/, '')})` : `tại ${d.location}`}. Sự kiện dành cho ${d.eligible_grades.toLocaleLowerCase('vi')}${
+    `“${event.title}” ${who} vào ${d.date}, ${d.time}, ${event.format === 'online' ? `theo hình thức trực tuyến (${d.location.replace(/^Trực tuyến\s*[–-]\s*/, '')})` : `tại ${d.location}`}. Sự kiện dành cho ${d.eligible_grades.toLocaleLowerCase('vi')}${
       isPast(event, ctx.now) ? '' : d.seats_left > 0 ? `; hiện còn ${String(d.seats_left)} chỗ; hạn đăng ký: ${d.registration_deadline}` : '; hiện đã hết chỗ'
     }. Trạng thái: ${d.status.toLocaleLowerCase('vi')}.`,
     d.summary,
   ];
+  if (d.organizer !== undefined) {
+    const source = d.information_source ?? d.club;
+    parts.push(
+      `Thông tin cuộc thi do ${source} cập nhật trên Rodemap. Sau khi bạn đăng ký trên Rodemap, ${source} tổng hợp danh sách và hướng dẫn các bước nộp hồ sơ theo quy định của đơn vị tổ chức.`,
+    );
+  }
   if (d.conflicts_with_plan.length > 0) parts.push(`Lưu ý: sự kiện trùng thời gian với ${d.conflicts_with_plan.map((c) => `“${c.title}”`).join(', ')} trong lịch của bạn.`);
   if (d.status === 'Còn chỗ') parts.push('Nếu bạn muốn tham gia, vui lòng nhập “Đăng ký sự kiện này” để Mochi chuẩn bị thẻ xác nhận.');
   return { intent: 'event_question', text: parts.join('\n\n'), cards: [{ kind: 'events', title: 'Sự kiện', eventIds: [event.id] }], focusEventId: event.id };
@@ -296,7 +306,8 @@ export function offlineDraft(e: SchoolEvent): string {
   const topics = e.tags.slice(0, 2).map((t) => lowerFirst(tagLabel(t)));
   const topicText = topics.length > 0 ? `về ${topics.join(' và ')}` : 'thêm về lĩnh vực này';
   const scope = e.category === 'TS' ? 'hoạt động chung của toàn trường' : `hoạt động thuộc lĩnh vực ${CATEGORY_LABELS[e.category].toLocaleLowerCase('vi')}`;
-  return `Tôi đã tham gia ${e.title} do ${clubName(e.clubId)} tổ chức vào ngày ${formatDate(eventStart(e))}. Thông qua ${scope}, tôi có điều kiện tìm hiểu ${topicText}. [Bổ sung: vai trò cụ thể của bạn, điều bạn học được và kế hoạch tiếp theo.]`;
+  const organizer = isExternalCompetition(e) ? e.organizer : clubName(e.clubId);
+  return `Tôi đã tham gia ${e.title} do ${organizer} tổ chức vào ngày ${formatDate(eventStart(e))}. Thông qua ${scope}, tôi có điều kiện tìm hiểu ${topicText}. [Bổ sung: vai trò cụ thể của bạn, điều bạn học được và kế hoạch tiếp theo.]`;
 }
 
 function portfolioReply(text: string, ctx: OfflineContext): OfflineReply {

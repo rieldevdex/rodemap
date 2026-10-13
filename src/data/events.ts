@@ -5,6 +5,9 @@ import type { SchoolEvent } from '../domain/types';
  * ev-001 … ev-045: approved events in chronological order (05/09/2026 – 22/05/2027).
  * ev-046 … ev-050: club submissions still in moderation (3 pending, 1 changes_requested, 1 rejected);
  * their histories live in SEED_SUBMISSIONS (src/data/seed.ts).
+ * ev-051 … ev-054: approved external academic competitions ("Cuộc thi ngoài trường") in
+ * chronological order, published by Phòng Cố vấn Học tập (clubId 'co-van-hoc-tap') with the
+ * external `organizer` named. Organisers and competitions are generic placeholders.
  */
 export const EVENTS: SchoolEvent[] = [
   /* ── Tháng 9/2026 ─────────────────────────────────────────────────── */
@@ -1067,5 +1070,95 @@ export const EVENTS: SchoolEvent[] = [
       'Các vận động viên thi đấu nội dung đơn và đôi theo thể thức loại trực tiếp, mỗi trận một ván hai mươi mốt điểm. Câu lạc bộ cung cấp cầu thi đấu, bố trí trọng tài và tổng hợp kết quả trên bảng tin của câu lạc bộ.',
     tags: ['the-chat', 'thi-dau'],
     status: 'rejected',
+  },
+
+  /* ── Cuộc thi ngoài trường do Phòng Cố vấn Học tập cập nhật ────────── */
+  {
+    id: 'ev-051',
+    slug: 'cuoc-thi-y-tuong-kinh-doanh-thpt-vong-so-loai',
+    title: 'Cuộc thi Ý tưởng kinh doanh dành cho học sinh trung học phổ thông: Vòng sơ loại trực tuyến',
+    clubId: 'co-van-hoc-tap',
+    organizer: 'Trường đại học đối tác',
+    category: 'HT',
+    format: 'online',
+    start: '2026-10-31T08:00:00+07:00',
+    end: '2026-10-31T11:30:00+07:00',
+    location: 'Trực tuyến – Nền tảng của ban tổ chức',
+    eligibleGrades: [10, 11, 12],
+    capacity: 90,
+    seatsTaken: 41,
+    registrationDeadline: '2026-10-25T23:59:00+07:00',
+    summary:
+      'Cuộc thi ngoài trường dành cho các nhóm học sinh trung học phổ thông có ý tưởng kinh doanh gắn với nhu cầu của cộng đồng. Tại vòng sơ loại trực tuyến, mỗi nhóm trình bày ý tưởng trong năm phút và nhận nhận xét của ban giám khảo do đơn vị tổ chức mời.',
+    description:
+      'Cuộc thi do Trường đại học đối tác tổ chức, gồm vòng sơ loại trực tuyến, vòng bán kết và vòng chung kết tại cơ sở của đơn vị tổ chức. Mỗi nhóm gồm từ hai đến bốn học sinh, nộp bản mô tả ý tưởng theo mẫu của ban tổ chức trước vòng sơ loại. Phòng Cố vấn Học tập cập nhật thông tin cuộc thi trên Rodemap; sau khi học sinh đăng ký trên Rodemap, Phòng tổng hợp danh sách và hướng dẫn học sinh hoàn thiện hồ sơ dự thi theo các bước của ban tổ chức.',
+    tags: ['khoi-nghiep', 'thuyet-trinh', 'lam-viec-nhom'],
+    status: 'approved',
+  },
+  {
+    id: 'ev-052',
+    slug: 'cuoc-thi-toan-va-khoa-hoc-tu-nhien-thcs',
+    title: 'Cuộc thi Toán và Khoa học tự nhiên dành cho học sinh trung học cơ sở',
+    clubId: 'co-van-hoc-tap',
+    organizer: 'Ban tổ chức cuộc thi cấp thành phố',
+    category: 'HT',
+    format: 'in_person',
+    start: '2026-12-13T08:00:00+07:00',
+    end: '2026-12-13T11:00:00+07:00',
+    location: 'Địa điểm do ban tổ chức thông báo',
+    eligibleGrades: [6, 7, 8, 9],
+    capacity: 120,
+    seatsTaken: 58,
+    registrationDeadline: '2026-12-07T23:59:00+07:00',
+    summary:
+      'Cuộc thi ngoài trường dành cho học sinh trung học cơ sở yêu thích Toán và các môn Khoa học tự nhiên. Học sinh làm bài thi cá nhân gồm phần trắc nghiệm và phần tự luận, qua đó rèn luyện tư duy giải quyết vấn đề và làm quen với môi trường thi đấu học thuật bên ngoài nhà trường.',
+    description:
+      'Cuộc thi do ban tổ chức cấp thành phố triển khai, bài thi gồm hai phần Toán và Khoa học tự nhiên với thời gian làm bài một trăm hai mươi phút. Địa điểm thi cụ thể được ban tổ chức thông báo tới từng thí sinh sau khi hồ sơ được xác nhận. Phòng Cố vấn Học tập cập nhật thông tin cuộc thi trên Rodemap; sau khi học sinh đăng ký trên Rodemap, Phòng tổng hợp danh sách, hoàn thiện hồ sơ đăng ký chung của nhà trường và hướng dẫn học sinh các bước tiếp theo theo quy định của ban tổ chức.',
+    tags: ['hoc-thuat', 'thi-dau'],
+    status: 'approved',
+  },
+  {
+    id: 'ev-053',
+    slug: 'cuoc-thi-nghien-cuu-khoa-hoc-thpt-vong-trinh-bay',
+    title: 'Cuộc thi Nghiên cứu khoa học dành cho học sinh trung học phổ thông: Vòng trình bày đề tài',
+    clubId: 'co-van-hoc-tap',
+    organizer: 'Viện nghiên cứu đối tác',
+    category: 'HT',
+    format: 'in_person',
+    start: '2027-01-23T08:00:00+07:00',
+    end: '2027-01-23T16:30:00+07:00',
+    location: 'Địa điểm do ban tổ chức thông báo',
+    eligibleGrades: [10, 11, 12],
+    capacity: 40,
+    seatsTaken: 15,
+    registrationDeadline: '2027-01-18T23:59:00+07:00',
+    summary:
+      'Cuộc thi ngoài trường dành cho học sinh trung học phổ thông đã có đề tài nghiên cứu khoa học cá nhân hoặc theo nhóm. Tại vòng trình bày, học sinh báo cáo kết quả nghiên cứu trước hội đồng chuyên môn và nhận góp ý để hoàn thiện đề tài.',
+    description:
+      'Cuộc thi do Viện nghiên cứu đối tác tổ chức, tiếp nhận đề tài thuộc các lĩnh vực khoa học tự nhiên, khoa học xã hội và kỹ thuật. Mỗi đề tài được trình bày trong mười phút, sau đó hội đồng chuyên môn đặt câu hỏi và nhận xét; học sinh chuẩn bị báo cáo tóm tắt và áp phích theo mẫu của ban tổ chức. Phòng Cố vấn Học tập cập nhật thông tin cuộc thi trên Rodemap; sau khi học sinh đăng ký trên Rodemap, Phòng tổng hợp danh sách, rà soát hồ sơ đề tài và hướng dẫn học sinh nộp hồ sơ theo các bước của ban tổ chức.',
+    tags: ['nghien-cuu', 'hoc-thuat', 'thuyet-trinh'],
+    status: 'approved',
+  },
+  {
+    id: 'ev-054',
+    slug: 'cuoc-thi-viet-luan-hoc-thuat-bang-tieng-anh-thpt',
+    title: 'Cuộc thi Viết luận học thuật bằng tiếng Anh dành cho học sinh trung học phổ thông',
+    clubId: 'co-van-hoc-tap',
+    organizer: 'Trường đại học đối tác',
+    category: 'HT',
+    format: 'online',
+    start: '2027-03-13T08:30:00+07:00',
+    end: '2027-03-13T11:00:00+07:00',
+    location: 'Trực tuyến – Nền tảng thi của ban tổ chức',
+    eligibleGrades: [10, 11, 12],
+    capacity: 150,
+    seatsTaken: 46,
+    registrationDeadline: '2027-03-08T23:59:00+07:00',
+    summary:
+      'Cuộc thi ngoài trường đánh giá năng lực lập luận và trình bày quan điểm bằng tiếng Anh theo văn phong học thuật, dành cho học sinh trung học phổ thông. Học sinh viết một bài luận theo đề do ban tổ chức công bố tại buổi thi trực tuyến.',
+    description:
+      'Cuộc thi do Trường đại học đối tác tổ chức; thí sinh có một trăm hai mươi phút để hoàn thành bài luận từ năm trăm đến bảy trăm từ trên nền tảng thi của ban tổ chức. Bài thi được chấm theo các tiêu chí lập luận, cấu trúc, sử dụng nguồn tham khảo và ngôn ngữ; kết quả được đơn vị tổ chức công bố sau bốn tuần. Phòng Cố vấn Học tập cập nhật thông tin cuộc thi trên Rodemap; sau khi học sinh đăng ký trên Rodemap, Phòng tổng hợp danh sách và hướng dẫn học sinh tạo tài khoản dự thi, kiểm tra thiết bị theo các bước của ban tổ chức.',
+    tags: ['tieng-anh', 'hoc-thuat', 'du-hoc'],
+    status: 'approved',
   },
 ];

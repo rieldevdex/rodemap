@@ -16,7 +16,7 @@ import { findConflicts } from '../domain/conflicts';
 import { deadlineDaysLeft, registrationState, seatsLeft } from '../domain/events';
 import { countActiveFilters, filterEvents, type FilterContext } from '../domain/filters';
 import { GRADES, type SchoolEvent } from '../domain/types';
-import { pathFor } from '../router';
+import { Link, pathFor } from '../router';
 import { selectUpcomingMine } from '../state/selectors';
 import { useCatalog } from '../state/useCatalog';
 import { EventRegistration } from './connected/EventRegistration';
@@ -24,6 +24,7 @@ import {
   activeFilters,
   DEADLINE_CHOICES,
   DEFAULT_EXPLORE_FILTER,
+  explorePath,
   FORMAT_CHOICES,
   QUERY_MAX_LENGTH,
   WINDOW_CHOICES,
@@ -69,6 +70,9 @@ function OpenRoute() {
   );
 }
 
+/** Offices that relay external competitions (Phòng Cố vấn Học tập): one link filters the list to them. */
+const OFFICE_IDS = CLUBS.filter((c) => c.kind === 'office').map((c) => c.id);
+
 const VIEW_LABELS: Record<ExploreView, { full: string; short: string }> = {
   grid: { full: 'Dạng lưới', short: 'Lưới' },
   list: { full: 'Dạng danh sách', short: 'Danh sách' },
@@ -109,6 +113,11 @@ export function ExplorePage() {
 
   const chips = activeFilters(filter, { categoryName: (code) => categoryByCode(code).name, clubName });
   const railActive = countActiveFilters({ ...filter, query: '' });
+  // The list already shows only the external competitions (the office filter and nothing else).
+  const officeOnly =
+    countActiveFilters(filter) === 1 &&
+    filter.clubIds.length === OFFICE_IDS.length &&
+    OFFICE_IDS.every((id) => filter.clubIds.includes(id));
   const anyActive = chips.length > 0;
 
   // ?tim=1 (Ctrl K / ⌘K, header search): focus the field after the router has placed focus
@@ -203,6 +212,14 @@ export function ExplorePage() {
           value={filter.query}
           onChange={explore.setQuery}
         />
+        {OFFICE_IDS.length > 0 ? (
+          <p className="explore__external">
+            Cuộc thi học thuật ngoài trường do Phòng Cố vấn Học tập cập nhật:{' '}
+            <Link to={explorePath(pathFor('explore'), { ...DEFAULT_EXPLORE_FILTER, clubIds: OFFICE_IDS }, view)} aria-current={officeOnly ? 'true' : false}>
+              Xem cuộc thi ngoài trường
+            </Link>
+          </p>
+        ) : null}
       </PageHead>
 
       <div className="explore">

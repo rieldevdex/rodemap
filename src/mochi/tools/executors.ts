@@ -26,6 +26,7 @@ import {
   findRegistration,
   formatGrades,
   gradesLabel,
+  isExternalCompetition,
   isPast,
   registrationState,
   seatsLeft,
@@ -99,6 +100,15 @@ function budgetOf(state: AppState): number {
   return state.profile?.weeklyHourBudget ?? DEFAULT_WEEKLY_HOUR_BUDGET;
 }
 
+/**
+ * For an external competition ("Cuộc thi ngoài trường"): the flag, the external organiser and the
+ * information source (the publisher, Phòng Cố vấn Học tập). Nothing for a school event.
+ */
+function externalFacts(e: SchoolEvent): { external_competition?: true; organizer?: string; information_source?: string } {
+  if (!isExternalCompetition(e)) return {};
+  return { external_competition: true, organizer: e.organizer, information_source: clubOf(e.clubId)?.shortName ?? e.clubId };
+}
+
 /** Compact, already formatted facts about one event (dates in Vietnamese conventions). */
 export function eventBrief(e: SchoolEvent, ctx: ToolContext) {
   const start = eventStart(e);
@@ -109,6 +119,7 @@ export function eventBrief(e: SchoolEvent, ctx: ToolContext) {
     category: e.category,
     category_name: CATEGORY_LABELS[e.category],
     club: clubOf(e.clubId)?.name ?? e.clubId,
+    ...externalFacts(e),
     date: formatLongDate(start),
     time: formatTimeRange(start, eventEnd(e)),
     location: e.location,

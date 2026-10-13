@@ -24,6 +24,7 @@ const octets = (s: string): number => encoder.encode(s).length;
 const clubs: Club[] = [
   {
     id: 'tranh-bien',
+    kind: 'club',
     slug: 'tranh-bien',
     name: 'Câu lạc bộ Tranh biện',
     shortName: 'CLB Tranh biện',
@@ -124,6 +125,14 @@ describe('eventUrl / eventDetails', () => {
     );
     expect(eventDetails(later, clubs)).toBe(later.summary);
     expect(eventDetails(later, clubs, '')).toBe(later.summary);
+  });
+
+  it('names the organiser of an external competition and gives the publisher as the source', () => {
+    const external = { ...debate, organizer: 'Trường đại học đối tác' };
+    expect(eventDetails(external, clubs)).toBe(
+      [debate.summary, 'Đơn vị tổ chức: Trường đại học đối tác', 'Nguồn thông tin: Câu lạc bộ Tranh biện'].join('\n'),
+    );
+    expect(eventDetails({ ...external, clubId: 'khong-ton-tai' }, clubs)).toBe([debate.summary, 'Đơn vị tổ chức: Trường đại học đối tác'].join('\n'));
   });
 });
 

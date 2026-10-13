@@ -49,7 +49,18 @@ export function buildSnapshot(state: AppState, now: Millis, full: boolean): stri
       .slice(0, CANDIDATES)
       .map((e) => {
         const b = eventBrief(e, ctx);
-        return { id: b.id, title: b.title, category: b.category, club: b.club, date: b.date, time: b.time, seats_left: b.seats_left, registration_deadline: b.registration_deadline, status: b.status };
+        return {
+          id: b.id,
+          title: b.title,
+          category: b.category,
+          club: b.club,
+          ...(b.organizer === undefined ? {} : { external_competition: true, organizer: b.organizer }),
+          date: b.date,
+          time: b.time,
+          seats_left: b.seats_left,
+          registration_deadline: b.registration_deadline,
+          status: b.status,
+        };
       });
   }
   let json = JSON.stringify(data);

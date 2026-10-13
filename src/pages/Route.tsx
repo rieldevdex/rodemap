@@ -23,7 +23,7 @@ import {
   toIsoDate,
   toMillis,
 } from '../domain/dates';
-import { deadlineDaysLeft, isPast, registrationState, seatsLeft } from '../domain/events';
+import { deadlineDaysLeft, isPast, publisherLine, registrationState, seatsLeft } from '../domain/events';
 import { layoutRoute, type Orientation, type RouteLayoutInput } from '../domain/route-layout';
 import { formatHours } from '../domain/text';
 import { CATEGORY_CODES, type CalendarPeriod, type CategoryCode, type SchoolEvent } from '../domain/types';
@@ -336,7 +336,7 @@ export function RoutePage() {
 
   const rows: RouteListRow[] = shown.map((e) => ({
     event: e,
-    clubName: clubName(e.clubId),
+    clubName: publisherLine(e, clubName(e.clubId)),
     status: facts(e).status,
     mine: mineSet.has(e.id),
     conflict: conflictIds.has(e.id),

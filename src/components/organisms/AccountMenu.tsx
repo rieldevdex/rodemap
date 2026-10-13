@@ -185,7 +185,7 @@ export function AccountMenu() {
           {state.role === 'club' ? (
             <div className="account-menu__section">
               <label className="account-menu__label" htmlFor={clubId}>
-                Câu lạc bộ đại diện
+                Đơn vị đại diện
               </label>
               <select
                 id={clubId}

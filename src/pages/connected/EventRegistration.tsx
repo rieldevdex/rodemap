@@ -1,4 +1,5 @@
 import { RegistrationControl } from '../../components/organisms/RegistrationControl';
+import { publisherLine } from '../../domain/events';
 import { useRegistration } from '../../state/useRegistration';
 
 /** Connects RegistrationControl to the store for one event. */
@@ -8,7 +9,7 @@ export function EventRegistration({ eventId, size = 'md' }: { eventId: string; s
   return (
     <RegistrationControl
       event={info.event}
-      clubName={info.club?.shortName ?? ''}
+      clubName={publisherLine(info.event, info.club?.shortName ?? '')}
       state={info.state}
       seatsLeft={info.seatsLeft}
       conflicts={info.conflicts}

@@ -36,6 +36,7 @@ const entry = (overrides: Partial<PortfolioEntry> = {}): PortfolioEntry => {
 const clubs: Club[] = [
   {
     id: 'tranh-bien',
+    kind: 'club',
     slug: 'tranh-bien',
     name: 'Câu lạc bộ Tranh biện',
     shortName: 'CLB Tranh biện',
@@ -173,5 +174,17 @@ describe('portfolioJson', () => {
 
   it('serialises to JSON without loss', () => {
     expect(JSON.parse(JSON.stringify(json))).toEqual(json);
+  });
+
+  it('names the organiser of an external competition', () => {
+    const competition = past('ev-x', '10', { title: 'Cuộc thi Viết luận', organizer: 'Trường đại học đối tác' });
+    const out = portfolioJson([entry({ id: 'pe-x', eventId: 'ev-x' })], [competition], clubs, null, now);
+    expect(out.entries[0]?.event).toEqual({
+      title: 'Cuộc thi Viết luận',
+      club: 'Câu lạc bộ Tranh biện',
+      organizer: 'Trường đại học đối tác',
+      category: 'HT',
+      date: '2026-10-10',
+    });
   });
 });

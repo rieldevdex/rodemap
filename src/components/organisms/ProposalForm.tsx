@@ -1,5 +1,6 @@
 import { useId, useRef, useState, type ReactNode } from 'react';
 import { CATEGORY_LABELS } from '../../domain/category-labels';
+import { studentClubs } from '../../domain/clubs';
 import { charCount } from '../../domain/moderation';
 import { PROPOSAL_LIMITS, proposalMonthLabel, type ActivityDraftErrors, type CollaborationDraftErrors } from '../../domain/proposals';
 import {
@@ -76,7 +77,7 @@ const L = PROPOSAL_LIMITS;
 const ACTIVITY_FIELDS = ['title', 'category', 'grades', 'clubId', 'description'] as const satisfies readonly (keyof ActivityProposalDraft)[];
 
 export interface ActivityProposalFormProps {
-  /** Clubs a student may name as the organiser (optional field). */
+  /** Clubs a student may name as the organiser (optional field); only student clubs are offered. */
   clubs: readonly Club[];
   /** The student's own grade, ticked by default. */
   defaultGrades: readonly Grade[];
@@ -141,7 +142,7 @@ export function ActivityProposalForm({ clubs, defaultGrades, onSubmit }: Activit
           <label htmlFor={f.id('clubId')}>Câu lạc bộ phù hợp (không bắt buộc)</label>
           <select id={f.id('clubId')} value={clubId} aria-invalid={f.invalid('clubId')} aria-describedby={f.describedBy('clubId')} onChange={(e) => { setClubId(e.target.value); }}>
             <option value="">Chưa xác định</option>
-            {clubs.map((c) => (
+            {studentClubs(clubs).map((c) => (
               <option key={c.id} value={c.id}>
                 {c.shortName}
               </option>
@@ -216,6 +217,7 @@ const COLLABORATION_FIELDS = ['toClubId', 'title', 'category', 'month', 'descrip
 export interface CollaborationFormProps {
   /** The sending club (never offered as its own partner). */
   fromClub: Club;
+  /** Possible partners; only student clubs are offered. */
   clubs: readonly Club[];
   /** Months left in the school year: "2026-10", "2026-11"… */
   months: readonly string[];
@@ -226,7 +228,7 @@ export interface CollaborationFormProps {
 /** A club's proposal to organise an activity together with another club. */
 export function CollaborationForm({ fromClub, clubs, months, onSubmit }: CollaborationFormProps) {
   const f = useFormErrors(COLLABORATION_FIELDS);
-  const partners = clubs.filter((c) => c.id !== fromClub.id);
+  const partners = studentClubs(clubs).filter((c) => c.id !== fromClub.id);
   const [toClubId, setToClubId] = useState('');
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<CategoryCode | ''>('');

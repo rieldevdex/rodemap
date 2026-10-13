@@ -56,6 +56,11 @@
   color: var(--color-ink-2);
 }
 
+.station-card__organizer {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
 .station-card__summary {
   font-size: var(--text-sm);
 }
