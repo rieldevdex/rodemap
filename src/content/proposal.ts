@@ -1,6 +1,6 @@
 /**
  * Nội dung trang Đề án (/de-an). Văn phong đề án gửi Phòng Công tác Học sinh.
- * Các ô trong ngoặc vuông là phần ứng cử viên tự điền; không chứa số liệu ước đoán.
+ * Thông tin ứng cử viên và thời gian các giai đoạn do ứng cử viên cung cấp; không chứa số liệu ước đoán.
  */
 
 export interface ProposalSection {
@@ -52,7 +52,7 @@ export const PROPOSAL_SECTIONS: ProposalSection[] = [
       'Mochi là trợ lý đồng hành, hỗ trợ học sinh lựa chọn sự kiện phù hợp, đăng ký tham gia và sắp xếp lịch cá nhân, qua đó góp phần nâng cao hiệu quả tham gia hoạt động ngoại khóa. Mọi thao tác đăng ký đều cần học sinh xác nhận; Mochi chỉ sử dụng dữ liệu của Rodemap và không tự tạo thông tin.',
     ],
     bullets: [
-      'Tổng hợp: một nguồn thông tin duy nhất cho toàn bộ sự kiện đã được Hội đồng Học sinh phê duyệt.',
+      'Tổng hợp: một nguồn thông tin duy nhất cho sự kiện của các câu lạc bộ và Hội đồng Học sinh, cùng các cuộc thi học thuật ngoài trường do Phòng Cố vấn Học tập cập nhật.',
       'Phân loại: bảy lĩnh vực, mỗi lĩnh vực có mã hai chữ cái và màu tuyến riêng; bộ lọc theo câu lạc bộ, khối, thời gian, hình thức và hạn đăng ký.',
       'Lộ trình: dòng thời gian toàn năm học, phát hiện trùng lịch, quỹ giờ mỗi tuần, xuất lịch định dạng .ics và liên kết Google Calendar.',
       'Hồ sơ năng lực: tổng hợp hoạt động đã tham gia theo lĩnh vực, kèm vai trò, số giờ, phần tự đánh giá và minh chứng; hỗ trợ in trên khổ A4.',
@@ -65,7 +65,7 @@ export const PROPOSAL_SECTIONS: ProposalSection[] = [
     title: 'Nguồn lực và tính khả thi',
     paragraphs: [
       'Rodemap được phát triển dưới dạng ứng dụng web, có thể truy cập trên máy tính và điện thoại mà không cần cài đặt. Bản trình diễn hiện tại đã có đầy đủ các chức năng chính, vận hành với dữ liệu minh họa, qua đó chứng minh tính khả thi về mặt kỹ thuật.',
-      'Việc vận hành cần ba nhóm nguồn lực: nhóm học sinh phụ trách kỹ thuật thuộc Hội đồng Học sinh; đại diện các câu lạc bộ phụ trách cập nhật sự kiện; và thành viên Hội đồng Học sinh phụ trách kiểm duyệt. Hạ tầng lưu trữ sử dụng dịch vụ có gói miễn phí phù hợp với quy mô một trường học.',
+      'Danh sách câu lạc bộ và lịch sự kiện được tiếp nhận từ Phòng Công tác Học sinh; thông tin các cuộc thi học thuật ngoài trường do Phòng Cố vấn Học tập cập nhật trực tiếp trên Rodemap. Việc vận hành cần thêm ba nhóm nguồn lực: nhóm học sinh phụ trách kỹ thuật thuộc Hội đồng Học sinh; đại diện các câu lạc bộ phụ trách cập nhật sự kiện phát sinh; và thành viên Hội đồng Học sinh phụ trách kiểm duyệt. Hạ tầng lưu trữ sử dụng dịch vụ có gói miễn phí phù hợp với quy mô một trường học.',
       'Trợ lý Mochi sử dụng dịch vụ trí tuệ nhân tạo có tính phí theo lượt sử dụng. Khi chưa có kinh phí được phê duyệt, Mochi hoạt động ở chế độ ngoại tuyến với các phản hồi được chuẩn bị sẵn; mọi chức năng tổng hợp, lộ trình và hồ sơ năng lực vẫn hoạt động đầy đủ.',
     ],
   },
@@ -94,32 +94,25 @@ export const PROPOSAL_PHASES: ProposalPhase[] = [
   {
     id: 'giai-doan-1',
     label: 'Giai đoạn 1',
-    title: 'Thí điểm với một số câu lạc bộ',
-    timing: '[thời gian dự kiến]',
+    title: 'Triển khai toàn trường',
+    timing: 'Tháng 11–12/2026',
     goals: [
-      'Lựa chọn một số câu lạc bộ đăng ký tham gia thí điểm.',
-      'Hướng dẫn đại diện câu lạc bộ gửi sự kiện và Hội đồng Học sinh kiểm duyệt.',
-      'Thu thập ý kiến phản hồi của học sinh về mức độ thuận tiện khi sử dụng.',
+      'Tiếp nhận danh sách câu lạc bộ và lịch sự kiện từ Phòng Công tác Học sinh để cập nhật lên Rodemap.',
+      'Phối hợp với Phòng Cố vấn Học tập cập nhật thông tin các cuộc thi học thuật ngoài trường trên Rodemap.',
+      'Hướng dẫn đại diện câu lạc bộ gửi sự kiện; hoàn thiện quy trình kiểm duyệt và quy chế đăng tải sự kiện.',
+      'Tổ chức buổi giới thiệu nền tảng cho học sinh các khối và thu thập ý kiến phản hồi về mức độ thuận tiện khi sử dụng.',
     ],
-    outputs: ['Danh sách sự kiện của các câu lạc bộ thí điểm được cập nhật trên Rodemap.', 'Báo cáo đánh giá thí điểm.'],
+    outputs: [
+      'Rodemap trở thành kênh tổng hợp sự kiện chính thức của Hội đồng Học sinh.',
+      'Quy chế đăng tải và kiểm duyệt sự kiện.',
+      'Báo cáo tổng hợp ý kiến phản hồi của học sinh.',
+    ],
   },
   {
     id: 'giai-doan-2',
     label: 'Giai đoạn 2',
-    title: 'Mở rộng toàn trường',
-    timing: '[thời gian dự kiến]',
-    goals: [
-      'Mời toàn bộ câu lạc bộ và các ban của Hội đồng Học sinh tham gia cập nhật sự kiện.',
-      'Hoàn thiện quy trình kiểm duyệt và quy chế đăng tải sự kiện.',
-      'Tổ chức buổi giới thiệu nền tảng cho học sinh các khối.',
-    ],
-    outputs: ['Rodemap trở thành kênh tổng hợp sự kiện chính thức của Hội đồng Học sinh.', 'Quy chế đăng tải và kiểm duyệt sự kiện.'],
-  },
-  {
-    id: 'giai-doan-3',
-    label: 'Giai đoạn 3',
     title: 'Đồng bộ Google Calendar và hoàn thiện hồ sơ năng lực',
-    timing: '[thời gian dự kiến]',
+    timing: 'Học kỳ II, tháng 1–5/2027',
     goals: [
       'Triển khai đồng bộ hai chiều với Google Calendar sau khi được nhà trường phê duyệt phương án tài khoản.',
       'Bổ sung xác nhận tham gia của câu lạc bộ phụ trách vào hồ sơ năng lực.',
