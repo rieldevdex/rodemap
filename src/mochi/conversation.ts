@@ -5,7 +5,7 @@
  */
 import type { CardStatus, MochiCard } from './cards';
 import { respondOffline } from './offline/engine';
-import { MAX_MESSAGES, MAX_TOOL_HOPS, type MochiErrorCode, type MochiRequest, type MochiResponse, type WireBlock, type WireMessage } from './protocol';
+import { MAX_MESSAGES, MAX_TOOL_HOPS, type MochiErrorCode, type MochiQuota, type MochiRequest, type MochiResponse, type WireBlock, type WireMessage } from './protocol';
 import { buildSnapshot } from './snapshot';
 import { executeTool, type ToolContext } from './tools/executors';
 
@@ -44,9 +44,12 @@ export interface TurnDeps {
   context: () => ToolContext;
 }
 
+export type MochiFailure = Extract<MochiResponse, { ok: false }>;
+
+/** `quota`: this browser's weekly questions after the turn, when the server reported it. */
 export type TurnResult =
-  | { ok: true; conversation: Conversation }
-  | { ok: false; error: MochiErrorCode | 'refusal' | 'hop_limit'; conversation: Conversation };
+  | { ok: true; conversation: Conversation; quota?: MochiQuota }
+  | { ok: false; error: MochiErrorCode | 'refusal' | 'hop_limit'; conversation: Conversation; quota?: MochiQuota; failure?: MochiFailure };
 
 function textOf(blocks: WireBlock[]): string {
   return blocks
@@ -79,20 +82,24 @@ export async function runOnlineTurn(conv: Conversation, text: string, deps: Turn
   }
   const items: ChatItem[] = [];
   let focusEventId = conv.focusEventId;
+  let quota: MochiQuota | undefined;
+  const withQuota = () => (quota ? { quota } : {});
 
   for (let hop = 0; hop <= MAX_TOOL_HOPS; hop += 1) {
     const res = await deps.send({ sessionId: deps.sessionId, messages: wire });
-    if (!res.ok) return { ok: false, error: res.error, conversation: conv };
+    if (!res.ok) return { ok: false, error: res.error, conversation: conv, failure: res, ...withQuota() };
+    if (res.quota) quota = res.quota;
     wire.push({ role: 'assistant', content: res.content });
     const said = textOf(res.content);
     if (said !== '') items.push({ id: itemId('m'), role: 'mochi', text: said, mode: 'online' });
-    if (res.stopReason === 'refusal') return { ok: false, error: 'refusal', conversation: conv };
+    if (res.stopReason === 'refusal') return { ok: false, error: 'refusal', conversation: conv, ...withQuota() };
 
     const calls = res.content.filter((b) => b.type === 'tool_use');
     if (calls.length === 0) {
       return {
         ok: true,
         conversation: { ...conv, wire, items: [...conv.items, ...items], focusEventId, snapshotSent: true, pendingNotes: [], openToolResults: false },
+        ...withQuota(),
       };
     }
     const results: WireBlock[] = calls.map((call) => {
@@ -112,6 +119,7 @@ export async function runOnlineTurn(conv: Conversation, text: string, deps: Turn
         ok: false,
         error: 'hop_limit',
         conversation: { ...conv, wire, items: [...conv.items, ...items], focusEventId, snapshotSent: true, pendingNotes: [], openToolResults: true },
+        ...withQuota(),
       };
     }
   }

@@ -8,7 +8,7 @@ import globals from 'globals';
 const presentational = ['src/components/**/*.{ts,tsx}', 'src/pages/**/*.{ts,tsx}'];
 
 export default tseslint.config(
-  { ignores: ['dist', 'dist-supabase', 'coverage', 'node_modules', 'test-results', 'playwright-report', 'screenshots', 'public'] },
+  { ignores: ['dist', 'dist-supabase', 'coverage', 'node_modules', 'test-results', 'playwright-report', 'screenshots', 'public', '.claude'] },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,

@@ -32,6 +32,36 @@ export function printPage(): void {
   window.print();
 }
 
+const MOCHI_ID_KEY = 'rodemap:mochi-id';
+const MOCHI_ID_RE = /^[A-Za-z0-9_-]{16,64}$/;
+let mochiIdInMemory: string | null = null;
+
+function randomHex(bytes: number): string {
+  const values = new Uint8Array(bytes);
+  crypto.getRandomValues(values);
+  return Array.from(values, (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * A random id kept in this browser so Mochi's weekly question quota counts per browser.
+ * It is not linked to the student; when storage is blocked it lasts until the page is closed.
+ */
+export function mochiBrowserId(): string {
+  try {
+    const saved = window.localStorage.getItem(MOCHI_ID_KEY);
+    if (saved !== null && MOCHI_ID_RE.test(saved)) return saved;
+  } catch {
+    /* storage blocked: keep the id in memory */
+  }
+  mochiIdInMemory ??= randomHex(16);
+  try {
+    window.localStorage.setItem(MOCHI_ID_KEY, mochiIdInMemory);
+  } catch {
+    /* storage blocked */
+  }
+  return mochiIdInMemory;
+}
+
 /** A random id for new records (submissions, portfolio entries). */
 export function newId(prefix: string): string {
   const rand =

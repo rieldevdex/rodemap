@@ -6,6 +6,6 @@
     "lib": ["ES2023", "DOM"],
     "types": []
   },
-  "include": ["supabase/functions", "src/mochi/system-prompt.ts", "src/mochi/tools/schemas.ts", "src/mochi/protocol.ts", "src/mochi/server/*.ts"],
+  "include": ["supabase/functions", "src/mochi/system-prompt.ts", "src/mochi/tools/schemas.ts", "src/mochi/protocol.ts", "src/mochi/server/*.ts", "src/domain/dates.ts", "src/domain/types.ts"],
   "exclude": ["src/mochi/server/*.test.ts"]
 }

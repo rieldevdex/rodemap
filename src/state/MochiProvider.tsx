@@ -15,9 +15,10 @@ import {
   setCardStatus,
   type Conversation,
 } from '../mochi/conversation';
-import { MAX_USER_CHARS } from '../mochi/protocol';
+import { MAX_USER_CHARS, type MochiQuota } from '../mochi/protocol';
+import { isStopActive, weeklyStopFrom, weeklyStopFromQuota, weeklyStopNotice, type WeeklyStop } from '../mochi/quota-notice';
 import type { MochiState } from '../components/organisms/Mochi';
-import { downloadFile, newId } from './effects';
+import { downloadFile, mochiBrowserId, newId } from './effects';
 import { useAppState, useDispatch, useNow } from './hooks';
 import { MochiContext, type MochiApi, type MochiMode } from './mochiContext';
 import { subscribeMochi } from './mochiBridge';
@@ -28,10 +29,6 @@ import { DEFAULT_WEEKLY_HOUR_BUDGET } from '../domain/budget';
 import type { AppState } from './schema';
 
 const CELEBRATE_MS = 1600;
-
-function randomSession(): string {
-  return newId('mochi').replace(/[^A-Za-z0-9_-]/g, '') + Math.random().toString(36).slice(2, 8);
-}
 
 /** Owns Mochi's conversation (in memory only — conversations are never stored). */
 export function MochiProvider({ children }: { children: ReactNode }) {
@@ -44,7 +41,11 @@ export function MochiProvider({ children }: { children: ReactNode }) {
   const [serverOffline, setServerOffline] = useState(false);
   const [lastTurnOffline, setLastTurnOffline] = useState(false);
   const [figure, setFigure] = useState<MochiState>('idle');
-  const sessionId = useRef(randomSession());
+  const [quota, setQuota] = useState<MochiQuota | null>(null);
+  // A used-up weekly limit: Mochi answers offline until the next Monday (real time, not the demo date).
+  const [weeklyStop, setWeeklyStop] = useState<WeeklyStop | null>(null);
+  // Kept in this browser so the weekly quota counts per browser rather than per page load.
+  const sessionId = useRef(mochiBrowserId());
   const latest = useRef({ state, now });
   const convRef = useRef(conv);
   useLayoutEffect(() => {
@@ -53,7 +54,8 @@ export function MochiProvider({ children }: { children: ReactNode }) {
   });
 
   const forcedOffline = state.mochiForcedOffline;
-  const mode: MochiMode = forcedOffline || serverOffline || lastTurnOffline ? 'offline' : 'online';
+  // A stop is cleared by the first message sent after it expires.
+  const mode: MochiMode = forcedOffline || serverOffline || lastTurnOffline || weeklyStop !== null ? 'offline' : 'online';
 
   const celebrate = useCallback(() => {
     setFigure('celebrating');
@@ -79,8 +81,12 @@ export function MochiProvider({ children }: { children: ReactNode }) {
       setFigure('thinking');
       const context = () => latest.current;
 
-      if (latest.current.state.mochiForcedOffline || serverOffline) {
-        setConv(runOfflineTurn(current, text, context()));
+      const stopped = isStopActive(weeklyStop, Date.now());
+      if (weeklyStop !== null && !stopped) setWeeklyStop(null);
+      if (latest.current.state.mochiForcedOffline || serverOffline || stopped) {
+        // A known weekly stop is explained once, on the first offline answer after it.
+        const explain = weeklyStop !== null && stopped && !current.items.some((i) => i.role === 'notice' && i.text === weeklyStopNotice(weeklyStop));
+        setConv(runOfflineTurn(explain ? addNotice(current, weeklyStopNotice(weeklyStop)) : current, text, context()));
         setBusy(false);
         setFigure('answering');
         window.setTimeout(() => {
@@ -90,7 +96,17 @@ export function MochiProvider({ children }: { children: ReactNode }) {
       }
 
       const result = await runOnlineTurn(current, text, { sessionId: sessionId.current, send: sendToMochi, context });
-      if (result.ok) {
+      if (result.quota) {
+        setQuota(result.quota);
+        setWeeklyStop(weeklyStopFromQuota(result.quota));
+      }
+      const stop = result.ok ? null : weeklyStopFrom(result.failure);
+      if (stop) {
+        setWeeklyStop(stop);
+        if (stop.scope === 'weekly_browser') setQuota({ remaining: 0, limit: stop.limit, resetsAt: stop.resetsAt });
+        setConv(runOfflineTurn(addNotice(current, weeklyStopNotice(stop)), text, context()));
+        setFigure('answering');
+      } else if (result.ok) {
         setConv(result.conversation);
         setLastTurnOffline(false);
         setFigure('answering');
@@ -117,7 +133,7 @@ export function MochiProvider({ children }: { children: ReactNode }) {
         setFigure((f) => (f === 'answering' ? 'idle' : f));
       }, CELEBRATE_MS);
     },
-    [busy, serverOffline],
+    [busy, serverOffline, weeklyStop],
   );
 
   // "Hỏi Mochi về sự kiện này" and other requests from pages.
@@ -170,6 +186,7 @@ export function MochiProvider({ children }: { children: ReactNode }) {
       items: conv.items,
       busy,
       mode,
+      quota,
       figure,
       send: (text) => {
         void send(text);
@@ -237,7 +254,7 @@ export function MochiProvider({ children }: { children: ReactNode }) {
         downloadFile(icsFileName(latest.current.now), ics, 'text/calendar;charset=utf-8');
       },
     };
-  }, [open, conv.items, busy, mode, figure, send, dispatch, resolveCard]);
+  }, [open, conv.items, busy, mode, quota, figure, send, dispatch, resolveCard]);
 
   return <MochiContext.Provider value={api}>{children}</MochiContext.Provider>;
 }

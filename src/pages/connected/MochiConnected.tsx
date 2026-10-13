@@ -4,6 +4,7 @@ import { MochiDock } from '../../components/organisms/MochiDock';
 import { MochiPanel } from '../../components/organisms/MochiPanel';
 import { formatDayLabel, formatTimeRange, toMillis } from '../../domain/dates';
 import { googleCalendarUrl } from '../../domain/gcal';
+import { quotaLabel } from '../../mochi/quota-notice';
 import { CLUBS } from '../../data/clubs';
 import { useMochi } from '../../state/mochiContext';
 import { useCatalog } from '../../state/useCatalog';
@@ -83,6 +84,7 @@ export function MochiConnected() {
         mode={mochi.mode}
         figure={mochi.figure}
         suggestions={mochi.items.length === 0 || !mochi.busy ? SUGGESTIONS : []}
+        quotaLabel={mochi.quota ? quotaLabel(mochi.quota) : null}
         onSend={mochi.send}
         onClose={close}
         onNewConversation={mochi.newConversation}

@@ -6,9 +6,10 @@
  * The API key stays on the server that runs this code.
  */
 import Anthropic from '@anthropic-ai/sdk';
-import { MAX_BODY_BYTES, RATE_LIMIT, type MochiErrorCode, type MochiRequest, type MochiResponse } from '../protocol';
+import { MAX_BODY_BYTES, RATE_LIMITS, type MochiErrorCode, type MochiQuota, type MochiRequest, type MochiResponse } from '../protocol';
 import { MOCHI_SYSTEM_PROMPT } from '../system-prompt';
 import { MOCHI_TOOLS } from '../tools/schemas';
+import { isNewQuestion, type QuotaGate } from './quota';
 import { checkRateLimit, type RateStore } from './rate-limit';
 import { validateMochiRequest } from './validate';
 
@@ -74,11 +75,18 @@ export async function readMochiRequest(request: Request): Promise<ReadResult> {
   return { ok: true, value: parsed.value };
 }
 
-/** The 429 response when the session or the address has used its window, else null. */
+/** The 429 response when the session or the address has used its short-term window, else null. */
 export async function rateLimitResponse(store: RateStore, sessionId: string, clientIp: string, now: number): Promise<Response | null> {
-  const rate = await checkRateLimit(store, [`s:${sessionId}`, `ip:${clientIp}`], now, RATE_LIMIT);
+  const rate = await checkRateLimit(
+    store,
+    [
+      { key: `s:${sessionId}`, limit: RATE_LIMITS.session },
+      { key: `ip:${clientIp}`, limit: RATE_LIMITS.ip },
+    ],
+    now,
+  );
   if (rate.allowed) return null;
-  return jsonResponse({ ok: false, error: 'rate_limited', retryAfterSeconds: rate.retryAfterSeconds }, 429, {
+  return jsonResponse({ ok: false, error: 'rate_limited', scope: 'burst', retryAfterSeconds: rate.retryAfterSeconds }, 429, {
     'retry-after': String(rate.retryAfterSeconds),
   });
 }
@@ -88,7 +96,11 @@ export function createClaudeClient(apiKey: string): Anthropic {
 }
 
 /** Asks Claude for the next assistant turn of a validated conversation. */
-export async function askClaude(client: Anthropic, request: MochiRequest, opts: { model: string; effort: MochiEffort }): Promise<Response> {
+export async function askClaude(
+  client: Anthropic,
+  request: MochiRequest,
+  opts: { model: string; effort: MochiEffort; quota?: MochiQuota | undefined },
+): Promise<Response> {
   const fallback = supportsServerFallback(opts.model);
   try {
     const response = await client.beta.messages.create({
@@ -114,6 +126,7 @@ export async function askClaude(client: Anthropic, request: MochiRequest, opts: 
         content: response.content as unknown as { type: string }[],
         stopReason: response.stop_reason,
         model: response.model,
+        ...(opts.quota ? { quota: opts.quota } : {}),
       },
       200,
     );
@@ -145,14 +158,23 @@ export interface RelayConfig {
   effort: string | undefined;
   store: RateStore;
   clientIp: string;
+  /** The weekly question quota (Supabase relay); without it only the short-term limits apply. */
+  quota?: QuotaGate | undefined;
 }
 
-/** The whole relay for one POST: key check, body, rate limit, Claude. */
+/** The whole relay for one POST: key check, body, short-term limits, weekly quota, Claude. */
 export async function relayMochiRequest(request: Request, config: RelayConfig): Promise<Response> {
   if (config.apiKey === undefined || config.apiKey === '') return jsonResponse({ ok: false, error: 'offline' }, 503);
   const body = await readMochiRequest(request);
   if (!body.ok) return body.response;
-  const limited = await rateLimitResponse(config.store, body.value.sessionId, config.clientIp, Date.now());
+  const now = Date.now();
+  const limited = await rateLimitResponse(config.store, body.value.sessionId, config.clientIp, now);
   if (limited) return limited;
-  return askClaude(createClaudeClient(config.apiKey), body.value, { model: resolveModel(config.model), effort: resolveEffort(config.effort) });
+  let quota: MochiQuota | undefined;
+  if (config.quota) {
+    const decision = await config.quota({ sessionId: body.value.sessionId, question: isNewQuestion(body.value), now });
+    if (!decision.ok) return jsonResponse(decision.body, decision.status, decision.headers);
+    quota = decision.quota;
+  }
+  return askClaude(createClaudeClient(config.apiKey), body.value, { model: resolveModel(config.model), effort: resolveEffort(config.effort), quota });
 }

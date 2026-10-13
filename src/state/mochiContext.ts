@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 import type { MochiState } from '../components/organisms/Mochi';
 import type { ChatItem } from '../mochi/conversation';
+import type { MochiQuota } from '../mochi/protocol';
 
 export type MochiMode = 'online' | 'offline';
 
@@ -10,6 +11,8 @@ export interface MochiApi {
   items: ChatItem[];
   busy: boolean;
   mode: MochiMode;
+  /** This browser's weekly questions, once the server has reported them. */
+  quota: MochiQuota | null;
   figure: MochiState;
   send: (text: string) => void;
   newConversation: () => void;

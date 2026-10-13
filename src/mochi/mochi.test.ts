@@ -5,6 +5,7 @@ import { NEWS } from '../data/news';
 import { makePost } from '../domain/test-fixtures';
 import { createDemoState, type AppState } from '../state/schema';
 import { addNotice, emptyConversation, needsRestart, runOfflineTurn, runOnlineTurn, setCardStatus, addStudentItem } from './conversation';
+import { isStopActive, quotaLabel, resetLabel, weeklyStopFrom, weeklyStopFromQuota, weeklyStopNotice } from './quota-notice';
 import { classify, findEventInText, offlineDraft, respondOffline, windowInText } from './offline/engine';
 import type { MochiResponse } from './protocol';
 import { buildSnapshot } from './snapshot';
@@ -276,13 +277,27 @@ describe('conversation', () => {
   it('reports server errors and refusals without keeping the failed turn', async () => {
     const base = emptyConversation();
     const offline = await runOnlineTurn(base, 'x', { sessionId: 's', send: () => Promise.resolve({ ok: false, error: 'offline' }), context: () => ctx() });
-    expect(offline).toEqual({ ok: false, error: 'offline', conversation: base });
+    expect(offline).toEqual({ ok: false, error: 'offline', conversation: base, failure: { ok: false, error: 'offline' } });
     const refusal = await runOnlineTurn(base, 'x', {
       sessionId: 's',
       send: () => Promise.resolve({ ok: true, content: [], stopReason: 'refusal', model: 'm' }),
       context: () => ctx(),
     });
     expect(refusal.ok).toBe(false);
+  });
+
+  it('carries the weekly quota of the last answer and the refusal that stopped a turn', async () => {
+    const quota = { remaining: 17, limit: 20, resetsAt: '2026-10-19T00:00:00+07:00' };
+    const answered = await runOnlineTurn(emptyConversation(), 'x', { sessionId: 's', send: () => Promise.resolve({ ...okText('Đã rõ.'), quota }), context: () => ctx() });
+    expect(answered).toMatchObject({ ok: true, quota });
+    const refused = { ok: false as const, error: 'rate_limited' as const, scope: 'weekly_browser' as const, limit: 20, resetsAt: quota.resetsAt, retryAfterSeconds: 60 };
+    const stopped = await runOnlineTurn(emptyConversation(), 'x', { sessionId: 's', send: () => Promise.resolve(refused), context: () => ctx() });
+    expect(stopped).toMatchObject({ ok: false, error: 'rate_limited', failure: refused });
+    expect('quota' in stopped).toBe(false);
+    const loop: MochiResponse = { ok: true, content: [{ type: 'tool_use', id: 't', name: 'search_events', input: {} }], stopReason: 'tool_use', model: 'm', quota };
+    expect(await runOnlineTurn(emptyConversation(), 'x', { sessionId: 's', send: () => Promise.resolve(loop), context: () => ctx() })).toMatchObject({ error: 'hop_limit', quota });
+    const refusal = await runOnlineTurn(emptyConversation(), 'x', { sessionId: 's', send: () => Promise.resolve({ ok: true, content: [], stopReason: 'refusal', model: 'm', quota }), context: () => ctx() });
+    expect(refusal).toMatchObject({ error: 'refusal', quota });
   });
 
   it('stops after the tool hop limit with a valid open chain, then merges the next message', async () => {
@@ -383,5 +398,44 @@ describe('Bản tin Hội đồng Học sinh', () => {
     expect(reply.intent).toBe('news');
     expect(reply.text).toBe('Bản tin Hội đồng Học sinh hiện chưa có bài viết phù hợp. Bạn có thể xem toàn bộ bài viết tại trang Bản tin.');
     expect(reply.cards).toEqual([]);
+  });
+});
+
+describe('weekly quota wording', () => {
+  const resetsAt = '2026-10-19T00:00:00+07:00';
+
+  it('reads a weekly stop from a refusal and ignores every other failure', () => {
+    expect(weeklyStopFrom({ ok: false, error: 'rate_limited', scope: 'weekly_browser', limit: 20, resetsAt })).toEqual({ scope: 'weekly_browser', limit: 20, resetsAt });
+    expect(weeklyStopFrom({ ok: false, error: 'rate_limited', scope: 'weekly_total', limit: 500, resetsAt })?.scope).toBe('weekly_total');
+    expect(weeklyStopFrom({ ok: false, error: 'rate_limited', scope: 'burst', retryAfterSeconds: 30 })).toBeNull();
+    expect(weeklyStopFrom({ ok: false, error: 'rate_limited', scope: 'weekly_browser', resetsAt })).toBeNull();
+    expect(weeklyStopFrom({ ok: false, error: 'rate_limited', scope: 'weekly_browser', limit: 20 })).toBeNull();
+    expect(weeklyStopFrom({ ok: false, error: 'offline' })).toBeNull();
+    expect(weeklyStopFrom(undefined)).toBeNull();
+  });
+
+  it('knows the next question is refused after the last one of the week', () => {
+    expect(weeklyStopFromQuota({ remaining: 0, limit: 20, resetsAt })).toEqual({ scope: 'weekly_browser', limit: 20, resetsAt });
+    expect(weeklyStopFromQuota({ remaining: 3, limit: 20, resetsAt })).toBeNull();
+    expect(weeklyStopFromQuota(undefined)).toBeNull();
+  });
+
+  it('keeps a stop until Monday 00:00', () => {
+    const stop = { scope: 'weekly_browser' as const, limit: 20, resetsAt };
+    expect(isStopActive(stop, toMillis('2026-10-18T23:59:00+07:00'))).toBe(true);
+    expect(isStopActive(stop, toMillis(resetsAt))).toBe(false);
+    expect(isStopActive(null, 0)).toBe(false);
+  });
+
+  it('words the notices and the remaining questions formally', () => {
+    expect(resetLabel(resetsAt)).toBe('00:00 Thứ Hai, 19/10/2026');
+    expect(weeklyStopNotice({ scope: 'weekly_browser', limit: 20, resetsAt })).toBe(
+      'Bạn đã sử dụng hết 20 câu hỏi dành cho Mochi trong tuần này. Mochi tiếp tục hỗ trợ ở chế độ ngoại tuyến; lượt hỏi được làm mới vào 00:00 Thứ Hai, 19/10/2026.',
+    );
+    expect(weeklyStopNotice({ scope: 'weekly_total', limit: 500, resetsAt })).toBe(
+      'Mochi đã đạt giới hạn câu hỏi chung của Rodemap trong tuần này. Mochi tiếp tục hỗ trợ ở chế độ ngoại tuyến; lượt hỏi được làm mới vào 00:00 Thứ Hai, 19/10/2026.',
+    );
+    expect(quotaLabel({ remaining: 17, limit: 20, resetsAt })).toBe('Còn 17/20 câu hỏi trong tuần này');
+    expect(quotaLabel({ remaining: 0, limit: 20, resetsAt })).toBe('Đã sử dụng hết 20 câu hỏi trong tuần này');
   });
 });

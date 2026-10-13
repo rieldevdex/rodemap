@@ -14,6 +14,8 @@ export interface MochiPanelProps {
   mode: 'online' | 'offline';
   figure: MochiState;
   suggestions: string[];
+  /** "Còn 17/20 câu hỏi trong tuần này", once the server has reported the weekly quota. */
+  quotaLabel?: string | null;
   onSend: (text: string) => void;
   onClose: () => void;
   onNewConversation: () => void;
@@ -52,6 +54,7 @@ export function MochiPanel({
   mode,
   figure,
   suggestions,
+  quotaLabel = null,
   onSend,
   onClose,
   onNewConversation,
@@ -60,6 +63,7 @@ export function MochiPanel({
   const titleId = useId();
   const fieldId = useId();
   const counterId = useId();
+  const quotaId = useId();
   const [draft, setDraft] = useState('');
   const fieldRef = useRef<HTMLTextAreaElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
@@ -221,7 +225,7 @@ export function MochiPanel({
             rows={2}
             maxLength={MAX_USER_CHARS}
             value={draft}
-            aria-describedby={counterId}
+            aria-describedby={quotaLabel ? `${counterId} ${quotaId}` : counterId}
             placeholder="Ví dụ: Gợi ý sự kiện tuần tới"
             onChange={(e) => {
               setDraft(e.target.value);
@@ -229,9 +233,16 @@ export function MochiPanel({
             onKeyDown={onKeyDown}
           />
           <div className="mochi-panel__form-row">
-            <span id={counterId} className="mochi-panel__counter">
-              {draft.length}/{MAX_USER_CHARS} ký tự
-            </span>
+            <div className="mochi-panel__meta">
+              <span id={counterId} className="mochi-panel__counter">
+                {draft.length}/{MAX_USER_CHARS} ký tự
+              </span>
+              {quotaLabel ? (
+                <span id={quotaId} className="mochi-panel__counter">
+                  {quotaLabel}
+                </span>
+              ) : null}
+            </div>
             <Button type="submit" size="sm" variant="primary" iconEnd="arrow-right" disabled={busy || draft.trim() === ''}>
               Gửi
             </Button>

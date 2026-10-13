@@ -9,3 +9,6 @@ screenshots
 .dev.vars
 .DS_Store
 dist-supabase
+
+# Git worktrees created by Claude Code sessions
+.claude/worktrees/

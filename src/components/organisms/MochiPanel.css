@@ -229,6 +229,12 @@
   gap: var(--space-3);
 }
 
+.mochi-panel__meta {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+
 .mochi-panel__counter {
   font-family: var(--font-mono);
   font-size: var(--text-xs);

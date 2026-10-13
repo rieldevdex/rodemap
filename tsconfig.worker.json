@@ -6,5 +6,5 @@
     "lib": ["ES2023"],
     "types": ["@cloudflare/workers-types"]
   },
-  "include": ["worker", "src/mochi/system-prompt.ts", "src/mochi/tools/schemas.ts", "src/mochi/protocol.ts", "src/mochi/server/*.ts"]
+  "include": ["worker", "src/mochi/system-prompt.ts", "src/mochi/tools/schemas.ts", "src/mochi/protocol.ts", "src/mochi/server/*.ts", "src/domain/dates.ts", "src/domain/types.ts"]
 }

@@ -15,8 +15,22 @@ export const MAX_MESSAGES = 48;
 export const MAX_BODY_BYTES = 256 * 1024;
 /** Tool round-trips the browser performs for a single student message. */
 export const MAX_TOOL_HOPS = 4;
-/** Requests per session (and per IP) per window. */
-export const RATE_LIMIT = { requests: 40, windowMs: 10 * 60 * 1000 } as const;
+/**
+ * Short-term limits against bursts. The address limit is generous because a whole school
+ * can share one public address behind the school Wi-Fi.
+ */
+export const RATE_LIMITS = {
+  session: { requests: 40, windowMs: 10 * 60 * 1000 },
+  ip: { requests: 400, windowMs: 10 * 60 * 1000 },
+} as const;
+
+/**
+ * Weekly question quota (Monday 00:00 to Sunday 24:00, Asia/Ho_Chi_Minh), enforced by the
+ * Supabase relay. A question is a student message; the tool round-trips that follow it are
+ * capped separately at REQUESTS_PER_QUESTION requests per question.
+ */
+export const WEEKLY_QUOTA = { perBrowser: 20, total: 500 } as const;
+export const REQUESTS_PER_QUESTION = MAX_TOOL_HOPS + 1;
 
 /** One content block as sent to / received from the Messages API (kept opaque on purpose). */
 export type WireBlock = { type: string } & Record<string, unknown>;
@@ -27,7 +41,7 @@ export interface WireMessage {
 }
 
 export interface MochiRequest {
-  /** Random per-browser id used for rate limiting; not linked to a person. */
+  /** Random id kept in this browser, used for the limits and the weekly quota; not linked to a person. */
   sessionId: string;
   messages: WireMessage[];
 }
@@ -39,6 +53,17 @@ export type MochiErrorCode =
   | 'bad_request'
   | 'upstream'; // the Claude API failed or timed out
 
+/** Which limit refused a request: a short burst, this browser's week or the whole site's week. */
+export type MochiLimitScope = 'burst' | 'weekly_browser' | 'weekly_total';
+
+/** This browser's weekly questions, returned with every answer when the quota is enforced. */
+export interface MochiQuota {
+  remaining: number;
+  limit: number;
+  /** Next Monday 00:00, Asia/Ho_Chi_Minh. */
+  resetsAt: string;
+}
+
 export type MochiResponse =
-  | { ok: true; content: WireBlock[]; stopReason: string | null; model: string }
-  | { ok: false; error: MochiErrorCode; retryAfterSeconds?: number };
+  | { ok: true; content: WireBlock[]; stopReason: string | null; model: string; quota?: MochiQuota }
+  | { ok: false; error: MochiErrorCode; retryAfterSeconds?: number; scope?: MochiLimitScope; limit?: number; resetsAt?: string };
