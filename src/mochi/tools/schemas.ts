@@ -194,7 +194,8 @@ export const MOCHI_TOOLS: readonly ToolDefinition[] = [
     input_schema: {
       type: 'object',
       properties: {
-        limit: { type: 'integer', minimum: 1, maximum: 5, description: 'Default 3.' },
+        // Strict tools accept no numeric bounds: the executor clamps the value to 1–5.
+        limit: { type: 'integer', description: 'Number of articles, 1 to 5. Default 3.' },
         category: { type: 'string', enum: ['announcement', 'activity', 'club', 'guide'], description: 'announcement Thông báo, activity Tin hoạt động, club Câu lạc bộ, guide Hướng dẫn.' },
       },
       required: [],

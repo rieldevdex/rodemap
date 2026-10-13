@@ -27,6 +27,34 @@ describe('tool schemas', () => {
       for (const key of tool.input_schema.required) expect(Object.keys(tool.input_schema.properties)).toContain(key);
     }
   });
+
+  it('uses only JSON Schema keywords that strict tool use accepts', () => {
+    // The Claude API rejects the whole request (400) when a strict tool schema carries one of these.
+    const unsupported = new Set(['minimum', 'maximum', 'exclusiveMinimum', 'exclusiveMaximum', 'multipleOf', 'minLength', 'maxLength', 'minItems', 'maxItems', 'uniqueItems', 'pattern', 'patternProperties']);
+    const formats = new Set(['date-time', 'time', 'date', 'duration', 'email', 'hostname', 'uri', 'ipv4', 'ipv6', 'uuid']);
+    const problems: string[] = [];
+    // Walks schema nodes only: the keys under `properties` are field names, not keywords.
+    const walk = (node: unknown, path: string): void => {
+      if (typeof node !== 'object' || node === null) return;
+      const schema = node as Record<string, unknown>;
+      for (const [key, value] of Object.entries(schema)) {
+        if (unsupported.has(key)) problems.push(`${path}.${key}`);
+        if (key === 'format' && (typeof value !== 'string' || !formats.has(value))) problems.push(`${path}.format`);
+      }
+      if (schema.type === 'object' && schema.additionalProperties !== false) problems.push(`${path} (additionalProperties must be false)`);
+      const props = schema.properties;
+      if (typeof props === 'object' && props !== null) {
+        for (const [name, child] of Object.entries(props)) walk(child, `${path}.${name}`);
+      }
+      walk(schema.items, `${path}[]`);
+      for (const key of ['anyOf', 'allOf'] as const) {
+        const list = schema[key];
+        if (Array.isArray(list)) list.forEach((child, i) => { walk(child, `${path}.${key}[${String(i)}]`); });
+      }
+    };
+    for (const tool of MOCHI_TOOLS) walk(tool.input_schema, tool.name);
+    expect(problems).toEqual([]);
+  });
 });
 
 describe('executors', () => {
