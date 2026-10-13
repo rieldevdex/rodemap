@@ -74,6 +74,27 @@ export function gradesLabel(grades: readonly Grade[]): string {
   return isOpenToAll(grades) ? `Khối ${formatGrades(grades)} (toàn trường)` : `Khối ${formatGrades(grades)}`;
 }
 
+/** The tag naming an event organised outside the school. */
+export const EXTERNAL_COMPETITION_LABEL = 'Cuộc thi ngoài trường';
+
+/**
+ * Organised outside the school ("Cuộc thi ngoài trường"): the event names its external
+ * organiser. The publisher (`clubId`, e.g. Phòng Cố vấn Học tập) only relays the information.
+ */
+export function isExternalCompetition<T extends { organizer?: string }>(e: T): e is T & { organizer: string } {
+  return e.organizer !== undefined && e.organizer.trim() !== '';
+}
+
+/**
+ * The publisher as shown next to an event in lists and dialogs: "CLB Tranh biện", or for an
+ * external competition "Phòng Cố vấn Học tập · Đơn vị tổ chức: Trường đại học đối tác".
+ */
+export function publisherLine(e: { organizer?: string }, publisherName: string): string {
+  if (!isExternalCompetition(e)) return publisherName;
+  const organizer = `Đơn vị tổ chức: ${e.organizer.trim()}`;
+  return publisherName === '' ? organizer : `${publisherName} · ${organizer}`;
+}
+
 /** Calendar days until the registration deadline (0 = today, negative = passed). */
 export function deadlineDaysLeft(e: SchoolEvent, now: Millis): number {
   return calendarDaysBetween(now, toMillis(e.registrationDeadline));

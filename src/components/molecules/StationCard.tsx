@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { formatDayLabel, formatTimeRange, toMillis } from '../../domain/dates';
-import type { RegistrationState } from '../../domain/events';
+import { EXTERNAL_COMPETITION_LABEL, isExternalCompetition, type RegistrationState } from '../../domain/events';
 import type { SchoolEvent } from '../../domain/types';
 import { Link } from '../../router';
 import { LineBadge } from '../atoms/LineBadge';
@@ -52,7 +52,10 @@ export function eventStatus(
   }
 }
 
-/** Event summary: code badge + category, title, club, mono date/time, place, status. */
+/**
+ * Event summary: code badge + category, title, club, mono date/time, place, status. An external
+ * competition adds its organiser under the publisher and a "Cuộc thi ngoài trường" tag.
+ */
 export function StationCard({
   event,
   clubName,
@@ -70,6 +73,7 @@ export function StationCard({
   const end = toMillis(event.end);
   const status = eventStatus(state, seatsLeft, deadlineDays);
   const Heading = headingLevel === 2 ? 'h2' : 'h3';
+  const external = isExternalCompetition(event);
   const href = `/su-kien/${event.slug}`;
   return (
     <article className={`station-card station-card--${variant}`} style={{ '--line': `var(--line-${event.category.toLowerCase()})` } as Record<string, string>}>
@@ -93,8 +97,14 @@ export function StationCard({
         <span aria-hidden="true"> · </span>
         <span>{event.format === 'online' ? `Trực tuyến · ${event.location}` : event.location}</span>
       </p>
+      {external ? <p className="station-card__organizer">Đơn vị tổ chức: {event.organizer}</p> : null}
       {showSummary ? <p className="station-card__summary">{event.summary}</p> : null}
       <div className="station-card__status">
+        {external ? (
+          <StatusTag tone="neutral" icon="external">
+            {EXTERNAL_COMPETITION_LABEL}
+          </StatusTag>
+        ) : null}
         <StatusTag tone={status.tone}>{status.label}</StatusTag>
         {conflict ? <StatusTag tone="stop">Trùng lịch</StatusTag> : null}
       </div>

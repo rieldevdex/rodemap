@@ -1,6 +1,16 @@
 /** Event list filtering for "Khám phá sự kiện". Pure: the clock comes in as `now`. */
 import { addDays, startOfIsoWeek, startOfNextVnMonth, startOfVnMonth } from './dates';
-import { deadlineDaysLeft, eventStart, isDeadlinePassed, isEligible, isFull, isPast, sortByStart } from './events';
+import {
+  deadlineDaysLeft,
+  eventStart,
+  EXTERNAL_COMPETITION_LABEL,
+  isDeadlinePassed,
+  isEligible,
+  isExternalCompetition,
+  isFull,
+  isPast,
+  sortByStart,
+} from './events';
 import { matchesQuery } from './text';
 import type { CategoryCode, Club, EventFormat, Grade, Millis, Registration, SchoolEvent } from './types';
 
@@ -55,9 +65,13 @@ export function windowRange(dateWindow: DateWindow, now: Millis): { from: Millis
   }
 }
 
-/** Title, summary, location, tag ids and the club's full and short names. */
+/**
+ * Title, summary, location, tag ids and the club's full and short names; for an external
+ * competition also its organiser and "Cuộc thi ngoài trường".
+ */
 function searchText(e: SchoolEvent, clubs: readonly Club[]): string {
   const parts = [e.title, e.summary, e.location, ...e.tags];
+  if (isExternalCompetition(e)) parts.push(e.organizer, EXTERNAL_COMPETITION_LABEL);
   const club = clubs.find((c) => c.id === e.clubId);
   if (club) parts.push(club.name, club.shortName);
   return parts.join(' ');

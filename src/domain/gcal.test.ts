@@ -6,6 +6,7 @@ import type { Club } from './types';
 const clubs: Club[] = [
   {
     id: 'tranh-bien',
+    kind: 'club',
     slug: 'tranh-bien',
     name: 'Câu lạc bộ Tranh biện',
     shortName: 'CLB Tranh biện',

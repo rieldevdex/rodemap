@@ -3,6 +3,7 @@ import { MochiCardView, type CardEvent } from '../../components/organisms/MochiC
 import { MochiDock } from '../../components/organisms/MochiDock';
 import { MochiPanel } from '../../components/organisms/MochiPanel';
 import { formatDayLabel, formatTimeRange, toMillis } from '../../domain/dates';
+import { publisherLine } from '../../domain/events';
 import { googleCalendarUrl } from '../../domain/gcal';
 import { CLUBS } from '../../data/clubs';
 import { useMochi } from '../../state/mochiContext';
@@ -46,7 +47,7 @@ export function MochiConnected() {
         id: e.id,
         title: e.title,
         category: e.category,
-        club: clubName(e.clubId),
+        club: publisherLine(e, clubName(e.clubId)),
         when: `${formatDayLabel(start)} · ${formatTimeRange(start, toMillis(e.end))}`,
         location: e.location,
         status: STATUS[info.state] ?? '',

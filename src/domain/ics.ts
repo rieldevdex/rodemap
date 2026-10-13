@@ -5,7 +5,7 @@
  */
 import { CATEGORY_LABELS } from './category-labels';
 import { TIME_ZONE, VN_OFFSET_MS, toIsoDate } from './dates';
-import { eventEnd, eventStart, sortByStart } from './events';
+import { eventEnd, eventStart, isExternalCompetition, sortByStart } from './events';
 import type { Club, Millis, SchoolEvent } from './types';
 
 export const ICS_PRODID = '-//Rodemap//Ban trinh dien//VI';
@@ -82,11 +82,19 @@ export function eventUrl(baseUrl: string, slug: string): string {
   return `${baseUrl.replace(/\/+$/, '')}/su-kien/${slug}`;
 }
 
-/** Plain-text description shared by .ics and Google Calendar: summary, organiser, link. */
+/**
+ * Plain-text description shared by .ics and Google Calendar: summary, organiser, link. An
+ * external competition names its organiser and gives the publisher as the source.
+ */
 export function eventDetails(e: SchoolEvent, clubs: readonly Club[], baseUrl?: string): string {
   const lines = [e.summary];
   const club = clubs.find((c) => c.id === e.clubId);
-  if (club) lines.push(`Đơn vị tổ chức: ${club.name}`);
+  if (isExternalCompetition(e)) {
+    lines.push(`Đơn vị tổ chức: ${e.organizer}`);
+    if (club) lines.push(`Nguồn thông tin: ${club.name}`);
+  } else if (club) {
+    lines.push(`Đơn vị tổ chức: ${club.name}`);
+  }
   if (baseUrl) lines.push(`Thông tin chi tiết: ${eventUrl(baseUrl, e.slug)}`);
   return lines.join('\n');
 }

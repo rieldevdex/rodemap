@@ -5,16 +5,19 @@ import {
   eventEnd,
   eventHours,
   eventStart,
+  EXTERNAL_COMPETITION_LABEL,
   findRegistration,
   fitsAvailability,
   isDeadlinePassed,
   formatGrades,
   gradesLabel,
   isEligible,
+  isExternalCompetition,
   isFull,
   isOpenToAll,
   isPast,
   isRegistered,
+  publisherLine,
   registrationState,
   seatsLeft,
   sortByStart,
@@ -97,6 +100,25 @@ describe('registrationState', () => {
     expect(registrationState(makeEvent({ registrationDeadline: '2026-10-09T23:59:00+07:00' }), [], now)).toBe('closed');
     expect(registrationState(makeEvent({ capacity: 3, seatsTaken: 3 }), [], now)).toBe('full');
     expect(registrationState(open, [], now)).toBe('open');
+  });
+});
+
+describe('external competitions', () => {
+  const school = makeEvent({ id: 's' });
+  const external = makeEvent({ id: 'x', clubId: 'co-van-hoc-tap', organizer: 'Trường đại học đối tác' });
+
+  it('recognises an event that names its external organiser', () => {
+    expect(EXTERNAL_COMPETITION_LABEL).toBe('Cuộc thi ngoài trường');
+    expect(isExternalCompetition(school)).toBe(false);
+    expect(isExternalCompetition(makeEvent({ organizer: '   ' }))).toBe(false);
+    expect(isExternalCompetition(external)).toBe(true);
+    expect(isExternalCompetition({ organizer: 'Ban tổ chức cuộc thi cấp thành phố' })).toBe(true);
+  });
+
+  it('adds the organiser to the publisher shown in lists', () => {
+    expect(publisherLine(school, 'CLB Tranh biện')).toBe('CLB Tranh biện');
+    expect(publisherLine(external, 'Phòng Cố vấn Học tập')).toBe('Phòng Cố vấn Học tập · Đơn vị tổ chức: Trường đại học đối tác');
+    expect(publisherLine({ organizer: '  Viện nghiên cứu đối tác ' }, '')).toBe('Đơn vị tổ chức: Viện nghiên cứu đối tác');
   });
 });
 

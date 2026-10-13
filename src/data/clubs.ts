@@ -1,10 +1,15 @@
 // Dữ liệu minh họa phục vụ bản trình diễn. Thay thế bằng dữ liệu chính thức khi triển khai.
 import type { Club } from '../domain/types';
 
-/** 14 clubs: Hội đồng Học sinh (school-wide events), Inkstep (the one real club) and 12 generic clubs. */
+/**
+ * 15 publishers: Hội đồng Học sinh (kind 'council', school-wide events), Phòng Cố vấn Học tập
+ * (kind 'office', external academic competitions it relays from the organisers), then 13 student
+ * clubs (kind 'club'): Inkstep (the one real club) and 12 generic clubs.
+ */
 export const CLUBS: Club[] = [
   {
     id: 'hdhs',
+    kind: 'council',
     slug: 'hdhs',
     name: 'Hội đồng Học sinh',
     shortName: 'HĐHS',
@@ -14,7 +19,19 @@ export const CLUBS: Club[] = [
     contact: '[Email Hội đồng Học sinh]',
   },
   {
+    id: 'co-van-hoc-tap',
+    kind: 'office',
+    slug: 'phong-co-van-hoc-tap',
+    name: 'Phòng Cố vấn Học tập',
+    shortName: 'Phòng Cố vấn Học tập',
+    description:
+      'Phòng Cố vấn Học tập tư vấn cho học sinh về định hướng học tập, lựa chọn môn học và lộ trình chuẩn bị cho bậc đại học. Phòng cập nhật trên Rodemap thông tin các cuộc thi học thuật ngoài trường, gồm thể lệ, hạn đăng ký và cách thức Phòng hỗ trợ học sinh hoàn thiện hồ sơ dự thi.',
+    categories: ['HT'],
+    contact: '[Email Phòng Cố vấn Học tập]',
+  },
+  {
     id: 'inkstep',
+    kind: 'club',
     slug: 'inkstep',
     name: 'Inkstep – Câu lạc bộ Phát triển Sản phẩm Học tập',
     shortName: 'Inkstep',
@@ -25,6 +42,7 @@ export const CLUBS: Club[] = [
   },
   {
     id: 'tranh-bien',
+    kind: 'club',
     slug: 'tranh-bien',
     name: 'Câu lạc bộ Tranh biện',
     shortName: 'CLB Tranh biện',
@@ -35,6 +53,7 @@ export const CLUBS: Club[] = [
   },
   {
     id: 'khoa-hoc-du-lieu',
+    kind: 'club',
     slug: 'khoa-hoc-du-lieu',
     name: 'Câu lạc bộ Khoa học Dữ liệu',
     shortName: 'CLB Khoa học Dữ liệu',
@@ -45,6 +64,7 @@ export const CLUBS: Club[] = [
   },
   {
     id: 'toan-hoc',
+    kind: 'club',
     slug: 'toan-hoc',
     name: 'Câu lạc bộ Toán học',
     shortName: 'CLB Toán học',
@@ -55,6 +75,7 @@ export const CLUBS: Club[] = [
   },
   {
     id: 'hung-bien-tieng-anh',
+    kind: 'club',
     slug: 'hung-bien-tieng-anh',
     name: 'Câu lạc bộ Hùng biện Tiếng Anh',
     shortName: 'CLB Hùng biện Tiếng Anh',
@@ -65,6 +86,7 @@ export const CLUBS: Club[] = [
   },
   {
     id: 'am-nhac',
+    kind: 'club',
     slug: 'am-nhac',
     name: 'Câu lạc bộ Âm nhạc',
     shortName: 'CLB Âm nhạc',
@@ -75,6 +97,7 @@ export const CLUBS: Club[] = [
   },
   {
     id: 'my-thuat',
+    kind: 'club',
     slug: 'my-thuat',
     name: 'Câu lạc bộ Mỹ thuật',
     shortName: 'CLB Mỹ thuật',
@@ -85,6 +108,7 @@ export const CLUBS: Club[] = [
   },
   {
     id: 'san-khau',
+    kind: 'club',
     slug: 'san-khau',
     name: 'Câu lạc bộ Sân khấu',
     shortName: 'CLB Sân khấu',
@@ -95,6 +119,7 @@ export const CLUBS: Club[] = [
   },
   {
     id: 'bong-ro',
+    kind: 'club',
     slug: 'bong-ro',
     name: 'Câu lạc bộ Bóng rổ',
     shortName: 'CLB Bóng rổ',
@@ -105,6 +130,7 @@ export const CLUBS: Club[] = [
   },
   {
     id: 'cau-long',
+    kind: 'club',
     slug: 'cau-long',
     name: 'Câu lạc bộ Cầu lông',
     shortName: 'CLB Cầu lông',
@@ -115,6 +141,7 @@ export const CLUBS: Club[] = [
   },
   {
     id: 'tinh-nguyen-xanh',
+    kind: 'club',
     slug: 'tinh-nguyen-xanh',
     name: 'Câu lạc bộ Tình nguyện Xanh',
     shortName: 'CLB Tình nguyện Xanh',
@@ -125,6 +152,7 @@ export const CLUBS: Club[] = [
   },
   {
     id: 'huong-nghiep',
+    kind: 'club',
     slug: 'huong-nghiep',
     name: 'Câu lạc bộ Hướng nghiệp',
     shortName: 'CLB Hướng nghiệp',
@@ -135,6 +163,7 @@ export const CLUBS: Club[] = [
   },
   {
     id: 'robotics',
+    kind: 'club',
     slug: 'robotics',
     name: 'Câu lạc bộ Robotics',
     shortName: 'CLB Robotics',

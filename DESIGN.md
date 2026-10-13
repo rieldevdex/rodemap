@@ -163,6 +163,11 @@ Scale (fluid): `--text-xs` 12 · `--text-sm` 14 · `--text-md` 16 ·
   "your route". Hovering or focusing a station opens a station card.
 - **StationCard**: event summary. Code badge + category, title, club, mono
   date/time, place, seats left, deadline, one-line summary by Mochi, actions.
+  An external competition (published by Phòng Cố vấn Học tập) adds a line
+  "Đơn vị tổ chức: …" under the publisher and a neutral StatusTag "Cuộc thi
+  ngoài trường" (icon `external`) before its status; the event page repeats
+  the tag and explains the office's role in a ground box with an ink edge.
+  (Added 2026-10-13.)
 - **LineBadge**: two-letter code on a category color, used everywhere a
   category appears.
 - **DepartureBoard**: the "Sắp diễn ra" list on the dashboard, styled like a

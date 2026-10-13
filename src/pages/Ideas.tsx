@@ -11,6 +11,7 @@ import { PageHead } from '../components/molecules/PageHead';
 import { ProposalCard } from '../components/molecules/ProposalCard';
 import { ActivityProposalForm, CollaborationForm } from '../components/organisms/ProposalForm';
 import { CLUBS } from '../data/clubs';
+import { studentClubs } from '../domain/clubs';
 import { formatDate, toIsoDateTime, toMillis } from '../domain/dates';
 import { gradesLabel } from '../domain/events';
 import { charCount } from '../domain/moderation';
@@ -40,9 +41,13 @@ import { useCatalog, type Catalog } from '../state/useCatalog';
 import './Ideas.css';
 
 const TONES: Record<ProposalStatus, StatusTone> = { pending: 'neutral', accepted: 'ok', declined: 'stop' };
-const KNOWN_CLUB_IDS: ReadonlySet<string> = new Set(CLUBS.map((c) => c.id));
-/** Clubs a student proposal can name or be handed to (HĐHS reviews them, so it is offered separately). */
-const ORGANISER_CLUBS = CLUBS.filter((c) => c.id !== 'hdhs');
+/**
+ * Student clubs only: the clubs a student proposal can name or be handed to, and the only ones that
+ * send or receive collaboration proposals. HĐHS reviews proposals (offered separately) and the
+ * offices (Phòng Cố vấn Học tập) take no part in Đề xuất.
+ */
+const STUDENT_CLUBS = studentClubs(CLUBS);
+const KNOWN_CLUB_IDS: ReadonlySet<string> = new Set(STUDENT_CLUBS.map((c) => c.id));
 const EYEBROW = 'Đề xuất · Năm học 2026–2027';
 
 function SentOn({ at }: { at: string }) {
@@ -193,7 +198,7 @@ function AnswerDialog({ target, onAnswer, onCancel }: { target: AnswerTarget | n
             }}
           >
             <option value="">Hội đồng Học sinh</option>
-            {ORGANISER_CLUBS.map((c) => (
+            {STUDENT_CLUBS.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.shortName}
               </option>
@@ -291,7 +296,7 @@ function StudentIdeas({ catalog }: { catalog: Catalog }) {
               Gửi đề xuất
             </h2>
             <StatusNote text={status} />
-            <ActivityProposalForm clubs={ORGANISER_CLUBS} defaultGrades={grade === undefined ? [] : [grade]} onSubmit={submit} />
+            <ActivityProposalForm clubs={STUDENT_CLUBS} defaultGrades={grade === undefined ? [] : [grade]} onSubmit={submit} />
           </div>
           <aside className="ideas__aside" aria-label="Nguyên tắc gửi đề xuất">
             <h3>Nguyên tắc gửi đề xuất</h3>
@@ -590,7 +595,7 @@ function ClubIdeas({ catalog, club }: { catalog: Catalog; club: Club }) {
               setStatus('');
             }}
           >
-            {CLUBS.map((c) => (
+            {STUDENT_CLUBS.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.shortName}
               </option>
@@ -610,7 +615,7 @@ function ClubIdeas({ catalog, club }: { catalog: Catalog; club: Club }) {
               Gửi đề xuất hợp tác
             </h2>
             <StatusNote text={status} />
-            <CollaborationForm key={club.id} fromClub={club} clubs={CLUBS} months={months} onSubmit={submit} />
+            <CollaborationForm key={club.id} fromClub={club} clubs={STUDENT_CLUBS} months={months} onSubmit={submit} />
           </div>
           <aside className="ideas__aside" aria-label="Quy trình hợp tác">
             <h3>Quy trình hợp tác</h3>
@@ -764,7 +769,8 @@ export function IdeasPage() {
   const catalog = useCatalog();
   const { state } = catalog;
   if (state.role === 'moderator') return <ModeratorIdeas catalog={catalog} />;
-  const club = CLUBS.find((c) => c.id === state.activeClubId) ?? CLUBS[0];
+  // Only clubs act here: with the council or an office as the demo publisher, the first club is shown (nothing is dispatched).
+  const club = STUDENT_CLUBS.find((c) => c.id === state.activeClubId) ?? STUDENT_CLUBS[0];
   if (state.role === 'club' && club) return <ClubIdeas catalog={catalog} club={club} />;
   return <StudentIdeas catalog={catalog} />;
 }

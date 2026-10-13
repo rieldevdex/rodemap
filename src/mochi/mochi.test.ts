@@ -8,6 +8,7 @@ import { addNotice, emptyConversation, needsRestart, runOfflineTurn, runOnlineTu
 import { classify, findEventInText, offlineDraft, respondOffline, windowInText } from './offline/engine';
 import type { MochiResponse } from './protocol';
 import { buildSnapshot } from './snapshot';
+import { MOCHI_SYSTEM_PROMPT } from './system-prompt';
 import { MOCHI_TOOLS, TOOL_NAMES } from './tools/schemas';
 import { eventBrief, executeTool, resolveClub } from './tools/executors';
 
@@ -17,6 +18,8 @@ const ctx = (state: AppState = seed()) => ({ state, now });
 const approved = EVENTS.filter((e) => e.status === 'approved');
 const upcoming = approved.filter((e) => toMillis(e.end) > now);
 const firstOpen = upcoming.find((e) => e.capacity - e.seatsTaken > 5 && toMillis(e.registrationDeadline) > now && e.eligibleGrades.includes(11));
+/** The first external academic competition (published by Phòng Cố vấn Học tập). */
+const competition = upcoming.find((e) => e.organizer !== undefined);
 
 describe('tool schemas', () => {
   it('defines eleven strict tools with closed object schemas', () => {
@@ -162,6 +165,26 @@ describe('executors', () => {
     const b = eventBrief(e, ctx());
     expect(b.time).toMatch(/^\d{2}:\d{2}–\d{2}:\d{2}$/);
     expect(b.registration_deadline).toMatch(/^\d{2}:\d{2} ngày \d{2}\/\d{2}\/\d{4}$/);
+    expect(b).not.toHaveProperty('external_competition');
+    expect(b).not.toHaveProperty('organizer');
+  });
+
+  it('flags external competitions with their organiser and Phòng Cố vấn Học tập as the source', () => {
+    if (!competition) throw new Error('fixture: no external competition');
+    const facts = { external_competition: true, organizer: competition.organizer, information_source: 'Phòng Cố vấn Học tập' };
+    expect(eventBrief(competition, ctx())).toMatchObject({ ...facts, club: 'Phòng Cố vấn Học tập' });
+    expect(executeTool('get_event', { event_id: competition.id }, ctx()).result).toMatchObject(facts);
+    const found = executeTool('search_events', { query: 'cuộc thi ngoài trường', limit: 10 }, ctx()).result as { events: { id: string; organizer?: string }[] };
+    expect(found.events.length).toBeGreaterThan(0);
+    expect(found.events.every((e) => e.organizer !== undefined)).toBe(true);
+    expect(found.events.map((e) => e.id)).toContain(competition.id);
+    const byOffice = executeTool('search_events', { club_id: 'Phòng Cố vấn Học tập', limit: 10 }, ctx()).result as { total: number };
+    expect(byOffice.total).toBe(EVENTS.filter((e) => e.clubId === 'co-van-hoc-tap').length);
+    const week = executeTool('summarize_events', { scope: 'week', date: competition.start.slice(0, 10) }, ctx()).result as { events: { id: string; organizer?: string }[] };
+    expect(week.events.find((e) => e.id === competition.id)?.organizer).toBe(competition.organizer);
+    const office = executeTool('get_club', { club_id: 'co-van-hoc-tap' }, ctx()).result as { short_name: string; upcoming_events: { external_competition?: boolean }[] };
+    expect(office.short_name).toBe('Phòng Cố vấn Học tập');
+    expect(office.upcoming_events.every((e) => e.external_competition === true)).toBe(true);
   });
 });
 
@@ -229,6 +252,17 @@ describe('offline engine', () => {
     const draft = offlineDraft(e);
     expect(draft).toContain(e.title);
     expect(draft).toContain('[Bổ sung:');
+    if (!competition) throw new Error('fixture: no external competition');
+    expect(offlineDraft(competition)).toContain(`do ${competition.organizer ?? ''} tổ chức`);
+  });
+
+  it('names the organiser of an external competition and Phòng Cố vấn Học tập as the source', () => {
+    if (!competition) throw new Error('fixture: no external competition');
+    const reply = respondOffline(`${competition.title} tổ chức ở đâu`, ctx());
+    expect(reply.focusEventId).toBe(competition.id);
+    expect(reply.text).toContain(`là cuộc thi ngoài trường do ${competition.organizer ?? ''} tổ chức`);
+    expect(reply.text).toContain('Thông tin cuộc thi do Phòng Cố vấn Học tập cập nhật trên Rodemap');
+    expect(reply.text).not.toContain('do Phòng Cố vấn Học tập tổ chức');
   });
 });
 
@@ -241,6 +275,23 @@ describe('snapshot', () => {
     expect(short).not.toContain('candidate_events');
     expect(full.length).toBeLessThan(16_000);
     expect(buildSnapshot({ ...seed(), profile: null }, now, false)).toContain('"profile":null');
+  });
+
+  it('marks candidate external competitions with their organiser', () => {
+    if (!competition) throw new Error('fixture: no external competition');
+    const data = JSON.parse(buildSnapshot(seed(), now, true).replace('<du_lieu_rodemap>', '').replace('</du_lieu_rodemap>', '')) as {
+      candidate_events: { id: string; external_competition?: boolean; organizer?: string }[];
+    };
+    const shown = data.candidate_events.find((e) => e.id === competition.id);
+    expect(shown).toMatchObject({ external_competition: true, organizer: competition.organizer });
+    for (const e of data.candidate_events.filter((c) => c.id !== competition.id && c.organizer === undefined)) expect(e).not.toHaveProperty('external_competition');
+  });
+});
+
+describe('system prompt', () => {
+  it('tells Mochi to name the organiser of an external competition and its source', () => {
+    expect(MOCHI_SYSTEM_PROMPT).toContain('Các cuộc thi học thuật ngoài trường (external_competition) do Phòng Cố vấn Học tập cập nhật trên Rodemap');
+    expect(MOCHI_SYSTEM_PROMPT).toContain('nêu rõ đơn vị tổ chức (organizer)');
   });
 });
 

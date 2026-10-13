@@ -32,6 +32,7 @@ function toDraft(e: SchoolEvent): EventDraft {
     summary: e.summary,
     description: e.description,
     tags: e.tags,
+    ...(e.organizer === undefined ? {} : { organizer: e.organizer }),
   };
 }
 
@@ -108,6 +109,8 @@ export function ClubPortalPage() {
   };
 
   const lastReason = (s: Submission) => [...s.history].reverse().find((h) => h.reason)?.reason;
+  // Phòng Cố vấn Học tập relays external competitions and names their organiser; only clubs propose collaborations.
+  const office = club.kind === 'office';
 
   return (
     <>
@@ -121,10 +124,14 @@ export function ClubPortalPage() {
           </>
         }
         title="Cổng câu lạc bộ"
-        lead="Gửi sự kiện của câu lạc bộ để Hội đồng Học sinh kiểm duyệt. Sự kiện chỉ hiển thị với học sinh sau khi được phê duyệt."
+        lead={
+          office
+            ? `${club.shortName} cập nhật thông tin cuộc thi học thuật ngoài trường, kèm tên đơn vị tổ chức. Cuộc thi chỉ hiển thị với học sinh sau khi được Hội đồng Học sinh phê duyệt.`
+            : 'Gửi sự kiện của câu lạc bộ để Hội đồng Học sinh kiểm duyệt. Sự kiện chỉ hiển thị với học sinh sau khi được phê duyệt.'
+        }
       >
         <div className="club-portal__club">
-          <label htmlFor="club-portal-select">Câu lạc bộ đại diện</label>
+          <label htmlFor="club-portal-select">Đơn vị đại diện</label>
           <select
             id="club-portal-select"
             value={club.id}
@@ -150,7 +157,7 @@ export function ClubPortalPage() {
         <div className="container club-portal__layout">
           <div className="stack stack--md">
             <h2 id="club-portal-form" className="club-portal__title">
-              {editing ? 'Chỉnh sửa và gửi lại sự kiện' : 'Gửi sự kiện mới'}
+              {editing ? 'Chỉnh sửa và gửi lại sự kiện' : office ? 'Gửi cuộc thi ngoài trường' : 'Gửi sự kiện mới'}
             </h2>
             {editing ? (
               <div className="club-portal__reason">
@@ -164,8 +171,9 @@ export function ClubPortalPage() {
               </p>
             ) : null}
             <EventSubmissionForm
-              key={editing?.submission.id ?? 'new'}
+              key={`${club.id}-${editing?.submission.id ?? 'new'}`}
               clubId={club.id}
+              askOrganizer={office}
               defaultCategory={club.categories[0] ?? 'KN'}
               tags={TAGS}
               initial={editing ? toDraft(editing.event) : undefined}
@@ -183,17 +191,29 @@ export function ClubPortalPage() {
           <aside className="club-portal__aside" aria-label="Hướng dẫn gửi sự kiện">
             <h3>Quy trình kiểm duyệt</h3>
             <ol>
-              <li>Câu lạc bộ gửi sự kiện với đầy đủ thông tin.</li>
+              <li>{club.kind === 'club' ? 'Câu lạc bộ' : club.shortName} gửi sự kiện với đầy đủ thông tin.</li>
               <li>Hội đồng Học sinh phê duyệt, yêu cầu chỉnh sửa hoặc từ chối kèm lý do.</li>
               <li>Sự kiện được phê duyệt sẽ hiển thị trên Khám phá sự kiện và Lộ trình.</li>
             </ol>
-            <h3>Phối hợp với câu lạc bộ khác</h3>
-            <p className="club-portal__muted">
-              Câu lạc bộ có thể gửi đề xuất hợp tác tới câu lạc bộ khác và theo dõi đề xuất của học sinh được giao cho câu lạc bộ.
-            </p>
-            <Link className="club-portal__link" to="/de-xuat">
-              Mở trang Đề xuất hợp tác
-            </Link>
+            {office ? (
+              <>
+                <h3>Thông tin cuộc thi ngoài trường</h3>
+                <p className="club-portal__muted">
+                  Ghi rõ đơn vị tổ chức, thể lệ, hạn nộp hồ sơ của ban tổ chức và cách thức Phòng hỗ trợ học sinh trong phần mô tả.
+                  Hạn đăng ký trên Rodemap là thời hạn Phòng tổng hợp danh sách học sinh, cần trước hạn nộp hồ sơ của ban tổ chức.
+                </p>
+              </>
+            ) : club.kind === 'club' ? (
+              <>
+                <h3>Phối hợp với câu lạc bộ khác</h3>
+                <p className="club-portal__muted">
+                  Câu lạc bộ có thể gửi đề xuất hợp tác tới câu lạc bộ khác và theo dõi đề xuất của học sinh được giao cho câu lạc bộ.
+                </p>
+                <Link className="club-portal__link" to="/de-xuat">
+                  Mở trang Đề xuất hợp tác
+                </Link>
+              </>
+            ) : null}
           </aside>
         </div>
       </section>
@@ -204,11 +224,14 @@ export function ClubPortalPage() {
             Sự kiện đã gửi
           </h2>
           {rows.length === 0 ? (
-            <p className="club-portal__muted">Câu lạc bộ chưa gửi sự kiện nào qua cổng. Sự kiện đã gửi sẽ được liệt kê tại đây cùng trạng thái kiểm duyệt.</p>
+            <p className="club-portal__muted">
+              {club.kind === 'club' ? 'Câu lạc bộ' : club.shortName} chưa gửi sự kiện nào qua cổng. Sự kiện đã gửi sẽ được liệt kê tại đây
+              cùng trạng thái kiểm duyệt.
+            </p>
           ) : (
             <div className="club-portal__table-wrap">
               <table className="club-portal__table">
-                <caption className="visually-hidden">Sự kiện câu lạc bộ đã gửi và trạng thái kiểm duyệt</caption>
+                <caption className="visually-hidden">Sự kiện đã gửi và trạng thái kiểm duyệt</caption>
                 <thead>
                   <tr>
                     <th scope="col">Sự kiện</th>

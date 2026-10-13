@@ -4,6 +4,7 @@ import { MonoTime } from '../components/atoms/MonoTime';
 import { PageHead } from '../components/molecules/PageHead';
 import { StationCard } from '../components/molecules/StationCard';
 import { NewsRelated } from '../components/organisms/NewsRelated';
+import { CLUB_KIND_LABELS } from '../domain/clubs';
 import { formatDate, toMillis } from '../domain/dates';
 import { deadlineDaysLeft, isPast, registrationState, seatsLeft } from '../domain/events';
 import { Link, useRoute } from '../router';
@@ -36,13 +37,17 @@ export function ClubDetailPage() {
   const events = selectEventsForClub(state, club.id);
   const upcoming = events.filter((e) => !isPast(e, now));
   const past = events.filter((e) => isPast(e, now)).reverse();
+  // Phòng Cố vấn Học tập relays external competitions; the council and clubs organise events.
+  const office = club.kind === 'office';
+  const isClub = club.kind === 'club';
+  const items = office ? 'cuộc thi' : 'sự kiện';
 
   return (
     <>
       <PageHead
         eyebrow={
           <>
-            Câu lạc bộ
+            {CLUB_KIND_LABELS[club.kind]}
             {club.categories.map((c) => (
               <LineBadge key={c} code={c} showName size="sm" />
             ))}
@@ -57,7 +62,7 @@ export function ClubDetailPage() {
         {state.role === 'club' ? (
           <div className="cluster">
             <Button to="/cong-cau-lac-bo" variant="secondary" iconEnd="arrow-right">
-              Gửi sự kiện qua Cổng câu lạc bộ
+              {office ? 'Cập nhật cuộc thi qua Cổng câu lạc bộ' : 'Gửi sự kiện qua Cổng câu lạc bộ'}
             </Button>
           </div>
         ) : null}
@@ -66,11 +71,12 @@ export function ClubDetailPage() {
       <section className="band band--surface" aria-labelledby="club-upcoming">
         <div className="container stack stack--md">
           <h2 id="club-upcoming" className="clubs__name">
-            Sự kiện sắp diễn ra
+            {office ? 'Cuộc thi ngoài trường sắp diễn ra' : 'Sự kiện sắp diễn ra'}
           </h2>
           {upcoming.length === 0 ? (
             <p className="clubs__full">
-              Câu lạc bộ chưa có sự kiện sắp diễn ra. Vui lòng theo dõi Lộ trình hoặc khám phá sự kiện của các câu lạc bộ khác.
+              {isClub ? 'Câu lạc bộ' : club.shortName} chưa có {items} sắp diễn ra. Vui lòng theo dõi Lộ trình hoặc khám phá sự kiện
+              của các câu lạc bộ khác.
             </p>
           ) : (
             <div className="club-detail__events">
@@ -96,10 +102,14 @@ export function ClubDetailPage() {
       <section className="band" aria-labelledby="club-past">
         <div className="container stack stack--md">
           <h2 id="club-past" className="clubs__name">
-            Sự kiện đã tổ chức
+            {office ? 'Cuộc thi đã diễn ra' : 'Sự kiện đã tổ chức'}
           </h2>
           {past.length === 0 ? (
-            <p className="clubs__full">Câu lạc bộ chưa tổ chức sự kiện nào trong năm học này.</p>
+            <p className="clubs__full">
+              {office
+                ? `${club.shortName} chưa cập nhật cuộc thi nào đã diễn ra trong năm học này.`
+                : `${isClub ? 'Câu lạc bộ' : club.shortName} chưa tổ chức sự kiện nào trong năm học này.`}
+            </p>
           ) : (
             <ul className="club-detail__past">
               {past.map((e) => (

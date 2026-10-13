@@ -97,7 +97,7 @@ function StationChoices<T extends string>({ name, options, value, onSelect }: St
 }
 
 /**
- * Filters for "Khám phá sự kiện": lĩnh vực, câu lạc bộ, khối, thời gian, hình thức, hạn đăng ký
+ * Filters for "Khám phá sự kiện": lĩnh vực, câu lạc bộ và đơn vị, khối, thời gian, hình thức, hạn đăng ký
  * and tình trạng. Presentational: the value and the facet counts come in through props and every
  * change goes out through `onChange` (applied at once in the rail, held as a draft in the sheet).
  */
@@ -152,7 +152,7 @@ export function FilterRail<V extends FilterRailValue>({
       </FilterGroup>
 
       <FilterGroup
-        title="Câu lạc bộ"
+        title="Câu lạc bộ và đơn vị"
         selectedCount={value.clubIds.length}
         onClear={() => {
           onChange({ ...value, clubIds: [] });

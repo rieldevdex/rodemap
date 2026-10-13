@@ -35,8 +35,15 @@ export const GRADE_LEVELS: readonly { name: string; grades: readonly Grade[] }[]
   { name: 'Trung học phổ thông', grades: [10, 11, 12] },
 ];
 
+/**
+ * Who publishes on Rodemap: a student club, the Hội đồng Học sinh (school-wide events) or a
+ * school office such as Phòng Cố vấn Học tập (external academic competitions).
+ */
+export type ClubKind = 'club' | 'council' | 'office';
+
 export interface Club {
   id: string;
+  kind: ClubKind;
   /** ASCII slug used in URLs. */
   slug: string;
   /** Full name, e.g. "Câu lạc bộ Tranh biện". */
@@ -78,6 +85,12 @@ export interface SchoolEvent {
   /** Tag ids from src/data/tags.ts. */
   tags: string[];
   status: EventStatus;
+  /**
+   * The external body organising the event, e.g. "Trường đại học đối tác". Set only for
+   * competitions organised outside the school ("Cuộc thi ngoài trường"), which a school office
+   * (the publisher, `clubId`) relays on Rodemap.
+   */
+  organizer?: string;
 }
 
 /** "Kiểm tra định kỳ" zones and holidays drawn on the RouteMap. */
@@ -182,7 +195,7 @@ export interface Submission {
   history: ReviewNote[];
 }
 
-/** Fields a club fills in the submission form. */
+/** Fields a club fills in the submission form (`organizer` only for Phòng Cố vấn Học tập). */
 export type EventDraft = Omit<SchoolEvent, 'id' | 'slug' | 'status' | 'seatsTaken'>;
 
 /* ── Derived ────────────────────────────────────────────────────────── */

@@ -97,6 +97,16 @@ describe('validateDraft', () => {
     expect(check({ description: 'a'.repeat(80) }).description).toBeUndefined();
   });
 
+  it('checks the external organiser only when the draft carries one (3–120 characters, trimmed)', () => {
+    expect(validateDraft(valid, now).organizer).toBeUndefined();
+    expect(check({ organizer: '' }).organizer).toBe('Tên đơn vị tổ chức cần có từ 3 đến 120 ký tự.');
+    expect(check({ organizer: '  ab  ' }).organizer).toBeDefined();
+    expect(check({ organizer: 'abc' }).organizer).toBeUndefined();
+    expect(check({ organizer: 'Trường đại học đối tác' })).toEqual({});
+    expect(check({ organizer: 'a'.repeat(120) }).organizer).toBeUndefined();
+    expect(check({ organizer: 'a'.repeat(121) }).organizer).toBeDefined();
+  });
+
   it('requires a location and at least one grade', () => {
     expect(check({ location: '   ' }).location).toBe('Vui lòng nhập địa điểm tổ chức.');
     expect(check({ eligibleGrades: [] }).eligibleGrades).toBe('Vui lòng chọn ít nhất một khối được phép tham gia.');

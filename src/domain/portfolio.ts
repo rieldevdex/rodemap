@@ -1,6 +1,6 @@
 /** Portfolio (Hồ sơ năng lực) aggregation and export. Pure. */
 import { toIsoDate, toIsoDateTime } from './dates';
-import { eventHours, eventStart, isPast, sortByStart } from './events';
+import { eventHours, eventStart, isExternalCompetition, isPast, sortByStart } from './events';
 import {
   CATEGORY_CODES,
   type CategoryCode,
@@ -24,8 +24,11 @@ export const REFLECTION_STATUS_LABELS = {
 export type ReflectionStatusLabel = (typeof REFLECTION_STATUS_LABELS)[keyof typeof REFLECTION_STATUS_LABELS];
 
 export interface PortfolioExportEntry {
-  /** When the event is no longer known: title falls back to the event id, `date` is null. `club` is null when unknown. */
-  event: { title: string; club: string | null; category: CategoryCode; date: IsoDate | null };
+  /**
+   * When the event is no longer known: title falls back to the event id, `date` is null. `club`
+   * (the publisher) is null when unknown; `organizer` is set for an external competition.
+   */
+  event: { title: string; club: string | null; organizer?: string; category: CategoryCode; date: IsoDate | null };
   role: string;
   hours: number;
   reflection: string;
@@ -148,6 +151,7 @@ export function portfolioJson(
       event: {
         title: event?.title ?? entry.eventId,
         club: club?.name ?? null,
+        ...(event && isExternalCompetition(event) ? { organizer: event.organizer } : {}),
         category: entry.category,
         date: event ? toIsoDate(start) : null,
       },

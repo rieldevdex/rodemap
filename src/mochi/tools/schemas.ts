@@ -43,7 +43,7 @@ export const MOCHI_TOOLS: readonly ToolDefinition[] = [
   {
     name: 'search_events',
     description:
-      'Search approved Rodemap events. Call this whenever the student asks about events matching a topic, category, club, date range or format, or when you need event ids. Returns at most `limit` events with id, title, category, club, start, end, location, seats left, registration deadline and the student\'s registration status. Never describe an event that no tool or the data snapshot returned.',
+      'Search approved Rodemap events. Call this whenever the student asks about events matching a topic, category, club, date range or format, or when you need event ids. Returns at most `limit` events with id, title, category, club, start, end, location, seats left, registration deadline and the student\'s registration status; an external academic competition (cuộc thi ngoài trường) also carries external_competition, its organizer and information_source (Phòng Cố vấn Học tập). Never describe an event that no tool or the data snapshot returned.',
     strict: true,
     input_schema: {
       type: 'object',
@@ -65,7 +65,7 @@ export const MOCHI_TOOLS: readonly ToolDefinition[] = [
   {
     name: 'get_event',
     description:
-      'Get full details of one event: description, Mochi summary, club, time, place, eligible grades, seats left, deadline, the student\'s registration status and any time conflicts with the student\'s plan. Call it before answering detailed questions about a specific event.',
+      'Get full details of one event: description, Mochi summary, club, time, place, eligible grades, seats left, deadline, the student\'s registration status and any time conflicts with the student\'s plan; for an external academic competition also external_competition, organizer and information_source. Call it before answering detailed questions about a specific event.',
     strict: true,
     input_schema: { type: 'object', properties: { event_id: eventId }, required: ['event_id'], additionalProperties: false },
   },
@@ -141,7 +141,7 @@ export const MOCHI_TOOLS: readonly ToolDefinition[] = [
   {
     name: 'summarize_events',
     description:
-      'Collect the facts needed to summarise one event, a club\'s events, a week or a month (scope). Returns structured facts; write the summary yourself from these facts only. For week/month, `date` is any day inside the period (default: today).',
+      'Collect the facts needed to summarise one event, a club\'s events, a week or a month (scope). Returns structured facts (external academic competitions carry external_competition, organizer and information_source); write the summary yourself from these facts only. For week/month, `date` is any day inside the period (default: today).',
     strict: true,
     input_schema: {
       type: 'object',

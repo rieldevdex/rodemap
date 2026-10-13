@@ -67,6 +67,9 @@ export const DRAFT_LIMITS = {
   summaryMin: 40,
   summaryMax: 400,
   descriptionMin: 80,
+  /** External organiser of a competition (Phòng Cố vấn Học tập only). */
+  organizerMin: 3,
+  organizerMax: 120,
   capacityMin: 1,
   capacityMax: 2000,
   /** Longest event that starts and ends on the same calendar day. */
@@ -92,7 +95,8 @@ function parseOrNull(value: string): Millis | null {
 
 /**
  * Validates the club submission form. Rules: title 8–120 characters; summary 40–400;
- * description ≥ 80; location and eligible grades non-empty; capacity an integer 1–2000;
+ * description ≥ 80; organizer (when present: the external organiser of a competition) 3–120;
+ * location and eligible grades non-empty; capacity an integer 1–2000;
  * start within SCHOOL_YEAR; start < end; same-day events ≤ 12 h, multi-day events ≤ 3 days;
  * registration deadline ≤ start and > now.
  */
@@ -110,6 +114,12 @@ export function validateDraft(d: EventDraft, now: Millis): ValidationErrors {
   }
   if (charCount(d.description) < L.descriptionMin) {
     errors.description = `Phần mô tả chi tiết cần có ít nhất ${L.descriptionMin} ký tự.`;
+  }
+  if (d.organizer !== undefined) {
+    const organizerLength = charCount(d.organizer);
+    if (organizerLength < L.organizerMin || organizerLength > L.organizerMax) {
+      errors.organizer = `Tên đơn vị tổ chức cần có từ ${L.organizerMin} đến ${L.organizerMax} ký tự.`;
+    }
   }
   if (d.location.trim() === '') errors.location = 'Vui lòng nhập địa điểm tổ chức.';
   if (d.eligibleGrades.length === 0) errors.eligibleGrades = 'Vui lòng chọn ít nhất một khối được phép tham gia.';

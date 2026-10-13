@@ -7,6 +7,7 @@ import { PortfolioEntryCard } from '../components/organisms/PortfolioEntryCard';
 import { RouteSummary } from '../components/organisms/RouteSummary';
 import { CATEGORY_LABELS } from '../domain/category-labels';
 import { formatDate, formatDayLabel, toIsoDateTime, toMillis } from '../domain/dates';
+import { publisherLine } from '../domain/events';
 import { entryFromEvent, groupByCategory, hoursByCategory, portfolioJson, totalHours } from '../domain/portfolio';
 import { formatHours } from '../domain/text';
 import type { PortfolioEntry } from '../domain/types';
@@ -180,7 +181,7 @@ export function PortfolioPage() {
                       entry={entry}
                       eventTitle={event?.title ?? entry.eventId}
                       eventHref={event ? `/su-kien/${event.slug}` : null}
-                      clubName={event ? clubName(event.clubId) : ''}
+                      clubName={event ? publisherLine(event, clubName(event.clubId)) : ''}
                       dateLabel={start === null ? '' : formatDate(start)}
                       dateTime={event?.start ?? ''}
                       onSave={(patch) => {

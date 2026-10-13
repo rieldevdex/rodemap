@@ -11,7 +11,16 @@ import { NewsRelated } from '../components/organisms/NewsRelated';
 import { STATUS_LABELS } from '../content/moderation';
 import { CATEGORY_LABELS } from '../domain/category-labels';
 import { formatDate, formatDayLabel, formatLongDate, formatTime, formatTimeRange, toMillis } from '../domain/dates';
-import { deadlineDaysLeft, gradesLabel, isPast, registrationState, seatsLeft } from '../domain/events';
+import { publisherFactLabel } from '../domain/clubs';
+import {
+  deadlineDaysLeft,
+  EXTERNAL_COMPETITION_LABEL,
+  gradesLabel,
+  isExternalCompetition,
+  isPast,
+  registrationState,
+  seatsLeft,
+} from '../domain/events';
 import { googleCalendarUrl } from '../domain/gcal';
 import { buildIcs, icsFileName } from '../domain/ics';
 import { CLUBS } from '../data/clubs';
@@ -76,6 +85,11 @@ export function EventDetailPage() {
     .slice(0, 3);
   const gcal = googleCalendarUrl(event, { clubs: CLUBS, baseUrl: window.location.origin });
   const deadlineNote = daysLeft < 0 ? 'đã kết thúc' : daysLeft === 0 ? 'kết thúc hôm nay' : `còn ${daysLeft} ngày`;
+  // An external competition is organised outside the school; its publisher (Phòng Cố vấn Học tập) is the source.
+  const organizer = isExternalCompetition(event) ? event.organizer : null;
+  const publisher = club ? <Link to={`/cau-lac-bo/${club.slug}`}>{club.name}</Link> : clubName(event.clubId);
+  const publisherShort = club?.shortName ?? 'câu lạc bộ';
+  const relatedTitle = club?.kind === 'office' ? `Cuộc thi khác do ${club.shortName} cập nhật` : `Sự kiện khác của ${publisherShort}`;
 
   const downloadOne = () => {
     const ics = buildIcs([event], { now, clubs: CLUBS, calendarName: 'Lịch Rodemap', baseUrl: window.location.origin });
@@ -92,6 +106,11 @@ export function EventDetailPage() {
               <Link className="event-detail__club-link" to={`/cau-lac-bo/${club.slug}`}>
                 {club.shortName}
               </Link>
+            ) : null}
+            {organizer !== null ? (
+              <StatusTag tone="neutral" icon="external">
+                {EXTERNAL_COMPETITION_LABEL}
+              </StatusTag>
             ) : null}
           </>
         }
@@ -134,9 +153,16 @@ export function EventDetailPage() {
       <section className="band band--surface" aria-labelledby="event-facts">
         <div className="container event-detail__layout">
           <div className="stack stack--lg">
-            <MochiNote label="Mochi tóm tắt" footnote="Tóm tắt dựa trên thông tin do câu lạc bộ cung cấp.">
+            <MochiNote label="Mochi tóm tắt" footnote={`Tóm tắt dựa trên thông tin do ${club?.kind === 'club' ? 'câu lạc bộ' : publisherShort} cung cấp.`}>
               <p>{event.summary}</p>
             </MochiNote>
+
+            {organizer !== null ? (
+              <p className="event-detail__note" role="note">
+                Cuộc thi do {organizer} tổ chức. {club?.shortName ?? 'Đơn vị đăng tin'} cập nhật thông tin trên Rodemap, tổng hợp danh sách
+                học sinh đăng ký và hướng dẫn các bước tiếp theo theo quy định của đơn vị tổ chức.
+              </p>
+            ) : null}
 
             {info && info.conflicts.length > 0 && regState === 'open' ? (
               <div className="event-detail__warning" role="note">
@@ -199,9 +225,15 @@ export function EventDetailPage() {
                   {event.category} – {CATEGORY_LABELS[event.category]}
                 </dd>
               </div>
+              {organizer !== null ? (
+                <div>
+                  <dt>Đơn vị tổ chức</dt>
+                  <dd>{organizer}</dd>
+                </div>
+              ) : null}
               <div>
-                <dt>Câu lạc bộ phụ trách</dt>
-                <dd>{club ? <Link to={`/cau-lac-bo/${club.slug}`}>{club.name}</Link> : clubName(event.clubId)}</dd>
+                <dt>{publisherFactLabel(club?.kind, organizer !== null)}</dt>
+                <dd>{publisher}</dd>
               </div>
               <div>
                 <dt>Khối được phép tham gia</dt>
@@ -234,7 +266,7 @@ export function EventDetailPage() {
         <section className="band" aria-labelledby="event-related">
           <div className="container stack stack--md">
             <h2 id="event-related" className="event-detail__h2">
-              Sự kiện khác của {club?.shortName ?? 'câu lạc bộ'}
+              {relatedTitle}
             </h2>
             <div className="event-detail__related">
               {related.map((e) => (
