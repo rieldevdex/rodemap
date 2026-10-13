@@ -22,10 +22,10 @@ export interface ProposalPhase {
 }
 
 export const CANDIDATE = {
-  name: '[Họ và tên]',
-  className: '[Lớp]',
-  position: '[Vị trí ứng tuyển]',
-  message: '[Thông điệp tranh cử]',
+  name: 'Nguyễn Thanh Lâm',
+  className: '12A1',
+  position: 'Chủ Tịch',
+  message: '“Vì tương lai của bạn.”',
 } as const;
 
 export const PROPOSAL_TITLE = 'Đề án xây dựng nền tảng Rodemap';
