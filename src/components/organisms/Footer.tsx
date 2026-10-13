@@ -29,6 +29,9 @@ export function Footer() {
               <Link to="/ban-tin">Bản tin</Link>
             </li>
             <li>
+              <Link to="/de-xuat">Đề xuất hoạt động</Link>
+            </li>
+            <li>
               <Link to="/kham-pha">Khám phá sự kiện</Link>
             </li>
           </ul>

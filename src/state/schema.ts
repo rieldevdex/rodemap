@@ -1,11 +1,14 @@
 /** Persisted application state: shape, seed and versioned migration. Pure. */
 import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS, SEED_SUBMISSIONS } from '../data/seed';
 import type {
+  ActivityProposal,
+  CollaborationProposal,
   EventStatus,
   IsoDate,
   NewsPost,
   PortfolioEntry,
   Profile,
+  ProposalResponse,
   Registration,
   Role,
   SchoolEvent,
@@ -32,6 +35,13 @@ export interface AppState {
   submissions: Submission[];
   /** Articles published through Soạn bài viết (the seed articles live in src/data/news.ts). */
   newsPosts: NewsPost[];
+  /** Proposals sent in the demo (the sample ones live in src/data/proposals.ts). */
+  proposals: ActivityProposal[];
+  collaborations: CollaborationProposal[];
+  /** Answers given in the demo, by proposal id (seed or demo); they override the sample answers. */
+  proposalResponses: Record<string, ProposalResponse>;
+  /** Proposals the demo student supports. */
+  supportedProposals: string[];
   theme: ThemePreference;
   /** Overrides "today" for the demo; null follows the real clock. */
   demoToday: IsoDate | null;
@@ -56,6 +66,10 @@ export function createSeedState(): AppState {
     moderation: {},
     submissions: structuredClone(SEED_SUBMISSIONS),
     newsPosts: [],
+    proposals: [],
+    collaborations: [],
+    proposalResponses: {},
+    supportedProposals: [],
     theme: 'system',
     demoToday: null,
     mochiForcedOffline: false,
@@ -94,6 +108,10 @@ export function isAppStateV1(x: unknown): x is AppState {
     isRecord(x.moderation) &&
     Array.isArray(x.submissions) &&
     Array.isArray(x.newsPosts) &&
+    Array.isArray(x.proposals) &&
+    Array.isArray(x.collaborations) &&
+    isRecord(x.proposalResponses) &&
+    Array.isArray(x.supportedProposals) &&
     typeof x.theme === 'string' &&
     THEMES.includes(x.theme) &&
     (x.demoToday === null || (typeof x.demoToday === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.demoToday))) &&
@@ -105,9 +123,21 @@ export function isAppStateV1(x: unknown): x is AppState {
  * Upgrades any known persisted version to the current one.
  * Returns null for unknown or corrupt data (the caller falls back to the seed).
  */
+/** Fields added to v1 after it shipped, with their empty values (older saved states lack them). */
+const LATER_V1_FIELDS = {
+  newsPosts: () => [],
+  proposals: () => [],
+  collaborations: () => [],
+  proposalResponses: () => ({}),
+  supportedProposals: () => [],
+} as const;
+
 export function migrate(raw: unknown): AppState | null {
-  // v1 states saved before the newsletter existed have no newsPosts yet.
-  const upgraded = isRecord(raw) && raw.version === 1 && !('newsPosts' in raw) ? { ...raw, newsPosts: [] } : raw;
+  let upgraded = raw;
+  if (isRecord(raw) && raw.version === 1) {
+    const missing = Object.entries(LATER_V1_FIELDS).filter(([key]) => !(key in raw));
+    if (missing.length > 0) upgraded = { ...raw, ...Object.fromEntries(missing.map(([key, empty]) => [key, empty()])) };
+  }
   if (isAppStateV1(upgraded)) return upgraded;
   return null;
 }

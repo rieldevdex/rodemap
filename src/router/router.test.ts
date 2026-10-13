@@ -20,7 +20,7 @@ describe('ROUTES', () => {
   it('lists every screen once with a Vietnamese title', () => {
     const names = ROUTES.map((r) => r.name);
     expect(new Set(names).size).toBe(names.length);
-    expect(names).toHaveLength(17);
+    expect(names).toHaveLength(18);
     for (const r of ROUTES) expect(r.title.length).toBeGreaterThan(0);
   });
 
@@ -40,6 +40,7 @@ describe('ROUTES', () => {
       clubPortal: '/cong-cau-lac-bo',
       moderation: '/kiem-duyet',
       proposal: '/de-an',
+      ideas: '/de-xuat',
       news: '/ban-tin',
       newsCompose: '/ban-tin/soan-bai',
       newsArticle: '/ban-tin/:slug',

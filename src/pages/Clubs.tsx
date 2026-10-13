@@ -23,7 +23,11 @@ export function ClubsPage() {
         eyebrow={`Danh sách · ${CLUBS.length} câu lạc bộ`}
         title="Câu lạc bộ"
         lead="Các câu lạc bộ và Hội đồng Học sinh, kèm lĩnh vực hoạt động và các sự kiện sắp diễn ra trên Rodemap."
-      />
+      >
+        <p className="clubs__ideas">
+          Chưa có hoạt động bạn mong muốn? <Link to="/de-xuat">Gửi đề xuất hoạt động tới Hội đồng Học sinh</Link>
+        </p>
+      </PageHead>
       <section className="band band--surface" aria-labelledby="clubs-list">
         <div className="container stack stack--md">
           <h2 id="clubs-list" className="visually-hidden">

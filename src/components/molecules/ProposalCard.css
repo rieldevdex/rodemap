@@ -1,0 +1,80 @@
+.proposal-card {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  min-inline-size: 0;
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-md);
+}
+
+.proposal-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.proposal-card__title {
+  font-size: var(--text-lg);
+  line-height: var(--leading-snug);
+  overflow-wrap: anywhere;
+}
+
+.proposal-card__description {
+  color: var(--color-ink-2);
+  overflow-wrap: anywhere;
+}
+
+.proposal-card__details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+  padding: 0;
+  font-size: var(--text-sm);
+  list-style: none;
+}
+
+.proposal-card__meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-ink-2);
+}
+
+.proposal-card__response {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  background: var(--color-surface-2);
+  border-inline-start: var(--rule-strong) solid var(--color-ink);
+  border-radius: var(--radius-sm);
+}
+
+.proposal-card__response-heading {
+  font-weight: var(--weight-semibold);
+}
+
+.proposal-card__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-block-start: var(--space-3);
+  border-block-start: var(--rule-hair) solid var(--color-rule);
+}
+
+.proposal-card__aside {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.proposal-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

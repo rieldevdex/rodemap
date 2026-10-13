@@ -9,7 +9,8 @@ import { ACTION_LABELS, STATUS_LABELS } from '../content/moderation';
 import { formatDate, formatLongDate, formatTime, formatTimeRange, toIsoDateTime, toMillis } from '../domain/dates';
 import { gradesLabel } from '../domain/events';
 import type { ModerationDecision } from '../state/actions';
-import { selectAllEvents, selectModerationQueue } from '../state/selectors';
+import { Link } from '../router';
+import { selectAllEvents, selectModerationQueue, selectPendingActivityCount } from '../state/selectors';
 import { useCatalog } from '../state/useCatalog';
 import './Moderation.css';
 
@@ -27,6 +28,7 @@ export function ModerationPage() {
   const [reasonError, setReasonError] = useState('');
   const [status, setStatus] = useState('');
   const queue = selectModerationQueue(state);
+  const pendingIdeas = selectPendingActivityCount(state);
   const allEvents = selectAllEvents(state);
   const reviewed = state.submissions
     .map((s) => ({ s, event: allEvents.find((e) => e.id === s.eventId) }))
@@ -98,6 +100,11 @@ export function ModerationPage() {
       >
         <p className="moderation__count">
           <span className="mono">{queue.length}</span> sự kiện đang chờ duyệt
+        </p>
+        <p className="moderation__ideas">
+          <Link to="/de-xuat">
+            Đề xuất của học sinh: <span className="mono">{pendingIdeas}</span> đề xuất đang chờ xem xét
+          </Link>
         </p>
       </PageHead>
 

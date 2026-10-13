@@ -27,6 +27,7 @@ import {
   selectNews,
   selectPendingAttendance,
   selectPlanBudget,
+  selectActivityProposals,
   selectRecommendations,
   selectUpcomingMine,
 } from '../state/selectors';
@@ -48,6 +49,7 @@ export function DashboardPage() {
   const deadlines = selectDeadlinesThisWeek(state, now).slice(0, 5);
   const recs = selectRecommendations(state, now, { limit: 3 });
   const latestNews = selectNews(state, now).slice(0, 3);
+  const myProposals = selectActivityProposals(state).filter((v) => v.mine);
   const digest = weeklyDigest(publicEvents, { now, regs: state.registrations, periods: PERIODS });
   const covered = CATEGORY_CODES.filter((c) => myEvents.some((e) => e.category === c));
   const next = upcomingMine[0];
@@ -321,6 +323,20 @@ export function DashboardPage() {
                 </Link>
               </section>
             ) : null}
+
+            <section className="dashboard__panel" aria-labelledby="dash-ideas">
+              <h2 id="dash-ideas" className="dashboard__h3">
+                Đề xuất hoạt động
+              </h2>
+              <p className="dashboard__muted">
+                {myProposals.length === 0
+                  ? 'Gửi tới Hội đồng Học sinh đề xuất về hoạt động hoặc sự kiện bạn mong muốn được tổ chức trong năm học.'
+                  : `Bạn đã gửi ${String(myProposals.length)} đề xuất, trong đó ${String(myProposals.filter((v) => v.status === 'pending').length)} đề xuất đang được xem xét.`}
+              </p>
+              <Link className="dashboard__small-link" to="/de-xuat">
+                {myProposals.length === 0 ? 'Gửi đề xuất hoạt động' : 'Xem đề xuất và phản hồi'}
+              </Link>
+            </section>
           </aside>
         </div>
       </div>

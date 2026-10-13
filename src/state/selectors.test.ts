@@ -8,11 +8,14 @@ import { firstRoute } from '../domain/planner';
 import { recommendEvents } from '../domain/recommend';
 import { NEWS } from '../data/news';
 import { makeEvent, makePost, makeProfile, reg } from '../domain/test-fixtures';
-import type { SchoolEvent, Submission } from '../domain/types';
+import type { Grade, SchoolEvent, Submission } from '../domain/types';
 import { reducer } from './reducer';
 import { createDemoState, type AppState } from './schema';
 import {
+  selectActivityProposals,
   selectAllEvents,
+  selectClubCollaborations,
+  selectCollaborations,
   selectClub,
   selectClubBySlug,
   selectConflictsInPlan,
@@ -29,7 +32,10 @@ import {
   selectNewsForEvent,
   selectNewsSlugs,
   selectNow,
+  selectPendingActivityCount,
   selectPendingAttendance,
+  selectProposalResponses,
+  selectProposalsForClub,
   selectPlanBudget,
   selectPublicEvents,
   selectRecommendations,
@@ -570,5 +576,53 @@ describe('newsletter selectors', () => {
     expect(selectNewsForEvent(state, 'ev-018', NOW).map((p) => p.id)).toEqual(expect.arrayContaining(['bt-demo-a', 'bt-demo-b']));
     expect(selectNewsForClub(state, 'tranh-bien', NOW).map((p) => p.id)).toContain('bt-demo-a');
     expect(selectNewsForClub(state, 'tranh-bien', NOW).map((p) => p.id)).not.toContain('bt-demo-b');
+  });
+});
+
+describe('proposal selectors', () => {
+  const sent = {
+    id: 'dx-demo-1',
+    title: 'Giải Cờ tướng học sinh',
+    category: 'TT' as const,
+    description: 'Đề xuất tổ chức giải Cờ tướng dành cho học sinh toàn trường vào buổi chiều thứ Bảy.',
+    grades: [6, 7, 8] as Grade[],
+    clubId: 'inkstep',
+    authorGrade: 7 as const,
+    submittedAt: AT,
+    supporters: 0,
+  };
+
+  it('lists pending proposals first, most supported first, with my support and my own proposals', () => {
+    const state = stateWith({ proposals: [sent], supportedProposals: ['dx-006'] });
+    const views = selectActivityProposals(state);
+    const statuses = views.map((v) => v.status);
+    expect(statuses.indexOf('accepted')).toBeGreaterThan(statuses.lastIndexOf('pending'));
+    expect(statuses.indexOf('declined')).toBeGreaterThan(statuses.lastIndexOf('accepted'));
+    const pending = views.filter((v) => v.status === 'pending').map((v) => v.support);
+    expect([...pending].sort((a, b) => b - a)).toEqual(pending);
+    expect(views.find((v) => v.proposal.id === 'dx-006')).toMatchObject({ supportedByMe: true, support: 13, mine: false });
+    expect(views.find((v) => v.proposal.id === 'dx-demo-1')).toMatchObject({ mine: true, status: 'pending', response: null });
+    expect(views.find((v) => v.proposal.id === 'dx-001')?.response?.assignedClubId).toBe('toan-hoc');
+    expect(selectPendingActivityCount(state)).toBe(views.filter((v) => v.status === 'pending').length);
+  });
+
+  it('applies answers given in the demo over the sample ones', () => {
+    const state = stateWith({ proposalResponses: { 'dx-002': { status: 'declined', at: AT, by: 'hdhs', note: 'Chưa phù hợp với kế hoạch.', assignedClubId: null } } });
+    expect(selectProposalResponses(state)['dx-001']?.status).toBe('accepted');
+    expect(selectActivityProposals(state).find((v) => v.proposal.id === 'dx-002')?.status).toBe('declined');
+  });
+
+  it("splits a club's collaborations into received and sent", () => {
+    const { incoming, outgoing } = selectClubCollaborations(stateWith({}), 'inkstep');
+    expect(incoming.map((v) => v.proposal.id)).toContain('ht-001');
+    expect(incoming.every((v) => v.proposal.toClubId === 'inkstep')).toBe(true);
+    expect(outgoing.find((v) => v.proposal.id === 'ht-002')?.status).toBe('accepted');
+    expect(selectCollaborations(stateWith({})).length).toBeGreaterThanOrEqual(4);
+  });
+
+  it('finds the student proposals that name a club or were handed to it', () => {
+    const state = stateWith({ proposals: [sent] });
+    expect(selectProposalsForClub(state, 'inkstep').map((v) => v.proposal.id)).toEqual(expect.arrayContaining(['dx-007', 'dx-demo-1']));
+    expect(selectProposalsForClub(state, 'toan-hoc').map((v) => v.proposal.id)).toEqual(['dx-001']);
   });
 });

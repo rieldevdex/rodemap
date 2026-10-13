@@ -60,7 +60,7 @@ Tùy chọn: để giới hạn tần suất truy cập Mochi một cách bền 
 
 ## 5. Thay dữ liệu minh họa bằng dữ liệu thật
 
-Dữ liệu nằm trong `src/data/` (mỗi tệp đều ghi chú là dữ liệu minh họa): `clubs.ts`, `events.ts`, `calendar.ts` (các đợt kiểm tra định kỳ, ngày nghỉ), `seed.ts` (hồ sơ học sinh minh họa, chỉ dùng cho kiểm thử và ảnh chụp màn hình), `school.ts` (tên trường: Vinschool Smart City), `news.ts` (các bài viết của Bản tin Hội đồng Học sinh; mỗi bài viết ký tên một ban, không ghi họ tên học sinh). Thông tin ứng cử viên (`[Họ và tên]`, `[Lớp]`, `[Vị trí ứng tuyển]`, `[Thông điệp tranh cử]`) và thời gian dự kiến của từng giai đoạn trên trang Đề án nằm trong `src/content/proposal.ts`. Sau khi thay, thực hiện `npm run check` để đảm bảo dữ liệu hợp lệ.
+Dữ liệu nằm trong `src/data/` (mỗi tệp đều ghi chú là dữ liệu minh họa): `clubs.ts`, `events.ts`, `calendar.ts` (các đợt kiểm tra định kỳ, ngày nghỉ), `seed.ts` (hồ sơ học sinh minh họa, chỉ dùng cho kiểm thử và ảnh chụp màn hình), `school.ts` (tên trường: Vinschool Smart City), `news.ts` (các bài viết của Bản tin Hội đồng Học sinh; mỗi bài viết ký tên một ban, không ghi họ tên học sinh), `proposals.ts` (đề xuất hoạt động của học sinh, chỉ ghi khối của người gửi; đề xuất hợp tác giữa các câu lạc bộ và các phản hồi minh họa). Thông tin ứng cử viên (họ và tên, lớp, vị trí ứng tuyển, thông điệp tranh cử; hiển thị trên trang Đề án) và thời gian dự kiến của từng giai đoạn trên trang Đề án nằm trong `src/content/proposal.ts`. Sau khi thay, thực hiện `npm run check` để đảm bảo dữ liệu hợp lệ.
 
 ## 6. Hồ sơ học sinh và khối lớp
 
@@ -70,6 +70,16 @@ Rodemap dành cho học sinh từ khối 6 đến khối 12 (trung học cơ s�
 
 Trang **Bản tin** (`/ban-tin`) trình bày các bài viết của Hội đồng Học sinh theo từng số hằng tháng. Để đăng bài trong bản trình diễn: mở **Tài khoản minh họa** → chọn vai trò **HĐHS** → **Bản tin** → **Soạn bài viết**. Bài viết được hiển thị ngay sau khi nhấn **Đăng bài**, đồng thời xuất hiện tại trang Tổng quan, trang của các sự kiện được liên kết và trang của câu lạc bộ tổ chức các sự kiện đó. Mochi có thể giới thiệu bài viết khi học sinh hỏi về thông báo mới. Bài viết đăng trong bản trình diễn được lưu trên trình duyệt, luôn hiển thị dù ngày minh họa được đặt là ngày nào, và có thể gỡ bằng nút **Gỡ bài viết**.
 
-## 8. Cấu trúc mã nguồn
+## 8. Đề xuất hoạt động và đề xuất hợp tác
+
+Trang **Đề xuất** (`/de-xuat`) thay đổi theo vai trò trong **Tài khoản minh họa**:
+
+- **Học sinh** gửi đề xuất hoạt động hoặc sự kiện tới Hội đồng Học sinh (tên hoạt động, lĩnh vực, khối dự kiến tham gia, câu lạc bộ phù hợp nếu có, nội dung). Đề xuất chỉ hiển thị khối của người gửi, không ghi họ tên; biểu mẫu từ chối nội dung có số điện thoại hoặc địa chỉ thư điện tử. Học sinh có thể ủng hộ đề xuất của học sinh khác, lọc theo trạng thái và rút đề xuất của mình khi chưa được phản hồi.
+- **HĐHS** xem xét đề xuất của học sinh: **Tiếp nhận** (có thể giao câu lạc bộ phụ trách) hoặc **Không tiếp nhận** (bắt buộc nêu lý do). Trang Kiểm duyệt hiển thị số đề xuất đang chờ xem xét.
+- **Câu lạc bộ** gửi **đề xuất hợp tác** tới câu lạc bộ khác (câu lạc bộ đối tác, tháng dự kiến, nội dung và phân công), đồng ý hoặc từ chối đề xuất nhận được (bắt buộc nêu lý do khi từ chối), và theo dõi đề xuất của học sinh nêu tên hoặc được giao cho câu lạc bộ. Sau khi hai bên thống nhất, câu lạc bộ chủ trì gửi sự kiện qua Cổng câu lạc bộ để Hội đồng Học sinh kiểm duyệt.
+
+Đề xuất và phản hồi trong bản trình diễn được lưu trên trình duyệt; thanh điều hướng hiển thị mục **Đề xuất** với vai trò Học sinh, còn với vai trò Câu lạc bộ hoặc HĐHS trang được mở từ Cổng CLB hoặc Kiểm duyệt.
+
+## 9. Cấu trúc mã nguồn
 
 Xem `docs/ARCHITECTURE.md` (kiến trúc và giao kèo giữa các lớp) và `DESIGN.md` (hệ thống thiết kế).

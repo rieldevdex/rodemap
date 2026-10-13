@@ -11,6 +11,7 @@ import { slugify, validateDraft } from '../domain/moderation';
 import type { EventDraft, SchoolEvent, Submission } from '../domain/types';
 import { CLUBS } from '../data/clubs';
 import { TAGS } from '../data/tags';
+import { Link } from '../router';
 import { newId } from '../state/effects';
 import { selectSubmissionsForClub } from '../state/selectors';
 import { useCatalog } from '../state/useCatalog';
@@ -186,6 +187,13 @@ export function ClubPortalPage() {
               <li>Hội đồng Học sinh phê duyệt, yêu cầu chỉnh sửa hoặc từ chối kèm lý do.</li>
               <li>Sự kiện được phê duyệt sẽ hiển thị trên Khám phá sự kiện và Lộ trình.</li>
             </ol>
+            <h3>Phối hợp với câu lạc bộ khác</h3>
+            <p className="club-portal__muted">
+              Câu lạc bộ có thể gửi đề xuất hợp tác tới câu lạc bộ khác và theo dõi đề xuất của học sinh được giao cho câu lạc bộ.
+            </p>
+            <Link className="club-portal__link" to="/de-xuat">
+              Mở trang Đề xuất hợp tác
+            </Link>
           </aside>
         </div>
       </section>

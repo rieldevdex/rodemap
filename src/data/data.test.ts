@@ -3,6 +3,7 @@ import { addDays, formatDate, formatTime, isoWeekKey, overlaps, SCHOOL_YEAR, toM
 import { AFTER_SCHOOL_MINUTE, eventEnd, eventHours, eventStart, isOpenToAll } from '../domain/events';
 import { applyReview, canTransition, charCount } from '../domain/moderation';
 import { NEWS_LIMITS, newsBodyText, publishedPosts, RESERVED_NEWS_SLUGS } from '../domain/news';
+import { hasContactDetails, responseError, validateActivityDraft, validateCollaborationDraft } from '../domain/proposals';
 import { CATEGORY_CODES, GRADES, NEWS_CATEGORIES, type EventStatus, type NewsPost, type SchoolEvent, type Submission } from '../domain/types';
 import { PERIODS } from './calendar';
 import { CATEGORIES, categoryByCode } from './categories';
@@ -10,6 +11,7 @@ import { CLUBS } from './clubs';
 import { EVENTS } from './events';
 import { GOALS } from './goals';
 import { NEWS, NEWS_DEPARTMENTS } from './news';
+import { ACTIVITY_PROPOSALS, COLLABORATIONS, PROPOSAL_RESPONSES } from './proposals';
 import { SCHOOL } from './school';
 import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS, SEED_SUBMISSIONS } from './seed';
 import { TAGS, tagLabel } from './tags';
@@ -98,7 +100,7 @@ describe('data files', () => {
 
   it('every data file starts with the illustrative comment', () => {
     expect(Object.keys(sources).sort()).toEqual(
-      ['calendar', 'categories', 'clubs', 'events', 'goals', 'news', 'school', 'seed', 'tags'].map((n) => `./${n}.ts`),
+      ['calendar', 'categories', 'clubs', 'events', 'goals', 'news', 'proposals', 'school', 'seed', 'tags'].map((n) => `./${n}.ts`),
     );
     for (const [file, source] of Object.entries(sources)) {
       expect(source.startsWith(`${HEADER}\n`), file).toBe(true);
@@ -750,5 +752,55 @@ describe('news', () => {
     }
     const raw = JSON.stringify(NEWS);
     expect(raw).toBe(raw.normalize('NFC'));
+  });
+});
+
+describe('proposals', () => {
+  const clubIds = new Set(CLUBS.map((c) => c.id));
+  const all = [...ACTIVITY_PROPOSALS, ...COLLABORATIONS];
+
+  it('uses unique, patterned ids', () => {
+    expect(new Set(all.map((p) => p.id)).size).toBe(all.length);
+    for (const p of ACTIVITY_PROPOSALS) expect(p.id).toMatch(/^dx-\d{3}$/);
+    for (const p of COLLABORATIONS) expect(p.id).toMatch(/^ht-\d{3}$/);
+  });
+
+  it('holds valid, anonymous student proposals sent before the demo date', () => {
+    for (const p of ACTIVITY_PROPOSALS) {
+      expect(validateActivityDraft(p, clubIds), p.id).toEqual({});
+      expect(p.grades, p.id).toEqual([...new Set(p.grades)].sort((a, b) => a - b));
+      expect(GRADES.includes(p.authorGrade), p.id).toBe(true);
+      expect(p.supporters, p.id).toBeGreaterThanOrEqual(0);
+      expect(ms(p.submittedAt) < DEMO_TODAY && ms(p.submittedAt) >= ms(SCHOOL_YEAR.start), p.id).toBe(true);
+      expect(hasContactDetails(`${p.title} ${p.description}`), p.id).toBe(false);
+    }
+    // Every grade band is represented, and some proposals name a club.
+    expect(ACTIVITY_PROPOSALS.some((p) => p.grades.every((g) => g <= 9))).toBe(true);
+    expect(ACTIVITY_PROPOSALS.some((p) => p.clubId !== null)).toBe(true);
+  });
+
+  it('holds valid collaborations between two different clubs within the school year', () => {
+    for (const p of COLLABORATIONS) {
+      expect(validateCollaborationDraft(p, { fromClubId: p.fromClubId, knownClubIds: clubIds, now: ms(SCHOOL_YEAR.start) }), p.id).toEqual({});
+      expect(ms(p.submittedAt) < DEMO_TODAY, p.id).toBe(true);
+    }
+    // The default demo club (Inkstep) both receives and sends one.
+    expect(COLLABORATIONS.some((p) => p.toClubId === 'inkstep')).toBe(true);
+    expect(COLLABORATIONS.some((p) => p.fromClubId === 'inkstep')).toBe(true);
+  });
+
+  it('answers each proposal at most once, by the right party, after it was sent', () => {
+    for (const [id, r] of Object.entries(PROPOSAL_RESPONSES)) {
+      const activity = ACTIVITY_PROPOSALS.find((p) => p.id === id);
+      const collab = COLLABORATIONS.find((p) => p.id === id);
+      expect(activity ?? collab, id).toBeDefined();
+      expect(r.by, id).toBe(activity ? 'hdhs' : collab?.toClubId);
+      expect(responseError(r.status, r.note), id).toBeNull();
+      expect(ms(r.at) > ms((activity ?? collab)?.submittedAt ?? '') && ms(r.at) < DEMO_TODAY, id).toBe(true);
+      if (r.assignedClubId !== null) expect(clubIds.has(r.assignedClubId), id).toBe(true);
+    }
+    const statuses = new Set(Object.values(PROPOSAL_RESPONSES).map((r) => r.status));
+    expect(statuses).toEqual(new Set(['accepted', 'declined']));
+    expect(ACTIVITY_PROPOSALS.filter((p) => PROPOSAL_RESPONSES[p.id] === undefined).length).toBeGreaterThanOrEqual(3);
   });
 });

@@ -28,8 +28,10 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Hồ sơ', to: 'portfolio', section: ['portfolio'] },
   { label: 'Câu lạc bộ', to: 'clubs', section: ['clubs', 'club'] },
   { label: 'Bản tin', to: 'news', section: ['news', 'newsArticle', 'newsCompose'] },
-  { label: 'Cổng CLB', to: 'clubPortal', section: ['clubPortal'], role: 'club' },
-  { label: 'Kiểm duyệt', to: 'moderation', section: ['moderation'], role: 'moderator' },
+  // Students only: with the club or HĐHS role, /de-xuat belongs to Cổng CLB or Kiểm duyệt (nine items do not fit at 1080).
+  { label: 'Đề xuất', to: 'ideas', section: ['ideas'], role: 'student' },
+  { label: 'Cổng CLB', to: 'clubPortal', section: ['clubPortal', 'ideas'], role: 'club' },
+  { label: 'Kiểm duyệt', to: 'moderation', section: ['moderation', 'ideas'], role: 'moderator' },
 ];
 
 const TEXT_INPUT_EXCLUDED = new Set(['checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'color', 'file', 'image']);

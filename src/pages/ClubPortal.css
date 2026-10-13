@@ -126,3 +126,8 @@
     clip-path: inset(50%);
   }
 }
+
+.club-portal__link {
+  color: var(--color-ink);
+  font-weight: var(--weight-semibold);
+}

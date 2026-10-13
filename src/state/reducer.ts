@@ -1,6 +1,7 @@
 /** The single pure reducer for AppState. Invalid actions return the same state object. */
 import { EVENTS } from '../data/events';
 import { NEWS } from '../data/news';
+import { ACTIVITY_PROPOSALS, COLLABORATIONS, PROPOSAL_RESPONSES } from '../data/proposals';
 import { RESERVED_NEWS_SLUGS } from '../domain/news';
 import { applyReview, canTransition } from '../domain/moderation';
 import type { EventStatus, Registration, SchoolEvent } from '../domain/types';
@@ -127,6 +128,47 @@ export function reducer(state: AppState, action: Action): AppState {
 
     case 'news/remove':
       return state.newsPosts.some((p) => p.id === action.id) ? { ...state, newsPosts: state.newsPosts.filter((p) => p.id !== action.id) } : state;
+
+    case 'proposal/submit': {
+      const { proposal } = action;
+      if ([...ACTIVITY_PROPOSALS, ...state.proposals, ...COLLABORATIONS, ...state.collaborations].some((p) => p.id === proposal.id)) return state;
+      return { ...state, proposals: [...state.proposals, proposal] };
+    }
+
+    case 'proposal/toggleSupport': {
+      // Other students' proposals only: a proposal sent in this browser is the student's own.
+      if (!ACTIVITY_PROPOSALS.some((p) => p.id === action.id) || state.proposals.some((p) => p.id === action.id)) return state;
+      const supported = state.supportedProposals.includes(action.id)
+        ? state.supportedProposals.filter((id) => id !== action.id)
+        : [...state.supportedProposals, action.id];
+      return { ...state, supportedProposals: supported };
+    }
+
+    case 'collaboration/submit': {
+      const { proposal } = action;
+      if (proposal.fromClubId === proposal.toClubId) return state;
+      if ([...ACTIVITY_PROPOSALS, ...state.proposals, ...COLLABORATIONS, ...state.collaborations].some((p) => p.id === proposal.id)) return state;
+      return { ...state, collaborations: [...state.collaborations, proposal] };
+    }
+
+    case 'proposal/respond': {
+      const { id, response } = action;
+      if (PROPOSAL_RESPONSES[id] !== undefined || state.proposalResponses[id] !== undefined) return state;
+      if (response.status === 'declined' && response.note.trim() === '') return state;
+      const activity = [...ACTIVITY_PROPOSALS, ...state.proposals].some((p) => p.id === id);
+      const collaboration = [...COLLABORATIONS, ...state.collaborations].find((p) => p.id === id);
+      // HĐHS answers students; only the receiving club answers a collaboration.
+      if (activity ? response.by !== 'hdhs' : collaboration?.toClubId !== response.by) return state;
+      return { ...state, proposalResponses: { ...state.proposalResponses, [id]: response } };
+    }
+
+    case 'proposal/withdraw': {
+      // Only what was sent in this browser, and only while nobody has answered it.
+      if (state.proposalResponses[action.id] !== undefined) return state;
+      if (state.proposals.some((p) => p.id === action.id)) return { ...state, proposals: state.proposals.filter((p) => p.id !== action.id) };
+      if (state.collaborations.some((p) => p.id === action.id)) return { ...state, collaborations: state.collaborations.filter((p) => p.id !== action.id) };
+      return state;
+    }
 
     case 'role/set':
       return state.role === action.role ? state : { ...state, role: action.role };

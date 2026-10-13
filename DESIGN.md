@@ -167,6 +167,12 @@ Scale (fluid): `--text-xs` 12 · `--text-sm` 14 · `--text-md` 16 ·
   category appears.
 - **DepartureBoard**: the "Sắp diễn ra" list on the dashboard, styled like a
   departure board: time, code, title, place, status, in tabular columns.
+- **ProposalCard**: one proposal on Đề xuất. Code badge + category and a
+  status tag (Đang xem xét / Đã tiếp nhận / Chưa tiếp nhận, or Chờ phản hồi /
+  Đã đồng ý hợp tác / Đã từ chối for collaborations), title, description,
+  facts (grades, club, planned month), mono sender line (a student is shown by
+  grade only), the answer in a surface-2 box with an ink edge, then support
+  count and role actions under a hairline. (Added 2026-10-13.)
 - **PortfolioSheet**: the portfolio as a printable A4 document with a route
   summary at the top, then entries grouped by category.
 - **MochiDock**: Mochi lives at the bottom-right as a 56 px figure (not a
@@ -217,7 +223,9 @@ cycle) ·
   HĐHS it adds "Kiểm duyệt". (Tổng quan added 2026-10-07: the dashboard needs a
   permanent entry point. Bản tin added 2026-10-08 for the council's newsletter;
   from 1080 units up the search control shows its icon only, keeping its name
-  and the Ctrl K shortcut, so eight sections fit.)
+  and the Ctrl K shortcut, so eight sections fit. Đề xuất added 2026-10-13 for
+  the student role only; with the club or HĐHS role /de-xuat is drawn as part of
+  Cổng CLB or Kiểm duyệt, which link to it, so the nav never exceeds eight.)
 - Before the student has set up a profile, every page except Trang chủ, Thiết lập
   hồ sơ and Đề án leads to Thiết lập hồ sơ; the header then drops the nav,
   search and Danh mục for a primary "Thiết lập hồ sơ" button (not shown on that

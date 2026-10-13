@@ -114,6 +114,19 @@ export function validateNewsDraft(draft, knownEventIds): NewsDraftErrors;
 export function uniqueNewsSlug(title, taken): string; export function postFromDraft(draft, { id, now, takenSlugs, clubOfEvent }): NewsPost;
 export function groupThousands(n): string;                    // 6000 -> '6.000'
 
+// proposals.ts — Đề xuất hoạt động (học sinh → HĐHS) and đề xuất hợp tác (câu lạc bộ → câu lạc bộ)
+export const PROPOSAL_LIMITS;                                 // title 8–100, description 40–600, note ≤ 300, decline reason ≥ 10
+export const ACTIVITY_STATUS_LABELS / COLLABORATION_STATUS_LABELS: Record<ProposalStatus, string>;
+export function hasContactDetails(text): boolean;             // phone numbers / e-mail addresses are refused
+export function validateActivityDraft(d, knownClubIds): ActivityDraftErrors;
+export function validateCollaborationDraft(d, { fromClubId, knownClubIds, now }): CollaborationDraftErrors;
+export function responseError(status, note): string | null;   // a decline always carries a reason
+export function proposalMonths(now): string[]; export function proposalMonthLabel('2027-01'): 'Tháng 1/2027';
+export function proposalStatus(id, responses): ProposalStatus; export function supportCount(p, supported): number;
+export function rankActivityProposals(list, responses, supported); // pending → accepted → declined; support, newest, id
+export function newestCollaborations(list);
+export function activityProposalFromDraft(d, { id, now, authorGrade }) / collaborationFromDraft(d, { id, now, fromClubId });
+
 // calendar-view.ts — Lịch của tôi
 export function monthGrid(ms): Millis[][];                    // Monday-first weeks covering the month
 export function weekDays(ms): Millis[]; export function isInMonth(day, monthMs): boolean;
@@ -260,6 +273,7 @@ calendar.ts     export const PERIODS: CalendarPeriod[]
 seed.ts         export const SEED_PROFILE: Profile; SEED_REGISTRATIONS; SEED_PORTFOLIO; SEED_SUBMISSIONS
 news.ts         export const NEWS: NewsPost[]; NEWS_DEPARTMENTS   // council articles (one scheduled), signed by a department
 school.ts       export const SCHOOL = { name: 'Vinschool Smart City', schoolYear: '2026–2027' }
+proposals.ts    export const ACTIVITY_PROPOSALS; COLLABORATIONS; PROPOSAL_RESPONSES // anonymous (grade only) student proposals, club collaborations, sample answers
 ```
 
 ## State (`src/state`)
@@ -276,6 +290,11 @@ export interface AppState {
   moderation: Record<string, EventStatus>;    // status overrides for any event id
   submissions: Submission[];
   newsPosts: NewsPost[];                      // articles published through Soạn bài viết (v1 states without it migrate to [])
+  proposals: ActivityProposal[];              // students' proposals sent in the demo (only the author's grade is kept)
+  collaborations: CollaborationProposal[];    // clubs' collaboration proposals sent in the demo
+  proposalResponses: Record<string, ProposalResponse>; // answers given in the demo (sample answers stay in src/data)
+  supportedProposals: string[];               // sample proposals the demo student supports
+  // v1 states saved before any of these fields existed migrate to empty values.
   theme: ThemePreference;
   demoToday: IsoDate | null;                  // overrides the clock for the demo
   mochiForcedOffline: boolean;
@@ -294,6 +313,11 @@ export type Action =
   | { type: 'moderation/review'; submissionId: string; action: 'approve'|'request_changes'|'reject'; reason?: string; at: IsoDateTime }
   | { type: 'news/publish'; post: NewsPost }    // refused when the id or slug exists or the slug is reserved
   | { type: 'news/remove'; id: string }         // only demo-published articles
+  | { type: 'proposal/submit'; proposal: ActivityProposal }       // refused when the id exists
+  | { type: 'proposal/toggleSupport'; id: string }                // sample proposals only, never your own
+  | { type: 'collaboration/submit'; proposal: CollaborationProposal } // from ≠ to, unique id
+  | { type: 'proposal/respond'; id: string; response: ProposalResponse } // once; HĐHS answers students, the receiving club answers a collaboration; a decline needs a note
+  | { type: 'proposal/withdraw'; id: string }                     // demo-sent and unanswered only
   | { type: 'role/set'; role: Role }
   | { type: 'club/setActive'; clubId: string }
   | { type: 'theme/set'; theme: ThemePreference }
@@ -318,6 +342,9 @@ selectPlanBudget(state, now)
 selectNews(state, now) / selectNewsBySlug(state, slug, now) / selectNewsSlugs(state)
 //   sample articles published by now + every article published in the demo (the demo cannot schedule)
 selectNewsForEvent(state, eventId, now) / selectNewsForClub(state, clubId, now)
+selectActivityProposals(state) / selectPendingActivityCount(state)  // sample + demo, ranked, with status, answer, support
+selectCollaborations(state) / selectClubCollaborations(state, clubId) // { incoming, outgoing }, newest first
+selectProposalsForClub(state, clubId)  // student proposals naming the club or handed to it by HĐHS
 selectDeadlinesThisWeek(state, now)
 selectPendingAttendance(state, now)
 selectSubmissionsForClub(state, clubId) / selectModerationQueue(state)
@@ -336,10 +363,10 @@ saveState(storage: Storage | null, s: AppState): void;  // try/catch
 
 ```ts
 export type RouteName = 'home'|'onboarding'|'dashboard'|'explore'|'event'|'route'|'calendar'
-  |'portfolio'|'clubs'|'club'|'clubPortal'|'moderation'|'proposal'|'news'|'newsCompose'|'newsArticle'|'notFound';
+  |'portfolio'|'clubs'|'club'|'clubPortal'|'moderation'|'proposal'|'ideas'|'news'|'newsCompose'|'newsArticle'|'notFound';
 export const ROUTES: { name: RouteName; path: string; title: string }[];
 // paths: / · /thiet-lap · /tong-quan · /kham-pha · /su-kien/:slug · /lo-trinh · /lich · /ho-so
-//        /cau-lac-bo · /cau-lac-bo/:slug · /cong-cau-lac-bo · /kiem-duyet · /de-an
+//        /cau-lac-bo · /cau-lac-bo/:slug · /cong-cau-lac-bo · /kiem-duyet · /de-an · /de-xuat
 //        /ban-tin · /ban-tin/soan-bai (before the slug route) · /ban-tin/:slug
 export function matchRoute(pathname: string): { name: RouteName; params: Record<string, string> };
 export function pathFor(name: RouteName, params?: Record<string, string>): string;

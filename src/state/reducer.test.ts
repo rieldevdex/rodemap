@@ -518,3 +518,84 @@ describe('newsletter', () => {
     expect(reducer(s1, { type: 'news/remove', id: 'bt-001' })).toBe(s1);
   });
 });
+
+describe('proposals', () => {
+  const mine = {
+    id: 'dx-demo-1',
+    title: 'Giải Cờ tướng học sinh',
+    category: 'TT' as const,
+    description: 'Đề xuất tổ chức giải Cờ tướng dành cho học sinh toàn trường vào buổi chiều thứ Bảy.',
+    grades: [6, 7, 8] as const,
+    clubId: null,
+    authorGrade: 7 as const,
+    submittedAt: AT,
+    supporters: 0,
+  };
+  const proposal = { ...mine, grades: [...mine.grades] };
+  const collab = {
+    id: 'ht-demo-1',
+    fromClubId: 'inkstep',
+    toClubId: 'robotics',
+    title: 'Ngày hội trải nghiệm sản phẩm học tập',
+    category: 'CN' as const,
+    description: 'Inkstep đề xuất phối hợp tổ chức ngày hội trải nghiệm sản phẩm học tập cùng Câu lạc bộ Robotics.',
+    month: '2026-12',
+    submittedAt: AT,
+  };
+  const answer = (status: 'accepted' | 'declined', by: string, note = 'Hội đồng Học sinh tiếp nhận đề xuất.') => ({ status, at: AT, by, note, assignedClubId: null });
+
+  it('stores a sent proposal once and refuses ids already in use', () => {
+    const s1 = reducer(createDemoState(), { type: 'proposal/submit', proposal });
+    expect(s1.proposals).toEqual([proposal]);
+    expect(reducer(s1, { type: 'proposal/submit', proposal })).toBe(s1);
+    expect(reducer(s1, { type: 'proposal/submit', proposal: { ...proposal, id: 'dx-001' } })).toBe(s1);
+    expect(reducer(s1, { type: 'proposal/submit', proposal: { ...proposal, id: 'ht-001' } })).toBe(s1);
+  });
+
+  it("supports and stops supporting other students' proposals only", () => {
+    const s1 = reducer(createDemoState(), { type: 'proposal/toggleSupport', id: 'dx-002' });
+    expect(s1.supportedProposals).toEqual(['dx-002']);
+    expect(reducer(s1, { type: 'proposal/toggleSupport', id: 'dx-002' }).supportedProposals).toEqual([]);
+    expect(reducer(s1, { type: 'proposal/toggleSupport', id: 'dx-404' })).toBe(s1);
+    const own = reducer(s1, { type: 'proposal/submit', proposal });
+    expect(reducer(own, { type: 'proposal/toggleSupport', id: proposal.id })).toBe(own);
+  });
+
+  it('stores a collaboration between two different clubs once', () => {
+    const s1 = reducer(createDemoState(), { type: 'collaboration/submit', proposal: collab });
+    expect(s1.collaborations).toEqual([collab]);
+    expect(reducer(s1, { type: 'collaboration/submit', proposal: collab })).toBe(s1);
+    expect(reducer(s1, { type: 'collaboration/submit', proposal: { ...collab, id: 'ht-demo-2', toClubId: 'inkstep' } })).toBe(s1);
+    expect(reducer(s1, { type: 'collaboration/submit', proposal: { ...collab, id: 'dx-001' } })).toBe(s1);
+  });
+
+  it('lets HĐHS answer a pending student proposal once', () => {
+    const s = createDemoState();
+    const s1 = reducer(s, { type: 'proposal/respond', id: 'dx-002', response: answer('accepted', 'hdhs') });
+    expect(s1.proposalResponses['dx-002']?.status).toBe('accepted');
+    expect(reducer(s1, { type: 'proposal/respond', id: 'dx-002', response: answer('declined', 'hdhs') })).toBe(s1);
+    // Already answered in the sample data, answered by a club, a decline without a reason, unknown id.
+    expect(reducer(s, { type: 'proposal/respond', id: 'dx-001', response: answer('declined', 'hdhs') })).toBe(s);
+    expect(reducer(s, { type: 'proposal/respond', id: 'dx-002', response: answer('accepted', 'inkstep') })).toBe(s);
+    expect(reducer(s, { type: 'proposal/respond', id: 'dx-002', response: answer('declined', 'hdhs', '  ') })).toBe(s);
+    expect(reducer(s, { type: 'proposal/respond', id: 'dx-404', response: answer('accepted', 'hdhs') })).toBe(s);
+  });
+
+  it('lets only the receiving club answer a collaboration', () => {
+    const s = createDemoState();
+    expect(reducer(s, { type: 'proposal/respond', id: 'ht-001', response: answer('accepted', 'robotics') })).toBe(s);
+    expect(reducer(s, { type: 'proposal/respond', id: 'ht-001', response: answer('accepted', 'hdhs') })).toBe(s);
+    const s1 = reducer(s, { type: 'proposal/respond', id: 'ht-001', response: answer('accepted', 'inkstep') });
+    expect(s1.proposalResponses['ht-001']?.by).toBe('inkstep');
+  });
+
+  it('withdraws only what was sent in this browser and is still unanswered', () => {
+    let s = reducer(createDemoState(), { type: 'proposal/submit', proposal });
+    s = reducer(s, { type: 'collaboration/submit', proposal: collab });
+    expect(reducer(s, { type: 'proposal/withdraw', id: proposal.id }).proposals).toEqual([]);
+    expect(reducer(s, { type: 'proposal/withdraw', id: collab.id }).collaborations).toEqual([]);
+    expect(reducer(s, { type: 'proposal/withdraw', id: 'dx-002' })).toBe(s);
+    const answered = reducer(s, { type: 'proposal/respond', id: proposal.id, response: answer('accepted', 'hdhs') });
+    expect(reducer(answered, { type: 'proposal/withdraw', id: proposal.id })).toBe(answered);
+  });
+});

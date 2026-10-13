@@ -264,3 +264,72 @@ export interface NewsDraft {
   bodyText: string;
   eventIds: string[];
 }
+
+/* ── Đề xuất hoạt động và đề xuất hợp tác ───────────────────────────── */
+
+export type ProposalStatus = 'pending' | 'accepted' | 'declined';
+
+/**
+ * A student's idea for an activity or event, sent to Hội đồng Học sinh. Anonymous: only the
+ * author's grade is kept, never a name.
+ */
+export interface ActivityProposal {
+  /** "dx-001" */
+  id: string;
+  title: string;
+  category: CategoryCode;
+  /** What the activity is and why students would join. */
+  description: string;
+  /** Grades it should be open to. */
+  grades: Grade[];
+  /** A club suggested to organise it (id in CLUBS), or null. */
+  clubId: string | null;
+  authorGrade: Grade;
+  submittedAt: IsoDateTime;
+  /** Support from other students (sample data); the demo student's own support lives in AppState. */
+  supporters: number;
+}
+
+/** A club's proposal to another club to organise an activity together. */
+export interface CollaborationProposal {
+  /** "ht-001" */
+  id: string;
+  fromClubId: string;
+  toClubId: string;
+  title: string;
+  category: CategoryCode;
+  description: string;
+  /** Month the clubs would hold it, "2026-11". */
+  month: string;
+  submittedAt: IsoDateTime;
+}
+
+/** The answer to a proposal: from HĐHS for a student's proposal, from the receiving club for a collaboration. */
+export interface ProposalResponse {
+  status: 'accepted' | 'declined';
+  at: IsoDateTime;
+  /** 'hdhs' or the id of the club that answered. */
+  by: string;
+  /** Reason (required when declined) or next steps. */
+  note: string;
+  /** A student proposal accepted by HĐHS can be handed to a club to organise. */
+  assignedClubId: string | null;
+}
+
+/** Fields of Gửi đề xuất (student). */
+export interface ActivityProposalDraft {
+  title: string;
+  category: CategoryCode | null;
+  description: string;
+  grades: Grade[];
+  clubId: string | null;
+}
+
+/** Fields of Gửi đề xuất hợp tác (club). */
+export interface CollaborationDraft {
+  toClubId: string;
+  title: string;
+  category: CategoryCode | null;
+  description: string;
+  month: string;
+}

@@ -131,3 +131,12 @@
     column-gap: var(--grid-gap);
   }
 }
+
+.clubs__ideas {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.clubs__ideas a {
+  color: var(--color-ink);
+}

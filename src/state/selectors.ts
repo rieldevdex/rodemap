@@ -6,16 +6,22 @@ import { CLUBS } from '../data/clubs';
 import { EVENTS } from '../data/events';
 import { GOALS } from '../data/goals';
 import { NEWS } from '../data/news';
+import { ACTIVITY_PROPOSALS, COLLABORATIONS, PROPOSAL_RESPONSES } from '../data/proposals';
 import { budgetStatus, DEFAULT_WEEKLY_HOUR_BUDGET, type BudgetStatus } from '../domain/budget';
 import { allConflicts } from '../domain/conflicts';
 import { addDays, startOfIsoWeek, toMillis } from '../domain/dates';
 import { findRegistration, isPast, isRegistered, sortByStart } from '../domain/events';
 import { isPublished, postsAboutClub, postsAboutEvent, sortNews } from '../domain/news';
 import { firstRoute, type PlanProposal } from '../domain/planner';
+import { newestCollaborations, proposalStatus, rankActivityProposals, supportCount } from '../domain/proposals';
 import { pendingAttendance } from '../domain/portfolio';
 import { recommendEvents, type RecommendContext, type RecommendOptions } from '../domain/recommend';
 import type {
+  ActivityProposal,
+  CollaborationProposal,
   NewsPost,
+  ProposalResponse,
+  ProposalStatus,
   Club,
   Conflict,
   EventStatus,
@@ -232,4 +238,73 @@ export function selectNewsForEvent(state: AppState, eventId: string, now: Millis
 
 export function selectNewsForClub(state: AppState, clubId: string, now: Millis): NewsPost[] {
   return postsAboutClub(selectNews(state, now), clubId);
+}
+
+/* ── Đề xuất hoạt động và đề xuất hợp tác ───────────────────────────── */
+
+/** Sample answers overridden by the answers given in the demo. */
+export function selectProposalResponses(state: AppState): Record<string, ProposalResponse> {
+  return { ...PROPOSAL_RESPONSES, ...state.proposalResponses };
+}
+
+export interface ActivityProposalView {
+  proposal: ActivityProposal;
+  status: ProposalStatus;
+  response: ProposalResponse | null;
+  /** Other students' support plus the demo student's. */
+  support: number;
+  supportedByMe: boolean;
+  /** Sent from this browser. */
+  mine: boolean;
+}
+
+/** Every student proposal (sample + sent in the demo), pending first, then most supported. */
+export function selectActivityProposals(state: AppState): ActivityProposalView[] {
+  const responses = selectProposalResponses(state);
+  const mine = new Set(state.proposals.map((p) => p.id));
+  const all = [...ACTIVITY_PROPOSALS.filter((p) => !mine.has(p.id)), ...state.proposals];
+  return rankActivityProposals(all, responses, state.supportedProposals).map((proposal) => ({
+    proposal,
+    status: proposalStatus(proposal.id, responses),
+    response: responses[proposal.id] ?? null,
+    support: supportCount(proposal, state.supportedProposals),
+    supportedByMe: state.supportedProposals.includes(proposal.id),
+    mine: mine.has(proposal.id),
+  }));
+}
+
+export function selectPendingActivityCount(state: AppState): number {
+  return selectActivityProposals(state).filter((v) => v.status === 'pending').length;
+}
+
+export interface CollaborationView {
+  proposal: CollaborationProposal;
+  status: ProposalStatus;
+  response: ProposalResponse | null;
+  /** Sent from this browser. */
+  mine: boolean;
+}
+
+/** Every collaboration proposal, newest first. */
+export function selectCollaborations(state: AppState): CollaborationView[] {
+  const responses = selectProposalResponses(state);
+  const mine = new Set(state.collaborations.map((p) => p.id));
+  const all = [...COLLABORATIONS.filter((p) => !mine.has(p.id)), ...state.collaborations];
+  return newestCollaborations(all).map((proposal) => ({
+    proposal,
+    status: proposalStatus(proposal.id, responses),
+    response: responses[proposal.id] ?? null,
+    mine: mine.has(proposal.id),
+  }));
+}
+
+/** A club's view: proposals it received and proposals it sent. */
+export function selectClubCollaborations(state: AppState, clubId: string): { incoming: CollaborationView[]; outgoing: CollaborationView[] } {
+  const all = selectCollaborations(state);
+  return { incoming: all.filter((v) => v.proposal.toClubId === clubId), outgoing: all.filter((v) => v.proposal.fromClubId === clubId) };
+}
+
+/** Student proposals that name the club, or that HĐHS handed to it. */
+export function selectProposalsForClub(state: AppState, clubId: string): ActivityProposalView[] {
+  return selectActivityProposals(state).filter((v) => v.proposal.clubId === clubId || v.response?.assignedClubId === clubId);
 }

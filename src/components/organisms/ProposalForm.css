@@ -1,0 +1,32 @@
+/* Shares the field styles of EventSubmissionForm.css (submission-form__*). */
+
+.proposal-form__levels {
+  display: grid;
+  gap: var(--space-3);
+  padding-block-start: var(--space-2);
+}
+
+.proposal-form__level {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.proposal-form__level-name {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+}
+
+/* No top padding inside a level; the four THCS grades stay on one row of a 390-unit phone. */
+.proposal-form__level .submission-form__choices {
+  column-gap: var(--space-2);
+  padding-block-start: 0;
+}
+
+@media (min-width: 720px) {
+  .proposal-form__level .submission-form__choices {
+    column-gap: var(--space-5);
+  }
+}

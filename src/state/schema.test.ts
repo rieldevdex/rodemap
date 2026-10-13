@@ -24,6 +24,10 @@ describe('createSeedState', () => {
       moderation: {},
       submissions: SEED_SUBMISSIONS,
       newsPosts: [],
+      proposals: [],
+      collaborations: [],
+      proposalResponses: {},
+      supportedProposals: [],
       theme: 'system',
       demoToday: null,
       mochiForcedOffline: false,
@@ -43,6 +47,10 @@ describe('createSeedState', () => {
       moderation: {},
       submissions: SEED_SUBMISSIONS,
       newsPosts: [],
+      proposals: [],
+      collaborations: [],
+      proposalResponses: {},
+      supportedProposals: [],
       theme: 'system',
       demoToday: null,
       mochiForcedOffline: false,
@@ -125,6 +133,10 @@ describe('isAppStateV1 / migrate', () => {
     ['submissions that are not an array', { submissions: {} }],
     ['news posts that are not an array', { newsPosts: {} }],
     ['news posts set to undefined', { newsPosts: undefined }],
+    ['proposals that are not an array', { proposals: {} }],
+    ['collaborations that are not an array', { collaborations: 'ht-001' }],
+    ['proposal responses that are an array', { proposalResponses: [] }],
+    ['supported proposals that are not an array', { supportedProposals: null }],
     ['a non-string theme', { theme: 0 }],
     ['an unknown theme', { theme: 'sepia' }],
     ['a numeric demo date', { demoToday: 20261007 }],
@@ -132,6 +144,20 @@ describe('isAppStateV1 / migrate', () => {
     ['a missing demo date', { demoToday: undefined }],
     ['a non-boolean Mochi offline flag', { mochiForcedOffline: 'false' }],
   ];
+
+  it('upgrades a v1 state saved before proposals existed', () => {
+    const older: Partial<ReturnType<typeof createSeedState>> = createDemoState();
+    delete older.proposals;
+    delete older.collaborations;
+    delete older.proposalResponses;
+    delete older.supportedProposals;
+    const migrated = migrate(older);
+    expect(migrated?.proposals).toEqual([]);
+    expect(migrated?.collaborations).toEqual([]);
+    expect(migrated?.proposalResponses).toEqual({});
+    expect(migrated?.supportedProposals).toEqual([]);
+    expect(migrated?.profile).toEqual(older.profile);
+  });
 
   it('upgrades a v1 state saved before the newsletter existed', () => {
     const older: Partial<ReturnType<typeof createSeedState>> = createSeedState();

@@ -1,10 +1,13 @@
 /** Every state change in Rodemap. Timestamps and ids are created by the caller so the reducer stays pure. */
 import type {
+  ActivityProposal,
+  CollaborationProposal,
   IsoDate,
   IsoDateTime,
   NewsPost,
   PortfolioEntry,
   Profile,
+  ProposalResponse,
   Role,
   SchoolEvent,
   Submission,
@@ -27,6 +30,11 @@ export type Action =
   | { type: 'moderation/review'; submissionId: string; action: ModerationDecision; reason?: string; at: IsoDateTime }
   | { type: 'news/publish'; post: NewsPost }
   | { type: 'news/remove'; id: string }
+  | { type: 'proposal/submit'; proposal: ActivityProposal }
+  | { type: 'proposal/toggleSupport'; id: string }
+  | { type: 'collaboration/submit'; proposal: CollaborationProposal }
+  | { type: 'proposal/respond'; id: string; response: ProposalResponse }
+  | { type: 'proposal/withdraw'; id: string }
   | { type: 'role/set'; role: Role }
   | { type: 'club/setActive'; clubId: string }
   | { type: 'theme/set'; theme: ThemePreference }
