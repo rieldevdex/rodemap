@@ -46,3 +46,12 @@ export function quotaLabel(quota: MochiQuota): string {
     ? `Còn ${String(quota.remaining)}/${String(quota.limit)} câu hỏi trong tuần này`
     : `Đã sử dụng hết ${String(quota.limit)} câu hỏi trong tuần này`;
 }
+
+/**
+ * The line under Mochi's message field: the site-wide stop when it is active, else this
+ * browser's remaining questions while that count belongs to the current week, else nothing.
+ */
+export function quotaLine(quota: MochiQuota | null, stop: WeeklyStop | null, realNow: number): string | null {
+  if (stop?.scope === 'weekly_total' && isStopActive(stop, realNow)) return 'Đã đạt giới hạn câu hỏi chung của Rodemap trong tuần này';
+  return quota && toMillis(quota.resetsAt) > realNow ? quotaLabel(quota) : null;
+}

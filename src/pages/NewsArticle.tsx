@@ -9,6 +9,7 @@ import { NewsCard } from '../components/molecules/NewsCard';
 import { PageHead } from '../components/molecules/PageHead';
 import { StationCard } from '../components/molecules/StationCard';
 import { NewsArticleBody } from '../components/organisms/NewsArticleBody';
+import { isStudentClub } from '../domain/clubs';
 import { formatLongDate, formatTime, toMillis } from '../domain/dates';
 import { deadlineDaysLeft, isPast, registrationState, seatsLeft } from '../domain/events';
 import { groupByIssue, NEWS_CATEGORY_LABELS, readingMinutes, relatedPosts } from '../domain/news';
@@ -165,7 +166,7 @@ export function NewsArticlePage() {
               {clubs.length > 0 ? (
                 <section className="news-article__panel" aria-labelledby="news-clubs">
                   <h2 id="news-clubs" className="news-article__h2">
-                    Câu lạc bộ liên quan
+                    {clubs.every(isStudentClub) ? 'Câu lạc bộ liên quan' : 'Câu lạc bộ và đơn vị liên quan'}
                   </h2>
                   <ul className="news-article__clubs">
                     {clubs.map((c) => (

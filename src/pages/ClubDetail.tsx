@@ -4,6 +4,7 @@ import { MonoTime } from '../components/atoms/MonoTime';
 import { PageHead } from '../components/molecules/PageHead';
 import { StationCard } from '../components/molecules/StationCard';
 import { NewsRelated } from '../components/organisms/NewsRelated';
+import { CLUBS } from '../data/clubs';
 import { CLUB_KIND_LABELS } from '../domain/clubs';
 import { formatDate, toMillis } from '../domain/dates';
 import { deadlineDaysLeft, isPast, registrationState, seatsLeft } from '../domain/events';
@@ -40,6 +41,8 @@ export function ClubDetailPage() {
   // Phòng Cố vấn Học tập relays external competitions; the council and clubs organise events.
   const office = club.kind === 'office';
   const isClub = club.kind === 'club';
+  // The portal opens for the publisher the visitor represents, not for the page being viewed.
+  const activeIsOffice = CLUBS.find((c) => c.id === state.activeClubId)?.kind === 'office';
   const items = office ? 'cuộc thi' : 'sự kiện';
 
   return (
@@ -62,7 +65,7 @@ export function ClubDetailPage() {
         {state.role === 'club' ? (
           <div className="cluster">
             <Button to="/cong-cau-lac-bo" variant="secondary" iconEnd="arrow-right">
-              {office ? 'Cập nhật cuộc thi qua Cổng câu lạc bộ' : 'Gửi sự kiện qua Cổng câu lạc bộ'}
+              {activeIsOffice ? 'Cập nhật cuộc thi qua Cổng câu lạc bộ' : 'Gửi sự kiện qua Cổng câu lạc bộ'}
             </Button>
           </div>
         ) : null}
@@ -75,8 +78,9 @@ export function ClubDetailPage() {
           </h2>
           {upcoming.length === 0 ? (
             <p className="clubs__full">
-              {isClub ? 'Câu lạc bộ' : club.shortName} chưa có {items} sắp diễn ra. Vui lòng theo dõi Lộ trình hoặc khám phá sự kiện
-              của các câu lạc bộ khác.
+              {isClub
+                ? 'Câu lạc bộ chưa có sự kiện sắp diễn ra. Vui lòng theo dõi Lộ trình hoặc khám phá sự kiện của các câu lạc bộ khác.'
+                : `${club.shortName} chưa có ${items} sắp diễn ra. Vui lòng theo dõi Lộ trình hoặc xem các sự kiện khác tại Khám phá sự kiện.`}
             </p>
           ) : (
             <div className="club-detail__events">

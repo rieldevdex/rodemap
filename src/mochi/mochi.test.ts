@@ -5,7 +5,7 @@ import { NEWS } from '../data/news';
 import { makePost } from '../domain/test-fixtures';
 import { createDemoState, type AppState } from '../state/schema';
 import { addNotice, emptyConversation, needsRestart, runOfflineTurn, runOnlineTurn, setCardStatus, addStudentItem } from './conversation';
-import { isStopActive, quotaLabel, resetLabel, weeklyStopFrom, weeklyStopFromQuota, weeklyStopNotice } from './quota-notice';
+import { isStopActive, quotaLabel, quotaLine, resetLabel, weeklyStopFrom, weeklyStopFromQuota, weeklyStopNotice } from './quota-notice';
 import { classify, findEventInText, offlineDraft, respondOffline, windowInText } from './offline/engine';
 import type { MochiResponse } from './protocol';
 import { buildSnapshot } from './snapshot';
@@ -488,5 +488,17 @@ describe('weekly quota wording', () => {
     );
     expect(quotaLabel({ remaining: 17, limit: 20, resetsAt })).toBe('Còn 17/20 câu hỏi trong tuần này');
     expect(quotaLabel({ remaining: 0, limit: 20, resetsAt })).toBe('Đã sử dụng hết 20 câu hỏi trong tuần này');
+  });
+
+  it('shows the site-wide stop over this browser’s count, and nothing once the week is over', () => {
+    const before = toMillis('2026-10-18T20:00:00+07:00');
+    const after = toMillis('2026-10-19T00:01:00+07:00');
+    const quota = { remaining: 17, limit: 20, resetsAt };
+    expect(quotaLine(quota, null, before)).toBe('Còn 17/20 câu hỏi trong tuần này');
+    expect(quotaLine(quota, { scope: 'weekly_total', limit: 500, resetsAt }, before)).toBe('Đã đạt giới hạn câu hỏi chung của Rodemap trong tuần này');
+    expect(quotaLine({ ...quota, remaining: 0 }, { scope: 'weekly_browser', limit: 20, resetsAt }, before)).toBe('Đã sử dụng hết 20 câu hỏi trong tuần này');
+    // Last week's count and stop no longer apply after Monday 00:00.
+    expect(quotaLine(quota, { scope: 'weekly_total', limit: 500, resetsAt }, after)).toBeNull();
+    expect(quotaLine(null, null, before)).toBeNull();
   });
 });

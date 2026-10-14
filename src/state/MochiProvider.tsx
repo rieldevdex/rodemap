@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { buildIcs, icsFileName } from '../domain/ics';
 import { entryFromEvent } from '../domain/portfolio';
 import { toIsoDateTime } from '../domain/dates';
@@ -16,8 +16,9 @@ import {
   type Conversation,
 } from '../mochi/conversation';
 import { MAX_USER_CHARS, type MochiQuota } from '../mochi/protocol';
-import { isStopActive, weeklyStopFrom, weeklyStopFromQuota, weeklyStopNotice, type WeeklyStop } from '../mochi/quota-notice';
+import { isStopActive, quotaLine, weeklyStopFrom, weeklyStopFromQuota, weeklyStopNotice, type WeeklyStop } from '../mochi/quota-notice';
 import type { MochiState } from '../components/organisms/Mochi';
+import { NowContext } from './context';
 import { downloadFile, mochiBrowserId, newId } from './effects';
 import { useAppState, useDispatch, useNow } from './hooks';
 import { MochiContext, type MochiApi, type MochiMode } from './mochiContext';
@@ -54,8 +55,11 @@ export function MochiProvider({ children }: { children: ReactNode }) {
   });
 
   const forcedOffline = state.mochiForcedOffline;
-  // A stop is cleared by the first message sent after it expires.
-  const mode: MochiMode = forcedOffline || serverOffline || lastTurnOffline || weeklyStop !== null ? 'offline' : 'online';
+  // The weekly quota follows the real clock (refreshed every minute), never the demo date.
+  const realNow = useContext(NowContext);
+  const stopActive = isStopActive(weeklyStop, realNow);
+  const mode: MochiMode = forcedOffline || serverOffline || lastTurnOffline || stopActive ? 'offline' : 'online';
+  const quotaText = quotaLine(quota, weeklyStop, realNow);
 
   const celebrate = useCallback(() => {
     setFigure('celebrating');
@@ -186,7 +190,7 @@ export function MochiProvider({ children }: { children: ReactNode }) {
       items: conv.items,
       busy,
       mode,
-      quota,
+      quotaLabel: quotaText,
       figure,
       send: (text) => {
         void send(text);
@@ -254,7 +258,7 @@ export function MochiProvider({ children }: { children: ReactNode }) {
         downloadFile(icsFileName(latest.current.now), ics, 'text/calendar;charset=utf-8');
       },
     };
-  }, [open, conv.items, busy, mode, quota, figure, send, dispatch, resolveCard]);
+  }, [open, conv.items, busy, mode, quotaText, figure, send, dispatch, resolveCard]);
 
   return <MochiContext.Provider value={api}>{children}</MochiContext.Provider>;
 }

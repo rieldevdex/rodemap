@@ -764,13 +764,45 @@ function ClubIdeas({ catalog, club }: { catalog: Catalog; club: Club }) {
   );
 }
 
+/** With the council or an office as the demo publisher: say so and let the visitor pick a club. */
+function NotAClubIdeas({ catalog, publisher }: { catalog: Catalog; publisher: string }) {
+  return (
+    <PageHead
+      eyebrow="Đề xuất hợp tác"
+      title="Đề xuất hợp tác"
+      lead={`${publisher} không tham gia Đề xuất hợp tác. Đề xuất hợp tác được gửi giữa các câu lạc bộ; vui lòng chọn một câu lạc bộ đại diện để xem và gửi đề xuất.`}
+    >
+      <div className="ideas__club">
+        <label htmlFor="ideas-club-select">Câu lạc bộ đại diện</label>
+        <select
+          id="ideas-club-select"
+          value=""
+          onChange={(e) => {
+            if (e.target.value !== '') catalog.dispatch({ type: 'club/setActive', clubId: e.target.value });
+          }}
+        >
+          <option value="">Chọn câu lạc bộ</option>
+          {STUDENT_CLUBS.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.shortName}
+            </option>
+          ))}
+        </select>
+      </div>
+    </PageHead>
+  );
+}
+
 /** Đề xuất: students propose activities to HĐHS, clubs propose collaborations to each other, HĐHS answers students. */
 export function IdeasPage() {
   const catalog = useCatalog();
   const { state } = catalog;
   if (state.role === 'moderator') return <ModeratorIdeas catalog={catalog} />;
-  // Only clubs act here: with the council or an office as the demo publisher, the first club is shown (nothing is dispatched).
-  const club = STUDENT_CLUBS.find((c) => c.id === state.activeClubId) ?? STUDENT_CLUBS[0];
-  if (state.role === 'club' && club) return <ClubIdeas catalog={catalog} club={club} />;
+  if (state.role === 'club') {
+    // Only clubs take part: the council and the offices are told so instead of acting as another club.
+    const club = STUDENT_CLUBS.find((c) => c.id === state.activeClubId);
+    if (club) return <ClubIdeas catalog={catalog} club={club} />;
+    return <NotAClubIdeas catalog={catalog} publisher={catalog.clubName(state.activeClubId) || 'Đơn vị đang đại diện'} />;
+  }
   return <StudentIdeas catalog={catalog} />;
 }
