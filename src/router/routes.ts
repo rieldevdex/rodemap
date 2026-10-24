@@ -126,13 +126,35 @@ export function pathFor(name: RouteName, params: Record<string, string> = {}): s
   return `/${parts.join('/')}`;
 }
 
-/** Pages open before the student has set up a profile: Trang chủ, Thiết lập hồ sơ, Đề án and 404. */
-export const PUBLIC_ROUTES: readonly RouteName[] = ['home', 'onboarding', 'proposal', 'notFound'];
+/**
+ * Pages a visitor can try before setting up a profile: browsing events and suggestions
+ * (Tổng quan shows quick picks instead of the personal dashboard), the route map, clubs, the
+ * newsletter and the proposals list, plus Trang chủ, Thiết lập hồ sơ, Đề án and 404.
+ * Actions on these pages that need a profile (registering, sending a proposal) ask for it.
+ */
+export const PUBLIC_ROUTES: readonly RouteName[] = [
+  'home',
+  'onboarding',
+  'proposal',
+  'notFound',
+  'dashboard',
+  'explore',
+  'event',
+  'route',
+  'clubs',
+  'club',
+  'news',
+  'newsArticle',
+  'ideas',
+];
 
-/** Every other page asks for the student profile first (Rodemap sends the visitor to /thiet-lap). */
+/** The personal pages (Lịch, Hồ sơ năng lực) and the demo role pages ask for the profile first. */
 export function requiresProfile(name: RouteName): boolean {
   return !PUBLIC_ROUTES.includes(name);
 }
+
+/** Pages that are never a destination after setup. */
+const NOT_A_RETURN: readonly RouteName[] = ['home', 'onboarding', 'notFound'];
 
 /** Query parameter of /thiet-lap holding the page to open once the profile is set up. */
 export const RETURN_PARAM = 'tiep-theo';
@@ -144,11 +166,11 @@ export function setupPathFor(returnTo: string): string {
 
 /**
  * The page to open after profile setup: only an in-app path ("/…", never "//…" or a full URL)
- * of a page that needs the profile. Anything else is ignored (null).
+ * of a real page other than Trang chủ and Thiết lập hồ sơ. Anything else is ignored (null).
  */
 export function returnPathAfterSetup(value: string | null): string | null {
   if (value === null || !value.startsWith('/') || value.startsWith('//') || value.includes('\\')) return null;
-  return requiresProfile(matchRoute(value).name) ? value : null;
+  return NOT_A_RETURN.includes(matchRoute(value).name) ? null : value;
 }
 
 export function routeTitle(name: RouteName): string {

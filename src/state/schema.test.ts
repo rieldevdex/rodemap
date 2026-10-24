@@ -28,7 +28,10 @@ describe('createSeedState', () => {
       collaborations: [],
       proposalResponses: {},
       supportedProposals: [],
+      guestPicks: { grade: null, interests: [] },
       theme: 'system',
+      mode: 'lo-trinh',
+      density: 'compact',
       demoToday: null,
       mochiForcedOffline: false,
     });
@@ -51,7 +54,10 @@ describe('createSeedState', () => {
       collaborations: [],
       proposalResponses: {},
       supportedProposals: [],
+      guestPicks: { grade: null, interests: [] },
       theme: 'system',
+      mode: 'lo-trinh',
+      density: 'compact',
       demoToday: null,
       mochiForcedOffline: false,
     });
@@ -137,8 +143,15 @@ describe('isAppStateV1 / migrate', () => {
     ['collaborations that are not an array', { collaborations: 'ht-001' }],
     ['proposal responses that are an array', { proposalResponses: [] }],
     ['supported proposals that are not an array', { supportedProposals: null }],
+    ['guest picks that are not an object', { guestPicks: [] }],
+    ['guest picks with a text grade', { guestPicks: { grade: '11', interests: [] } }],
+    ['guest picks without interests', { guestPicks: { grade: null } }],
     ['a non-string theme', { theme: 0 }],
     ['an unknown theme', { theme: 'sepia' }],
+    ['an unknown appearance mode', { mode: 'neon' }],
+    ['a non-string appearance mode', { mode: 1 }],
+    ['an unknown text density', { density: 'tiny' }],
+    ['a non-string text density', { density: null }],
     ['a numeric demo date', { demoToday: 20261007 }],
     ['an unreadable demo date', { demoToday: 'ngày mai' }],
     ['a missing demo date', { demoToday: undefined }],
@@ -157,6 +170,30 @@ describe('isAppStateV1 / migrate', () => {
     expect(migrated?.proposalResponses).toEqual({});
     expect(migrated?.supportedProposals).toEqual([]);
     expect(migrated?.profile).toEqual(older.profile);
+  });
+
+  it('upgrades a v1 state saved before guest picks existed', () => {
+    const older: Partial<ReturnType<typeof createSeedState>> = createSeedState();
+    delete older.guestPicks;
+    expect(migrate(older)?.guestPicks).toEqual({ grade: null, interests: [] });
+  });
+
+  it('upgrades a v1 state saved before appearance modes and text density existed', () => {
+    const older: Partial<ReturnType<typeof createSeedState>> = createSeedState();
+    delete older.mode;
+    delete older.density;
+    const migrated = migrate(older);
+    expect(migrated?.mode).toBe('lo-trinh');
+    expect(migrated?.density).toBe('compact');
+  });
+
+  it('accepts every appearance mode and text density', () => {
+    for (const mode of ['lo-trinh', 'ruc-ro', 'ap-phich', 'diu-nhe'] as const) {
+      expect(isAppStateV1({ ...createSeedState(), mode })).toBe(true);
+    }
+    for (const density of ['full', 'compact', 'minimal'] as const) {
+      expect(isAppStateV1({ ...createSeedState(), density })).toBe(true);
+    }
   });
 
   it('upgrades a v1 state saved before the newsletter existed', () => {

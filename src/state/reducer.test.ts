@@ -101,6 +101,8 @@ describe('reducer purity', () => {
       { type: 'role/set', role: 'moderator' },
       { type: 'club/setActive', clubId: 'robotics' },
       { type: 'theme/set', theme: 'dark' },
+      { type: 'appearance/setMode', mode: 'diu-nhe' },
+      { type: 'appearance/setDensity', density: 'minimal' },
       { type: 'demo/setToday', date: '2026-10-07' },
       { type: 'demo/setMochiOffline', offline: true },
       { type: 'demo/reset' },
@@ -436,6 +438,18 @@ describe('setters', () => {
     expect(reducer(s, { type: 'theme/set', theme: 'system' })).toBe(s);
   });
 
+  it('appearance/setMode and appearance/setDensity change the appearance; same or unknown values change nothing', () => {
+    const s = createDemoState();
+    const vivid = reducer(s, { type: 'appearance/setMode', mode: 'ruc-ro' });
+    expect(vivid.mode).toBe('ruc-ro');
+    expect(reducer(vivid, { type: 'appearance/setMode', mode: 'ruc-ro' })).toBe(vivid);
+    expect(reducer(s, { type: 'appearance/setMode', mode: 'neon' as never })).toBe(s);
+    const minimal = reducer(s, { type: 'appearance/setDensity', density: 'minimal' });
+    expect(minimal.density).toBe('minimal');
+    expect(reducer(minimal, { type: 'appearance/setDensity', density: 'minimal' })).toBe(minimal);
+    expect(reducer(s, { type: 'appearance/setDensity', density: 'tiny' as never })).toBe(s);
+  });
+
   it('demo/setToday sets and clears the demo date; the same value returns the identical state', () => {
     const s = createDemoState();
     const dated = reducer(s, { type: 'demo/setToday', date: '2026-10-07' });
@@ -459,6 +473,8 @@ describe('demo/reset', () => {
       { type: 'role/set', role: 'moderator' },
       { type: 'club/setActive', clubId: 'robotics' },
       { type: 'theme/set', theme: 'dark' },
+      { type: 'appearance/setMode', mode: 'ap-phich' },
+      { type: 'appearance/setDensity', density: 'full' },
       { type: 'demo/setToday', date: '2026-11-02' },
       { type: 'demo/setMochiOffline', offline: true },
       { type: 'profile/clear' },
@@ -470,7 +486,7 @@ describe('demo/reset', () => {
     for (const action of actions) s = reducer(s, action);
 
     const next = reducer(s, { type: 'demo/reset' });
-    expect(next).toEqual({ ...createSeedState(), theme: 'dark', demoToday: '2026-11-02', mochiForcedOffline: true });
+    expect(next).toEqual({ ...createSeedState(), theme: 'dark', mode: 'ap-phich', density: 'full', demoToday: '2026-11-02', mochiForcedOffline: true });
     expect(next.role).toBe('student');
     expect(next.activeClubId).toBe('inkstep');
     expect(next.profile).toBeNull();
@@ -516,6 +532,18 @@ describe('newsletter', () => {
     const s1 = reducer(createDemoState(), { type: 'news/publish', post });
     expect(reducer(s1, { type: 'news/remove', id: post.id }).newsPosts).toEqual([]);
     expect(reducer(s1, { type: 'news/remove', id: 'bt-001' })).toBe(s1);
+  });
+});
+
+describe('guest picks', () => {
+  it('keeps a known grade and distinct known fields, and ignores a repeat', () => {
+    const s0 = createSeedState();
+    const s1 = reducer(s0, { type: 'guest/setPicks', picks: { grade: 8, interests: ['CN', 'NT', 'CN', 'XX' as never] } });
+    expect(s1.guestPicks).toEqual({ grade: 8, interests: ['CN', 'NT'] });
+    expect(reducer(s1, { type: 'guest/setPicks', picks: { grade: 8, interests: ['CN', 'NT'] } })).toBe(s1);
+    expect(reducer(s1, { type: 'guest/setPicks', picks: { grade: 5 as never, interests: [] } }).guestPicks).toEqual({ grade: null, interests: [] });
+    // A reset clears what the visitor picked.
+    expect(reducer(s1, { type: 'demo/reset' }).guestPicks).toEqual({ grade: null, interests: [] });
   });
 });
 

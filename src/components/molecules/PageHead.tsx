@@ -4,13 +4,19 @@ import { MAIN_HEADING_ID } from '../../router';
 export interface PageHeadProps {
   eyebrow: ReactNode;
   title: string;
+  /** Shown in every density unless `leadShort` is given (then only in Đầy đủ). */
   lead?: ReactNode;
+  /**
+   * One formal sentence for Gọn (DESIGN.md §10). With it, the lead is prose: Gọn shows this
+   * sentence and Tối giản shows neither. Leave it out when the lead carries facts.
+   */
+  leadShort?: ReactNode;
   /** Extra content under the lead: actions, meta, demo label. */
   children?: ReactNode;
 }
 
-/** The standard page head: mono eyebrow, display h1 (focus target after navigation), lead. */
-export function PageHead({ eyebrow, title, lead, children }: PageHeadProps) {
+/** The standard page head: eyebrow, display h1 (focus target after navigation), lead. */
+export function PageHead({ eyebrow, title, lead, leadShort, children }: PageHeadProps) {
   return (
     <header className="page-head">
       <div className="container page-head__inner">
@@ -18,7 +24,8 @@ export function PageHead({ eyebrow, title, lead, children }: PageHeadProps) {
         <h1 id={MAIN_HEADING_ID} className="page-head__title" tabIndex={-1}>
           {title}
         </h1>
-        {lead === undefined ? null : <p className="page-head__lead">{lead}</p>}
+        {lead === undefined ? null : <p className={leadShort === undefined ? 'page-head__lead' : 'page-head__lead density-full-only'}>{lead}</p>}
+        {leadShort === undefined ? null : <p className="page-head__lead density-compact-only">{leadShort}</p>}
         {children}
       </div>
     </header>

@@ -42,12 +42,15 @@ test.describe('demo path', () => {
   test('onboarding → first route → confirm → Lộ trình and Lịch → .ics', async ({ page }) => {
     const errors = trackErrors(page);
     await seedDemo(page, { profile: null, registrations: [], portfolio: [] });
-    // Without a profile, the app pages lead to Thiết lập hồ sơ first and come back afterwards.
-    await page.goto('/kham-pha');
-    await expect(page).toHaveURL('/thiet-lap?tiep-theo=%2Fkham-pha');
+    // Without a profile, the personal pages lead to Thiết lập hồ sơ first and come back afterwards;
+    // a visitor's nav keeps the open sections only.
+    await page.goto('/lich');
+    await expect(page).toHaveURL('/thiet-lap?tiep-theo=%2Flich');
     await expect(page.locator('#main-heading')).toHaveText('Thiết lập hồ sơ');
-    await expect(page.getByText('Học sinh cần thiết lập hồ sơ trước khi sử dụng Rodemap.', { exact: false })).toBeVisible();
-    await expect(page.getByRole('navigation', { name: 'Điều hướng chính' })).toHaveCount(0);
+    await expect(page.getByText('Hồ sơ học sinh cần thiết cho thao tác bạn đã chọn.', { exact: false })).toBeVisible();
+    const nav = page.getByRole('navigation', { name: 'Điều hướng chính' });
+    await expect(nav.getByRole('link', { name: 'Khám phá' })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Lịch' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Hỏi Mochi' })).toHaveCount(0);
     await page.goto('/thiet-lap');
 
@@ -101,9 +104,9 @@ test.describe('demo path', () => {
     if (!wholeSchool || !upperOnly) throw new Error('Sample data needs open whole-school and upper-secondary events');
     await seedDemo(page, { profile: null, registrations: [], portfolio: [] });
 
-    await page.goto('/ban-tin');
-    await expect(page).toHaveURL('/thiet-lap?tiep-theo=%2Fban-tin');
-    await expect(page.getByText('Sau khi hoàn tất bốn bước, Rodemap mở trang bạn đã chọn.', { exact: false })).toBeVisible();
+    await page.goto('/ho-so');
+    await expect(page).toHaveURL('/thiet-lap?tiep-theo=%2Fho-so');
+    await expect(page.getByText('Sau khi hoàn tất bốn bước, Rodemap mở lại trang trước đó.', { exact: false })).toBeVisible();
     await expect(page.getByRole('group', { name: 'Trung học cơ sở' }).getByRole('radio')).toHaveCount(4);
     await expect(page.getByRole('group', { name: 'Trung học phổ thông' }).getByRole('radio')).toHaveCount(3);
     await page.getByRole('radio', { name: 'Khối 7' }).check();
@@ -120,9 +123,9 @@ test.describe('demo path', () => {
     await page.getByRole('button', { name: /^(Chỉ lưu|Lưu) hồ sơ$/ }).click();
 
     // Back on the page the student asked for, now with the full navigation.
-    await expect(page).toHaveURL('/ban-tin');
-    await expect(page.locator('#main-heading')).toHaveText('Bản tin Hội đồng Học sinh');
-    await expect(page.getByRole('navigation', { name: 'Điều hướng chính' })).toBeVisible();
+    await expect(page).toHaveURL('/ho-so');
+    await expect(page.locator('#main-heading')).toHaveText('Hồ sơ năng lực');
+    await expect(page.getByRole('navigation', { name: 'Điều hướng chính' }).getByRole('link', { name: 'Lịch' })).toBeVisible();
 
     await page.goto(`/su-kien/${wholeSchool.slug}`);
     await expect(page.getByText('Khối 6–12 (toàn trường)').first()).toBeVisible();

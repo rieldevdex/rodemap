@@ -63,7 +63,9 @@ export function EventDetailPage() {
       />
     );
   }
-  const staffView = state.role === 'club' || state.role === 'moderator';
+  // The demo roles act once a profile exists; a visitor sees what students see.
+  const hasProfile = state.profile !== null;
+  const staffView = hasProfile && (state.role === 'club' || state.role === 'moderator');
   if (event.status !== 'approved' && !staffView) {
     return (
       <NotPublished
@@ -139,14 +141,17 @@ export function EventDetailPage() {
           <Button variant="quiet" iconStart="download" onClick={downloadOne}>
             Tải tệp .ics
           </Button>
-          <Button
-            variant="quiet"
-            onClick={() => {
-              requestMochi({ kind: 'event', eventId: event.id });
-            }}
-          >
-            Hỏi Mochi về sự kiện này
-          </Button>
+          {/* Mochi works from the student's profile (DESIGN.md §7.2). */}
+          {hasProfile ? (
+            <Button
+              variant="quiet"
+              onClick={() => {
+                requestMochi({ kind: 'event', eventId: event.id });
+              }}
+            >
+              Hỏi Mochi về sự kiện này
+            </Button>
+          ) : null}
         </div>
       </PageHead>
 

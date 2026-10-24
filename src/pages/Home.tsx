@@ -1,8 +1,13 @@
 import { useMemo } from 'react';
 import { Button } from '../components/atoms/Button';
+import { DotRoad } from '../components/atoms/DotRoad';
 import { LineBadge } from '../components/atoms/LineBadge';
 import { MonoTime } from '../components/atoms/MonoTime';
 import { StationCard } from '../components/molecules/StationCard';
+import { CountUp } from '../components/motion/CountUp';
+import { Reveal } from '../components/motion/Reveal';
+import { SplitLines } from '../components/motion/SplitLines';
+import { CategoryMarquee } from '../components/organisms/CategoryMarquee';
 import { Mochi } from '../components/organisms/Mochi';
 import { RouteMap } from '../components/organisms/RouteMap';
 import { useMediaQuery } from '../components/useMediaQuery';
@@ -16,7 +21,7 @@ import { deadlineDaysLeft, isRegistered, registrationState, seatsLeft } from '..
 import { layoutRoute } from '../domain/route-layout';
 import { respondOffline } from '../mochi/offline/engine';
 import { CATEGORY_CODES } from '../domain/types';
-import { MAIN_HEADING_ID, useNavigate } from '../router';
+import { Link, MAIN_HEADING_ID, useNavigate } from '../router';
 import { useAppState, useNow } from '../state/hooks';
 import { requestMochi } from '../state/mochiBridge';
 import './Home.css';
@@ -30,7 +35,11 @@ export function HomePage() {
   const wide = useMediaQuery('(min-width: 720px)', true);
   const orientation = wide ? 'horizontal' : 'vertical';
 
+  const hasProfile = state.profile !== null;
   const events = useMemo(() => EVENTS.filter((e) => e.status === 'approved'), []);
+  // The figures are counted from the sample data, never typed in (DESIGN.md §6.2 #16).
+  const openCount = events.filter((e) => registrationState(e, state.registrations, now) === 'open').length;
+  const clubCount = CLUBS.filter((c) => c.kind === 'club').length;
   const byId = useMemo(() => new Map(events.map((e) => [e.id, e])), [events]);
   const clubName = (id: string) => CLUBS.find((c) => c.id === id)?.shortName ?? '';
 
@@ -76,25 +85,46 @@ export function HomePage() {
     <>
       <section className="home-hero">
         <div className="container home-hero__grid">
-          <div className="home-hero__copy">
-            <p className="home-hero__eyebrow">{HERO.eyebrow}</p>
-            <h1 id={MAIN_HEADING_ID} className="home-hero__title" tabIndex={-1}>
+          <div className="home-hero__head">
+            <p className="home-hero__eyebrow density-full-only">{HERO.eyebrow}</p>
+            <SplitLines as="h1" id={MAIN_HEADING_ID} className="home-hero__title" tabIndex={-1} trigger="load">
               {HERO.headline}
-            </h1>
-            <p className="home-hero__lead">{SOLUTION}</p>
+            </SplitLines>
+          </div>
+          <div className="home-hero__copy">
+            <p className="home-hero__lead density-full-only">{SOLUTION}</p>
+            <p className="home-hero__lead home-hero__lead--short density-hide-full">{HERO.short}</p>
             <div className="cluster home-hero__actions">
-              <Button to="/thiet-lap" variant="primary" size="lg" iconEnd="arrow-right">
-                {HERO.primaryCta}
-              </Button>
-              <Button to="/de-an" variant="secondary" size="lg">
-                {HERO.secondaryCta}
-              </Button>
+              {hasProfile ? (
+                <>
+                  <Button to="/tong-quan" variant="primary" size="lg" iconEnd="arrow-right">
+                    {HERO.dashboardCta}
+                  </Button>
+                  <Button to="/de-an" variant="secondary" size="lg">
+                    {HERO.secondaryCta}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button to="/tong-quan" variant="primary" size="lg" iconEnd="arrow-right">
+                    {HERO.tryCta}
+                  </Button>
+                  <Button to="/thiet-lap" variant="secondary" size="lg">
+                    {HERO.setupCta}
+                  </Button>
+                </>
+              )}
             </div>
+            {hasProfile ? null : (
+              <p className="home-hero__note density-full-only">
+                <Link to="/de-an">{HERO.secondaryCta}</Link>
+              </p>
+            )}
           </div>
           <figure className="home-hero__map">
             <figcaption className="home-hero__map-caption">
               <span>Lộ trình minh họa</span>
-              <span className="home-hero__map-note">Sáu tuần, dữ liệu minh họa</span>
+              <span className="home-hero__map-note density-detail">Sáu tuần, dữ liệu minh họa</span>
             </figcaption>
             <RouteMap
               layout={layout}
@@ -127,9 +157,38 @@ export function HomePage() {
             />
           </figure>
         </div>
+        <DotRoad className="home-hero__road" />
       </section>
 
-      <section className="band band--surface" aria-labelledby="home-problem">
+      <section className="band band--block home-lines density-detail" aria-label="Rodemap trong năm học">
+        <div className="container stack stack--lg">
+          <dl className="home-figures">
+            <div>
+              <dt>sự kiện đang mở đăng ký</dt>
+              <dd>
+                <CountUp value={openCount} />
+              </dd>
+            </div>
+            <div>
+              <dt>câu lạc bộ đăng sự kiện</dt>
+              <dd>
+                <CountUp value={clubCount} />
+              </dd>
+            </div>
+            <div>
+              <dt>sự kiện trong năm học</dt>
+              <dd>
+                <CountUp value={events.length} />
+              </dd>
+            </div>
+          </dl>
+          <div className="density-full-only">
+            <CategoryMarquee />
+          </div>
+        </div>
+      </section>
+
+      <section className="band band--surface density-full-only" aria-labelledby="home-problem">
         <div className="container home-split">
           <div className="home-split__item">
             <p className="eyebrow">Vấn đề</p>
@@ -146,24 +205,25 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="band" aria-labelledby="home-pillars">
+      <section className="band density-detail" aria-labelledby="home-pillars">
         <div className="container stack stack--lg">
-          <h2 id="home-pillars" className="home-section-title">
+          <SplitLines as="h2" id="home-pillars" className="home-section-title">
             Bốn trụ cột của Rodemap
-          </h2>
-          <ol className="home-pillars">
+          </SplitLines>
+          <Reveal as="ol" className="home-pillars">
             {PILLARS.map((p) => (
               <li key={p.id} className="home-pillars__item" style={{ '--line': `var(--line-${p.line.toLowerCase()})` } as Record<string, string>}>
                 <span className="home-pillars__station" aria-hidden="true" />
                 <h3 className="home-pillars__title">{p.title}</h3>
-                <p className="home-pillars__body">{p.body}</p>
+                <p className="home-pillars__body density-full-only">{p.body}</p>
+                <p className="home-pillars__body density-compact-only">{p.short}</p>
               </li>
             ))}
-          </ol>
+          </Reveal>
         </div>
       </section>
 
-      <section className="band band--surface" aria-labelledby="home-mochi">
+      <section className="band band--surface density-full-only" aria-labelledby="home-mochi">
         <div className="container home-mochi">
           <div className="home-mochi__figure">
             <Mochi state="idle" title="Mochi, trợ lý đồng hành của Rodemap" />
@@ -210,26 +270,29 @@ export function HomePage() {
                 ) : null}
               </li>
             </ol>
-            <Button
-              variant="secondary"
-              size="sm"
-              iconEnd="arrow-right"
-              className="home-demo__ask"
-              onClick={() => {
-                requestMochi({ kind: 'prompt', text: DEMO_QUESTION });
-              }}
-            >
-              Gửi câu hỏi này cho Mochi
-            </Button>
+            {/* Mochi works from the student's profile (DESIGN.md §7.2). */}
+            {hasProfile ? (
+              <Button
+                variant="secondary"
+                size="sm"
+                iconEnd="arrow-right"
+                className="home-demo__ask"
+                onClick={() => {
+                  requestMochi({ kind: 'prompt', text: DEMO_QUESTION });
+                }}
+              >
+                Gửi câu hỏi này cho Mochi
+              </Button>
+            ) : null}
           </figure>
         </div>
       </section>
 
-      <section className="band" aria-labelledby="home-participation">
+      <section className="band density-full-only" aria-labelledby="home-participation">
         <div className="container stack stack--lg">
-          <h2 id="home-participation" className="home-section-title">
+          <SplitLines as="h2" id="home-participation" className="home-section-title">
             Cách các bên cùng tham gia
-          </h2>
+          </SplitLines>
           <ol className="home-steps">
             {PARTICIPATION.map((s) => (
               <li key={s.id} className="home-steps__item">
@@ -242,20 +305,20 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="band band--surface" aria-labelledby="home-closing">
+      <section className="band band--surface density-detail" aria-labelledby="home-closing">
         <div className="container home-closing">
           <div className="stack stack--md">
-            <h2 id="home-closing" className="home-section-title">
+            <SplitLines as="h2" id="home-closing" className="home-section-title">
               {CLOSING.title}
-            </h2>
-            <p className="home-split__body">{CLOSING.body}</p>
+            </SplitLines>
+            <p className="home-split__body density-full-only">{CLOSING.body}</p>
           </div>
           <div className="cluster">
-            <Button to="/thiet-lap" variant="primary" size="lg" iconEnd="arrow-right">
-              {CLOSING.cta}
+            <Button to={hasProfile ? '/tong-quan' : '/thiet-lap'} variant="primary" size="lg" iconEnd="arrow-right">
+              {hasProfile ? HERO.dashboardCta : CLOSING.cta}
             </Button>
           </div>
-          <ul className="home-closing__lines" aria-label="Bảy tuyến lĩnh vực">
+          <ul className="home-closing__lines density-full-only" aria-label="Bảy tuyến lĩnh vực">
             {CATEGORIES.map((c) => (
               <li key={c.code}>
                 <LineBadge code={c.code} showName />

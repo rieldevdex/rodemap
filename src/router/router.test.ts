@@ -150,8 +150,9 @@ describe('titles and path helpers', () => {
 });
 
 describe('profile gate', () => {
-  it('keeps only Trang chủ, Thiết lập hồ sơ, Đề án and 404 open without a profile', () => {
-    expect([...PUBLIC_ROUTES].sort()).toEqual(['home', 'notFound', 'onboarding', 'proposal']);
+  it('lets a visitor browse events and suggestions; personal and demo-role pages need a profile', () => {
+    expect([...PUBLIC_ROUTES].sort()).toEqual(['club', 'clubs', 'dashboard', 'event', 'explore', 'home', 'ideas', 'news', 'newsArticle', 'notFound', 'onboarding', 'proposal', 'route']);
+    expect(ROUTES.filter((r) => requiresProfile(r.name)).map((r) => r.name)).toEqual(['calendar', 'portfolio', 'clubPortal', 'moderation', 'newsCompose']);
     for (const r of ROUTES) expect(requiresProfile(r.name), r.name).toBe(!PUBLIC_ROUTES.includes(r.name));
   });
 
@@ -160,9 +161,11 @@ describe('profile gate', () => {
     expect(new URLSearchParams(setupPathFor('/kham-pha?linh-vuc=CN').split('?')[1]).get('tiep-theo')).toBe('/kham-pha?linh-vuc=CN');
   });
 
-  it('returns only to in-app pages that need the profile', () => {
+  it('returns only to in-app pages other than Trang chủ and Thiết lập hồ sơ', () => {
     expect(returnPathAfterSetup('/kham-pha?linh-vuc=CN')).toBe('/kham-pha?linh-vuc=CN');
     expect(returnPathAfterSetup('/ban-tin/thong-bao')).toBe('/ban-tin/thong-bao');
+    expect(returnPathAfterSetup('/lich')).toBe('/lich');
+    expect(returnPathAfterSetup('/de-an')).toBe('/de-an');
     expect(returnPathAfterSetup(null)).toBeNull();
     expect(returnPathAfterSetup('')).toBeNull();
     expect(returnPathAfterSetup('https://example.org/tong-quan')).toBeNull();
@@ -170,7 +173,6 @@ describe('profile gate', () => {
     expect(returnPathAfterSetup('/\\example.org')).toBeNull();
     expect(returnPathAfterSetup('/thiet-lap')).toBeNull();
     expect(returnPathAfterSetup('/')).toBeNull();
-    expect(returnPathAfterSetup('/de-an')).toBeNull();
     expect(returnPathAfterSetup('/khong-co-trang-nay')).toBeNull();
   });
 });

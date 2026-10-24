@@ -9,6 +9,7 @@ import { VisuallyHidden } from '../components/atoms/VisuallyHidden';
 import { ConfirmDialog } from '../components/molecules/ConfirmDialog';
 import { PageHead } from '../components/molecules/PageHead';
 import { ProposalCard } from '../components/molecules/ProposalCard';
+import { SetupInvite } from '../components/molecules/SetupInvite';
 import { ActivityProposalForm, CollaborationForm } from '../components/organisms/ProposalForm';
 import { CLUBS } from '../data/clubs';
 import { studentClubs } from '../domain/clubs';
@@ -28,6 +29,7 @@ import {
   validateCollaborationDraft,
 } from '../domain/proposals';
 import type { ActivityProposalDraft, Club, CollaborationDraft, ProposalResponse, ProposalStatus } from '../domain/types';
+import { useSetupHref } from '../router/Router';
 import { newId } from '../state/effects';
 import {
   selectActivityProposals,
@@ -266,6 +268,9 @@ function StudentIdeas({ catalog }: { catalog: Catalog }) {
   const others = views.filter((v) => !v.mine);
   const shown = filter === 'all' ? others : others.filter((v) => v.status === filter);
   const grade = state.profile?.grade;
+  // A visitor reads the proposals; sending and supporting wait for the profile (DESIGN.md §7.2).
+  const guest = state.profile === null;
+  const setupHref = useSetupHref();
 
   const submit = (draft: ActivityProposalDraft) => {
     const errors = validateActivityDraft(draft, KNOWN_CLUB_IDS);
@@ -295,8 +300,19 @@ function StudentIdeas({ catalog }: { catalog: Catalog }) {
             <h2 id="ideas-form" className="ideas__title">
               Gửi đề xuất
             </h2>
-            <StatusNote text={status} />
-            <ActivityProposalForm clubs={STUDENT_CLUBS} defaultGrades={grade === undefined ? [] : [grade]} onSubmit={submit} />
+            {guest ? (
+              <SetupInvite
+                headingLevel={3}
+                title="Thiết lập hồ sơ để gửi đề xuất"
+                text="Đề xuất được gửi kèm khối của người gửi, vì vậy học sinh cần thiết lập hồ sơ trước khi gửi hoặc ủng hộ đề xuất. Bạn vẫn có thể xem các đề xuất và phản hồi của Hội đồng Học sinh bên dưới."
+                to={setupHref}
+              />
+            ) : (
+              <>
+                <StatusNote text={status} />
+                <ActivityProposalForm clubs={STUDENT_CLUBS} defaultGrades={grade === undefined ? [] : [grade]} onSubmit={submit} />
+              </>
+            )}
           </div>
           <aside className="ideas__aside" aria-label="Nguyên tắc gửi đề xuất">
             <h3>Nguyên tắc gửi đề xuất</h3>
@@ -373,7 +389,7 @@ function StudentIdeas({ catalog }: { catalog: Catalog }) {
                     view={v}
                     catalog={catalog}
                     actions={
-                      v.status === 'pending' ? (
+                      v.status === 'pending' && !guest ? (
                         <Chip
                           pressed={v.supportedByMe}
                           onClick={() => {
@@ -797,6 +813,8 @@ function NotAClubIdeas({ catalog, publisher }: { catalog: Catalog; publisher: st
 export function IdeasPage() {
   const catalog = useCatalog();
   const { state } = catalog;
+  // The demo roles act once a profile exists; a visitor always reads the student view.
+  if (state.profile === null) return <StudentIdeas catalog={catalog} />;
   if (state.role === 'moderator') return <ModeratorIdeas catalog={catalog} />;
   if (state.role === 'club') {
     // Only clubs take part: the council and the offices are told so instead of acting as another club.

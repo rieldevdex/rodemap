@@ -1,7 +1,7 @@
 import { useEffect, useReducer, useState, type ReactNode } from 'react';
 import type { Millis } from '../domain/types';
 import { DispatchContext, NowContext, StateContext } from './context';
-import { applyTheme } from './effects';
+import { applyAppearance, applyTheme } from './effects';
 import { getStorage, loadState, saveState } from './persistence';
 import { reducer } from './reducer';
 import type { AppState } from './schema';
@@ -25,6 +25,10 @@ export function StoreProvider({ children, initialState }: StoreProviderProps) {
   useEffect(() => {
     applyTheme(state.theme);
   }, [state.theme]);
+
+  useEffect(() => {
+    applyAppearance(state.mode, state.density);
+  }, [state.mode, state.density]);
 
   useEffect(() => {
     const id = window.setInterval(() => {

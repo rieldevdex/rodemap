@@ -178,9 +178,15 @@
     font-size: var(--text-md);
   }
 
-  /* The theme choice moves into the account menu on phones (no room in the bar). */
-  .site-header__actions .theme-toggle {
+  /* Visitors: "Thiết lập hồ sơ" moves into the Danh mục panel on phones (no room in the bar). */
+  .site-header__setup {
     display: none;
+  }
+
+  .site-nav__item--setup .site-nav__link {
+    padding-left: 0;
+    color: var(--color-link);
+    font-weight: var(--weight-semibold);
   }
 
   .site-header__menu-button {
@@ -290,7 +296,8 @@
   }
 
   .site-header__menu-button,
-  .site-nav__item--search {
+  .site-nav__item--search,
+  .site-nav__item--setup {
     display: none;
   }
 

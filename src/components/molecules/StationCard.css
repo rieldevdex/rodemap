@@ -6,6 +6,20 @@
   border: var(--rule-hair) solid var(--color-rule);
   border-inline-start: var(--chip-edge) solid var(--line);
   border-radius: var(--radius-sm);
+  transition: border-color var(--dur-hover) var(--ease-out);
+}
+
+/* Hover and focus answer with a darker edge, never a lift (DESIGN.md §6.2 #3). */
+.station-card:focus-within {
+  border-color: var(--color-ink);
+  border-inline-start-color: var(--line);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .station-card:hover {
+    border-color: var(--color-ink);
+    border-inline-start-color: var(--line);
+  }
 }
 
 .station-card--compact {

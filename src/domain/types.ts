@@ -232,6 +232,21 @@ export interface Conflict {
 
 export type ThemePreference = 'system' | 'light' | 'dark';
 
+/** Chế độ màu (DESIGN.md §2.4): one token set per mode, in light and dark. */
+export type AppearanceMode = 'lo-trinh' | 'ruc-ro' | 'ap-phich' | 'diu-nhe';
+export const APPEARANCE_MODES: readonly AppearanceMode[] = ['lo-trinh', 'ruc-ro', 'ap-phich', 'diu-nhe'];
+
+/** Mật độ nội dung (DESIGN.md §10): how much text Rodemap shows. */
+export type TextDensity = 'full' | 'compact' | 'minimal';
+export const TEXT_DENSITIES: readonly TextDensity[] = ['full', 'compact', 'minimal'];
+
+/** A visitor's quick picks on Tổng quan before setting up a profile (kept on this device only). */
+export interface GuestPicks {
+  grade: Grade | null;
+  /** In the order picked; the first three count as top interests. */
+  interests: CategoryCode[];
+}
+
 /* ── Council newsletter (Bản tin Hội đồng Học sinh) ────────────────── */
 
 export const NEWS_CATEGORIES = ['announcement', 'activity', 'club', 'guide'] as const;

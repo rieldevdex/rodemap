@@ -3,8 +3,8 @@ import { Footer } from './components/organisms/Footer';
 import { Header } from './components/organisms/Header';
 import { HomePage } from './pages/Home';
 import { MochiConnected } from './pages/connected/MochiConnected';
-import { useNavigate, useRoute } from './router/Router';
-import { requiresProfile, setupPathFor, type RouteName } from './router/routes';
+import { useNavigate, useRoute, useSetupHref } from './router/Router';
+import { requiresProfile, type RouteName } from './router/routes';
 import { useSelector } from './state/hooks';
 import './App.css';
 
@@ -94,12 +94,11 @@ function PageError() {
 
 /** A page that needs the student profile, opened without one: on to Thiết lập hồ sơ, then back. */
 function ProfileRequired() {
-  const route = useRoute();
   const navigate = useNavigate();
+  const setupHref = useSetupHref();
   useEffect(() => {
-    const query = route.search.toString();
-    navigate(setupPathFor(`${route.pathname}${query === '' ? '' : `?${query}`}${route.hash}`), { replace: true });
-  }, [navigate, route]);
+    navigate(setupHref, { replace: true });
+  }, [navigate, setupHref]);
   return <PageLoading />;
 }
 

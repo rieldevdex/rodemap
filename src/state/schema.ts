@@ -1,9 +1,12 @@
 /** Persisted application state: shape, seed and versioned migration. Pure. */
 import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS, SEED_SUBMISSIONS } from '../data/seed';
+import { APPEARANCE_MODES, TEXT_DENSITIES } from '../domain/types';
 import type {
   ActivityProposal,
+  AppearanceMode,
   CollaborationProposal,
   EventStatus,
+  GuestPicks,
   IsoDate,
   NewsPost,
   PortfolioEntry,
@@ -13,6 +16,7 @@ import type {
   Role,
   SchoolEvent,
   Submission,
+  TextDensity,
   ThemePreference,
 } from '../domain/types';
 
@@ -42,7 +46,13 @@ export interface AppState {
   proposalResponses: Record<string, ProposalResponse>;
   /** Proposals the demo student supports. */
   supportedProposals: string[];
+  /** A visitor's grade and fields on Tổng quan before the profile exists (prefills Thiết lập hồ sơ). */
+  guestPicks: GuestPicks;
   theme: ThemePreference;
+  /** Chế độ màu, kept on this device. */
+  mode: AppearanceMode;
+  /** Mật độ nội dung, kept on this device. */
+  density: TextDensity;
   /** Overrides "today" for the demo; null follows the real clock. */
   demoToday: IsoDate | null;
   /** Forces Mochi's offline mode (for presentations). */
@@ -70,7 +80,10 @@ export function createSeedState(): AppState {
     collaborations: [],
     proposalResponses: {},
     supportedProposals: [],
+    guestPicks: { grade: null, interests: [] },
     theme: 'system',
+    mode: 'lo-trinh',
+    density: 'compact',
     demoToday: null,
     mochiForcedOffline: false,
   };
@@ -93,6 +106,10 @@ function isRecord(x: unknown): x is Record<string, unknown> {
   return typeof x === 'object' && x !== null && !Array.isArray(x);
 }
 
+function isGuestPicks(x: unknown): x is GuestPicks {
+  return isRecord(x) && (x.grade === null || typeof x.grade === 'number') && Array.isArray(x.interests);
+}
+
 /** Structural check of a parsed v1 state. Deep content is trusted (it was written by this app). */
 export function isAppStateV1(x: unknown): x is AppState {
   if (!isRecord(x)) return false;
@@ -112,8 +129,13 @@ export function isAppStateV1(x: unknown): x is AppState {
     Array.isArray(x.collaborations) &&
     isRecord(x.proposalResponses) &&
     Array.isArray(x.supportedProposals) &&
+    isGuestPicks(x.guestPicks) &&
     typeof x.theme === 'string' &&
     THEMES.includes(x.theme) &&
+    typeof x.mode === 'string' &&
+    (APPEARANCE_MODES as readonly string[]).includes(x.mode) &&
+    typeof x.density === 'string' &&
+    (TEXT_DENSITIES as readonly string[]).includes(x.density) &&
     (x.demoToday === null || (typeof x.demoToday === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.demoToday))) &&
     typeof x.mochiForcedOffline === 'boolean'
   );
@@ -130,6 +152,9 @@ const LATER_V1_FIELDS = {
   collaborations: () => [],
   proposalResponses: () => ({}),
   supportedProposals: () => [],
+  guestPicks: () => ({ grade: null, interests: [] }),
+  mode: () => 'lo-trinh',
+  density: () => 'compact',
 } as const;
 
 export function migrate(raw: unknown): AppState | null {

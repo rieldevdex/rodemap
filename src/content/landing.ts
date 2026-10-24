@@ -7,8 +7,13 @@ import type { CategoryCode } from '../domain/types';
 export const HERO = {
   eyebrow: 'Đề xuất tranh cử Hội đồng Học sinh nhiệm kỳ 2026–2027',
   headline: 'Toàn bộ hoạt động ngoại khóa trên một lộ trình thống nhất.',
-  primaryCta: 'Bắt đầu thiết lập lộ trình',
+  /** The one line under the headline in Gọn and Tối giản (DESIGN.md §10); Đầy đủ shows SOLUTION. */
+  short: 'Mọi sự kiện ngoại khóa của trường trên một bản đồ.',
   secondaryCta: 'Xem đề án',
+  /** Visitors can look around before setting up a profile (DESIGN.md §7.2). */
+  tryCta: 'Dùng thử Rodemap',
+  setupCta: 'Thiết lập hồ sơ',
+  dashboardCta: 'Về trang Tổng quan',
 } as const;
 
 export const PROBLEM =
@@ -24,6 +29,8 @@ export interface Pillar {
   id: string;
   title: string;
   body: string;
+  /** One formal sentence for Gọn. */
+  short: string;
   /** Category line used to draw the pillar's station marker. */
   line: CategoryCode;
 }
@@ -32,24 +39,28 @@ export const PILLARS: Pillar[] = [
   {
     id: 'tong-hop',
     title: 'Tổng hợp',
+    short: 'Mọi sự kiện đã kiểm duyệt tại một nơi.',
     body: 'Sự kiện của các câu lạc bộ, Đoàn trường và Hội đồng Học sinh được tập trung tại một nơi sau khi được kiểm duyệt.',
     line: 'HT',
   },
   {
     id: 'phan-loai',
     title: 'Phân loại',
+    short: 'Bảy lĩnh vực, mỗi lĩnh vực một mã tuyến.',
     body: 'Mỗi sự kiện thuộc một trong bảy lĩnh vực; mỗi lĩnh vực có mã tuyến và màu riêng. Bộ lọc hỗ trợ tra cứu theo câu lạc bộ, khối, thời gian, hình thức và hạn đăng ký.',
     line: 'NT',
   },
   {
     id: 'lo-trinh',
     title: 'Lộ trình',
+    short: 'Kiểm tra trùng lịch và quỹ giờ mỗi tuần.',
     body: 'Năm học được trình bày như một bản đồ lộ trình; kế hoạch cá nhân được kiểm tra trùng lịch và quỹ giờ mỗi tuần.',
     line: 'TN',
   },
   {
     id: 'ho-so-nang-luc',
     title: 'Hồ sơ năng lực',
+    short: 'Tổng hợp hoạt động, sẵn sàng in khổ A4.',
     body: 'Hoạt động đã tham gia được tổng hợp theo lĩnh vực, kèm vai trò, số giờ, phần tự đánh giá và minh chứng, sẵn sàng in trên khổ A4.',
     line: 'CN',
   },

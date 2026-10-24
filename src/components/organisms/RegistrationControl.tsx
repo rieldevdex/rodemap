@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { formatDate, formatLongDate, formatTime, formatTimeRange, toMillis } from '../../domain/dates';
 import { formatGrades, type RegistrationState } from '../../domain/events';
 import type { SchoolEvent } from '../../domain/types';
@@ -6,6 +6,8 @@ import { Button } from '../atoms/Button';
 import { LineBadge } from '../atoms/LineBadge';
 import { MonoTime } from '../atoms/MonoTime';
 import { StatusTag } from '../atoms/StatusTag';
+import { lineVar } from '../atoms/lineVar';
+import { SparkBurst } from '../motion/SparkBurst';
 import { ConfirmDialog } from '../molecules/ConfirmDialog';
 import './RegistrationControl.css';
 
@@ -51,6 +53,7 @@ export function RegistrationControl({
 }: RegistrationControlProps) {
   const [dialog, setDialog] = useState<'register' | 'unregister' | null>(null);
   const [announcement, setAnnouncement] = useState('');
+  const [burst, setBurst] = useState(0);
   const start = toMillis(event.start);
   const end = toMillis(event.end);
 
@@ -61,6 +64,7 @@ export function RegistrationControl({
     if (dialog === 'register') {
       onRegister();
       setAnnouncement(`Đã đăng ký sự kiện ${event.title}.`);
+      setBurst((n) => n + 1);
     } else if (dialog === 'unregister') {
       onUnregister();
       setAnnouncement(`Đã hủy đăng ký sự kiện ${event.title}.`);
@@ -101,8 +105,9 @@ export function RegistrationControl({
   }
 
   return (
-    <div className="registration-control">
+    <div className="registration-control" style={{ '--line': lineVar(event.category) } as CSSProperties}>
       {control}
+      <SparkBurst play={burst} />
       <span className="visually-hidden" role="status">
         {announcement}
       </span>

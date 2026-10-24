@@ -15,8 +15,6 @@ const ROLE_OPTIONS: { value: Role; label: string }[] = [
   { value: 'moderator', label: 'HĐHS' },
 ];
 
-const THEME_LABEL = { system: 'Theo cài đặt hệ thống', light: 'Giao diện sáng', dark: 'Giao diện tối' } as const;
-
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 /** "14/10/2026", or null when the stored value is not a valid date. */
@@ -33,7 +31,7 @@ type FocusTarget = 'confirm' | 'reset' | null;
 
 /**
  * "Tài khoản minh họa": the demo control panel (role, club, demo date, Mochi offline,
- * theme, clearing the data so the profile is set up again). A disclosure: Escape or a click outside closes it; Escape returns focus
+ * clearing the data so the profile is set up again; colours and density live in Giao diện). A disclosure: Escape or a click outside closes it; Escape returns focus
  * to the button.
  */
 export function AccountMenu() {
@@ -252,25 +250,6 @@ export function AccountMenu() {
               />
               <span>Chuyển Mochi sang chế độ ngoại tuyến</span>
             </label>
-          </div>
-
-          <div className="account-menu__section">
-            <p className="account-menu__label">Giao diện</p>
-            <div className="account-menu__row account-menu__row--wrap" role="group" aria-label="Chọn giao diện">
-              {(['light', 'dark', 'system'] as const).map((theme) => (
-                <Button
-                  key={theme}
-                  variant="secondary"
-                  size="sm"
-                  aria-pressed={state.theme === theme}
-                  onClick={() => {
-                    dispatch({ type: 'theme/set', theme });
-                  }}
-                >
-                  {THEME_LABEL[theme]}
-                </Button>
-              ))}
-            </div>
           </div>
 
           <div className="account-menu__section account-menu__section--reset">

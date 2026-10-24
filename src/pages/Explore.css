@@ -100,6 +100,7 @@
   margin-inline-end: var(--space-1);
   color: var(--color-ink);
   font-family: var(--font-display);
+  font-stretch: var(--display-stretch);
   font-size: var(--text-xl);
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
@@ -283,7 +284,7 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: var(--tracking-caps);
   line-height: var(--leading-snug);
-  text-transform: uppercase;
+  text-transform: var(--case-caps);
 }
 
 .explore-month__count {

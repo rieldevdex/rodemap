@@ -16,7 +16,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { documentTitle, matchRoute, normalizePath, routeTitle, type RouteName } from './routes';
+import { documentTitle, matchRoute, normalizePath, routeTitle, setupPathFor, type RouteName } from './routes';
 
 /** How the current location was reached. */
 type NavKind = 'initial' | 'push' | 'pop';
@@ -191,6 +191,13 @@ export function useRoute(): RouteState {
 /** Navigates within the app (pushState, or replaceState with { replace: true }). */
 export function useNavigate(): Navigate {
   return useRouterContext().navigate;
+}
+
+/** Thiết lập hồ sơ with the way back to the current page (path, query and hash). */
+export function useSetupHref(): string {
+  const { pathname, search, hash } = useRoute();
+  const query = search.toString();
+  return setupPathFor(`${pathname}${query === '' ? '' : `?${query}`}${hash}`);
 }
 
 /**

@@ -159,6 +159,22 @@
   padding-block: var(--space-6);
 }
 
+/* Colour block (DESIGN.md §11): one full-bleed field per page at most, with its own ink. */
+.band--block {
+  background: var(--color-block-a);
+  color: var(--color-block-a-ink);
+}
+
+.band--block a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.band--block + .band,
+.band + .band--block {
+  border-top: 0;
+}
+
 @media (min-width: 720px) {
   .band {
     padding-block: var(--space-8);
@@ -197,7 +213,7 @@
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-caps);
   line-height: var(--leading-snug);
-  text-transform: uppercase;
+  text-transform: var(--case-caps);
 }
 
 .page-head__title {

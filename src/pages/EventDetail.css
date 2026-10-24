@@ -105,7 +105,7 @@
   font-size: var(--text-xs);
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
+  text-transform: var(--case-caps);
   color: var(--color-ink-2);
 }
 

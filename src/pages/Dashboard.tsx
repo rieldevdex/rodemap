@@ -31,13 +31,21 @@ import {
   selectRecommendations,
   selectUpcomingMine,
 } from '../state/selectors';
+import { useSelector } from '../state/hooks';
 import { useCatalog } from '../state/useCatalog';
 import { EventRegistration } from './connected/EventRegistration';
+import { GuestDashboard } from './GuestDashboard';
 import './Dashboard.css';
 
 const BOARD_SIZE = 8;
 
+/** Tổng quan: the student's board, or the visitor version before a profile exists (DESIGN.md §7.2). */
 export function DashboardPage() {
+  const hasProfile = useSelector((s) => s.profile !== null);
+  return hasProfile ? <StudentDashboard /> : <GuestDashboard />;
+}
+
+function StudentDashboard() {
   const { state, dispatch, now, publicEvents, clubName, eventById } = useCatalog();
   const [boardScope, setBoardScope] = useState<'all' | 'mine'>('all');
   const profile = state.profile;
@@ -66,20 +74,9 @@ export function DashboardPage() {
       <PageHead
         eyebrow={`Bảng tin cá nhân · Tuần ${Number(isoWeekKey(now).slice(-2))}`}
         title="Tổng quan"
-        lead={
-          profile
-            ? `Xin chào bạn, học sinh lớp ${profile.className}. Hôm nay là ${formatLongDate(now)}.`
-            : 'Bạn chưa thiết lập hồ sơ. Sau khi thiết lập, Rodemap sẽ đề xuất sự kiện phù hợp với lĩnh vực quan tâm và thời gian của bạn.'
-        }
+        lead={`Xin chào bạn, học sinh lớp ${profile?.className ?? ''}. Hôm nay là ${formatLongDate(now)}.`}
       >
-        <div className="cluster">
-          {profile ? null : (
-            <Button to="/thiet-lap" variant="primary" iconEnd="arrow-right">
-              Bắt đầu thiết lập lộ trình
-            </Button>
-          )}
-          <DemoLabel />
-        </div>
+        <DemoLabel />
       </PageHead>
 
       <div className="band band--surface">

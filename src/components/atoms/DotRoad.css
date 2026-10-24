@@ -1,0 +1,6 @@
+.dot-road {
+  display: block;
+  inline-size: 100%;
+  block-size: var(--space-9);
+  fill: var(--color-pattern);
+}

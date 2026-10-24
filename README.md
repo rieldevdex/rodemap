@@ -32,8 +32,9 @@ Các lệnh kiểm tra chất lượng:
 | `npm run lint` | ESLint (TypeScript nghiêm ngặt) |
 | `npm run lint:tokens` | Kiểm tra giá trị thiết kế chỉ lấy từ `src/styles/tokens.css` |
 | `npm run lint:copy` | Kiểm tra văn phong tiếng Việt (từ ngữ khẩu ngữ, cấu trúc khẩu hiệu, biểu tượng cảm xúc) |
+| `npm run lint:contrast` | Kiểm tra độ tương phản của bốn chế độ màu ở giao diện sáng và tối |
 | `npm test` | Kiểm thử đơn vị (Vitest) |
-| `npm run e2e` | Kiểm thử luồng trình diễn (thiết lập hồ sơ → lộ trình → lịch → tệp .ics; Mochi trực tuyến và ngoại tuyến), hoạt động khi không có mạng và khả năng tiếp cận (Playwright + axe) |
+| `npm run e2e` | Kiểm thử luồng trình diễn (dùng thử → thiết lập hồ sơ → lộ trình → lịch → tệp .ics; Mochi trực tuyến và ngoại tuyến; bảng Giao diện và mật độ nội dung), hoạt động khi không có mạng và khả năng tiếp cận ở mọi chế độ màu (Playwright + axe) |
 | `npm run size` | Kiểm tra dung lượng JavaScript tải lần đầu (giới hạn 200 KB sau nén gzip) |
 | `npm run screens` | Chụp ảnh màn hình mọi trang ở 390 px và 1440 px, giao diện sáng và tối |
 
@@ -58,7 +59,7 @@ Ngoài ra, mỗi trình duyệt được gửi tối đa 40 yêu cầu và mỗi
 ## 4. Chuẩn bị trước Ngày bầu cử
 
 1. Mở trang đã triển khai trên máy dùng để trình chiếu **ít nhất một lần khi có kết nối mạng**: service worker lưu toàn bộ ứng dụng vào bộ nhớ đệm, nhờ đó các trang vẫn mở được khi mạng tại hội trường gián đoạn và Mochi tự động trả lời ở chế độ ngoại tuyến.
-2. Mở **Tài khoản minh họa** (góc trên bên phải) → **Xóa dữ liệu trên trình duyệt này** → **Xác nhận xóa** để đưa ứng dụng về trạng thái của người dùng mới (cần thiết lập hồ sơ trước khi sử dụng).
+2. Mở **Tài khoản minh họa** (góc trên bên phải) → **Xóa dữ liệu trên trình duyệt này** → **Xác nhận xóa** để đưa ứng dụng về trạng thái của người dùng mới (khách dùng thử, chưa có hồ sơ).
 3. Tùy chọn trong cùng trình đơn:
    - **Ngày minh họa**: cố định "hôm nay" (ví dụ ngày bầu cử) để bảng tin, hạn đăng ký và lộ trình hiển thị ổn định;
    - **Chuyển Mochi sang chế độ ngoại tuyến**: Mochi sử dụng phản hồi chuẩn bị sẵn, không phụ thuộc mạng.
@@ -76,7 +77,11 @@ Dữ liệu nằm trong `src/data/` (mỗi tệp đều ghi chú là dữ liệu
 
 ## 6. Hồ sơ học sinh và khối lớp
 
-Rodemap dành cho học sinh từ khối 6 đến khối 12 (trung học cơ sở và trung học phổ thông). Trước khi sử dụng, học sinh cần thiết lập hồ sơ gồm bốn bước (khối và lớp, lĩnh vực quan tâm, mục tiêu, thời gian có thể tham gia); khi chưa có hồ sơ, mọi trang ngoài Trang chủ, Thiết lập hồ sơ và Đề án đều chuyển tới trang Thiết lập hồ sơ, sau đó trở lại trang học sinh đã chọn. Mỗi sự kiện ghi rõ các khối được phép tham gia (`eligibleGrades` trong `src/data/events.ts`); sự kiện dành cho mọi khối được hiển thị là "Khối 6–12 (toàn trường)".
+Rodemap dành cho học sinh từ khối 6 đến khối 12 (trung học cơ sở và trung học phổ thông). Học sinh có thể **dùng thử** trước khi thiết lập hồ sơ: trang Tổng quan dành cho khách cho phép chọn khối và lĩnh vực quan tâm để xem gợi ý sự kiện (lựa chọn chỉ được lưu trên trình duyệt và được điền sẵn khi thiết lập hồ sơ); các trang Khám phá, Chi tiết sự kiện, Lộ trình, Câu lạc bộ, Bản tin và Đề xuất (chỉ xem) đều mở cho khách. Hồ sơ gồm bốn bước (khối và lớp, lĩnh vực quan tâm, mục tiêu, thời gian có thể tham gia) và cần thiết để đăng ký sự kiện, gửi hoặc ủng hộ đề xuất, sử dụng Lịch, Hồ sơ năng lực, Mochi và các trang của vai trò trình diễn; khi đó Rodemap chuyển tới trang Thiết lập hồ sơ rồi trở lại trang trước đó. Mỗi sự kiện ghi rõ các khối được phép tham gia (`eligibleGrades` trong `src/data/events.ts`); sự kiện dành cho mọi khối được hiển thị là "Khối 6–12 (toàn trường)".
+
+### Giao diện và mật độ nội dung
+
+Nút **Giao diện** (biểu tượng bảng màu trên thanh tiêu đề) cho phép chọn chế độ màu (Lộ trình, Rực rỡ, Áp phích, Dịu nhẹ), độ sáng (Theo hệ thống, Sáng, Tối) và mật độ nội dung (Đầy đủ, Gọn, Tối giản). Lựa chọn được áp dụng ngay và lưu trên trình duyệt; bản in luôn dùng chế độ Lộ trình sáng. Quy cách của từng chế độ nằm trong `DESIGN.md` §2.4 và §10.
 
 ## 7. Bản tin Hội đồng Học sinh
 

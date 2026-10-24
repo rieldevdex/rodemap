@@ -70,6 +70,7 @@
 
 .account-menu__title {
   font-family: var(--font-display);
+  font-stretch: var(--display-stretch);
   font-size: var(--text-lg);
   font-weight: var(--weight-bold);
   letter-spacing: var(--tracking-tight);
@@ -110,7 +111,7 @@
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-caps);
   line-height: var(--leading-snug);
-  text-transform: uppercase;
+  text-transform: var(--case-caps);
 }
 
 /* fieldset legends do not take part in flex gap */

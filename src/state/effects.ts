@@ -1,10 +1,38 @@
 /** Browser side effects that components may trigger through hooks (never directly). */
-import type { ThemePreference } from '../domain/types';
+import type { AppearanceMode, TextDensity, ThemePreference } from '../domain/types';
 
 /** Applies the theme preference to <html data-theme>. "system" removes the attribute. */
 export function applyTheme(theme: ThemePreference, root: HTMLElement = document.documentElement): void {
   if (theme === 'system') root.removeAttribute('data-theme');
   else root.setAttribute('data-theme', theme);
+}
+
+/** Applies the appearance mode and text density to <html data-mode data-density> (DESIGN.md §2.4, §10). */
+export function applyAppearance(mode: AppearanceMode, density: TextDensity, root: HTMLElement = document.documentElement): void {
+  root.setAttribute('data-mode', mode);
+  root.setAttribute('data-density', density);
+}
+
+/** Places the theme ripple's centre on `origin` (in viewport percentages, so it survives resizing). */
+export function setRippleOrigin(origin: HTMLElement | null, root: HTMLElement = document.documentElement): void {
+  if (!origin) return;
+  const rect = origin.getBoundingClientRect();
+  root.style.setProperty('--ripple-x', `${String(Math.round(((rect.left + rect.width / 2) / window.innerWidth) * 100))}%`);
+  root.style.setProperty('--ripple-y', `${String(Math.round(((rect.top + rect.height / 2) / window.innerHeight) * 100))}%`);
+}
+
+/**
+ * Runs `change` inside a view transition when the browser supports one and motion is allowed
+ * (the theme ripple, DESIGN.md §6.2); otherwise runs it at once.
+ */
+export function withViewTransition(change: () => void): void {
+  const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown };
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (typeof doc.startViewTransition !== 'function' || reduced) {
+    change();
+    return;
+  }
+  doc.startViewTransition(change);
 }
 
 /** True when the effective theme is dark (explicit choice or system setting). */

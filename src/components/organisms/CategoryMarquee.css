@@ -1,0 +1,77 @@
+.marquee {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+}
+
+.marquee__viewport {
+  flex: 1 1 0;
+  min-inline-size: 0;
+  overflow: clip;
+}
+
+.marquee__track {
+  display: flex;
+  inline-size: max-content;
+}
+
+.marquee__row {
+  display: flex;
+  flex: none;
+  gap: var(--space-6);
+  margin: 0;
+  padding: 0 var(--space-6) 0 0;
+  list-style: none;
+}
+
+.marquee__row .line-badge {
+  font-size: var(--text-lg);
+}
+
+.marquee__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: var(--size-touch);
+  padding-inline: var(--space-3);
+  border: var(--rule-hair) solid currentColor;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .marquee__track {
+    animation: marquee var(--dur-marquee) var(--ease-linear) infinite;
+  }
+
+  .marquee:hover .marquee__track,
+  .marquee:focus-within .marquee__track,
+  .marquee[data-paused='true'] .marquee__track {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Reduced motion: one still row that wraps; the copy and the control are not needed. */
+@media (prefers-reduced-motion: reduce) {
+  .marquee__track,
+  .marquee__row {
+    flex-wrap: wrap;
+    inline-size: auto;
+  }
+
+  .marquee__row[aria-hidden='true'],
+  .marquee__toggle {
+    display: none;
+  }
+}

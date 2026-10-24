@@ -112,8 +112,10 @@ h4,
 h5,
 h6 {
   font-family: var(--font-display);
-  font-weight: var(--weight-bold);
+  font-stretch: var(--display-stretch);
+  font-weight: var(--weight-display);
   letter-spacing: var(--tracking-tight);
+  word-spacing: var(--word-space-display);
   line-height: var(--leading-display);
   text-wrap: balance;
 }
@@ -139,7 +141,7 @@ h6 {
 }
 
 a {
-  color: var(--color-signal);
+  color: var(--color-link);
   text-decoration-thickness: var(--rule-hair);
   text-underline-offset: var(--space-1);
 }
@@ -211,7 +213,7 @@ kbd {
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-caps);
   line-height: var(--leading-snug);
-  text-transform: uppercase;
+  text-transform: var(--case-caps);
 }
 
 .measure {
@@ -223,6 +225,37 @@ kbd {
   font-size: var(--text-lg);
   line-height: var(--leading-body);
   max-width: var(--measure);
+}
+
+/* ── Mật độ nội dung (DESIGN.md §10): hidden blocks leave the layout and the accessibility tree ── */
+
+:root:not([data-density='full']) .density-full-only,
+:root:not([data-density='compact']) .density-compact-only,
+:root[data-density='full'] .density-hide-full,
+:root[data-density='minimal'] .density-detail {
+  display: none;
+}
+
+/* ── Theme ripple (DESIGN.md §6.2 #6): the new appearance grows from the Giao diện control ── */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  animation: theme-ripple var(--dur-slow) var(--ease-in-out);
+}
+
+@keyframes theme-ripple {
+  from {
+    clip-path: circle(0 at var(--ripple-x, 50%) var(--ripple-y, 0%));
+  }
+
+  to {
+    clip-path: circle(150% at var(--ripple-x, 50%) var(--ripple-y, 0%));
+  }
 }
 
 /* ── Reduced motion: instant states, nothing loops or hops ───────── */

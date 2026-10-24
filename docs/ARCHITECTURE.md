@@ -70,6 +70,18 @@ The product is **Rodemap** (never "Rode").
   is global in `base.css`; do not remove outlines.
 - Every animation must be disabled or instant under
   `prefers-reduced-motion: reduce` (durations already collapse to 0 in tokens).
+- Appearance modes (DESIGN.md §2.4) are token sets on `:root[data-mode='…']` inside
+  `@media screen` in `tokens.css`, each with a dark set for both "Theo hệ thống" and
+  "Tối". `npm run lint:contrast` (`scripts/contrast-check.ts`) resolves the cascade for
+  every mode and brightness and fails on any contrast pair below its minimum.
+- Text density (DESIGN.md §10) is pure CSS: `data-density` on `<html>` and the helper
+  classes `.density-full-only`, `.density-compact-only`, `.density-hide-full`,
+  `.density-detail` in `base.css`. `PageHead` takes `lead` and `leadShort`.
+- Motion (`src/components/motion/`): GSAP is set up in `gsap.ts`, which reads durations
+  and curves from the tokens (`motionSeconds`, `motionEase` → CustomEase); components
+  adapted from React Bits: `SplitLines` (SplitText), `Reveal` (AnimatedContent),
+  `CountUp`, `SparkBurst` (ClickSpark). framer-motion is used once, for the visitor's
+  suggestion rows (`GuestDashboard`). Each effect checks `prefersReducedMotion()`.
 
 ## Domain contracts (`src/domain/*.ts`)
 
@@ -323,8 +335,11 @@ export interface AppState {
   collaborations: CollaborationProposal[];    // clubs' collaboration proposals sent in the demo
   proposalResponses: Record<string, ProposalResponse>; // answers given in the demo (sample answers stay in src/data)
   supportedProposals: string[];               // sample proposals the demo student supports
+  guestPicks: GuestPicks;                     // a visitor's grade and fields on Tổng quan (prefills Thiết lập hồ sơ)
   // v1 states saved before any of these fields existed migrate to empty values.
   theme: ThemePreference;
+  mode: AppearanceMode;                       // 'lo-trinh' | 'ruc-ro' | 'ap-phich' | 'diu-nhe' (default lo-trinh)
+  density: TextDensity;                       // 'full' | 'compact' | 'minimal' (default compact)
   demoToday: IsoDate | null;                  // overrides the clock for the demo
   mochiForcedOffline: boolean;
 }
@@ -350,13 +365,17 @@ export type Action =
   | { type: 'role/set'; role: Role }
   | { type: 'club/setActive'; clubId: string }
   | { type: 'theme/set'; theme: ThemePreference }
+  | { type: 'appearance/setMode'; mode: AppearanceMode }       // unknown values ignored
+  | { type: 'appearance/setDensity'; density: TextDensity }    // unknown values ignored
+  | { type: 'guest/setPicks'; picks: GuestPicks }              // cleaned (known grade, known distinct fields)
   | { type: 'demo/setToday'; date: IsoDate | null }
   | { type: 'demo/setMochiOffline'; offline: boolean }
   | { type: 'demo/reset' };
 export function reducer(state: AppState, action: Action): AppState;  // pure; unknown/invalid → same state
 export function createSeedState(): AppState;   // a new visitor: profile null, no registrations or portfolio
 export function createDemoState(): AppState;   // the illustrative grade 11 student (tests, screenshots)
-// demo/reset returns to createSeedState() (presentation settings kept), so a new profile is needed.
+// demo/reset returns to createSeedState() (theme, mode, density, demo date and Mochi offline kept),
+// so a new profile is needed.
 // selectors.ts — pure, (state, now?) → value
 selectAllEvents(state)             // EVENTS + submittedEvents with moderation overrides applied
 selectPublicEvents(state)          // approved only, sorted by start
@@ -366,6 +385,7 @@ selectMyEvents(state)              // public events with registration registered
 selectUpcomingMine(state, now)
 selectConflictsInPlan(state)
 selectRecommendations(state, now, opts?)
+selectGuestRecommendations(state, now, opts?)  // a visitor's picks as a profile (domain/guest.ts), time fit not claimed
 selectFirstRoute(state, now, size?)  // planner.firstRoute: best event of each top interest first, then by score
 selectPlanBudget(state, now)
 selectNews(state, now) / selectNewsBySlug(state, slug, now) / selectNewsSlugs(state)
@@ -384,8 +404,12 @@ saveState(storage: Storage | null, s: AppState): void;  // try/catch
 // hooks.ts (React): useAppState(), useDispatch(), useSelector(fn), useNow()
 // routeMemory.ts: "your route" as last seen on the Lộ trình map in this session; onboarding and
 //   Mochi call rememberRouteBefore(ids) before registering, so the map grows to the new stations.
-// effects.ts: applyTheme, downloadFile, printPage, newId, registerServiceWorker (production only),
-//   copyText(text): Promise<boolean> (the only clipboard access; false when the browser refuses).
+// effects.ts: applyTheme, applyAppearance (data-mode, data-density), setRippleOrigin and
+//   withViewTransition (the theme ripple), downloadFile, printPage, newId, registerServiceWorker
+//   (production only), copyText(text): Promise<boolean> (the only clipboard access).
+// useAppearance.ts: { mode, theme, density, setMode, setTheme, setDensity } for Giao diện;
+//   colour changes run inside a view transition with flushSync. public/theme-init.js applies the
+//   saved theme, mode and density before the first paint.
 ```
 
 ## Router (`src/router`)
@@ -399,12 +423,15 @@ export const ROUTES: { name: RouteName; path: string; title: string }[];
 //        /ban-tin · /ban-tin/soan-bai (before the slug route) · /ban-tin/:slug
 export function matchRoute(pathname: string): { name: RouteName; params: Record<string, string> };
 export function pathFor(name: RouteName, params?: Record<string, string>): string;
-export const PUBLIC_ROUTES = ['home', 'onboarding', 'proposal', 'notFound'];
-export function requiresProfile(name: RouteName): boolean;     // every other page needs state.profile
+export const PUBLIC_ROUTES = ['home', 'onboarding', 'proposal', 'notFound', 'dashboard', 'explore', 'event',
+  'route', 'clubs', 'club', 'news', 'newsArticle', 'ideas'];   // a visitor can try these (DESIGN.md §7.2)
+export function requiresProfile(name: RouteName): boolean;     // calendar, portfolio, clubPortal, moderation, newsCompose
 export function setupPathFor(returnTo: string): string;        // /thiet-lap?tiep-theo=<encoded path>
 export function returnPathAfterSetup(value: string | null): string | null; // in-app path of a gated page, else null
 // App renders <ProfileRequired> (replace-navigates to setupPathFor) instead of a gated page while
-// state.profile is null; the header then shows "Thiết lập hồ sơ" instead of the nav, and Mochi is hidden.
+// state.profile is null. A visitor gets the visitor nav and a "Thiết lập hồ sơ" button; Mochi is hidden;
+// EventRegistration shows "Thiết lập hồ sơ để đăng ký" (useSetupHref) instead of "Đăng ký".
+export function useSetupHref(): string;                         // setupPathFor(current path + query + hash)
 export function RouterProvider(props: { children: ReactNode }): JSX.Element;
 export function useRoute(): { name: RouteName; params: Record<string, string>; search: URLSearchParams };
 export function useNavigate(): (to: string, opts?: { replace?: boolean }) => void;

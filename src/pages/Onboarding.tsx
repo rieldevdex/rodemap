@@ -12,11 +12,11 @@ import { CATEGORIES } from '../data/categories';
 import { GOALS } from '../data/goals';
 import { CATEGORY_LABELS } from '../domain/category-labels';
 import { formatDayLabel, formatTimeRange, toIsoDateTime, toMillis } from '../domain/dates';
+import { draftFromGuestPicks } from '../domain/guest';
 import {
   BUDGET_LIMITS,
   clampBudget,
   draftToProfile,
-  emptyDraft,
   moveInterest,
   ONBOARDING_STEPS,
   stepErrors,
@@ -87,7 +87,8 @@ export function OnboardingPage() {
   const navigate = useNavigate();
   // The page the visitor tried to open before setting up a profile (?tiep-theo=…).
   const returnTo = returnPathAfterSetup(useRoute().search.get(RETURN_PARAM));
-  const [draft, setDraft] = useState<ProfileDraft>(emptyDraft);
+  // A visitor's grade and fields from Tổng quan prefill steps 1 and 2 (DESIGN.md §7.2).
+  const [draft, setDraft] = useState<ProfileDraft>(() => draftFromGuestPicks(state.guestPicks));
   const [stepIndex, setStepIndex] = useState(0);
   const [attempted, setAttempted] = useState<ReadonlySet<OnboardingStep>>(new Set());
   const [excluded, setExcluded] = useState<ReadonlySet<string>>(new Set());
@@ -197,8 +198,8 @@ export function OnboardingPage() {
             <Icon name="info" size="sm" />
             <span>
               {returnTo === null
-                ? 'Học sinh cần thiết lập hồ sơ trước khi sử dụng Rodemap.'
-                : 'Học sinh cần thiết lập hồ sơ trước khi sử dụng Rodemap. Sau khi hoàn tất bốn bước, Rodemap mở trang bạn đã chọn.'}
+                ? 'Hồ sơ học sinh cần thiết cho việc đăng ký sự kiện, lịch cá nhân, hồ sơ năng lực và Mochi.'
+                : 'Hồ sơ học sinh cần thiết cho thao tác bạn đã chọn. Sau khi hoàn tất bốn bước, Rodemap mở lại trang trước đó.'}
             </span>
           </p>
         )}

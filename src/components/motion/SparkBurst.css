@@ -1,0 +1,27 @@
+.spark-burst {
+  --spark-reach: calc(var(--space-6) + var(--space-2));
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.spark-burst__arm {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  rotate: calc(var(--i) * 30deg);
+}
+
+.spark-burst__ray {
+  position: absolute;
+  bottom: calc(var(--space-6) / 2);
+  left: calc(var(--rule-strong) / -2);
+  width: var(--rule-strong);
+  height: var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--line, var(--color-signal));
+  opacity: 0;
+  transform-origin: bottom center;
+}

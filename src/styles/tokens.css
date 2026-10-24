@@ -16,10 +16,34 @@
   --color-rule: #d5d8cf;
   --color-signal: #1e47c8;
   --color-signal-ink: #ffffff;
+  /* Links follow the signal, except where the signal is a red (Rực rỡ, Áp phích): there links are ink. */
+  --color-link: var(--color-signal);
   --color-ok: #1b6f46;
   --color-warn: #8f5400;
   --color-stop: #b3261e;
   --color-scrim: rgb(20 24 31 / 0.4);
+  /* Colour blocks: one full-bleed band per page at most (DESIGN.md §11), each with its own ink. */
+  --color-block-a: #dce5fb;
+  --color-block-a-ink: #14181f;
+  --color-block-b: #f7e1eb;
+  --color-block-b-ink: #14181f;
+  --color-block-c: #ddefe5;
+  --color-block-c-ink: #14181f;
+  /* DotRoad dots (decorative, never behind text). */
+  --color-pattern: rgb(20 24 31 / 0.16);
+  /* Giao diện swatches: each mode's ground, signal and first colour block (light). */
+  --preview-lo-trinh-1: #f2f3ee;
+  --preview-lo-trinh-2: #1e47c8;
+  --preview-lo-trinh-3: #dce5fb;
+  --preview-ruc-ro-1: #ffffff;
+  --preview-ruc-ro-2: #d0021b;
+  --preview-ruc-ro-3: #ffd23f;
+  --preview-ap-phich-1: #eeebe4;
+  --preview-ap-phich-2: #bd1029;
+  --preview-ap-phich-3: #141414;
+  --preview-diu-nhe-1: #f1f3ef;
+  --preview-diu-nhe-2: #1d6a4e;
+  --preview-diu-nhe-3: #dce9e0;
 
   /* ── Category lines (light) ──────────────────────────────────────── */
   --line-ht: #1e47c8;
@@ -39,8 +63,17 @@
 
   /* ── Typography ──────────────────────────────────────────────────── */
   --font-display: 'Bricolage Grotesque Variable', 'Be Vietnam Pro', system-ui, sans-serif;
+  /* The wordmark keeps its own face in every appearance mode. */
+  --font-brand: 'Bricolage Grotesque Variable', 'Be Vietnam Pro', system-ui, sans-serif;
   --font-body: 'Lexend Variable', 'Be Vietnam Pro', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  /* Display width and weight per appearance mode (DESIGN.md §3). */
+  --display-stretch: 100%;
+  --weight-display: 800;
+  /* Short labels (eyebrows, codes): upper case in Lộ trình, sentence case in the other modes. */
+  --case-caps: uppercase;
+  /* Extra space between words in wide or condensed display faces. */
+  --word-space-display: normal;
 
   --weight-regular: 400;
   --weight-medium: 500;
@@ -56,10 +89,11 @@
   --text-3xl: clamp(2.5rem, 1.664rem + 3.429vw, 4.75rem); /* 40 → 76 */
   --text-display: clamp(3.5rem, 1.829rem + 6.857vw, 8rem); /* 56 → 128 */
 
-  --leading-display: 1.1;
+  --leading-display: 1.15;
   --leading-snug: 1.3;
   --leading-body: 1.6;
   --tracking-tight: -0.03em;
+  --tracking-brand: -0.03em;
   --tracking-caps: 0.08em;
   --measure: 62ch;
 
@@ -103,6 +137,7 @@
   --dock-size: 56px;
   --panel-w: 400px;
   --card-w: 320px;
+  --picker-w: 360px;
   --header-h: 64px;
   /* One RouteMap SVG user unit rendered at 1:1 in the horizontal (scrolling) map. */
   --map-unit: 1px;
@@ -129,14 +164,27 @@
   --z-overlay: 60;
   --z-toast: 70;
 
-  /* ── Motion ──────────────────────────────────────────────────────── */
-  --dur-fast: 140ms;
+  /* ── Motion (DESIGN.md §6.1; curves and durations from the Taste skill's motion study) ── */
+  --dur-fast: 140ms; /* press feedback */
+  --dur-hover: 180ms; /* hover colour */
+  --dur-ui: 240ms; /* menus and panels */
   --dur-med: 320ms;
   --dur-slow: 700ms;
+  --dur-reveal: 800ms; /* section reveals, line rises */
+  --dur-open: 1200ms; /* the theme ripple */
   --dur-draw: 1600ms;
   --dur-idle: 5200ms;
-  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --ease-spring: cubic-bezier(0.3, 1.5, 0.5, 1);
+  --dur-marquee: 40s;
+  --dur-spark: 600ms; /* registration spark burst */
+  --dur-count: 1100ms; /* home figures counting up */
+  --stagger-line: 90ms;
+  --stagger-item: 70ms;
+  --rise: 24px; /* reveal travel */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1); /* quint out: entrances and UI under 600 ms */
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1); /* expo out: reveals of 800 ms and more */
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1); /* wipes and things that travel */
+  --ease-exit: cubic-bezier(0.55, 0.055, 0.675, 0.19); /* leaving for good, short */
+  --ease-spring: cubic-bezier(0.3, 1.5, 0.5, 1); /* Mochi only, never on interface elements */
   --ease-linear: linear;
 }
 
@@ -156,6 +204,25 @@
     --color-warn: #e0a845;
     --color-stop: #f2867e;
     --color-scrim: rgb(0 0 0 / 0.6);
+    --color-block-a: #1b2647;
+    --color-block-a-ink: #e9ecef;
+    --color-block-b: #3b1f2c;
+    --color-block-b-ink: #e9ecef;
+    --color-block-c: #16301f;
+    --color-block-c-ink: #e9ecef;
+    --color-pattern: rgb(233 236 239 / 0.16);
+    --preview-lo-trinh-1: #0f1216;
+    --preview-lo-trinh-2: #7a9bff;
+    --preview-lo-trinh-3: #1b2647;
+    --preview-ruc-ro-1: #0b0b0b;
+    --preview-ruc-ro-2: #ff5468;
+    --preview-ruc-ro-3: #ffd23f;
+    --preview-ap-phich-1: #141414;
+    --preview-ap-phich-2: #ff5a4e;
+    --preview-ap-phich-3: #eeebe4;
+    --preview-diu-nhe-1: #121513;
+    --preview-diu-nhe-2: #7fd3ae;
+    --preview-diu-nhe-3: #1d3327;
 
     --line-ht: #7a9bff;
     --line-nt: #f07ab0;
@@ -188,6 +255,25 @@
   --color-warn: #e0a845;
   --color-stop: #f2867e;
   --color-scrim: rgb(0 0 0 / 0.6);
+  --color-block-a: #1b2647;
+  --color-block-a-ink: #e9ecef;
+  --color-block-b: #3b1f2c;
+  --color-block-b-ink: #e9ecef;
+  --color-block-c: #16301f;
+  --color-block-c-ink: #e9ecef;
+  --color-pattern: rgb(233 236 239 / 0.16);
+  --preview-lo-trinh-1: #0f1216;
+  --preview-lo-trinh-2: #7a9bff;
+  --preview-lo-trinh-3: #1b2647;
+  --preview-ruc-ro-1: #0b0b0b;
+  --preview-ruc-ro-2: #ff5468;
+  --preview-ruc-ro-3: #ffd23f;
+  --preview-ap-phich-1: #141414;
+  --preview-ap-phich-2: #ff5a4e;
+  --preview-ap-phich-3: #eeebe4;
+  --preview-diu-nhe-1: #121513;
+  --preview-diu-nhe-2: #7fd3ae;
+  --preview-diu-nhe-3: #1d3327;
 
   --line-ht: #7a9bff;
   --line-nt: #f07ab0;
@@ -204,14 +290,276 @@
   --shadow-panel: 0 12px 32px rgb(0 0 0 / 0.5);
 }
 
+/* ── Appearance modes (DESIGN.md §2.4), screens only: print always uses Lộ trình light ── */
+@media screen {
+  /* Rực rỡ: transit-signage colour fields (yellow, pink, cobalt) on white, black type, the student's route in map red. */
+  :root[data-mode='ruc-ro'] {
+    color-scheme: light;
+    --color-ground: #ffffff;
+    --color-surface: #f4f4f1;
+    --color-surface-2: #eaeae5;
+    --color-ink: #0b0b0b;
+    --color-ink-2: #45453f;
+    --color-rule: #d6d6cf;
+    --color-signal: #d0021b;
+    --color-signal-ink: #ffffff;
+    --color-ok: #17683f;
+    --color-warn: #8a4b00;
+    --color-stop: #9e1a1a;
+    --color-block-a: #ffd23f;
+    --color-block-a-ink: #0b0b0b;
+    --color-block-b: #ffa3c8;
+    --color-block-b-ink: #0b0b0b;
+    --color-block-c: #0039a6;
+    --color-block-c-ink: #ffffff;
+    --color-pattern: rgb(11 11 11 / 0.18);
+    --line-ts: #0b0b0b;
+    --font-display: 'Anybody Variable', 'Be Vietnam Pro', system-ui, sans-serif;
+    --font-body: 'Mona Sans Variable', 'Be Vietnam Pro', system-ui, sans-serif;
+    --font-mono: var(--font-body);
+    --display-stretch: 125%;
+    --weight-display: 800;
+    --tracking-tight: -0.02em;
+    --word-space-display: 0.12em;
+    --color-link: var(--color-ink);
+    --case-caps: none;
+    --tracking-caps: 0;
+    --radius-sm: 0;
+    --radius-md: 0;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root[data-mode='ruc-ro']:not([data-theme='light']) {
+      color-scheme: dark;
+      --color-ground: #0b0b0b;
+      --color-surface: #161616;
+      --color-surface-2: #212121;
+      --color-ink: #f5f5f2;
+      --color-ink-2: #b5b5ae;
+      --color-rule: #2e2e2e;
+      --color-signal: #ff5468;
+      --color-signal-ink: #0b0b0b;
+      --color-ok: #4fcb8a;
+      --color-warn: #f0b04a;
+      --color-stop: #ff8a80;
+      --color-block-a: #ffd23f;
+      --color-block-a-ink: #0b0b0b;
+      --color-block-b: #ffa3c8;
+      --color-block-b-ink: #0b0b0b;
+      --color-block-c: #0039a6;
+      --color-block-c-ink: #ffffff;
+      --color-pattern: rgb(245 245 242 / 0.18);
+      --line-ts: #f5f5f2;
+    }
+  }
+
+  :root[data-mode='ruc-ro'][data-theme='dark'] {
+    color-scheme: dark;
+    --color-ground: #0b0b0b;
+    --color-surface: #161616;
+    --color-surface-2: #212121;
+    --color-ink: #f5f5f2;
+    --color-ink-2: #b5b5ae;
+    --color-rule: #2e2e2e;
+    --color-signal: #ff5468;
+    --color-signal-ink: #0b0b0b;
+    --color-ok: #4fcb8a;
+    --color-warn: #f0b04a;
+    --color-stop: #ff8a80;
+    --color-block-a: #ffd23f;
+    --color-block-a-ink: #0b0b0b;
+    --color-block-b: #ffa3c8;
+    --color-block-b-ink: #0b0b0b;
+    --color-block-c: #0039a6;
+    --color-block-c-ink: #ffffff;
+    --color-pattern: rgb(245 245 242 / 0.18);
+    --line-ts: #f5f5f2;
+  }
+
+  /* Áp phích: the council's wall newspaper, two inks (black and newspaper red) on stone paper, condensed headlines. */
+  :root[data-mode='ap-phich'] {
+    color-scheme: light;
+    --color-ground: #eeebe4;
+    --color-surface: #f8f6f1;
+    --color-surface-2: #e2ded5;
+    --color-ink: #141414;
+    --color-ink-2: #4a463f;
+    --color-rule: #cfc9be;
+    --color-signal: #bd1029;
+    --color-signal-ink: #ffffff;
+    --color-ok: #1b6640;
+    --color-warn: #7f4a00;
+    --color-stop: #8e1b12;
+    --color-block-a: #141414;
+    --color-block-a-ink: #eeebe4;
+    --color-block-b: #bd1029;
+    --color-block-b-ink: #ffffff;
+    --color-block-c: #e2ded5;
+    --color-block-c-ink: #141414;
+    --color-pattern: rgb(20 20 20 / 0.2);
+    --line-ts: #141414;
+    --font-display: 'Anybody Variable', 'Be Vietnam Pro', system-ui, sans-serif;
+    --font-body: 'Mona Sans Variable', 'Be Vietnam Pro', system-ui, sans-serif;
+    --font-mono: var(--font-body);
+    --display-stretch: 62%;
+    --weight-display: 800;
+    --leading-display: 1.2;
+    --tracking-tight: 0.01em;
+    --word-space-display: 0.08em;
+    --color-link: var(--color-ink);
+    --case-caps: none;
+    --tracking-caps: 0;
+    --radius-sm: 0;
+    --radius-md: 0;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root[data-mode='ap-phich']:not([data-theme='light']) {
+      color-scheme: dark;
+      --color-ground: #141414;
+      --color-surface: #1c1c1a;
+      --color-surface-2: #272623;
+      --color-ink: #eeebe4;
+      --color-ink-2: #ada89e;
+      --color-rule: #353330;
+      --color-signal: #ff5a4e;
+      --color-signal-ink: #141414;
+      --color-ok: #5cc48e;
+      --color-warn: #e0a845;
+      --color-stop: #ff9a8f;
+      --color-block-a: #eeebe4;
+      --color-block-a-ink: #141414;
+      --color-block-b: #ff5a4e;
+      --color-block-b-ink: #141414;
+      --color-block-c: #272623;
+      --color-block-c-ink: #eeebe4;
+      --color-pattern: rgb(238 235 228 / 0.2);
+      --line-ts: #eeebe4;
+    }
+  }
+
+  :root[data-mode='ap-phich'][data-theme='dark'] {
+    color-scheme: dark;
+    --color-ground: #141414;
+    --color-surface: #1c1c1a;
+    --color-surface-2: #272623;
+    --color-ink: #eeebe4;
+    --color-ink-2: #ada89e;
+    --color-rule: #353330;
+    --color-signal: #ff5a4e;
+    --color-signal-ink: #141414;
+    --color-ok: #5cc48e;
+    --color-warn: #e0a845;
+    --color-stop: #ff9a8f;
+    --color-block-a: #eeebe4;
+    --color-block-a-ink: #141414;
+    --color-block-b: #ff5a4e;
+    --color-block-b-ink: #141414;
+    --color-block-c: #272623;
+    --color-block-c-ink: #eeebe4;
+    --color-pattern: rgb(238 235 228 / 0.2);
+    --line-ts: #eeebe4;
+  }
+
+  /* Dịu nhẹ: the quiet hours of the school day, putty paper and deep green ink, one soft family, rounded cards. */
+  :root[data-mode='diu-nhe'] {
+    color-scheme: light;
+    --color-ground: #f1f3ef;
+    --color-surface: #ffffff;
+    --color-surface-2: #e4e8e2;
+    --color-ink: #18201b;
+    --color-ink-2: #4e5951;
+    --color-rule: #cdd5cc;
+    --color-signal: #1d6a4e;
+    --color-signal-ink: #ffffff;
+    --color-ok: #1d6a4e;
+    --color-warn: #855000;
+    --color-stop: #a42a22;
+    --color-block-a: #dce9e0;
+    --color-block-a-ink: #18201b;
+    --color-block-b: #dee7ee;
+    --color-block-b-ink: #18201b;
+    --color-block-c: #ece7da;
+    --color-block-c-ink: #18201b;
+    --color-pattern: rgb(24 32 27 / 0.14);
+    --line-ts: #18201b;
+    --font-display: 'Mona Sans Variable', 'Be Vietnam Pro', system-ui, sans-serif;
+    --font-body: 'Mona Sans Variable', 'Be Vietnam Pro', system-ui, sans-serif;
+    --font-mono: var(--font-body);
+    --display-stretch: 112%;
+    --weight-display: 700;
+    --case-caps: none;
+    --tracking-caps: 0;
+    --radius-sm: 14px;
+    --radius-md: 22px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root[data-mode='diu-nhe']:not([data-theme='light']) {
+      color-scheme: dark;
+      --color-ground: #121513;
+      --color-surface: #1a1e1b;
+      --color-surface-2: #232924;
+      --color-ink: #e4e9e4;
+      --color-ink-2: #a2aca4;
+      --color-rule: #2f3731;
+      --color-signal: #7fd3ae;
+      --color-signal-ink: #121513;
+      --color-ok: #7fd3ae;
+      --color-warn: #e3b15a;
+      --color-stop: #f2958c;
+      --color-block-a: #1d3327;
+      --color-block-a-ink: #e4e9e4;
+      --color-block-b: #1e2a33;
+      --color-block-b-ink: #e4e9e4;
+      --color-block-c: #2f2b20;
+      --color-block-c-ink: #e4e9e4;
+      --color-pattern: rgb(228 233 228 / 0.14);
+      --line-ts: #e4e9e4;
+    }
+  }
+
+  :root[data-mode='diu-nhe'][data-theme='dark'] {
+    color-scheme: dark;
+    --color-ground: #121513;
+    --color-surface: #1a1e1b;
+    --color-surface-2: #232924;
+    --color-ink: #e4e9e4;
+    --color-ink-2: #a2aca4;
+    --color-rule: #2f3731;
+    --color-signal: #7fd3ae;
+    --color-signal-ink: #121513;
+    --color-ok: #7fd3ae;
+    --color-warn: #e3b15a;
+    --color-stop: #f2958c;
+    --color-block-a: #1d3327;
+    --color-block-a-ink: #e4e9e4;
+    --color-block-b: #1e2a33;
+    --color-block-b-ink: #e4e9e4;
+    --color-block-c: #2f2b20;
+    --color-block-c-ink: #e4e9e4;
+    --color-pattern: rgb(228 233 228 / 0.14);
+    --line-ts: #e4e9e4;
+  }
+}
+
 /* ── Reduced motion: every duration collapses to instant ─────────── */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --dur-fast: 0ms;
+    --dur-hover: 0ms;
+    --dur-ui: 0ms;
     --dur-med: 0ms;
     --dur-slow: 0ms;
+    --dur-reveal: 0ms;
+    --dur-open: 0ms;
     --dur-draw: 0ms;
     --dur-idle: 0ms;
+    --dur-spark: 0ms;
+    --dur-count: 0ms;
+    --stagger-line: 0ms;
+    --stagger-item: 0ms;
+    --rise: 0px;
   }
 }
 
@@ -237,6 +585,13 @@
     --line-kn: #7a5a00;
     --line-cn: #0e7490;
     --line-ts: #14181f;
+    --color-block-a: #dce5fb;
+    --color-block-a-ink: #14181f;
+    --color-block-b: #f7e1eb;
+    --color-block-b-ink: #14181f;
+    --color-block-c: #ddefe5;
+    --color-block-c-ink: #14181f;
+    --color-pattern: rgb(20 24 31 / 0.16);
     --shadow-panel: none;
   }
 }

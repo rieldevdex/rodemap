@@ -32,6 +32,8 @@ export interface RecommendContext {
   regs: Registration[];
   now: Millis;
   goals: Goal[];
+  /** False for a visitor's quick picks: availability is unknown, so time fit is neither claimed nor penalised. */
+  availabilityKnown?: boolean;
 }
 
 export interface RecommendOptions {
@@ -79,7 +81,7 @@ const NO_PROFILE_FACTS: ProfileFacts = {
   fitsTime: null,
 };
 
-function profileFacts(e: SchoolEvent, profile: Profile, goals: readonly Goal[]): ProfileFacts {
+function profileFacts(e: SchoolEvent, profile: Profile, goals: readonly Goal[], knowsTime: boolean): ProfileFacts {
   const rankIndex = profile.topInterests.slice(0, TOP_INTEREST_POINTS.length).indexOf(e.category);
   const topPoints = TOP_INTEREST_POINTS[rankIndex] ?? 0;
   const matchedGoals = profile.goals.filter((id) => {
@@ -91,7 +93,7 @@ function profileFacts(e: SchoolEvent, profile: Profile, goals: readonly Goal[]):
     topPoints,
     interest: rankIndex < 0 && profile.interests.includes(e.category),
     matchedGoals,
-    fitsTime: fitsAvailability(e, profile.availability),
+    fitsTime: knowsTime ? fitsAvailability(e, profile.availability) : null,
   };
 }
 
@@ -152,7 +154,7 @@ export function recommendEvents(
   const candidates = sortByStart(events.filter((e) => passesHardFilters(e, ctx, planIds) && matchesOptions(e, opts)));
 
   const recommendations = candidates.map((e): Recommendation => {
-    const facts = profile ? profileFacts(e, profile, ctx.goals) : NO_PROFILE_FACTS;
+    const facts = profile ? profileFacts(e, profile, ctx.goals, ctx.availabilityKnown !== false) : NO_PROFILE_FACTS;
     const reasonSignals: [ReasonCode, boolean, number][] = [
       ['top_interest', facts.topRank !== undefined, facts.topPoints],
       ['interest', facts.interest, POINTS.interest],

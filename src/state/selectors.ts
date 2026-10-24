@@ -12,6 +12,7 @@ import { allConflicts } from '../domain/conflicts';
 import { addDays, startOfIsoWeek, toMillis } from '../domain/dates';
 import { findRegistration, isPast, isRegistered, sortByStart } from '../domain/events';
 import { isPublished, postsAboutClub, postsAboutEvent, sortNews } from '../domain/news';
+import { guestProfile } from '../domain/guest';
 import { firstRoute, type PlanProposal } from '../domain/planner';
 import { newestCollaborations, proposalStatus, rankActivityProposals, supportCount } from '../domain/proposals';
 import { pendingAttendance } from '../domain/portfolio';
@@ -137,6 +138,15 @@ function recommendContext(state: AppState, now: Millis): RecommendContext {
     now,
     goals: GOALS,
   };
+}
+
+/** Suggestions for a visitor from the quick picks on Tổng quan (no plan, availability unknown). */
+export function selectGuestRecommendations(state: AppState, now: Millis, opts: RecommendOptions = {}): Recommendation[] {
+  return recommendEvents(
+    selectPublicEvents(state),
+    { profile: guestProfile(state.guestPicks, now), plan: [], regs: state.registrations, now, goals: GOALS, availabilityKnown: false },
+    opts,
+  );
 }
 
 /** Mochi's recommendations over approved events, with my upcoming events as the plan. */

@@ -1,0 +1,19 @@
+.setup-invite {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+  padding: var(--space-5);
+  background: var(--color-surface-2);
+  border-inline-start: var(--chip-edge) solid var(--color-signal);
+  border-radius: var(--radius-sm);
+}
+
+.setup-invite__title {
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+}
+
+.setup-invite__text {
+  max-inline-size: var(--measure);
+  color: var(--color-ink-2);
+}

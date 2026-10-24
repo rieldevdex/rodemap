@@ -13,5 +13,5 @@ Hard rules (all enforced by `npm run check`):
 - `src/domain` is pure and 100 % covered. Components/pages never call localStorage, fetch or the Mochi client.
 - Times are Asia/Ho_Chi_Minh; always use `src/domain/dates.ts`.
 
-Commands: `npm run dev`, `npm test`, `npm run lint`, `npm run lint:tokens`, `npm run lint:copy`, `npm run typecheck`, `npm run build`, `npm run e2e`, `npm run screens`, `npm run check` (everything).
+Commands: `npm run dev`, `npm test`, `npm run lint`, `npm run lint:tokens`, `npm run lint:copy`, `npm run lint:contrast`, `npm run typecheck`, `npm run build`, `npm run e2e`, `npm run screens`, `npm run check` (everything).
 Playwright uses the preinstalled Chromium (`@playwright/test` pinned to 1.56.1 to match `/opt/pw-browsers/chromium-1194`); never run `playwright install`.

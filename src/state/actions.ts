@@ -1,7 +1,9 @@
 /** Every state change in Rodemap. Timestamps and ids are created by the caller so the reducer stays pure. */
 import type {
   ActivityProposal,
+  AppearanceMode,
   CollaborationProposal,
+  GuestPicks,
   IsoDate,
   IsoDateTime,
   NewsPost,
@@ -11,6 +13,7 @@ import type {
   Role,
   SchoolEvent,
   Submission,
+  TextDensity,
   ThemePreference,
 } from '../domain/types';
 
@@ -37,7 +40,10 @@ export type Action =
   | { type: 'proposal/withdraw'; id: string }
   | { type: 'role/set'; role: Role }
   | { type: 'club/setActive'; clubId: string }
+  | { type: 'guest/setPicks'; picks: GuestPicks }
   | { type: 'theme/set'; theme: ThemePreference }
+  | { type: 'appearance/setMode'; mode: AppearanceMode }
+  | { type: 'appearance/setDensity'; density: TextDensity }
   | { type: 'demo/setToday'; date: IsoDate | null }
   | { type: 'demo/setMochiOffline'; offline: boolean }
   | { type: 'demo/reset' };

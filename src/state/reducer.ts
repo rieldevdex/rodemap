@@ -2,9 +2,10 @@
 import { EVENTS } from '../data/events';
 import { NEWS } from '../data/news';
 import { ACTIVITY_PROPOSALS, COLLABORATIONS, PROPOSAL_RESPONSES } from '../data/proposals';
+import { cleanGuestPicks, sameGuestPicks } from '../domain/guest';
 import { RESERVED_NEWS_SLUGS } from '../domain/news';
 import { applyReview, canTransition } from '../domain/moderation';
-import type { EventStatus, Registration, SchoolEvent } from '../domain/types';
+import { APPEARANCE_MODES, TEXT_DENSITIES, type EventStatus, type Registration, type SchoolEvent } from '../domain/types';
 import type { Action } from './actions';
 import { createSeedState, type AppState } from './schema';
 
@@ -176,8 +177,19 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'club/setActive':
       return state.activeClubId === action.clubId ? state : { ...state, activeClubId: action.clubId };
 
+    case 'guest/setPicks': {
+      const picks = cleanGuestPicks(action.picks);
+      return sameGuestPicks(picks, state.guestPicks) ? state : { ...state, guestPicks: picks };
+    }
+
     case 'theme/set':
       return state.theme === action.theme ? state : { ...state, theme: action.theme };
+
+    case 'appearance/setMode':
+      return state.mode === action.mode || !APPEARANCE_MODES.includes(action.mode) ? state : { ...state, mode: action.mode };
+
+    case 'appearance/setDensity':
+      return state.density === action.density || !TEXT_DENSITIES.includes(action.density) ? state : { ...state, density: action.density };
 
     case 'demo/setToday':
       return state.demoToday === action.date ? state : { ...state, demoToday: action.date };
@@ -189,7 +201,14 @@ export function reducer(state: AppState, action: Action): AppState {
       // Presentation settings survive a reset; the profile and the student's data are cleared,
       // so Rodemap asks for a new profile before anything else.
       const seed = createSeedState();
-      return { ...seed, theme: state.theme, demoToday: state.demoToday, mochiForcedOffline: state.mochiForcedOffline };
+      return {
+        ...seed,
+        theme: state.theme,
+        mode: state.mode,
+        density: state.density,
+        demoToday: state.demoToday,
+        mochiForcedOffline: state.mochiForcedOffline,
+      };
     }
 
     default:

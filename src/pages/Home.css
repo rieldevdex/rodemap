@@ -10,6 +10,7 @@
   gap: var(--space-7);
 }
 
+.home-hero__head,
 .home-hero__copy {
   display: grid;
   align-content: start;
@@ -21,18 +22,19 @@
   font-size: var(--text-xs);
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
+  text-transform: var(--case-caps);
   color: var(--color-ink-2);
 }
 
 .home-hero__title {
   font-family: var(--font-display);
+  font-stretch: var(--display-stretch);
   font-size: var(--text-3xl);
-  font-weight: var(--weight-bold);
+  font-weight: var(--weight-display);
   letter-spacing: var(--tracking-tight);
   line-height: var(--leading-display);
   text-wrap: balance;
-  max-inline-size: 16ch;
+  max-inline-size: 22ch;
 }
 
 .home-hero__lead {
@@ -42,6 +44,50 @@
 
 .home-hero__actions {
   padding-block-start: var(--space-2);
+}
+
+.home-hero__note a {
+  color: var(--color-ink);
+}
+
+/* The dot road closes the hero, full bleed, under the copy and the map (never behind text). */
+.home-hero__road {
+  margin-block-start: var(--space-7);
+}
+
+/* ── Figures and lines: the page's one colour block ──────────────── */
+
+.home-figures {
+  display: grid;
+  gap: var(--space-5);
+  margin: 0;
+}
+
+.home-figures > div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--space-1);
+}
+
+.home-figures dt {
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+}
+
+.home-figures dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-stretch: var(--display-stretch);
+  font-size: var(--text-display);
+  font-weight: var(--weight-display);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (min-width: 720px) {
+  .home-figures {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .home-hero__map {
@@ -60,17 +106,35 @@
   font-size: var(--text-xs);
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
+  text-transform: var(--case-caps);
 }
 
 .home-hero__map-note {
   color: var(--color-ink-2);
 }
 
+/* The headline runs across the page; under it the live route map takes the larger share
+   beside the line and the actions (DESIGN.md §7.1). */
 @media (min-width: 1080px) {
   .home-hero__grid {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-areas:
+      'head head'
+      'copy map';
     align-items: start;
+    row-gap: var(--space-6);
+  }
+
+  .home-hero__head {
+    grid-area: head;
+  }
+
+  .home-hero__copy {
+    grid-area: copy;
+  }
+
+  .home-hero__map {
+    grid-area: map;
   }
 
   .home-hero {
@@ -206,7 +270,7 @@
   font-size: var(--text-xs);
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
+  text-transform: var(--case-caps);
   color: var(--color-ink-2);
 }
 
@@ -248,7 +312,7 @@
   font-size: var(--text-xs);
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
+  text-transform: var(--case-caps);
   color: var(--color-signal);
 }
 
@@ -338,7 +402,7 @@
   font-size: var(--text-xs);
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
+  text-transform: var(--case-caps);
   color: var(--color-signal);
 }
 
@@ -371,4 +435,21 @@
   padding: var(--space-4) 0 0;
   list-style: none;
   border-block-start: var(--rule-hair) solid var(--color-rule);
+}
+
+/* Stacking steps (DESIGN.md §6.2 #9): on one column the cards hold under the header and the next
+   one slides over the last; a plain list under reduced motion and from 1080 units (three columns). */
+@media (width < 1080px) and (prefers-reduced-motion: no-preference) {
+  .home-steps__item {
+    position: sticky;
+    top: calc(var(--header-h) + var(--space-4));
+  }
+
+  .home-steps__item:nth-child(2) {
+    top: calc(var(--header-h) + var(--space-4) * 2);
+  }
+
+  .home-steps__item:nth-child(3) {
+    top: calc(var(--header-h) + var(--space-4) * 3);
+  }
 }

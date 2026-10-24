@@ -17,9 +17,15 @@
   text-decoration: none;
   cursor: pointer;
   transition:
-    background-color var(--dur-fast) var(--ease-out),
-    border-color var(--dur-fast) var(--ease-out),
-    color var(--dur-fast) var(--ease-out);
+    background-color var(--dur-hover) var(--ease-out),
+    border-color var(--dur-hover) var(--ease-out),
+    color var(--dur-hover) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out);
+}
+
+/* Press feedback (DESIGN.md §6.2 #1): the button gives a little under the hand. */
+.button:active:not(:disabled, [aria-disabled='true']) {
+  transform: scale(0.97);
 }
 
 .button__label {

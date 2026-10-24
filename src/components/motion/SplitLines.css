@@ -1,0 +1,5 @@
+/* Line masks leave room above and below for stacked Vietnamese diacritics (Ấ, Ể, Ỗ) and descenders. */
+.split-lines .split-lines__line-mask {
+  padding-block: 0.14em;
+  margin-block: -0.14em;
+}

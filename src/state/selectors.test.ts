@@ -10,7 +10,7 @@ import { NEWS } from '../data/news';
 import { makeEvent, makePost, makeProfile, reg } from '../domain/test-fixtures';
 import type { Grade, SchoolEvent, Submission } from '../domain/types';
 import { reducer } from './reducer';
-import { createDemoState, type AppState } from './schema';
+import { createDemoState, createSeedState, type AppState } from './schema';
 import {
   selectActivityProposals,
   selectAllEvents,
@@ -38,6 +38,7 @@ import {
   selectProposalsForClub,
   selectPlanBudget,
   selectPublicEvents,
+  selectGuestRecommendations,
   selectRecommendations,
   selectRegistration,
   selectSubmissionsForClub,
@@ -284,6 +285,25 @@ describe('selectPlanBudget', () => {
     const custom = stateWith({ profile: makeProfile({ weeklyHourBudget: 1 }) });
     expect(selectPlanBudget(custom, tuesday)).toEqual({ weekKey: '2026-W42', used: 1.75, budget: 1, remaining: 0 });
     expect(selectPlanBudget(stateWith({ profile: null }), tuesday).budget).toBe(6);
+  });
+});
+
+describe('selectGuestRecommendations', () => {
+  it('lists open events by date until a grade is picked, then ranks by the picked fields', () => {
+    const visitor = createSeedState();
+    const byDate = selectGuestRecommendations(visitor, NOW, { limit: 10 });
+    expect(byDate).toEqual(recommendEvents(selectPublicEvents(visitor), { profile: null, plan: [], regs: [], now: NOW, goals: GOALS, availabilityKnown: false }, { limit: 10 }));
+    expect(byDate.every((r) => r.reasons.every((c) => c === 'deadline_soon'))).toBe(true);
+
+    const picked = { ...visitor, guestPicks: { grade: 7 as Grade, interests: ['NT' as const] } };
+    const recs = selectGuestRecommendations(picked, NOW, { limit: 5 });
+    expect(recs.length).toBeGreaterThan(0);
+    for (const r of recs) {
+      expect(r.event.eligibleGrades).toContain(7);
+      expect(r.reasons).not.toContain('fits_time');
+      expect(r.reasons).not.toContain('goal');
+    }
+    expect(recs[0]?.event.category).toBe('NT');
   });
 });
 

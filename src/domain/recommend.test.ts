@@ -214,6 +214,16 @@ describe('recommendEvents: profile edge cases', () => {
 describe('recommendEvents: availability, deadlines and warnings', () => {
   const profile = makeProfile({ interests: ['CN'], topInterests: ['CN'], goals: [] });
 
+  it('neither claims nor penalises the time fit when availability is unknown (a visitor)', () => {
+    const weekdayOnly = makeProfile({ interests: [], topInterests: [], goals: [], availability: { weekdayAfterSchool: true, weekend: false } });
+    const events = [ev('u-sat', '2026-10-17T08:00', '2026-10-17T10:00', { category: 'TT' }), ev('u-evening', '2026-10-14T16:30', '2026-10-14T18:30', { category: 'KN' })];
+    const recs = recommendEvents(events, ctxWith({ profile: weekdayOnly, availabilityKnown: false }));
+    for (const r of recs) {
+      expect(r.reasons).not.toContain('fits_time');
+      expect(r.warnings).not.toContain('outside_availability');
+    }
+  });
+
   it('flags events outside availability (−3) and school-hours events except TS', () => {
     const weekdayOnly = makeProfile({
       interests: [],

@@ -30,6 +30,7 @@
 .news-body__quote blockquote {
   margin: 0;
   font-family: var(--font-display);
+  font-stretch: var(--display-stretch);
   font-size: var(--text-xl);
   font-weight: var(--weight-semibold);
   line-height: var(--leading-snug);
@@ -40,7 +41,7 @@
   font-size: var(--text-xs);
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-caps);
-  text-transform: uppercase;
+  text-transform: var(--case-caps);
   color: var(--color-ink-2);
 }
 
