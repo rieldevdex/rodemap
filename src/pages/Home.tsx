@@ -18,6 +18,7 @@ import { CLUBS } from '../data/clubs';
 import { EVENTS } from '../data/events';
 import { addDays, formatDayLabel, formatTime, startOfIsoWeek, toMillis } from '../domain/dates';
 import { deadlineDaysLeft, isRegistered, registrationState, seatsLeft } from '../domain/events';
+import { atLeast } from '../domain/interactivity';
 import { layoutRoute } from '../domain/route-layout';
 import { respondOffline } from '../mochi/offline/engine';
 import { CATEGORY_CODES } from '../domain/types';
@@ -134,6 +135,7 @@ export function HomePage() {
               stationLabel={stationLabel}
               animateIn
               fit
+              linkedHighlight={atLeast(state.interactivity, 'medium')}
               endMarker={<Mochi state="idle" />}
               onActivate={(id) => {
                 const e = byId.get(id);

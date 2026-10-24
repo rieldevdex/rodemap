@@ -13,6 +13,7 @@ import {
 } from '../domain/events';
 import type { Club, SchoolEvent } from '../domain/types';
 import { DEFAULT_WEEKLY_HOUR_BUDGET } from '../domain/budget';
+import { hapticConfirm } from './effects';
 import { useAppState, useDispatch, useNow } from './hooks';
 import { selectClub, selectEventById, selectUpcomingMine } from './selectors';
 
@@ -76,6 +77,8 @@ export function useRegistration(eventId: string): {
         });
   const register = useCallback(() => {
     dispatch({ type: 'registration/register', eventId, at: toIsoDateTime(now) });
+    // A short pulse on phones at "Tối đa" (DESIGN.md §6.3); the status text still says it.
+    hapticConfirm();
   }, [dispatch, eventId, now]);
   const unregister = useCallback(() => {
     dispatch({ type: 'registration/unregister', eventId });

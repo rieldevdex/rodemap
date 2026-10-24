@@ -7,7 +7,7 @@ import { StatusTag } from '../components/atoms/StatusTag';
 import { PageHead } from '../components/molecules/PageHead';
 import { eventStatus, StationCard } from '../components/molecules/StationCard';
 import { RouteList, type RouteListRow } from '../components/organisms/RouteList';
-import { RouteMap, RouteMapLegend, type RouteMapHandle } from '../components/organisms/RouteMap';
+import { RouteMap, RouteMapFocusScope, RouteMapLegend, type RouteMapHandle } from '../components/organisms/RouteMap';
 import { useMediaQuery } from '../components/useMediaQuery';
 import { CATEGORIES } from '../data/categories';
 import { PERIODS } from '../data/calendar';
@@ -24,6 +24,7 @@ import {
   toMillis,
 } from '../domain/dates';
 import { deadlineDaysLeft, isPast, publisherLine, registrationState, seatsLeft } from '../domain/events';
+import { atLeast } from '../domain/interactivity';
 import { layoutRoute, type Orientation, type RouteLayoutInput } from '../domain/route-layout';
 import { formatHours } from '../domain/text';
 import { CATEGORY_CODES, type CalendarPeriod, type CategoryCode, type SchoolEvent } from '../domain/types';
@@ -380,149 +381,151 @@ export function RoutePage() {
         />
       </PageHead>
 
-      <section className="route-stage" aria-labelledby="route-stage-title">
-        <div className="container route-stage__head">
-          <h2 id="route-stage-title" className="visually-hidden">
-            {view === 'map' ? 'Bản đồ lộ trình năm học' : 'Danh sách sự kiện theo tháng'}
-          </h2>
-          <div className="route-toolbar">
-            <Segmented<Scope>
-              id="route-scope-label"
-              label="Phạm vi"
-              value={scope}
-              options={[
-                { value: 'all', label: 'Toàn trường' },
-                { value: 'mine', label: 'Của tôi' },
-              ]}
-              onChange={(v) => {
-                setParam(SCOPE_PARAM, v === 'mine' ? SCOPE_MINE : null);
-              }}
-            />
-            <Segmented<View>
-              id="route-view-label"
-              label="Hiển thị"
-              value={view}
-              options={[
-                { value: 'map', label: 'Xem dạng bản đồ', icon: 'map' },
-                { value: 'list', label: 'Xem dạng danh sách', icon: 'list' },
-              ]}
-              onChange={(v) => {
-                setParam(VIEW_PARAM, v === 'list' ? VIEW_LIST : null);
-              }}
-            />
-            <div className="route-toolbar__end">
-              <p className="route-toolbar__count" role="status">
-                {countText}
-              </p>
-              {view === 'map' && layout.today !== null && !emptyMine && !emptyAll ? (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  iconStart="calendar"
-                  onClick={() => {
-                    mapRef.current?.scrollToToday();
+      <RouteMapFocusScope enabled={atLeast(state.interactivity, 'medium')}>
+        <section className="route-stage" aria-labelledby="route-stage-title">
+          <div className="container route-stage__head">
+            <h2 id="route-stage-title" className="visually-hidden">
+              {view === 'map' ? 'Bản đồ lộ trình năm học' : 'Danh sách sự kiện theo tháng'}
+            </h2>
+            <div className="route-toolbar">
+              <Segmented<Scope>
+                id="route-scope-label"
+                label="Phạm vi"
+                value={scope}
+                options={[
+                  { value: 'all', label: 'Toàn trường' },
+                  { value: 'mine', label: 'Của tôi' },
+                ]}
+                onChange={(v) => {
+                  setParam(SCOPE_PARAM, v === 'mine' ? SCOPE_MINE : null);
+                }}
+              />
+              <Segmented<View>
+                id="route-view-label"
+                label="Hiển thị"
+                value={view}
+                options={[
+                  { value: 'map', label: 'Xem dạng bản đồ', icon: 'map' },
+                  { value: 'list', label: 'Xem dạng danh sách', icon: 'list' },
+                ]}
+                onChange={(v) => {
+                  setParam(VIEW_PARAM, v === 'list' ? VIEW_LIST : null);
+                }}
+              />
+              <div className="route-toolbar__end">
+                <p className="route-toolbar__count" role="status">
+                  {countText}
+                </p>
+                {view === 'map' && layout.today !== null && !emptyMine && !emptyAll ? (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    iconStart="calendar"
+                    onClick={() => {
+                      mapRef.current?.scrollToToday();
+                    }}
+                  >
+                    Chuyển đến hôm nay
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+
+            {emptyMine ? (
+              <div className="route-empty">
+                <h3 className="route-empty__title">Lộ trình của bạn chưa có sự kiện</h3>
+                <p className="route-empty__body">
+                  Bạn chưa đăng ký sự kiện nào trong năm học. Vui lòng khám phá các sự kiện đang mở đăng ký, hoặc thiết lập hồ sơ
+                  để Mochi đề xuất những sự kiện phù hợp với lĩnh vực quan tâm và thời gian của bạn. Các sự kiện đã đăng ký sẽ được
+                  nối thành lộ trình trên bản đồ.
+                </p>
+                <div className="cluster">
+                  <Button to="/kham-pha" variant="primary" iconEnd="arrow-right">
+                    Khám phá sự kiện
+                  </Button>
+                  <Button to="/thiet-lap" variant="secondary">
+                    Thiết lập hồ sơ
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+            {emptyAll ? (
+              <div className="route-empty">
+                <h3 className="route-empty__title">Chưa có sự kiện được phê duyệt</h3>
+                <p className="route-empty__body">
+                  Hội đồng Học sinh chưa phê duyệt sự kiện nào trong năm học này. Vui lòng xem danh sách câu lạc bộ để theo dõi các hoạt
+                  động sắp được công bố.
+                </p>
+                <div className="cluster">
+                  <Button to="/cau-lac-bo" variant="secondary" iconEnd="arrow-right">
+                    Xem danh sách câu lạc bộ
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+
+            {view === 'map' && !wide ? <RouteMapLegend lanes={LANES} variant="full" className="route-stage__legend" /> : null}
+          </div>
+
+          {view === 'map' ? (
+            <div className="route-stage__map" ref={measureRef}>
+              {orientation === 'horizontal' || measuredWidth !== null ? (
+                <RouteMap
+                  ref={mapRef}
+                  layout={layout}
+                  orientation={orientation}
+                  lanes={LANES}
+                  label={`Bản đồ lộ trình năm học ${SCHOOL.schoolYear}${scope === 'mine' ? ', các sự kiện của bạn' : ', toàn trường'}`}
+                  stationLabel={stationLabel}
+                  stationHref={(id) => {
+                    const e = byId.get(id);
+                    return e ? `/su-kien/${e.slug}` : '/kham-pha';
                   }}
-                >
-                  Chuyển đến hôm nay
-                </Button>
+                  onActivate={(id) => {
+                    const e = byId.get(id);
+                    if (e) navigate(`/su-kien/${e.slug}`);
+                  }}
+                  renderCard={(id) => {
+                    const e = byId.get(id);
+                    if (!e) return null;
+                    const f = facts(e);
+                    return (
+                      <StationCard
+                        event={e}
+                        clubName={clubName(e.clubId)}
+                        state={f.regState}
+                        seatsLeft={f.seats}
+                        deadlineDays={f.deadlineDays}
+                        conflict={conflictIds.has(e.id)}
+                        variant="compact"
+                        linked={false}
+                      />
+                    );
+                  }}
+                  todayLabel={todayLabel}
+                  growFrom={growFrom}
+                  arrivals={growth?.arrivals}
+                  legend="none"
+                />
+              ) : null}
+              <p className="container route-stage__hint">
+                {wide
+                  ? 'Cuộn ngang để xem toàn bộ năm học. Di chuột hoặc sử dụng phím Tab để xem thông tin điểm dừng; phím mũi tên chuyển giữa các điểm dừng, phím Enter mở trang sự kiện.'
+                  : 'Chạm vào một điểm dừng để mở trang sự kiện. Dạng danh sách trình bày đầy đủ thông tin của từng sự kiện.'}
+              </p>
+              {wide ? (
+                <div className="container">
+                  <RouteMapLegend lanes={LANES} variant="full" className="route-stage__legend" />
+                </div>
               ) : null}
             </div>
-          </div>
-
-          {emptyMine ? (
-            <div className="route-empty">
-              <h3 className="route-empty__title">Lộ trình của bạn chưa có sự kiện</h3>
-              <p className="route-empty__body">
-                Bạn chưa đăng ký sự kiện nào trong năm học. Vui lòng khám phá các sự kiện đang mở đăng ký, hoặc thiết lập hồ sơ
-                để Mochi đề xuất những sự kiện phù hợp với lĩnh vực quan tâm và thời gian của bạn. Các sự kiện đã đăng ký sẽ được
-                nối thành lộ trình trên bản đồ.
-              </p>
-              <div className="cluster">
-                <Button to="/kham-pha" variant="primary" iconEnd="arrow-right">
-                  Khám phá sự kiện
-                </Button>
-                <Button to="/thiet-lap" variant="secondary">
-                  Thiết lập hồ sơ
-                </Button>
-              </div>
+          ) : (
+            <div className="container route-stage__list">
+              {rows.length > 0 ? <RouteList rows={rows} periods={PERIODS} now={now} headingLevel={3} /> : null}
             </div>
-          ) : null}
-          {emptyAll ? (
-            <div className="route-empty">
-              <h3 className="route-empty__title">Chưa có sự kiện được phê duyệt</h3>
-              <p className="route-empty__body">
-                Hội đồng Học sinh chưa phê duyệt sự kiện nào trong năm học này. Vui lòng xem danh sách câu lạc bộ để theo dõi các hoạt
-                động sắp được công bố.
-              </p>
-              <div className="cluster">
-                <Button to="/cau-lac-bo" variant="secondary" iconEnd="arrow-right">
-                  Xem danh sách câu lạc bộ
-                </Button>
-              </div>
-            </div>
-          ) : null}
-
-          {view === 'map' && !wide ? <RouteMapLegend lanes={LANES} variant="full" className="route-stage__legend" /> : null}
-        </div>
-
-        {view === 'map' ? (
-          <div className="route-stage__map" ref={measureRef}>
-            {orientation === 'horizontal' || measuredWidth !== null ? (
-              <RouteMap
-                ref={mapRef}
-                layout={layout}
-                orientation={orientation}
-                lanes={LANES}
-                label={`Bản đồ lộ trình năm học ${SCHOOL.schoolYear}${scope === 'mine' ? ', các sự kiện của bạn' : ', toàn trường'}`}
-                stationLabel={stationLabel}
-                stationHref={(id) => {
-                  const e = byId.get(id);
-                  return e ? `/su-kien/${e.slug}` : '/kham-pha';
-                }}
-                onActivate={(id) => {
-                  const e = byId.get(id);
-                  if (e) navigate(`/su-kien/${e.slug}`);
-                }}
-                renderCard={(id) => {
-                  const e = byId.get(id);
-                  if (!e) return null;
-                  const f = facts(e);
-                  return (
-                    <StationCard
-                      event={e}
-                      clubName={clubName(e.clubId)}
-                      state={f.regState}
-                      seatsLeft={f.seats}
-                      deadlineDays={f.deadlineDays}
-                      conflict={conflictIds.has(e.id)}
-                      variant="compact"
-                      linked={false}
-                    />
-                  );
-                }}
-                todayLabel={todayLabel}
-                growFrom={growFrom}
-                arrivals={growth?.arrivals}
-                legend="none"
-              />
-            ) : null}
-            <p className="container route-stage__hint">
-              {wide
-                ? 'Cuộn ngang để xem toàn bộ năm học. Di chuột hoặc sử dụng phím Tab để xem thông tin điểm dừng; phím mũi tên chuyển giữa các điểm dừng, phím Enter mở trang sự kiện.'
-                : 'Chạm vào một điểm dừng để mở trang sự kiện. Dạng danh sách trình bày đầy đủ thông tin của từng sự kiện.'}
-            </p>
-            {wide ? (
-              <div className="container">
-                <RouteMapLegend lanes={LANES} variant="full" className="route-stage__legend" />
-              </div>
-            ) : null}
-          </div>
-        ) : (
-          <div className="container route-stage__list">
-            {rows.length > 0 ? <RouteList rows={rows} periods={PERIODS} now={now} headingLevel={3} /> : null}
-          </div>
-        )}
-      </section>
+          )}
+        </section>
+      </RouteMapFocusScope>
     </div>
   );
 }

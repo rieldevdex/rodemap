@@ -81,7 +81,15 @@ The product is **Rodemap** (never "Rode").
   and curves from the tokens (`motionSeconds`, `motionEase` → CustomEase); components
   adapted from React Bits: `SplitLines` (SplitText), `Reveal` (AnimatedContent),
   `CountUp`, `SparkBurst` (ClickSpark). framer-motion is used once, for the visitor's
-  suggestion rows (`GuestDashboard`). Each effect checks `prefersReducedMotion()`.
+  suggestion rows (`GuestDashboard`). Each effect checks `motionOff()` (level below "Vừa" or
+  reduced motion).
+- Interactivity levels (DESIGN.md §6.3): `data-interactivity` on `<html>`; tokens.css collapses
+  durations for `none` and the page-moment durations for `slight`; `src/domain/interactivity.ts`
+  (`atLeast`, `movementAllowed`, `recommendedLevel`) is the pure logic; `effects.ts` reads the
+  page level, device signals and runs `hapticConfirm()`; `router/morph.ts` carries a card title
+  into the event page (`Link morph`, `PageHead morphTarget`) with same-document View Transitions;
+  `components/keyboard.ts` holds `isTypingTarget` and `useListAccelerators` (J / K);
+  `RouteMapFocusScope` shares linked highlighting between a RouteMap and its legend.
 
 ## Domain contracts (`src/domain/*.ts`)
 
@@ -340,6 +348,7 @@ export interface AppState {
   theme: ThemePreference;
   mode: AppearanceMode;                       // 'lo-trinh' | 'ruc-ro' | 'ap-phich' | 'diu-nhe' (default lo-trinh)
   density: TextDensity;                       // 'full' | 'compact' | 'minimal' (default compact)
+  interactivity: InteractivityLevel;          // 'none' | 'slight' | 'medium' | 'extreme' (default medium, DESIGN.md §6.3)
   demoToday: IsoDate | null;                  // overrides the clock for the demo
   mochiForcedOffline: boolean;
 }
@@ -367,6 +376,7 @@ export type Action =
   | { type: 'theme/set'; theme: ThemePreference }
   | { type: 'appearance/setMode'; mode: AppearanceMode }       // unknown values ignored
   | { type: 'appearance/setDensity'; density: TextDensity }    // unknown values ignored
+  | { type: 'appearance/setInteractivity'; level: InteractivityLevel } // unknown values ignored
   | { type: 'guest/setPicks'; picks: GuestPicks }              // cleaned (known grade, known distinct fields)
   | { type: 'demo/setToday'; date: IsoDate | null }
   | { type: 'demo/setMochiOffline'; offline: boolean }

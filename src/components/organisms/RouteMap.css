@@ -171,6 +171,19 @@
   stroke: var(--lane-color);
   stroke-width: var(--route-w);
   stroke-linecap: round;
+  transition: opacity var(--dur-hover) var(--ease-out);
+}
+
+/* Linked highlighting (DESIGN.md §6.3): the other lines step back; "your route" stays. */
+.route-map__lane--dim,
+.route-map__station--dim,
+.route-map__interchanges--dim {
+  opacity: 0.25;
+}
+
+.route-map__station,
+.route-map__interchanges {
+  transition: opacity var(--dur-hover) var(--ease-out);
 }
 
 .route-map__interchange {
@@ -395,6 +408,33 @@
   gap: var(--space-2);
   font-size: var(--text-sm);
   line-height: var(--leading-snug);
+}
+
+.route-map__legend-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: var(--size-touch);
+  margin-block: calc(var(--space-2) * -1);
+  padding-inline: var(--space-2);
+  border: var(--rule-hair) solid transparent;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-hover) var(--ease-out),
+    border-color var(--dur-hover) var(--ease-out);
+}
+
+.route-map__legend-button:hover {
+  background: var(--color-surface-2);
+}
+
+.route-map__legend-button[aria-pressed='true'] {
+  border-color: var(--color-ink);
+  background: var(--color-surface-2);
 }
 
 .route-map__legend-swatch {

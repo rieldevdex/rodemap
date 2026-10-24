@@ -168,3 +168,25 @@
   padding-inline-start: var(--space-5);
   font-size: var(--text-sm);
 }
+
+/* "Thử quỹ giờ" (Tối đa): the what-if slider under the budget meter. */
+.dashboard__whatif {
+  display: grid;
+  gap: var(--space-2);
+  justify-self: stretch;
+  padding: var(--space-3);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+}
+
+.dashboard__whatif-label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.dashboard__whatif-range {
+  inline-size: 100%;
+  min-block-size: var(--size-touch);
+  margin: 0;
+  accent-color: var(--color-ink);
+}

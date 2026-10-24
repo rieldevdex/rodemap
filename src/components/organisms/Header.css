@@ -3,7 +3,7 @@
 .site-header {
   position: sticky;
   top: 0;
-  z-index: var(--z-sticky);
+  z-index: var(--z-header);
   border-bottom: var(--rule-hair) solid var(--color-rule);
   background: var(--color-surface);
 }

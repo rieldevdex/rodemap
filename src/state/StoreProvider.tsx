@@ -27,8 +27,8 @@ export function StoreProvider({ children, initialState }: StoreProviderProps) {
   }, [state.theme]);
 
   useEffect(() => {
-    applyAppearance(state.mode, state.density);
-  }, [state.mode, state.density]);
+    applyAppearance(state.mode, state.density, state.interactivity);
+  }, [state.mode, state.density, state.interactivity]);
 
   useEffect(() => {
     const id = window.setInterval(() => {

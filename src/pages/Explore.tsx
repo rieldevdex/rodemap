@@ -3,8 +3,10 @@ import { Button } from '../components/atoms/Button';
 import { Icon } from '../components/atoms/Icon';
 import { lineVar } from '../components/atoms/lineVar';
 import { VisuallyHidden } from '../components/atoms/VisuallyHidden';
+import { useListAccelerators } from '../components/keyboard';
 import { PageHead } from '../components/molecules/PageHead';
 import { SearchField } from '../components/molecules/SearchField';
+import { ShortcutHint } from '../components/molecules/ShortcutHint';
 import { StationCard } from '../components/molecules/StationCard';
 import { FilterRail, type FilterRailOptions } from '../components/organisms/FilterRail';
 import { FilterSheet } from '../components/organisms/FilterSheet';
@@ -90,6 +92,9 @@ export function ExplorePage() {
   const searchRef = useRef<HTMLInputElement>(null);
   const countRef = useRef<HTMLParagraphElement>(null);
   const chipListRef = useRef<HTMLUListElement>(null);
+  const resultsRef = useRef<HTMLElement>(null);
+  const accelerators = state.interactivity === 'extreme';
+  useListAccelerators(resultsRef, accelerators);
   /** After removing a chip: index of the chip to focus next (-1 = the result count). */
   const pendingChipFocus = useRef<number | null>(null);
 
@@ -239,7 +244,8 @@ export function ExplorePage() {
             />
           ) : null}
 
-          <section className="explore__results" aria-label="Kết quả tìm kiếm">
+          <section className="explore__results" aria-label="Kết quả tìm kiếm" ref={resultsRef}>
+            {accelerators ? <ShortcutHint /> : null}
             <div className="explore-toolbar">
               {isDesktop ? null : (
                 <Button

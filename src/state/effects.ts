@@ -1,5 +1,6 @@
 /** Browser side effects that components may trigger through hooks (never directly). */
-import type { AppearanceMode, TextDensity, ThemePreference } from '../domain/types';
+import { movementAllowed, type DeviceSignals } from '../domain/interactivity';
+import type { AppearanceMode, InteractivityLevel, TextDensity, ThemePreference } from '../domain/types';
 
 /** Applies the theme preference to <html data-theme>. "system" removes the attribute. */
 export function applyTheme(theme: ThemePreference, root: HTMLElement = document.documentElement): void {
@@ -7,10 +8,55 @@ export function applyTheme(theme: ThemePreference, root: HTMLElement = document.
   else root.setAttribute('data-theme', theme);
 }
 
-/** Applies the appearance mode and text density to <html data-mode data-density> (DESIGN.md §2.4, §10). */
-export function applyAppearance(mode: AppearanceMode, density: TextDensity, root: HTMLElement = document.documentElement): void {
+/**
+ * Applies the appearance mode, text density and interactivity level to
+ * <html data-mode data-density data-interactivity> (DESIGN.md §2.4, §10, §6.3).
+ */
+export function applyAppearance(
+  mode: AppearanceMode,
+  density: TextDensity,
+  interactivity: InteractivityLevel,
+  root: HTMLElement = document.documentElement,
+): void {
   root.setAttribute('data-mode', mode);
   root.setAttribute('data-density', density);
+  root.setAttribute('data-interactivity', interactivity);
+}
+
+const LEVELS: readonly string[] = ['none', 'slight', 'medium', 'extreme'];
+
+/** The level in force on the page (set by applyAppearance and public/theme-init.js). */
+export function pageInteractivity(root: HTMLElement = document.documentElement): InteractivityLevel {
+  const value = root.getAttribute('data-interactivity') ?? 'medium';
+  return (LEVELS.includes(value) ? value : 'medium') as InteractivityLevel;
+}
+
+export function prefersReducedMotion(): boolean {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/** Movement may run at `min` on this page (level and the device's reduced-motion setting). */
+export function pageAllowsMovement(min: InteractivityLevel): boolean {
+  return movementAllowed(pageInteractivity(), min, prefersReducedMotion());
+}
+
+/** Cores, memory and Data Saver as the browser reports them (adaptive loading, DESIGN.md §6.3). */
+export function readDeviceSignals(): DeviceSignals {
+  const nav = navigator as Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
+  return {
+    cores: typeof nav.hardwareConcurrency === 'number' && nav.hardwareConcurrency > 0 ? nav.hardwareConcurrency : undefined,
+    memoryGb: typeof nav.deviceMemory === 'number' ? nav.deviceMemory : undefined,
+    saveData: nav.connection?.saveData === true,
+  };
+}
+
+/**
+ * A short pulse that confirms an action on phones that support vibration (Android; iOS and
+ * desktops ignore it), at "Tối đa" only. Call it inside the click that confirmed the action.
+ */
+export function hapticConfirm(): void {
+  if (pageInteractivity() !== 'extreme' || prefersReducedMotion() || !('vibrate' in navigator)) return;
+  navigator.vibrate(18);
 }
 
 /** Places the theme ripple's centre on `origin` (in viewport percentages, so it survives resizing). */
@@ -22,17 +68,21 @@ export function setRippleOrigin(origin: HTMLElement | null, root: HTMLElement = 
 }
 
 /**
- * Runs `change` inside a view transition when the browser supports one and motion is allowed
- * (the theme ripple, DESIGN.md §6.2); otherwise runs it at once.
+ * Runs `change` inside a view transition when the browser supports one and the level allows
+ * movement (the theme ripple, DESIGN.md §6.2 #6); otherwise runs it at once.
  */
 export function withViewTransition(change: () => void): void {
-  const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown };
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (typeof doc.startViewTransition !== 'function' || reduced) {
+  const doc = document as Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } };
+  if (typeof doc.startViewTransition !== 'function' || !pageAllowsMovement('medium')) {
     change();
     return;
   }
-  doc.startViewTransition(change);
+  const root = document.documentElement;
+  root.classList.add('vt-ripple');
+  const transition = doc.startViewTransition(change);
+  void transition.finished.finally(() => {
+    root.classList.remove('vt-ripple');
+  });
 }
 
 /** True when the effective theme is dark (explicit choice or system setting). */

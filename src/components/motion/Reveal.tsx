@@ -7,7 +7,7 @@
  */
 import { useGSAP } from '@gsap/react';
 import { useRef, type ReactNode } from 'react';
-import { gsap, motionEase, motionSeconds, prefersReducedMotion } from './gsap';
+import { gsap, motionEase, motionSeconds, motionOff } from './gsap';
 
 gsap.registerPlugin(useGSAP);
 
@@ -25,7 +25,7 @@ export function Reveal({ children, className, as: Tag = 'div' }: RevealProps) {
     () => {
       const el = ref.current;
       // Already on the first screen, or reduced motion: shown as it is.
-      if (!el || prefersReducedMotion() || el.getBoundingClientRect().top < window.innerHeight) return undefined;
+      if (!el || motionOff() || el.getBoundingClientRect().top < window.innerHeight) return undefined;
       const parts = Array.from(el.children);
       const rise = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--rise')) || 0;
       gsap.set(parts, { opacity: 0, y: rise });

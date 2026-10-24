@@ -440,16 +440,16 @@
 /* Stacking steps (DESIGN.md §6.2 #9): on one column the cards hold under the header and the next
    one slides over the last; a plain list under reduced motion and from 1080 units (three columns). */
 @media (width < 1080px) and (prefers-reduced-motion: no-preference) {
-  .home-steps__item {
+  :root:is([data-interactivity='medium'], [data-interactivity='extreme']) .home-steps__item {
     position: sticky;
     top: calc(var(--header-h) + var(--space-4));
   }
 
-  .home-steps__item:nth-child(2) {
+  :root:is([data-interactivity='medium'], [data-interactivity='extreme']) .home-steps__item:nth-child(2) {
     top: calc(var(--header-h) + var(--space-4) * 2);
   }
 
-  .home-steps__item:nth-child(3) {
+  :root:is([data-interactivity='medium'], [data-interactivity='extreme']) .home-steps__item:nth-child(3) {
     top: calc(var(--header-h) + var(--space-4) * 3);
   }
 }

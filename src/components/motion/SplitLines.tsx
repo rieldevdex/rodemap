@@ -7,7 +7,7 @@
  */
 import { useGSAP } from '@gsap/react';
 import { useRef, type ReactNode } from 'react';
-import { gsap, motionEase, motionSeconds, prefersReducedMotion, SplitText } from './gsap';
+import { gsap, motionEase, motionSeconds, motionOff, SplitText } from './gsap';
 import './SplitLines.css';
 
 gsap.registerPlugin(useGSAP);
@@ -28,10 +28,11 @@ export function SplitLines({ as: Tag = 'h2', children, className, id, tabIndex, 
   useGSAP(
     () => {
       const el = ref.current;
-      if (!el || prefersReducedMotion()) return undefined;
+      if (!el || motionOff()) return undefined;
       let observer: IntersectionObserver | null = null;
       let played = trigger === 'load';
       let current: gsap.core.Tween | null = null;
+      let done = false;
       // autoSplit re-splits when the fonts arrive or the width changes and carries the tween's
       // progress over, so the heading can be split before the first paint (no flash, no replay).
       const split = SplitText.create(el, {
@@ -43,13 +44,24 @@ export function SplitLines({ as: Tag = 'h2', children, className, id, tabIndex, 
         // SplitText carries the animation over to the next split.
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onSplit: (self) => {
+          // Risen already: a later re-split (font load, resize) must not run it again.
+          if (done) {
+            self.revert();
+            return undefined;
+          }
           const tween = gsap.from(self.lines, {
             // Far enough below the mask that stacked diacritics (Ấ, Ể) stay hidden too.
-            yPercent: 150,
+            yPercent: 200,
             duration: motionSeconds('--dur-reveal'),
             ease: motionEase('--ease-expo'),
             stagger: motionSeconds('--stagger-line'),
             paused: !played,
+            // Once risen, the heading is plain text again: no mask can clip a descender or a
+            // dot below (ạ, ộ), and it rewraps freely (Taste's "lines that rise" recipe).
+            onComplete: () => {
+              done = true;
+              self.revert();
+            },
           });
           current = tween;
           if (trigger === 'view' && observer === null) {

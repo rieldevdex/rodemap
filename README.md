@@ -81,7 +81,7 @@ Rodemap dành cho học sinh từ khối 6 đến khối 12 (trung học cơ s�
 
 ### Giao diện và mật độ nội dung
 
-Nút **Giao diện** (biểu tượng bảng màu trên thanh tiêu đề) cho phép chọn chế độ màu (Lộ trình, Rực rỡ, Áp phích, Dịu nhẹ), độ sáng (Theo hệ thống, Sáng, Tối) và mật độ nội dung (Đầy đủ, Gọn, Tối giản). Lựa chọn được áp dụng ngay và lưu trên trình duyệt; bản in luôn dùng chế độ Lộ trình sáng. Quy cách của từng chế độ nằm trong `DESIGN.md` §2.4 và §10.
+Nút **Giao diện** (biểu tượng bảng màu trên thanh tiêu đề) cho phép chọn chế độ màu (Lộ trình, Rực rỡ, Áp phích, Dịu nhẹ), độ sáng (Theo hệ thống, Sáng, Tối), mật độ nội dung (Đầy đủ, Gọn, Tối giản) và mức độ tương tác bằng thanh trượt (Không, Nhẹ, Vừa, Tối đa; mức càng cao càng sử dụng nhiều tài nguyên của thiết bị). Mức Vừa thêm tô sáng tuyến trên bản đồ; mức Tối đa thêm chuyển tiếp từ thẻ sang trang sự kiện, phím tắt J và K, ô thử quỹ giờ trên trang Tổng quan và rung phản hồi trên điện thoại Android. Lựa chọn được áp dụng ngay và lưu trên trình duyệt; bản in luôn dùng chế độ Lộ trình sáng. Quy cách của từng chế độ nằm trong `DESIGN.md` §2.4 và §10.
 
 ## 7. Bản tin Hội đồng Học sinh
 

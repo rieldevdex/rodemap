@@ -25,6 +25,9 @@ describe('contrast rules', () => {
     expect(matchRoot(':root', a)).toBe(1);
     expect(matchRoot(":root[data-mode='x']:not([data-theme='light'])", a)).toBe(3);
     expect(matchRoot(":root[data-theme='dark']", a)).toBeNull();
+    expect(matchRoot(":root[data-interactivity='medium']", a)).toBe(2);
+    expect(matchRoot(":root[data-interactivity='none']", { ...a, interactivity: 'none' })).toBe(2);
+    expect(matchRoot(":root[data-interactivity='none']", a)).toBeNull();
     expect(() => matchRoot('.button', a)).toThrow(/Unsupported selector/);
   });
 

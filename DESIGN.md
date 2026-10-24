@@ -258,8 +258,9 @@ metadata. Taste: two typefaces at most per mode, numbers in tabular figures.*
   `--leading-body` 1.6; measure `--measure` 62ch.
 - Focus: `--focus-w` 2 px, `--focus-offset` 2 px.
 - Mochi stroke `--mochi-stroke` 2.5 px.
-- Layers `--z-base` 0, `--z-sticky` 10, `--z-dock` 40, `--z-panel` 50,
-  `--z-overlay` 60, `--z-toast` 70.
+- Layers `--z-base` 0, `--z-sticky` 10, `--z-dock` 40, `--z-header` 45 (the
+  header and its panels above Mochi's dock), `--z-panel` 50, `--z-overlay` 60,
+  `--z-toast` 70.
 - Misc: chip category edge `--chip-edge` 4 px; icons `--size-icon` 20 px /
   `--size-icon-sm` 16 px; header `--header-h` 64 px; RouteMap user unit
   `--map-unit` 1 px; grid gap `--grid-gap` 24 px (`--grid-gap-phone` 16 px).
@@ -404,6 +405,42 @@ One orchestrated moment per screen still applies: on the landing page the
 headline rises and the route lines draw in, stations pop on and Mochi hops onto
 the last station; the other effects are small.
 
+### 6.3 Mức độ tương tác (interactivity levels)
+
+The owner asked for a site that can be even more interactive, chosen by each
+student with a slider in Giao diện, with a warning that more interactivity costs
+more performance, and without the gestures generic AI-built sites call
+"interactive" (glowing cursors, magnetic buttons, particle backgrounds, tilting
+cards, parallax everywhere, scroll-jacking). Every interaction below exists
+because research gives it a job; nothing is added for decoration.
+
+| Level | Value | What it adds | Why (research) |
+|---|---|---|---|
+| **Không** | `none` | Nothing moves: every duration is 0, loops stop, GSAP and framer-motion effects do not run, the legend is a plain list. Every function still works. | WCAG 2.3.3 Animation from Interactions: interaction-triggered motion must be possible to turn off (vestibular disorders); Apple HIG: make motion optional, never the only channel. |
+| **Nhẹ** | `slight` | Feedback only: press, hover and focus colour, panels opening (`--dur-fast`, `--dur-hover`, `--dur-ui`). No reveals, line rises, counting figures, marquee, theme ripple, sparks or route draw-in; Mochi rests. | NN/g: feedback animation about 100 ms, larger changes 200–300 ms; Taste's app rule: on screens people work in, motion is feedback. |
+| **Vừa** (default) | `medium` | The page moments of §6.2 (#6–#17), plus **linked highlighting** on the route map: hovering or focusing a line in the legend or a station brings that line forward and dims the others (opacity 0.25, `--dur-hover`); pressing a legend line keeps it (`aria-pressed`), Escape clears it. | Brushing and linking (North and Shneiderman, Snap-Together Visualization): selecting in one view highlights in every linked view; overview-and-detail coordination improved task performance by 30–80 %. Shneiderman's "overview first, details on demand". |
+| **Tối đa** | `extreme` | Everything above, plus: (1) **card to page** — the title of an event card is carried into the event page heading (same-document View Transitions; old page leaves in `--dur-ui` with `--ease-exit`, new page rises in `--dur-med`); (2) **J / K** move between events on Khám phá and Tổng quan, Enter opens, with a visible "Phím tắt" line; (3) **Thử quỹ giờ** on the student's Tổng quan — dragging a weekly-hours slider recomputes Mochi's suggestions and the hour meter live, and saves only on "Lưu quỹ giờ này"; (4) a 18 ms **haptic pulse** when "Xác nhận" registers an event (Android; ignored elsewhere). | (1) Material motion's container transform (a persistent container keeps the spatial relationship) and Chrome's same-document View Transitions; (2) Nielsen's heuristic 7, flexibility and efficiency of use: accelerators for frequent users, invisible to novices, made discoverable; WCAG 2.1.4 single-key shortcuts must be possible to turn off — the level is that switch; (3) Bret Victor's explorable explanations and reactive documents: the reader changes a value and sees the consequence at once; (4) Apple HIG: haptics supplement visual feedback; the Vibration API is an enhancement only (no iOS support). |
+
+- **The warning.** Under the slider, always visible: "Mức tương tác càng cao, trang
+  càng sử dụng nhiều tài nguyên xử lý, bộ nhớ và pin của thiết bị; trên thiết bị cấu
+  hình thấp, trang có thể phản hồi chậm hơn." When the browser reports 4 or fewer
+  cores, 4 GB or less memory, or Data Saver, the panel adds that Rodemap advises
+  "Nhẹ" (web.dev adaptive loading: these signals predict slow devices). When the
+  device asks for reduced motion, it says movement stays off at every level while
+  linked highlighting and shortcuts still work.
+- **Interactivity is not motion.** Linked highlighting, shortcuts and the what-if
+  change colour, focus and numbers, not position; they keep working under reduced
+  motion. Movement always obeys `prefers-reduced-motion` (`movementAllowed()` in
+  `src/domain/interactivity.ts`).
+- **Performance discipline.** Movement uses `transform` and `opacity` only
+  (compositor properties); GSAP effects run once and settle; nothing listens to
+  scroll (IntersectionObserver instead); the what-if recomputes about 50 events per
+  input, well inside the 200 ms Interaction to Next Paint budget (web.dev). The
+  card-to-page transition never holds the old frame longer than 1 s while the next
+  page loads.
+- **Never, at any level:** custom or trailing cursors, magnetic or tilting elements,
+  particles, parallax, scroll-jacking, preloaders, sound, scramble text.
+
 ---
 
 ## 7. Layout and placement
@@ -483,6 +520,9 @@ suggestions:
   2. **Độ sáng** — Theo hệ thống / Sáng / Tối (segmented radio group).
   3. **Mật độ nội dung** — Đầy đủ / Gọn / Tối giản (radios), each with a
      one-line description (§10).
+  4. **Mức độ tương tác** — a four-step slider (Không · Nhẹ · Vừa · Tối đa) with
+     `aria-valuetext` naming the level and what it adds, the level's one-line
+     description, and the performance warning (§6.3).
 - Arrow keys move within a group; Escape closes and returns focus to the
   button; a click outside or a navigation closes; the panel opens from its
   corner (`--dur-ui`, scale from 0.97).
@@ -527,7 +567,9 @@ All UI copy is **formal, administrative Vietnamese** (văn phong hành chính).
 - Mochi's panel is a labelled dialog/complementary region; new messages are
   announced with `aria-live="polite"`; focus returns to the dock on close.
 - Focus is always visible: 2 px `--color-signal` outline with 2 px offset.
-- Motion: see §6.1 (reduced motion, 2.2.2 pause control, 2.3.1 no flashing).
+- Motion: see §6.1 (reduced motion, 2.2.2 pause control, 2.3.1 no flashing) and
+  §6.3 (2.3.3: "Không" turns off every interaction-triggered animation; 2.1.4:
+  single-key shortcuts exist only at "Tối đa").
   Split headings keep an accessible name; counting figures are read once.
 - Hidden-by-density content (§10) is removed from the accessibility tree too
   (`display: none`), never only visually hidden.
@@ -592,6 +634,20 @@ was taken from each:
 | [Taste skill](https://github.com/Leonxlnx/taste-skill) (MIT) | Anti-slop frontend art direction distilled from 247 gallery sites and 23 product screens; house rules, app-screen rules, motion study | The idea per mode (§2.4), no violet, no gradients, ink 7:1, two faces at most, sentence-case labels, no shadows at rest, motion tokens and rules (§6.1), entrances on pages only, line rise, reveal, rolling figures, press feedback |
 | [React Bits](https://reactbits.dev/) (MIT + Commons Clause) | Animated React components (GSAP and motion based) | Adapted, with the copyright notice kept in each file: SplitText → `SplitLines`, AnimatedContent → `Reveal`, CountUp → `CountUp`, ClickSpark → `SparkBurst` (`src/components/motion/`) |
 | [GSAP](https://gsap.com/) and [framer-motion](https://motion.dev/) | Animation libraries (GSAP with SplitText and CustomEase) | GSAP drives #7, #10, #12 and #16 from the motion tokens; framer-motion drives #17 |
+
+**Research behind the interactivity levels (§6.3), October 2026.**
+[WCAG 2.3.3 Animation from Interactions](https://www.w3.org/WAI/WCAG21/Understanding/animation-from-interactions) ·
+[Apple HIG — Motion](https://developer.apple.com/design/human-interface-guidelines/motion) ·
+NN/g on animation duration and response-time limits (as quoted in [MDN — How long is too long](https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/How_long_is_too_long)) ·
+[North and Shneiderman, Snap-Together Visualization (2000)](https://www.cs.umd.edu/users/ben/papers/North2000Snapa.pdf) ·
+[NN/g — Flexibility and efficiency heuristic](https://www.nngroup.com/articles/flexibility-efficiency-heuristic/) ·
+[Bret Victor — Explorable Explanations](https://worrydream.com/ExplorableExplanations/) ·
+[Material motion system](https://material.io/design/motion/the-motion-system.html) ·
+[Chrome — Same-document view transitions](https://developer.chrome.com/docs/web-platform/view-transitions/same-document) ·
+[web.dev — Optimize INP](https://web.dev/articles/optimize-inp) ·
+[web.dev — Adaptive loading](https://web.dev/articles/adaptive-loading-cds-2019) ·
+[Chrome — Scroll-driven animation performance](https://developer.chrome.com/blog/scroll-animation-performance-case-study) ·
+[Baymard — hover delays](https://baymard.com/research-articles/dropdown-menu-flickering-issue) (why previews wait for intent; Rodemap shows details on focus or press instead).
 
 **Taste rules Rodemap keeps differently, and why.** Lộ trình is the existing
 brand and keeps three devices Taste bans on marketing pages: monospace times

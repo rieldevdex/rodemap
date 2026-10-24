@@ -16,6 +16,8 @@ export interface Appearance {
   /** The data-theme attribute; null when it is absent (Theo hệ thống). */
   theme: 'light' | 'dark' | null;
   systemDark: boolean;
+  /** The data-interactivity attribute (motion tokens only); defaults to 'medium'. */
+  interactivity?: string;
 }
 
 /** Collects every rule with custom properties, with the @media preludes around it. */
@@ -62,15 +64,19 @@ function conditionHolds(condition: string, a: Appearance): boolean {
 export function matchRoot(selector: string, a: Appearance): number | null {
   let rest = selector.trim();
   let specificity = 0;
-  const attr = (name: string): string | null => (name === 'data-mode' ? a.mode : a.theme);
+  const attr = (name: string): string | null => {
+    if (name === 'data-mode') return a.mode;
+    if (name === 'data-interactivity') return a.interactivity ?? 'medium';
+    return a.theme;
+  };
   while (rest.length > 0) {
     let m: RegExpMatchArray | null;
     if ((m = /^:root/.exec(rest))) {
       specificity += 1;
-    } else if ((m = /^\[(data-mode|data-theme)='([\w-]+)'\]/.exec(rest))) {
+    } else if ((m = /^\[(data-mode|data-theme|data-interactivity)='([\w-]+)'\]/.exec(rest))) {
       if (attr(m[1] ?? '') !== m[2]) return null;
       specificity += 1;
-    } else if ((m = /^:not\(\[(data-mode|data-theme)='([\w-]+)'\]\)/.exec(rest))) {
+    } else if ((m = /^:not\(\[(data-mode|data-theme|data-interactivity)='([\w-]+)'\]\)/.exec(rest))) {
       if (attr(m[1] ?? '') === m[2]) return null;
       specificity += 1;
     } else {

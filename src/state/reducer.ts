@@ -5,7 +5,7 @@ import { ACTIVITY_PROPOSALS, COLLABORATIONS, PROPOSAL_RESPONSES } from '../data/
 import { cleanGuestPicks, sameGuestPicks } from '../domain/guest';
 import { RESERVED_NEWS_SLUGS } from '../domain/news';
 import { applyReview, canTransition } from '../domain/moderation';
-import { APPEARANCE_MODES, TEXT_DENSITIES, type EventStatus, type Registration, type SchoolEvent } from '../domain/types';
+import { APPEARANCE_MODES, INTERACTIVITY_LEVELS, TEXT_DENSITIES, type EventStatus, type Registration, type SchoolEvent } from '../domain/types';
 import type { Action } from './actions';
 import { createSeedState, type AppState } from './schema';
 
@@ -191,6 +191,9 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'appearance/setDensity':
       return state.density === action.density || !TEXT_DENSITIES.includes(action.density) ? state : { ...state, density: action.density };
 
+    case 'appearance/setInteractivity':
+      return state.interactivity === action.level || !INTERACTIVITY_LEVELS.includes(action.level) ? state : { ...state, interactivity: action.level };
+
     case 'demo/setToday':
       return state.demoToday === action.date ? state : { ...state, demoToday: action.date };
 
@@ -206,6 +209,7 @@ export function reducer(state: AppState, action: Action): AppState {
         theme: state.theme,
         mode: state.mode,
         density: state.density,
+        interactivity: state.interactivity,
         demoToday: state.demoToday,
         mochiForcedOffline: state.mochiForcedOffline,
       };

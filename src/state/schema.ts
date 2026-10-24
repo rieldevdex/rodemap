@@ -1,12 +1,13 @@
 /** Persisted application state: shape, seed and versioned migration. Pure. */
 import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS, SEED_SUBMISSIONS } from '../data/seed';
-import { APPEARANCE_MODES, TEXT_DENSITIES } from '../domain/types';
+import { APPEARANCE_MODES, INTERACTIVITY_LEVELS, TEXT_DENSITIES } from '../domain/types';
 import type {
   ActivityProposal,
   AppearanceMode,
   CollaborationProposal,
   EventStatus,
   GuestPicks,
+  InteractivityLevel,
   IsoDate,
   NewsPost,
   PortfolioEntry,
@@ -53,6 +54,8 @@ export interface AppState {
   mode: AppearanceMode;
   /** Mật độ nội dung, kept on this device. */
   density: TextDensity;
+  /** Mức độ tương tác, kept on this device. */
+  interactivity: InteractivityLevel;
   /** Overrides "today" for the demo; null follows the real clock. */
   demoToday: IsoDate | null;
   /** Forces Mochi's offline mode (for presentations). */
@@ -84,6 +87,7 @@ export function createSeedState(): AppState {
     theme: 'system',
     mode: 'lo-trinh',
     density: 'compact',
+    interactivity: 'medium',
     demoToday: null,
     mochiForcedOffline: false,
   };
@@ -136,6 +140,8 @@ export function isAppStateV1(x: unknown): x is AppState {
     (APPEARANCE_MODES as readonly string[]).includes(x.mode) &&
     typeof x.density === 'string' &&
     (TEXT_DENSITIES as readonly string[]).includes(x.density) &&
+    typeof x.interactivity === 'string' &&
+    (INTERACTIVITY_LEVELS as readonly string[]).includes(x.interactivity) &&
     (x.demoToday === null || (typeof x.demoToday === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(x.demoToday))) &&
     typeof x.mochiForcedOffline === 'boolean'
   );
@@ -155,6 +161,7 @@ const LATER_V1_FIELDS = {
   guestPicks: () => ({ grade: null, interests: [] }),
   mode: () => 'lo-trinh',
   density: () => 'compact',
+  interactivity: () => 'medium',
 } as const;
 
 export function migrate(raw: unknown): AppState | null {

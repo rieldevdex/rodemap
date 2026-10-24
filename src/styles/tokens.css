@@ -160,6 +160,8 @@
   --z-base: 0;
   --z-sticky: 10;
   --z-dock: 40;
+  /* The header and its panels (Giao diện, Tài khoản) sit above Mochi's dock, under Mochi's panel. */
+  --z-header: 45;
   --z-panel: 50;
   --z-overlay: 60;
   --z-toast: 70;
@@ -288,6 +290,40 @@
   --mochi-outline: #14181f;
 
   --shadow-panel: 0 12px 32px rgb(0 0 0 / 0.5);
+}
+
+/* ── Mức độ tương tác (DESIGN.md §6.3) ─────────────────────────────
+   Không: nothing moves. Nhẹ: feedback only (press, hover, panels); page moments,
+   loops, reveals and the theme ripple collapse to instant. Vừa and Tối đa keep the
+   full motion tokens. Reduced motion (below) always collapses everything. */
+:root[data-interactivity='none'] {
+  --dur-fast: 0ms;
+  --dur-hover: 0ms;
+  --dur-ui: 0ms;
+  --dur-med: 0ms;
+  --dur-slow: 0ms;
+  --dur-reveal: 0ms;
+  --dur-open: 0ms;
+  --dur-draw: 0ms;
+  --dur-idle: 0ms;
+  --dur-spark: 0ms;
+  --dur-count: 0ms;
+  --stagger-line: 0ms;
+  --stagger-item: 0ms;
+  --rise: 0px;
+}
+
+:root[data-interactivity='slight'] {
+  --dur-slow: 0ms;
+  --dur-reveal: 0ms;
+  --dur-open: 0ms;
+  --dur-draw: 0ms;
+  --dur-idle: 0ms;
+  --dur-spark: 0ms;
+  --dur-count: 0ms;
+  --stagger-line: 0ms;
+  --stagger-item: 0ms;
+  --rise: 0px;
 }
 
 /* ── Appearance modes (DESIGN.md §2.4), screens only: print always uses Lộ trình light ── */

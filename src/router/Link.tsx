@@ -1,4 +1,5 @@
 import type { AnchorHTMLAttributes, MouseEvent, Ref } from 'react';
+import { navigateWithMorph } from './morph';
 import { useNavigate, useRoute } from './Router';
 import { normalizePath } from './routes';
 
@@ -6,6 +7,8 @@ export type LinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & 
   /** In-app path ("/kham-pha?q=tranh"), hash ("#muc-2") or an external URL. */
   to: string;
   ref?: Ref<HTMLAnchorElement>;
+  /** Carry this link into the next page's `[data-morph-target]` heading at "Tối đa" (router/morph.ts). */
+  morph?: boolean;
 };
 
 const SCHEME_RE = /^[a-z][a-z\d+.-]*:/i;
@@ -24,7 +27,7 @@ function isPlainLeftClick(e: MouseEvent<HTMLAnchorElement>): boolean {
  * path is the current page (pass aria-current explicitly to override). Modifier clicks,
  * middle clicks, target="_blank", downloads and external links behave natively.
  */
-export function Link({ to, onClick, target, rel, ref, children, ...rest }: LinkProps) {
+export function Link({ to, onClick, target, rel, ref, morph = false, children, ...rest }: LinkProps) {
   const navigate = useNavigate();
   const route = useRoute();
   const external = isExternalHref(to);
@@ -40,7 +43,13 @@ export function Link({ to, onClick, target, rel, ref, children, ...rest }: LinkP
     if (target !== undefined && target !== '_self') return;
     if (rest.download !== undefined) return;
     e.preventDefault();
-    navigate(to);
+    if (morph) {
+      navigateWithMorph(e.currentTarget, () => {
+        navigate(to);
+      });
+    } else {
+      navigate(to);
+    }
   };
 
   return (

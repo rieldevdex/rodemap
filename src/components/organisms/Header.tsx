@@ -7,6 +7,7 @@ import { useSelector } from '../../state/hooks';
 import { Button } from '../atoms/Button';
 import { Icon } from '../atoms/Icon';
 import { Wordmark } from '../atoms/Wordmark';
+import { isTypingTarget } from '../keyboard';
 import { AccountMenu } from './AccountMenu';
 import { AppearancePicker } from './AppearancePicker';
 import './Header.css';
@@ -36,15 +37,6 @@ const NAV_ITEMS: NavItem[] = [
 
 /** A visitor without a profile sees the open sections only (DESIGN.md §7.2). */
 const VISITOR_NAV: readonly RouteName[] = ['dashboard', 'explore', 'route', 'clubs', 'news', 'ideas'];
-
-const TEXT_INPUT_EXCLUDED = new Set(['checkbox', 'radio', 'button', 'submit', 'reset', 'range', 'color', 'file', 'image']);
-
-/** True while focus is in a text field (Ctrl K must not interrupt typing). */
-function isTypingTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false;
-  if (target.isContentEditable || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement) return true;
-  return target instanceof HTMLInputElement && !TEXT_INPUT_EXCLUDED.has(target.type);
-}
 
 /** Khám phá sự kiện with its search field focused (?tim=1), keeping `current` query params. */
 function searchHref(explorePath: string, current: URLSearchParams | null): string {

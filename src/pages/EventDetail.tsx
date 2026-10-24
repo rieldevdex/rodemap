@@ -101,6 +101,7 @@ export function EventDetailPage() {
   return (
     <div className="event-detail" style={{ '--line': `var(--line-${event.category.toLowerCase()})` } as Record<string, string>}>
       <PageHead
+        morphTarget
         eyebrow={
           <>
             <LineBadge code={event.category} showName size="sm" />

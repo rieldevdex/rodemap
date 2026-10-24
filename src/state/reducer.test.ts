@@ -448,6 +448,10 @@ describe('setters', () => {
     expect(minimal.density).toBe('minimal');
     expect(reducer(minimal, { type: 'appearance/setDensity', density: 'minimal' })).toBe(minimal);
     expect(reducer(s, { type: 'appearance/setDensity', density: 'tiny' as never })).toBe(s);
+    const still = reducer(s, { type: 'appearance/setInteractivity', level: 'none' });
+    expect(still.interactivity).toBe('none');
+    expect(reducer(still, { type: 'appearance/setInteractivity', level: 'none' })).toBe(still);
+    expect(reducer(s, { type: 'appearance/setInteractivity', level: 'wild' as never })).toBe(s);
   });
 
   it('demo/setToday sets and clears the demo date; the same value returns the identical state', () => {
@@ -475,6 +479,7 @@ describe('demo/reset', () => {
       { type: 'theme/set', theme: 'dark' },
       { type: 'appearance/setMode', mode: 'ap-phich' },
       { type: 'appearance/setDensity', density: 'full' },
+      { type: 'appearance/setInteractivity', level: 'extreme' },
       { type: 'demo/setToday', date: '2026-11-02' },
       { type: 'demo/setMochiOffline', offline: true },
       { type: 'profile/clear' },
@@ -486,7 +491,7 @@ describe('demo/reset', () => {
     for (const action of actions) s = reducer(s, action);
 
     const next = reducer(s, { type: 'demo/reset' });
-    expect(next).toEqual({ ...createSeedState(), theme: 'dark', mode: 'ap-phich', density: 'full', demoToday: '2026-11-02', mochiForcedOffline: true });
+    expect(next).toEqual({ ...createSeedState(), theme: 'dark', mode: 'ap-phich', density: 'full', interactivity: 'extreme', demoToday: '2026-11-02', mochiForcedOffline: true });
     expect(next.role).toBe('student');
     expect(next.activeClubId).toBe('inkstep');
     expect(next.profile).toBeNull();

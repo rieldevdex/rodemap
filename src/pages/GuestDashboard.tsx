@@ -1,13 +1,17 @@
 import { AnimatePresence, MotionConfig, motion } from 'framer-motion';
+import { useRef } from 'react';
 import { Button } from '../components/atoms/Button';
 import { DemoLabel } from '../components/atoms/DemoLabel';
 import { MonoTime } from '../components/atoms/MonoTime';
 import { StatusTag } from '../components/atoms/StatusTag';
+import { useListAccelerators } from '../components/keyboard';
 import { PageHead } from '../components/molecules/PageHead';
+import { ShortcutHint } from '../components/molecules/ShortcutHint';
 import { StationCard } from '../components/molecules/StationCard';
 import { QuickPicks } from '../components/organisms/QuickPicks';
 import { describeReasons, describeWarnings } from '../content/reasons';
 import { formatDate, formatTime, isoWeekKey, toMillis } from '../domain/dates';
+import { atLeast } from '../domain/interactivity';
 import { deadlineDaysLeft, registrationState, seatsLeft } from '../domain/events';
 import { Link } from '../router';
 import { useSetupHref } from '../router/Router';
@@ -29,6 +33,9 @@ export function GuestDashboard() {
   const picks = state.guestPicks;
   const recs = selectGuestRecommendations(state, now, { limit: SUGGESTION_LIMIT });
   const deadlines = selectDeadlinesThisWeek(state, now).slice(0, 5);
+  const recsRef = useRef<HTMLElement>(null);
+  const accelerators = state.interactivity === 'extreme';
+  useListAccelerators(recsRef, accelerators);
 
   return (
     <div className="dashboard">
@@ -62,7 +69,7 @@ export function GuestDashboard() {
 
       <div className="band band--surface">
         <div className="container dashboard__grid">
-          <section className="dashboard__main" aria-labelledby="guest-recs">
+          <section className="dashboard__main" aria-labelledby="guest-recs" ref={recsRef}>
             <div className="dashboard__section-head">
               <h2 id="guest-recs" className="dashboard__h2">
                 Gợi ý cho bạn
@@ -71,6 +78,7 @@ export function GuestDashboard() {
                 Xem toàn bộ sự kiện
               </Link>
             </div>
+            {accelerators ? <ShortcutHint /> : null}
             <p className="dashboard__muted" role="status">
               {picks.grade === null
                 ? 'Chọn khối để xem các sự kiện dành cho bạn.'
@@ -79,7 +87,7 @@ export function GuestDashboard() {
             {recs.length === 0 ? (
               <p className="dashboard__muted">Hiện chưa có sự kiện phù hợp còn mở đăng ký.</p>
             ) : (
-              <MotionConfig reducedMotion="user">
+              <MotionConfig reducedMotion={atLeast(state.interactivity, 'medium') ? 'user' : 'always'}>
                 <ol className="dashboard__recs">
                   <AnimatePresence initial={false}>
                     {recs.map((r) => (

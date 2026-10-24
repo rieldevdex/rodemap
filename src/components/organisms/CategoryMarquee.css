@@ -44,8 +44,9 @@
   cursor: pointer;
 }
 
+/* Moves at Vừa and Tối đa only (DESIGN.md §6.3). */
 @media (prefers-reduced-motion: no-preference) {
-  .marquee__track {
+  :root:is([data-interactivity='medium'], [data-interactivity='extreme']) .marquee__track {
     animation: marquee var(--dur-marquee) var(--ease-linear) infinite;
   }
 
@@ -74,4 +75,16 @@
   .marquee__toggle {
     display: none;
   }
+}
+
+/* Không and Nhẹ: the same still, wrapped row. */
+:root:is([data-interactivity='none'], [data-interactivity='slight']) .marquee__track,
+:root:is([data-interactivity='none'], [data-interactivity='slight']) .marquee__row {
+  flex-wrap: wrap;
+  inline-size: auto;
+}
+
+:root:is([data-interactivity='none'], [data-interactivity='slight']) .marquee__row[aria-hidden='true'],
+:root:is([data-interactivity='none'], [data-interactivity='slight']) .marquee__toggle {
+  display: none;
 }

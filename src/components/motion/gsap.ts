@@ -1,9 +1,11 @@
 /**
  * GSAP set-up for Rodemap's motion layer (DESIGN.md §6). Durations and curves are read from the
  * motion tokens in src/styles/tokens.css, so CSS and GSAP move alike and reduced motion (every
- * duration 0) applies to both.
+ * duration 0) applies to both; motionOff() also honours the interactivity level.
  */
 import { gsap } from 'gsap';
+import { movementAllowed } from '../../domain/interactivity';
+import { INTERACTIVITY_LEVELS, type InteractivityLevel } from '../../domain/types';
 import { CustomEase } from 'gsap/CustomEase';
 import { SplitText } from 'gsap/SplitText';
 
@@ -37,6 +39,13 @@ export function motionEase(token: string): string {
   return name;
 }
 
-export function prefersReducedMotion(): boolean {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+/**
+ * True when page moments must not move: the level (data-interactivity on <html>) is below
+ * "Vừa", or the device asks for reduced motion (DESIGN.md §6.3).
+ */
+export function motionOff(): boolean {
+  const value = document.documentElement.getAttribute('data-interactivity');
+  const level: InteractivityLevel = INTERACTIVITY_LEVELS.find((l) => l === value) ?? 'medium';
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return !movementAllowed(level, 'medium', reduced);
 }

@@ -49,3 +49,21 @@ for (const mode of MODES) {
     }
   }
 }
+
+/** "Tối đa" adds the shortcut hint, the "Thử quỹ giờ" panel and the pressable legend. */
+for (const route of [
+  { name: 'tong-quan', path: '/tong-quan' },
+  { name: 'kham-pha', path: '/kham-pha' },
+  { name: 'lo-trinh', path: '/lo-trinh' },
+] as const) {
+  test(`axe: ${route.name} · Tối đa`, async ({ page }) => {
+    await seedDemo(page, { interactivity: 'extreme' });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto(route.path);
+    await expect(page.locator('#main-heading')).toBeVisible();
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+    const blocking = results.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
+    const report = blocking.map((v) => `${v.id} (${v.impact}): ${v.help}\n  ${v.nodes.map((n) => n.target.join(' ')).slice(0, 5).join('\n  ')}`);
+    expect(report, report.join('\n')).toEqual([]);
+  });
+}

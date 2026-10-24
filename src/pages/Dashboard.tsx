@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from '../components/atoms/Button';
 import { DemoLabel } from '../components/atoms/DemoLabel';
 import { LineBadge } from '../components/atoms/LineBadge';
 import { MonoTime } from '../components/atoms/MonoTime';
 import { StatusTag } from '../components/atoms/StatusTag';
+import { useListAccelerators } from '../components/keyboard';
 import { BudgetMeter } from '../components/molecules/BudgetMeter';
 import { MochiNote } from '../components/molecules/MochiNote';
 import { NewsCard } from '../components/molecules/NewsCard';
 import { PageHead } from '../components/molecules/PageHead';
+import { ShortcutHint } from '../components/molecules/ShortcutHint';
 import { StationCard, eventStatus } from '../components/molecules/StationCard';
 import { DepartureBoard, type DepartureRow } from '../components/organisms/DepartureBoard';
 import { describeReasons, describeWarnings } from '../content/reasons';
@@ -15,6 +17,8 @@ import { formatDate, formatDayLabel, formatLongDate, formatTime, isoWeekKey, toM
 import { weeklyDigest } from '../domain/digest';
 import { deadlineDaysLeft, isPast, isRegistered, registrationState, seatsLeft } from '../domain/events';
 import { entryFromEvent } from '../domain/portfolio';
+import { BUDGET_LIMITS } from '../domain/profile';
+import { formatHours } from '../domain/text';
 import { CATEGORY_CODES } from '../domain/types';
 import { PERIODS } from '../data/calendar';
 import { Link } from '../router';
@@ -49,13 +53,21 @@ function StudentDashboard() {
   const { state, dispatch, now, publicEvents, clubName, eventById } = useCatalog();
   const [boardScope, setBoardScope] = useState<'all' | 'mine'>('all');
   const profile = state.profile;
+  const extreme = state.interactivity === 'extreme';
+  // "Thử quỹ giờ" (DESIGN.md §6.3, Tối đa): a reactive what-if; nothing is saved until "Lưu".
+  const [trialBudget, setTrialBudget] = useState<number | null>(null);
+  const trying = extreme && profile !== null && trialBudget !== null && trialBudget !== profile.weeklyHourBudget;
+  const view = trying ? { ...state, profile: { ...profile, weeklyHourBudget: trialBudget } } : state;
+  const recsRef = useRef<HTMLElement>(null);
+  useListAccelerators(recsRef, extreme);
   const upcomingMine = selectUpcomingMine(state, now);
   const myEvents = selectMyEvents(state);
-  const budget = selectPlanBudget(state, now);
+  const budget = selectPlanBudget(view, now);
   const conflicts = selectConflictsInPlan(state).filter((c) => upcomingMine.some((e) => e.id === c.a || e.id === c.b));
   const pending = selectPendingAttendance(state, now);
   const deadlines = selectDeadlinesThisWeek(state, now).slice(0, 5);
-  const recs = selectRecommendations(state, now, { limit: 3 });
+  const recs = selectRecommendations(view, now, { limit: 3 });
+  const recsWithinBudget = recs.filter((r) => !r.warnings.includes('over_budget')).length;
   const latestNews = selectNews(state, now).slice(0, 3);
   const myProposals = selectActivityProposals(state).filter((v) => v.mine);
   const digest = weeklyDigest(publicEvents, { now, regs: state.registrations, periods: PERIODS });
@@ -116,7 +128,7 @@ function StudentDashboard() {
               </p>
             </section>
 
-            <section aria-labelledby="dash-recs">
+            <section aria-labelledby="dash-recs" ref={recsRef}>
               <div className="dashboard__section-head">
                 <h2 id="dash-recs" className="dashboard__h2">
                   Mochi đề xuất
@@ -131,6 +143,10 @@ function StudentDashboard() {
                   Hỏi Mochi
                 </Button>
               </div>
+              {extreme ? <ShortcutHint /> : null}
+              {trying ? (
+                <p className="dashboard__muted">Đề xuất đang được tính với quỹ thử nghiệm {formatHours(budget.budget)} giờ mỗi tuần.</p>
+              ) : null}
               {recs.length === 0 ? (
                 <p className="dashboard__muted">Hiện chưa có sự kiện phù hợp còn mở đăng ký. Mochi sẽ đề xuất khi có sự kiện mới.</p>
               ) : (
@@ -200,7 +216,55 @@ function StudentDashboard() {
                   )
                 </p>
               ) : null}
-              <BudgetMeter used={budget.used} budget={budget.budget} label="Quỹ giờ tuần này" />
+              <BudgetMeter used={budget.used} budget={budget.budget} label={trying ? 'Quỹ giờ thử nghiệm' : 'Quỹ giờ tuần này'} />
+              {extreme && profile ? (
+                <div className="dashboard__whatif">
+                  <label className="dashboard__whatif-label" htmlFor="dash-whatif">
+                    Thử quỹ giờ mỗi tuần
+                  </label>
+                  <input
+                    id="dash-whatif"
+                    className="dashboard__whatif-range"
+                    type="range"
+                    min={BUDGET_LIMITS.min}
+                    max={BUDGET_LIMITS.max}
+                    step={BUDGET_LIMITS.step}
+                    value={trialBudget ?? profile.weeklyHourBudget}
+                    aria-valuetext={`${formatHours(trialBudget ?? profile.weeklyHourBudget)} giờ mỗi tuần`}
+                    onChange={(e) => {
+                      setTrialBudget(Number(e.target.value));
+                    }}
+                  />
+                  <p className="dashboard__muted" role="status">
+                    {trying
+                      ? `Với ${formatHours(budget.budget)} giờ mỗi tuần: còn ${formatHours(budget.remaining)} giờ trong tuần này; ${String(recsWithinBudget)}/${String(recs.length)} sự kiện được đề xuất không vượt quỹ giờ.`
+                      : 'Kéo thanh trượt để xem đề xuất của Mochi thay đổi theo quỹ giờ; hồ sơ chỉ thay đổi khi bạn lưu.'}
+                  </p>
+                  {trying ? (
+                    <div className="cluster cluster--sm">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => {
+                          dispatch({ type: 'profile/complete', profile: { ...profile, weeklyHourBudget: trialBudget } });
+                          setTrialBudget(null);
+                        }}
+                      >
+                        Lưu quỹ giờ này
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="quiet"
+                        onClick={() => {
+                          setTrialBudget(null);
+                        }}
+                      >
+                        Khôi phục
+                      </Button>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
               {covered.length > 0 ? (
                 <ul className="dashboard__lines" aria-label="Các tuyến trong lộ trình">
                   {covered.map((c) => (

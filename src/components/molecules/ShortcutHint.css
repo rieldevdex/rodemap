@@ -1,0 +1,16 @@
+.shortcut-hint {
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+}
+
+.shortcut-hint kbd {
+  display: inline-block;
+  min-inline-size: var(--space-5);
+  padding: 0 var(--space-1);
+  border: var(--rule-hair) solid var(--color-ink-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-size: var(--text-xs);
+  text-align: center;
+}

@@ -32,6 +32,7 @@ describe('createSeedState', () => {
       theme: 'system',
       mode: 'lo-trinh',
       density: 'compact',
+      interactivity: 'medium',
       demoToday: null,
       mochiForcedOffline: false,
     });
@@ -58,6 +59,7 @@ describe('createSeedState', () => {
       theme: 'system',
       mode: 'lo-trinh',
       density: 'compact',
+      interactivity: 'medium',
       demoToday: null,
       mochiForcedOffline: false,
     });
@@ -152,6 +154,8 @@ describe('isAppStateV1 / migrate', () => {
     ['a non-string appearance mode', { mode: 1 }],
     ['an unknown text density', { density: 'tiny' }],
     ['a non-string text density', { density: null }],
+    ['an unknown interactivity level', { interactivity: 'wild' }],
+    ['a non-string interactivity level', { interactivity: 2 }],
     ['a numeric demo date', { demoToday: 20261007 }],
     ['an unreadable demo date', { demoToday: 'ngày mai' }],
     ['a missing demo date', { demoToday: undefined }],
@@ -182,9 +186,11 @@ describe('isAppStateV1 / migrate', () => {
     const older: Partial<ReturnType<typeof createSeedState>> = createSeedState();
     delete older.mode;
     delete older.density;
+    delete older.interactivity;
     const migrated = migrate(older);
     expect(migrated?.mode).toBe('lo-trinh');
     expect(migrated?.density).toBe('compact');
+    expect(migrated?.interactivity).toBe('medium');
   });
 
   it('accepts every appearance mode and text density', () => {
@@ -193,6 +199,9 @@ describe('isAppStateV1 / migrate', () => {
     }
     for (const density of ['full', 'compact', 'minimal'] as const) {
       expect(isAppStateV1({ ...createSeedState(), density })).toBe(true);
+    }
+    for (const interactivity of ['none', 'slight', 'medium', 'extreme'] as const) {
+      expect(isAppStateV1({ ...createSeedState(), interactivity })).toBe(true);
     }
   });
 

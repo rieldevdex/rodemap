@@ -7,7 +7,7 @@
  */
 import { useGSAP } from '@gsap/react';
 import { useRef } from 'react';
-import { gsap, motionEase, motionSeconds, prefersReducedMotion } from './gsap';
+import { gsap, motionEase, motionSeconds, motionOff } from './gsap';
 
 gsap.registerPlugin(useGSAP);
 
@@ -22,7 +22,7 @@ export function CountUp({ value, className }: { value: number; className?: strin
       const el = ref.current;
       const shown = digits.current;
       // Already on the first screen, or reduced motion: the value is shown as it is.
-      if (!el || !shown || prefersReducedMotion() || el.getBoundingClientRect().top < window.innerHeight) return undefined;
+      if (!el || !shown || motionOff() || el.getBoundingClientRect().top < window.innerHeight) return undefined;
       const counter = { n: 0 };
       shown.textContent = format.format(0);
       const observer = new IntersectionObserver(

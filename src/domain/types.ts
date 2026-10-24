@@ -240,6 +240,14 @@ export const APPEARANCE_MODES: readonly AppearanceMode[] = ['lo-trinh', 'ruc-ro'
 export type TextDensity = 'full' | 'compact' | 'minimal';
 export const TEXT_DENSITIES: readonly TextDensity[] = ['full', 'compact', 'minimal'];
 
+/**
+ * Mức độ tương tác (DESIGN.md §6.3): none — nothing moves; slight — feedback only; medium —
+ * page moments and linked highlighting; extreme — card-to-page transitions, keyboard shortcuts,
+ * live what-if and haptics. The device's reduced-motion setting always stops movement.
+ */
+export type InteractivityLevel = 'none' | 'slight' | 'medium' | 'extreme';
+export const INTERACTIVITY_LEVELS: readonly InteractivityLevel[] = ['none', 'slight', 'medium', 'extreme'];
+
 /** A visitor's quick picks on Tổng quan before setting up a profile (kept on this device only). */
 export interface GuestPicks {
   grade: Grade | null;

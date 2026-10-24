@@ -238,13 +238,13 @@ kbd {
 
 /* ── Theme ripple (DESIGN.md §6.2 #6): the new appearance grows from the Giao diện control ── */
 
-::view-transition-old(root),
-::view-transition-new(root) {
+:root.vt-ripple::view-transition-old(root),
+:root.vt-ripple::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }
 
-::view-transition-new(root) {
+:root.vt-ripple::view-transition-new(root) {
   animation: theme-ripple var(--dur-slow) var(--ease-in-out);
 }
 
@@ -256,6 +256,58 @@ kbd {
   to {
     clip-path: circle(150% at var(--ripple-x, 50%) var(--ripple-y, 0%));
   }
+}
+
+/* ── Card to page (DESIGN.md §6.3, Tối đa): the event title carried into the event page ──
+   Material's container transform built with same-document View Transitions: the old page
+   leaves quickly, the new one rises in, and the clicked title travels into the heading. */
+
+:root.vt-morph-target [data-morph-target] {
+  view-transition-name: event-morph;
+}
+
+:root.vt-morph::view-transition-old(root) {
+  animation: vt-leave var(--dur-ui) var(--ease-exit) both;
+}
+
+:root.vt-morph::view-transition-new(root) {
+  animation: vt-arrive var(--dur-med) var(--ease-out) both;
+}
+
+:root.vt-morph::view-transition-group(event-morph) {
+  animation-duration: var(--dur-med);
+  animation-timing-function: var(--ease-in-out);
+}
+
+@keyframes vt-leave {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-4));
+  }
+}
+
+/* ── Mức độ tương tác: Không stops every animation and transition, as reduced motion does ── */
+
+:root[data-interactivity='none'] *,
+:root[data-interactivity='none'] *::before,
+:root[data-interactivity='none'] *::after {
+  animation-duration: var(--dur-fast) !important;
+  animation-delay: var(--dur-fast) !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: var(--dur-fast) !important;
+  transition-delay: var(--dur-fast) !important;
+  scroll-behavior: auto !important;
+}
+
+/* Nhẹ keeps feedback but no loop: Mochi rests between frames. */
+:root[data-interactivity='slight'] .mochi * {
+  animation-iteration-count: 1 !important;
 }
 
 /* ── Reduced motion: instant states, nothing loops or hops ───────── */

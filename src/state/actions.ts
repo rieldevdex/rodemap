@@ -4,6 +4,7 @@ import type {
   AppearanceMode,
   CollaborationProposal,
   GuestPicks,
+  InteractivityLevel,
   IsoDate,
   IsoDateTime,
   NewsPost,
@@ -44,6 +45,7 @@ export type Action =
   | { type: 'theme/set'; theme: ThemePreference }
   | { type: 'appearance/setMode'; mode: AppearanceMode }
   | { type: 'appearance/setDensity'; density: TextDensity }
+  | { type: 'appearance/setInteractivity'; level: InteractivityLevel }
   | { type: 'demo/setToday'; date: IsoDate | null }
   | { type: 'demo/setMochiOffline'; offline: boolean }
   | { type: 'demo/reset' };

@@ -1,4 +1,7 @@
 import {
+  createContext,
+  useCallback,
+  useContext,
   useId,
   useImperativeHandle,
   useLayoutEffect,
@@ -63,6 +66,8 @@ export interface RouteMapProps {
   endMarker?: ReactNode;
   /** Pin the line codes to the leading edge while the map scrolls. Defaults to true unless `fit`. */
   laneLabels?: boolean | undefined;
+  /** Linked highlighting between the legend, the stations and the lines ("Vừa" and richer). */
+  linkedHighlight?: boolean | undefined;
   ref?: Ref<RouteMapHandle> | undefined;
   className?: string | undefined;
 }
@@ -82,8 +87,10 @@ function laneVar(code: CategoryCode): string {
   return `var(--line-${code.toLowerCase()})`;
 }
 
+/** Page moments (the route growing to new stations) need "Vừa" or richer and no reduced-motion request. */
 function prefersReducedMotion(): boolean {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const level = document.documentElement.getAttribute('data-interactivity');
+  return level === 'none' || level === 'slight' || window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -119,6 +126,40 @@ function StationMark({ station }: { station: StationGeom }) {
   );
 }
 
+/**
+ * Linked highlighting (brushing and linking, DESIGN.md §6.3, "Vừa" and richer): hovering or
+ * focusing a line in the legend, or a station on the map, brings that line forward and dims the
+ * others; pressing a legend line keeps it highlighted until it is pressed again or Escape.
+ */
+interface LineFocus {
+  active: CategoryCode | null;
+  pinned: CategoryCode | null;
+  preview: (code: CategoryCode | null) => void;
+  toggle: (code: CategoryCode) => void;
+  clear: () => void;
+}
+
+const LineFocusContext = createContext<LineFocus | null>(null);
+
+function useLineFocusState(): LineFocus {
+  const [previewed, setPreviewed] = useState<CategoryCode | null>(null);
+  const [pinned, setPinned] = useState<CategoryCode | null>(null);
+  const toggle = useCallback((code: CategoryCode) => {
+    setPinned((p) => (p === code ? null : code));
+  }, []);
+  const clear = useCallback(() => {
+    setPinned(null);
+    setPreviewed(null);
+  }, []);
+  return { active: previewed ?? pinned, pinned, preview: setPreviewed, toggle, clear };
+}
+
+/** Shares one linked highlight between a RouteMap and a RouteMapLegend rendered beside it. */
+export function RouteMapFocusScope({ enabled, children }: { enabled: boolean; children: ReactNode }) {
+  const focus = useLineFocusState();
+  return <LineFocusContext.Provider value={enabled ? focus : null}>{children}</LineFocusContext.Provider>;
+}
+
 /** Lane legend: code + name, never color alone; the full variant adds the map symbols. */
 export function RouteMapLegend({
   lanes,
@@ -131,15 +172,48 @@ export function RouteMapLegend({
   className?: string;
 }) {
   const id = useId();
+  const focus = useContext(LineFocusContext);
   const lines = lanes.map((l) => (
     <li key={l.code} className="route-map__legend-item" style={{ '--lane-color': laneVar(l.code) } as Record<string, string>}>
-      <span className="route-map__legend-code">{l.code}</span>
-      <span className="route-map__legend-name">{l.name}</span>
+      {focus ? (
+        <button
+          type="button"
+          className="route-map__legend-button"
+          aria-pressed={focus.pinned === l.code}
+          onMouseEnter={() => {
+            focus.preview(l.code);
+          }}
+          onMouseLeave={() => {
+            focus.preview(null);
+          }}
+          onFocus={() => {
+            focus.preview(l.code);
+          }}
+          onBlur={() => {
+            focus.preview(null);
+          }}
+          onClick={() => {
+            focus.toggle(l.code);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') focus.clear();
+          }}
+        >
+          <span className="route-map__legend-code">{l.code}</span>
+          <span className="route-map__legend-name">{l.name}</span>
+        </button>
+      ) : (
+        <>
+          <span className="route-map__legend-code">{l.code}</span>
+          <span className="route-map__legend-name">{l.name}</span>
+        </>
+      )}
     </li>
   ));
+  const linesLabel = focus ? 'Các tuyến lĩnh vực, chọn một tuyến để làm nổi bật trên bản đồ' : 'Các tuyến lĩnh vực';
   if (variant === 'lines') {
     return (
-      <ul className={['route-map__legend', className].filter(Boolean).join(' ')} aria-label="Các tuyến lĩnh vực">
+      <ul className={['route-map__legend', className].filter(Boolean).join(' ')} aria-label={linesLabel}>
         {lines}
         <li className="route-map__legend-item route-map__legend-item--mine">
           <span className="route-map__legend-swatch" aria-hidden="true" />
@@ -154,6 +228,7 @@ export function RouteMapLegend({
         <div className="route-map__legend-row">
           <p className="route-map__legend-title" id={`${id}-lines`}>
             Tuyến
+            {focus ? <span className="visually-hidden">, chọn một tuyến để làm nổi bật trên bản đồ</span> : null}
           </p>
           <ul className="route-map__legend" aria-labelledby={`${id}-lines`}>
             {lines}
@@ -227,9 +302,14 @@ export function RouteMap({
   legend = 'lines',
   endMarker,
   laneLabels = !fit,
+  linkedHighlight = false,
   ref,
   className,
 }: RouteMapProps) {
+  const outerFocus = useContext(LineFocusContext);
+  const ownFocus = useLineFocusState();
+  const focus = outerFocus ?? (linkedHighlight ? ownFocus : null);
+  const dimmed = (code: CategoryCode): boolean => focus?.active != null && focus.active !== code;
   const uid = useId().replace(/:/g, '');
   const hatchId = `hatch-${uid}`;
   const holidayId = `holiday-${uid}`;
@@ -444,6 +524,7 @@ export function RouteMap({
       s.mine ? 'route-map__station--mine' : '',
       s.interchange ? 'route-map__station--interchange' : '',
       arriving.has(s.eventId) ? 'route-map__station--arrive' : '',
+      dimmed(s.category) ? 'route-map__station--dim' : '',
     ]
       .filter(Boolean)
       .join(' '),
@@ -454,15 +535,19 @@ export function RouteMap({
     onFocus: () => {
       setActiveId(s.eventId);
       setCardId(s.eventId);
+      focus?.preview(s.category);
     },
     onBlur: () => {
       setCardId((c) => (c === s.eventId ? null : c));
+      focus?.preview(null);
     },
     onMouseEnter: () => {
       setCardId(s.eventId);
+      focus?.preview(s.category);
     },
     onMouseLeave: () => {
       setCardId((c) => (c === s.eventId ? null : c));
+      focus?.preview(null);
     },
     onKeyDown: (e: KeyboardEvent) => {
       onKeyDown(e, s);
@@ -476,7 +561,7 @@ export function RouteMap({
     </g>
   );
 
-  return (
+  const tree = (
     <div
       className={[
         'route-map',
@@ -584,7 +669,7 @@ export function RouteMap({
                 {layout.lanes.map((l) => (
                   <line
                     key={l.category}
-                    className="route-map__lane"
+                    className={dimmed(l.category) ? 'route-map__lane route-map__lane--dim' : 'route-map__lane'}
                     style={{ '--lane-color': laneVar(l.category) } as Record<string, string>}
                     x1={l.x1}
                     y1={l.y1}
@@ -596,7 +681,7 @@ export function RouteMap({
               </g>
 
               {/* Same-day interchanges between lines. */}
-              <g className="route-map__interchanges" aria-hidden="true">
+              <g className={focus?.active != null ? 'route-map__interchanges route-map__interchanges--dim' : 'route-map__interchanges'} aria-hidden="true">
                 {layout.interchanges.map((ic) => (
                   <line key={ic.eventIds.join('|')} className="route-map__interchange" x1={ic.x1} y1={ic.y1} x2={ic.x2} y2={ic.y2} />
                 ))}
@@ -714,4 +799,5 @@ export function RouteMap({
       </span>
     </div>
   );
+  return outerFocus === null && linkedHighlight ? <LineFocusContext.Provider value={ownFocus}>{tree}</LineFocusContext.Provider> : tree;
 }

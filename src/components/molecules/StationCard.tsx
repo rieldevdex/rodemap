@@ -85,7 +85,7 @@ export function StationCard({
       </div>
       <Heading className="station-card__title">
         {linked ? (
-          <Link className="station-card__link" to={href}>
+          <Link className="station-card__link" to={href} morph>
             {event.title}
           </Link>
         ) : (

@@ -7,7 +7,7 @@
  */
 import { useGSAP } from '@gsap/react';
 import { useRef, type CSSProperties } from 'react';
-import { gsap, motionEase, motionSeconds, prefersReducedMotion } from './gsap';
+import { gsap, motionEase, motionSeconds, motionOff } from './gsap';
 import './SparkBurst.css';
 
 gsap.registerPlugin(useGSAP);
@@ -21,7 +21,7 @@ export function SparkBurst({ play }: { play: number }) {
   useGSAP(
     () => {
       const el = ref.current;
-      if (!el || play === 0 || prefersReducedMotion()) return;
+      if (!el || play === 0 || motionOff()) return;
       const sparks = el.querySelectorAll('.spark-burst__ray');
       const reach = parseFloat(getComputedStyle(el).getPropertyValue('--spark-reach')) || 0;
       gsap.fromTo(
