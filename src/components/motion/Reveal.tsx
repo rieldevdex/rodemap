@@ -2,7 +2,7 @@
  * Section entrance (DESIGN.md §6.2 #7): the parts of a section arrive in reading order, once.
  * Adapted from React Bits "AnimatedContent" (https://reactbits.dev, MIT + Commons Clause,
  * Copyright (c) 2026 David Haz): GSAP from/to on the children with a stagger, settled with
- * clearProps. Rodemap triggers it with an IntersectionObserver instead of ScrollTrigger, never
+ * clearProps. vsmcclubs triggers it with an IntersectionObserver instead of ScrollTrigger, never
  * hides anything already on the first screen, and takes travel and timing from tokens.
  */
 import { useGSAP } from '@gsap/react';

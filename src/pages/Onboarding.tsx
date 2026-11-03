@@ -39,7 +39,7 @@ const STEP_TITLES: Record<OnboardingStep, { short: string; title: string; hint: 
   class: {
     short: 'Khối và lớp',
     title: 'Khối và lớp',
-    hint: 'Thông tin khối lớp giúp Rodemap chỉ đề xuất các sự kiện dành cho khối của bạn.',
+    hint: 'Thông tin khối lớp giúp vsmcclubs chỉ đề xuất các sự kiện dành cho khối của bạn.',
   },
   interests: {
     short: 'Lĩnh vực quan tâm',
@@ -183,7 +183,7 @@ export function OnboardingPage() {
       <PageHead
         eyebrow={`Thiết lập hồ sơ · Bước ${String(stepIndex + 1)}/${String(ONBOARDING_STEPS.length)}`}
         title="Thiết lập hồ sơ"
-        lead="Bốn bước thiết lập giúp Rodemap đề xuất lộ trình phù hợp với khối lớp, lĩnh vực quan tâm, mục tiêu và thời gian của bạn."
+        lead="Bốn bước thiết lập giúp vsmcclubs đề xuất lộ trình phù hợp với khối lớp, lĩnh vực quan tâm, mục tiêu và thời gian của bạn."
       >
         {state.profile ? (
           <p className="onboarding__existing">
@@ -199,7 +199,7 @@ export function OnboardingPage() {
             <span>
               {returnTo === null
                 ? 'Hồ sơ học sinh cần thiết cho việc đăng ký sự kiện, lịch cá nhân, hồ sơ năng lực và Mochi.'
-                : 'Hồ sơ học sinh cần thiết cho thao tác bạn đã chọn. Sau khi hoàn tất bốn bước, Rodemap mở lại trang trước đó.'}
+                : 'Hồ sơ học sinh cần thiết cho thao tác bạn đã chọn. Sau khi hoàn tất bốn bước, vsmcclubs mở lại trang trước đó.'}
             </span>
           </p>
         )}
@@ -281,7 +281,7 @@ export function OnboardingPage() {
                 <p className="onboarding__privacy">
                   <Icon name="info" size="sm" />
                   <span>
-                    Rodemap chỉ ghi nhận khối, lớp, lĩnh vực quan tâm, mục tiêu và thời gian có thể tham gia. Vui lòng không nhập họ tên, số điện thoại, địa chỉ
+                    vsmcclubs chỉ ghi nhận khối, lớp, lĩnh vực quan tâm, mục tiêu và thời gian có thể tham gia. Vui lòng không nhập họ tên, số điện thoại, địa chỉ
                     hay thông tin cá nhân khác.
                   </span>
                 </p>
@@ -512,7 +512,7 @@ export function OnboardingPage() {
                   <>
                     <p className="onboarding__hint">
                       Mochi đề xuất {proposal.accepted.length} sự kiện phù hợp với lĩnh vực ưu tiên, mục tiêu và quỹ giờ {profile.weeklyHourBudget} giờ mỗi tuần
-                      của bạn. Bạn có thể bỏ chọn sự kiện chưa phù hợp; Rodemap chỉ đăng ký sau khi bạn xác nhận.
+                      của bạn. Bạn có thể bỏ chọn sự kiện chưa phù hợp; vsmcclubs chỉ đăng ký sau khi bạn xác nhận.
                     </p>
                     <ol className="first-route" aria-label="Các sự kiện trong lộ trình đề xuất">
                       {proposal.accepted.map((e) => {
@@ -594,7 +594,7 @@ export function OnboardingPage() {
                   <p className="onboarding__small">
                     {chosen.length === 0
                       ? 'Vui lòng chọn ít nhất một sự kiện để xác nhận lộ trình.'
-                      : `Khi bạn xác nhận, Rodemap sẽ lưu hồ sơ và đăng ký ${String(chosen.length)} sự kiện đã chọn.`}
+                      : `Khi bạn xác nhận, vsmcclubs sẽ lưu hồ sơ và đăng ký ${String(chosen.length)} sự kiện đã chọn.`}
                   </p>
                 ) : null}
               </div>

@@ -12,7 +12,7 @@ export function Footer() {
         <div className="footer__brand">
           <Wordmark />
           <p className="footer__about">
-            Rodemap tổng hợp sự kiện của các câu lạc bộ trên một lộ trình thống nhất, đồng thời hỗ trợ học sinh xây
+            vsmcclubs tổng hợp sự kiện của các câu lạc bộ trên một lộ trình thống nhất, đồng thời hỗ trợ học sinh xây
             dựng lộ trình cá nhân và hồ sơ năng lực.
           </p>
           <DemoLabel />

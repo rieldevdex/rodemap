@@ -262,7 +262,7 @@ describe('offline engine', () => {
     const reply = respondOffline(`${competition.title} tổ chức ở đâu`, ctx());
     expect(reply.focusEventId).toBe(competition.id);
     expect(reply.text).toContain(`là cuộc thi ngoài trường do ${competition.organizer ?? ''} tổ chức`);
-    expect(reply.text).toContain('Thông tin cuộc thi do Phòng Cố vấn Học tập cập nhật trên Rodemap');
+    expect(reply.text).toContain('Thông tin cuộc thi do Phòng Cố vấn Học tập cập nhật trên vsmcclubs');
     expect(reply.text).not.toContain('do Phòng Cố vấn Học tập tổ chức');
   });
 });
@@ -291,7 +291,7 @@ describe('snapshot', () => {
 
 describe('system prompt', () => {
   it('tells Mochi to name the organiser of an external competition and its source', () => {
-    expect(MOCHI_SYSTEM_PROMPT).toContain('Các cuộc thi học thuật ngoài trường (external_competition) do Phòng Cố vấn Học tập cập nhật trên Rodemap');
+    expect(MOCHI_SYSTEM_PROMPT).toContain('Các cuộc thi học thuật ngoài trường (external_competition) do Phòng Cố vấn Học tập cập nhật trên vsmcclubs');
     expect(MOCHI_SYSTEM_PROMPT).toContain('nêu rõ đơn vị tổ chức (organizer)');
   });
 });
@@ -484,7 +484,7 @@ describe('weekly quota wording', () => {
       'Bạn đã sử dụng hết 20 câu hỏi dành cho Mochi trong tuần này. Mochi tiếp tục hỗ trợ ở chế độ ngoại tuyến; lượt hỏi được làm mới vào 00:00 Thứ Hai, 19/10/2026.',
     );
     expect(weeklyStopNotice({ scope: 'weekly_total', limit: 500, resetsAt })).toBe(
-      'Mochi đã đạt giới hạn câu hỏi chung của Rodemap trong tuần này. Mochi tiếp tục hỗ trợ ở chế độ ngoại tuyến; lượt hỏi được làm mới vào 00:00 Thứ Hai, 19/10/2026.',
+      'Mochi đã đạt giới hạn câu hỏi chung của vsmcclubs trong tuần này. Mochi tiếp tục hỗ trợ ở chế độ ngoại tuyến; lượt hỏi được làm mới vào 00:00 Thứ Hai, 19/10/2026.',
     );
     expect(quotaLabel({ remaining: 17, limit: 20, resetsAt })).toBe('Còn 17/20 câu hỏi trong tuần này');
     expect(quotaLabel({ remaining: 0, limit: 20, resetsAt })).toBe('Đã sử dụng hết 20 câu hỏi trong tuần này');
@@ -495,7 +495,7 @@ describe('weekly quota wording', () => {
     const after = toMillis('2026-10-19T00:01:00+07:00');
     const quota = { remaining: 17, limit: 20, resetsAt };
     expect(quotaLine(quota, null, before)).toBe('Còn 17/20 câu hỏi trong tuần này');
-    expect(quotaLine(quota, { scope: 'weekly_total', limit: 500, resetsAt }, before)).toBe('Đã đạt giới hạn câu hỏi chung của Rodemap trong tuần này');
+    expect(quotaLine(quota, { scope: 'weekly_total', limit: 500, resetsAt }, before)).toBe('Đã đạt giới hạn câu hỏi chung của vsmcclubs trong tuần này');
     expect(quotaLine({ ...quota, remaining: 0 }, { scope: 'weekly_browser', limit: 20, resetsAt }, before)).toBe('Đã sử dụng hết 20 câu hỏi trong tuần này');
     // Last week's count and stop no longer apply after Monday 00:00.
     expect(quotaLine(quota, { scope: 'weekly_total', limit: 500, resetsAt }, after)).toBeNull();

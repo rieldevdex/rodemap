@@ -33,7 +33,7 @@ export const CONSTRAINED_MEMORY_GB = 4;
 
 /**
  * Adaptive loading (web.dev): on a device with few cores, little memory or Data Saver on,
- * Rodemap advises "Nhẹ". Null when nothing points to a constrained device.
+ * vsmcclubs advises "Nhẹ". Null when nothing points to a constrained device.
  */
 export function recommendedLevel(signals: DeviceSignals): InteractivityLevel | null {
   const fewCores = signals.cores !== undefined && signals.cores <= CONSTRAINED_CORES;

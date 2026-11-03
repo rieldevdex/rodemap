@@ -110,7 +110,9 @@ export function printPage(): void {
   window.print();
 }
 
-const MOCHI_ID_KEY = 'rodemap:mochi-id';
+const MOCHI_ID_KEY = 'vsmcclubs:mochi-id';
+/** The key before the rename (2026-11-03): moved over so the weekly quota keeps counting. */
+const LEGACY_MOCHI_ID_KEY = 'rodemap:mochi-id';
 const MOCHI_ID_RE = /^[A-Za-z0-9_-]{16,64}$/;
 let mochiIdInMemory: string | null = null;
 
@@ -128,6 +130,12 @@ export function mochiBrowserId(): string {
   try {
     const saved = window.localStorage.getItem(MOCHI_ID_KEY);
     if (saved !== null && MOCHI_ID_RE.test(saved)) return saved;
+    const legacy = window.localStorage.getItem(LEGACY_MOCHI_ID_KEY);
+    if (legacy !== null && MOCHI_ID_RE.test(legacy)) {
+      window.localStorage.setItem(MOCHI_ID_KEY, legacy);
+      window.localStorage.removeItem(LEGACY_MOCHI_ID_KEY);
+      return legacy;
+    }
   } catch {
     /* storage blocked: keep the id in memory */
   }
@@ -150,7 +158,7 @@ export function newId(prefix: string): string {
 }
 
 /**
- * Registers the build-time service worker (production builds only) so Rodemap keeps working
+ * Registers the build-time service worker (production builds only) so vsmcclubs keeps working
  * without a network, e.g. on Voting Day.
  */
 export function registerServiceWorker(): void {

@@ -63,8 +63,8 @@ test.describe('shell', () => {
     for (const [density, budget] of Object.entries(budgets)) {
       await page.goto('/');
       await page.evaluate((value) => {
-        const raw = JSON.parse(window.localStorage.getItem('rodemap:v1') ?? '{}') as Record<string, unknown>;
-        window.localStorage.setItem('rodemap:v1', JSON.stringify({ ...raw, density: value }));
+        const raw = JSON.parse(window.localStorage.getItem('vsmcclubs:v1') ?? '{}') as Record<string, unknown>;
+        window.localStorage.setItem('vsmcclubs:v1', JSON.stringify({ ...raw, density: value }));
       }, density);
       await page.reload();
       // Words a reader sees in the page body, without the route map (event titles) and the footer.

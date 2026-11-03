@@ -12,7 +12,7 @@ describe('weeklyDigest', () => {
   it('reports an empty week honestly', () => {
     const d = weeklyDigest([], { now, regs: [], periods: [] });
     expect(d.weekLabel).toBe('Tuần 12/10 – 18/10/2026');
-    expect(d.paragraphs).toEqual(['Tuần này Rodemap chưa có sự kiện nào được công bố.', 'Bạn chưa đăng ký sự kiện nào trong tuần.']);
+    expect(d.paragraphs).toEqual(['Tuần này vsmcclubs chưa có sự kiện nào được công bố.', 'Bạn chưa đăng ký sự kiện nào trong tuần.']);
     expect(d.highlights).toEqual([]);
   });
 

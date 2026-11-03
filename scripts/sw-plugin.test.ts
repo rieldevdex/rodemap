@@ -6,7 +6,7 @@ describe('serviceWorkerSource', () => {
   const source = serviceWorkerSource('abc123', ['/', '/assets/index-x.js']);
 
   it('versions the cache and lists the precached files', () => {
-    expect(source).toContain("const CACHE = 'rodemap-abc123';");
+    expect(source).toContain("const CACHE = 'vsmcclubs-abc123';");
     expect(source).toContain('const PRECACHE = ["/","/assets/index-x.js"];');
   });
 

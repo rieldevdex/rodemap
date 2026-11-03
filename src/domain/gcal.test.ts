@@ -26,7 +26,7 @@ const event = makeEvent({
 
 describe('googleCalendarUrl', () => {
   it('builds a TEMPLATE link with Vietnam wall-clock dates and ctz', () => {
-    const url = new URL(googleCalendarUrl(event, { clubs, baseUrl: 'https://rodemap.example' }));
+    const url = new URL(googleCalendarUrl(event, { clubs, baseUrl: 'https://vsmcclubs.site' }));
     expect(`${url.origin}${url.pathname}`).toBe(GOOGLE_CALENDAR_RENDER_URL);
     expect(url.searchParams.get('action')).toBe('TEMPLATE');
     expect(url.searchParams.get('text')).toBe('Tranh biện chuyên đề & thực hành');
@@ -37,7 +37,7 @@ describe('googleCalendarUrl', () => {
       [
         'Buổi tranh biện theo chuyên đề môi trường.',
         'Đơn vị tổ chức: Câu lạc bộ Tranh biện',
-        'Thông tin chi tiết: https://rodemap.example/su-kien/tranh-bien-chuyen-de',
+        'Thông tin chi tiết: https://vsmcclubs.site/su-kien/tranh-bien-chuyen-de',
       ].join('\n'),
     );
   });

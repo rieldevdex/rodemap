@@ -6,8 +6,10 @@ export interface WordmarkProps {
 }
 
 /**
- * "Rodemap" in the display face with its route mark: a short 4-unit line between two
- * stations (origin in ink, destination in signal). No emoji, no gradient.
+ * "vsmcclubs" (one lowercase word, like the domain vsmcclubs.site) with its route mark: a short
+ * 4-unit line between two stations (origin in ink, destination in signal). "vsmc" (Vinschool
+ * Smart City) is set heavier than "clubs" so the two c's read apart; the name is read as one
+ * word. No emoji, no gradient.
  */
 export function Wordmark({ size = 'md', className }: WordmarkProps) {
   const classes = ['wordmark', size === 'lg' ? 'wordmark--lg' : null, className].filter(Boolean).join(' ');
@@ -18,7 +20,11 @@ export function Wordmark({ size = 'md', className }: WordmarkProps) {
         <circle className="wordmark__origin" cx="6.5" cy="8" r="4.5" />
         <circle className="wordmark__stop" cx="25.5" cy="8" r="4.5" />
       </svg>
-      <span className="wordmark__text">Rodemap</span>
+      {/* No space between the spans: the text stays one word, "vsmcclubs". */}
+      <span className="wordmark__text">
+        <span className="wordmark__school">vsmc</span>
+        <span className="wordmark__clubs">clubs</span>
+      </span>
     </span>
   );
 }

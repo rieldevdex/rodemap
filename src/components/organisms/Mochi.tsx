@@ -10,7 +10,7 @@ export interface MochiProps {
 }
 
 /**
- * Mochi — Rodemap's companion. An original rabbit built from simple geometry:
+ * Mochi — vsmcclubs' companion. An original rabbit built from simple geometry:
  * a daifuku-shaped body (wider at the bottom), two ears drawn as parallel lane
  * lines (the left tip bends forward), oval eyes, blush, a small curved smile and
  * a route-station badge. Every state is a CSS transform of these same parts.

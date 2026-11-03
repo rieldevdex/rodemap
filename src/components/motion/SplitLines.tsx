@@ -2,7 +2,7 @@
  * Masked line reveal for display headings (DESIGN.md §6.2 #12).
  * Adapted from React Bits "SplitText" (https://reactbits.dev, MIT + Commons Clause,
  * Copyright (c) 2026 David Haz): GSAP SplitText with line masks and autoSplit, reverted on
- * unmount. Rodemap splits by line only (never by letter, so Vietnamese diacritics and screen
+ * unmount. vsmcclubs splits by line only (never by letter, so Vietnamese diacritics and screen
  * readers keep whole words), rises once from behind each line, and takes its timing from tokens.
  */
 import { useGSAP } from '@gsap/react';

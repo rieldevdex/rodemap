@@ -125,7 +125,7 @@ describe('data files', () => {
     ];
     for (const [text, label] of samples) expect(copyViolations(text), text).toContain(label);
     // Words that merely contain a banned sequence are fine.
-    expect(copyViolations('Thư viện, lối đi, sự thực, Rodemap, lộ trình, căn chỉnh.')).toEqual([]);
+    expect(copyViolations('Thư viện, lối đi, sự thực, vsmcclubs, lộ trình, căn chỉnh.')).toEqual([]);
   });
 
   it('no string anywhere in the sample data uses banned copy', () => {
@@ -541,7 +541,7 @@ describe('events: external academic competitions', () => {
       // An event carries every field of the submission form.
       expect(validateDraft(e, DEMO_TODAY), e.id).toEqual({});
       expect(e.summary.startsWith('Cuộc thi ngoài trường'), e.id).toBe(true);
-      for (const words of ['Phòng Cố vấn Học tập cập nhật thông tin cuộc thi trên Rodemap', 'sau khi học sinh đăng ký trên Rodemap', 'tổng hợp danh sách', 'hướng dẫn học sinh']) {
+      for (const words of ['Phòng Cố vấn Học tập cập nhật thông tin cuộc thi trên vsmcclubs', 'sau khi học sinh đăng ký trên vsmcclubs', 'tổng hợp danh sách', 'hướng dẫn học sinh']) {
         expect(e.description, e.id).toContain(words);
       }
       expect(e.description, e.id).toContain(e.organizer === 'Ban tổ chức cuộc thi cấp thành phố' ? 'ban tổ chức cấp thành phố' : e.organizer);

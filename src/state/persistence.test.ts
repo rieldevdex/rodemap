@@ -89,6 +89,16 @@ describe('loadState', () => {
     const storage = memoryStorage({ 'rodemap:v0': JSON.stringify({ ...createSeedState(), role: 'moderator' }) });
     expect(loadState(storage).role).toBe('student');
   });
+
+  it('reads the state saved before the rename, and the new key wins when both exist', () => {
+    const legacy = memoryStorage({ 'rodemap:v1': JSON.stringify({ ...createSeedState(), role: 'moderator' }) });
+    expect(loadState(legacy).role).toBe('moderator');
+    const both = memoryStorage({
+      'rodemap:v1': JSON.stringify({ ...createSeedState(), role: 'moderator' }),
+      'vsmcclubs:v1': JSON.stringify({ ...createSeedState(), role: 'club' }),
+    });
+    expect(loadState(both).role).toBe('club');
+  });
 });
 
 describe('saveState', () => {

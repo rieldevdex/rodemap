@@ -24,11 +24,11 @@ export interface RouteDef {
   name: RouteName;
   /** Path pattern; `:param` segments match one non-empty URL segment. */
   path: string;
-  /** Vietnamese page title; the document title is "<title> · Rodemap". */
+  /** Vietnamese page title; the document title is "<title> · vsmcclubs". */
   title: string;
 }
 
-export const APP_NAME = 'Rodemap';
+export const APP_NAME = 'vsmcclubs';
 
 export const ROUTES: RouteDef[] = [
   { name: 'home', path: '/', title: 'Trang chủ' },
@@ -177,7 +177,7 @@ export function routeTitle(name: RouteName): string {
   return ROUTE_BY_NAME.get(name)?.title ?? APP_NAME;
 }
 
-/** "Tổng quan · Rodemap". */
+/** "Tổng quan · vsmcclubs". */
 export function documentTitle(title: string): string {
   return `${title} · ${APP_NAME}`;
 }

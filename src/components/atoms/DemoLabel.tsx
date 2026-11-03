@@ -8,7 +8,7 @@ export interface DemoLabelProps {
   className?: string;
 }
 
-/** The permanent, honest marker that Rodemap is a demo with illustrative data. */
+/** The permanent, honest marker that vsmcclubs is a demo with illustrative data. */
 export function DemoLabel({ text = DEMO_LABEL_TEXT, className }: DemoLabelProps) {
   return (
     <span className={className ? `demo-label ${className}` : 'demo-label'}>

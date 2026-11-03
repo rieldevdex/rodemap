@@ -1,4 +1,4 @@
-/** Every state change in Rodemap. Timestamps and ids are created by the caller so the reducer stays pure. */
+/** Every state change in vsmcclubs. Timestamps and ids are created by the caller so the reducer stays pure. */
 import type {
   ActivityProposal,
   AppearanceMode,

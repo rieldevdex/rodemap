@@ -1,5 +1,5 @@
 /*
- * Rodemap design tokens — the ONLY file allowed to contain raw colors, font
+ * vsmcclubs design tokens — the ONLY file allowed to contain raw colors, font
  * names, px/rem values, shadows, gradients, durations and easing curves.
  * Every value traces back to DESIGN.md. `npm run lint:tokens` enforces this.
  */

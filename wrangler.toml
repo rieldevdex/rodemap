@@ -1,4 +1,6 @@
-# Cloudflare Workers configuration for Rodemap (Worker with static assets).
+# Cloudflare Workers configuration for vsmcclubs (Worker with static assets), served at
+# https://vsmcclubs.site (custom domain attached in the Cloudflare dashboard, see README §3).
+# The Worker keeps its pre-rename name "rodemap": Workers Builds is bound to it.
 # `npx wrangler deploy` runs `npm run build` ([build]), uploads dist/ as static assets and deploys
 # worker/index.ts, which only handles /api/* (Mochi). Everything else is served from dist/.
 #

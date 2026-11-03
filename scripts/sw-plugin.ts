@@ -1,6 +1,6 @@
 /**
  * Build-time service worker for Voting Day: the app shell, every built asset and the public
- * files are precached, so Rodemap opens and runs without a network (Mochi then answers in its
+ * files are precached, so vsmcclubs opens and runs without a network (Mochi then answers in its
  * offline mode). Navigations are network-first (fresh deploys win) with the cached shell as
  * fallback; other same-origin GETs are cache-first; /api is never cached.
  */
@@ -11,8 +11,8 @@ import type { Plugin } from 'vite';
 const PUBLIC_FILES = ['/theme-init.js', '/favicon.svg'];
 
 export function serviceWorkerSource(version: string, urls: readonly string[]): string {
-  return `/* Rodemap service worker ${version} (generated at build time). */
-const CACHE = 'rodemap-${version}';
+  return `/* vsmcclubs service worker ${version} (generated at build time). */
+const CACHE = 'vsmcclubs-${version}';
 const PRECACHE = ${JSON.stringify(urls)};
 
 self.addEventListener('install', (event) => {
@@ -28,7 +28,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((key) => key.startsWith('rodemap-') && key !== CACHE).map((key) => caches.delete(key))))
+      .then((keys) => Promise.all(keys.filter((key) => (key.startsWith('vsmcclubs-') || key.startsWith('rodemap-')) && key !== CACHE).map((key) => caches.delete(key))))
       .then(() => self.clients.claim()),
   );
 });
@@ -72,7 +72,7 @@ self.addEventListener('fetch', (event) => {
 /** Emits /sw.js listing the shell, every emitted file and the public files. */
 export function serviceWorkerPlugin(): Plugin {
   return {
-    name: 'rodemap-service-worker',
+    name: 'vsmcclubs-service-worker',
     apply: 'build',
     generateBundle(_options, bundle) {
       const emitted = Object.keys(bundle)

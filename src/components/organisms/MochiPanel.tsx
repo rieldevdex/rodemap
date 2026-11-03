@@ -119,7 +119,7 @@ export function MochiPanel({
           <h2 id={titleId} className="mochi-panel__title">
             Mochi
           </h2>
-          <p className="mochi-panel__subtitle">Trợ lý đồng hành của Rodemap</p>
+          <p className="mochi-panel__subtitle">Trợ lý đồng hành của vsmcclubs</p>
         </div>
         <button type="button" className="mochi-panel__close" onClick={onClose}>
           <Icon name="x" />
@@ -139,11 +139,11 @@ export function MochiPanel({
             <p className="mochi-panel__who">Mochi</p>
             <div className="mochi-panel__text">
               <p>
-                Xin chào bạn. Mochi là trợ lý đồng hành của Rodemap. Mochi có thể đề xuất sự kiện phù hợp, chuẩn bị thẻ xác
+                Xin chào bạn. Mochi là trợ lý đồng hành của vsmcclubs. Mochi có thể đề xuất sự kiện phù hợp, chuẩn bị thẻ xác
                 nhận đăng ký, tổng hợp lịch cá nhân, tóm tắt sự kiện và đề xuất bản nháp cho hồ sơ năng lực.
               </p>
               <p className="mochi-panel__fine">
-                Mochi chỉ sử dụng dữ liệu của Rodemap, không lưu nội dung trò chuyện và không yêu cầu thông tin cá nhân nhạy cảm.
+                Mochi chỉ sử dụng dữ liệu của vsmcclubs, không lưu nội dung trò chuyện và không yêu cầu thông tin cá nhân nhạy cảm.
                 Mọi thao tác đăng ký đều cần bạn nhấn Xác nhận.
               </p>
             </div>

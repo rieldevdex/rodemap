@@ -511,7 +511,7 @@ describe('review: buildIcs (RFC 5545)', () => {
     start: '2026-10-18T16:30:00Z', // Sunday 23:30 in Vietnam
     end: '2026-10-18T16:59:00Z',
   });
-  const ics = buildIcs([long], { now: Date.UTC(2026, 9, 14, 2, 3, 4, 567), clubs, baseUrl: 'https://rodemap.example/' });
+  const ics = buildIcs([long], { now: Date.UTC(2026, 9, 14, 2, 3, 4, 567), clubs, baseUrl: 'https://vsmcclubs.site/' });
   const physical = ics.split('\r\n');
 
   it('ends every physical line with CRLF and never emits a bare CR or LF', () => {
@@ -540,8 +540,8 @@ describe('review: buildIcs (RFC 5545)', () => {
     const description = unfolded.find((l) => l.startsWith('DESCRIPTION:')) ?? '';
     expect(description).toContain('kế hoạch học tập.\\nNội dung');
     expect(description).toContain('\\nĐơn vị tổ chức: Câu lạc bộ Tranh biện và Hùng biện Tiếng Việt\\, khối');
-    expect(description).toContain('\\nThông tin chi tiết: https://rodemap.example/su-kien/hoi-thao-dai');
-    expect(unfolded).toContain('URL:https://rodemap.example/su-kien/hoi-thao-dai');
+    expect(description).toContain('\\nThông tin chi tiết: https://vsmcclubs.site/su-kien/hoi-thao-dai');
+    expect(unfolded).toContain('URL:https://vsmcclubs.site/su-kien/hoi-thao-dai');
   });
 
   it('formats DTSTAMP in UTC and DTSTART/DTEND as Vietnam wall-clock with TZID', () => {
@@ -549,7 +549,7 @@ describe('review: buildIcs (RFC 5545)', () => {
     expect(unfolded).toContain('DTSTAMP:20261014T020304Z');
     expect(unfolded).toContain('DTSTART;TZID=Asia/Ho_Chi_Minh:20261018T233000');
     expect(unfolded).toContain('DTEND;TZID=Asia/Ho_Chi_Minh:20261018T235900');
-    expect(unfolded).toContain('UID:ev-dai@rodemap.app');
+    expect(unfolded).toContain('UID:ev-dai@vsmcclubs.site');
     const tz = unfolded.slice(unfolded.indexOf('BEGIN:VTIMEZONE'), unfolded.indexOf('END:VTIMEZONE') + 1);
     expect(tz).toEqual([
       'BEGIN:VTIMEZONE',
@@ -577,7 +577,7 @@ describe('review: buildIcs (RFC 5545)', () => {
   });
 
   it('names the file after the Vietnam date of now', () => {
-    expect(icsFileName(toMillis('2026-10-13T17:00:00Z'))).toBe('rodemap-lich-ca-nhan-2026-10-14.ics');
+    expect(icsFileName(toMillis('2026-10-13T17:00:00Z'))).toBe('vsmcclubs-lich-ca-nhan-2026-10-14.ics');
   });
 });
 
@@ -592,7 +592,7 @@ describe('review: googleCalendarUrl', () => {
       location: 'Sân trường, khu A',
       summary: 'Tóm tắt.',
     });
-    const url = new URL(googleCalendarUrl(e, { clubs: [], baseUrl: 'https://rodemap.example' }));
+    const url = new URL(googleCalendarUrl(e, { clubs: [], baseUrl: 'https://vsmcclubs.site' }));
     expect(`${url.origin}${url.pathname}`).toBe('https://calendar.google.com/calendar/render');
     expect(url.searchParams.get('action')).toBe('TEMPLATE');
     expect(url.searchParams.get('text')).toBe('Đêm nhạc & giao lưu: "Thu" 100%');
@@ -600,7 +600,7 @@ describe('review: googleCalendarUrl', () => {
     expect(url.searchParams.get('ctz')).toBe('Asia/Ho_Chi_Minh');
     expect(url.searchParams.get('location')).toBe('Sân trường, khu A');
     expect(url.searchParams.get('details')).toBe(
-      `Tóm tắt.\nThông tin chi tiết: https://rodemap.example/su-kien/${e.slug}`,
+      `Tóm tắt.\nThông tin chi tiết: https://vsmcclubs.site/su-kien/${e.slug}`,
     );
     expect([...url.searchParams.keys()]).toEqual(['action', 'text', 'dates', 'ctz', 'details', 'location']);
   });

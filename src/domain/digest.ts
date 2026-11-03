@@ -38,7 +38,7 @@ export function weeklyDigest(events: readonly SchoolEvent[], ctx: DigestContext)
   const highlights: Digest['highlights'] = [];
 
   if (inWeek.length === 0) {
-    paragraphs.push('Tuần này Rodemap chưa có sự kiện nào được công bố.');
+    paragraphs.push('Tuần này vsmcclubs chưa có sự kiện nào được công bố.');
   } else {
     const counts = CATEGORY_CODES.map((code) => ({ code, n: inWeek.filter((e) => e.category === code).length })).filter((c) => c.n > 0);
     const list = counts.map((c) => `${CATEGORY_LABELS[c.code]} (${c.n})`).join(', ');

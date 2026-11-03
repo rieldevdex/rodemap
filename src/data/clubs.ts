@@ -25,7 +25,7 @@ export const CLUBS: Club[] = [
     name: 'Phòng Cố vấn Học tập',
     shortName: 'Phòng Cố vấn Học tập',
     description:
-      'Phòng Cố vấn Học tập tư vấn cho học sinh về định hướng học tập, lựa chọn môn học và lộ trình chuẩn bị cho bậc đại học. Phòng cập nhật trên Rodemap thông tin các cuộc thi học thuật ngoài trường, gồm thể lệ, hạn đăng ký và cách thức Phòng hỗ trợ học sinh hoàn thiện hồ sơ dự thi.',
+      'Phòng Cố vấn Học tập tư vấn cho học sinh về định hướng học tập, lựa chọn môn học và lộ trình chuẩn bị cho bậc đại học. Phòng cập nhật trên vsmcclubs thông tin các cuộc thi học thuật ngoài trường, gồm thể lệ, hạn đăng ký và cách thức Phòng hỗ trợ học sinh hoàn thiện hồ sơ dự thi.',
     categories: ['HT'],
     contact: '[Email Phòng Cố vấn Học tập]',
   },

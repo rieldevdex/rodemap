@@ -101,7 +101,7 @@ export function clampBudget(hours: number): number {
 
 /**
  * The profile for a complete draft, or null while a step still has errors. Only grade, class,
- * interests, goals and availability are kept: Rodemap collects nothing else about the student.
+ * interests, goals and availability are kept: vsmcclubs collects nothing else about the student.
  */
 export function draftToProfile(draft: ProfileDraft, now: Millis): Profile | null {
   if (draft.grade === null || firstIncompleteStep(draft) !== null) return null;

@@ -32,7 +32,7 @@ let ipCounter = 0;
 
 function call(body: unknown, env: Record<string, unknown> = { ANTHROPIC_API_KEY: 'test-key' }, raw?: string) {
   ipCounter += 1;
-  const request = new Request('https://rodemap.test/api/mochi', {
+  const request = new Request('https://vsmcclubs.test/api/mochi', {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'cf-connecting-ip': `10.0.0.${ipCounter}` },
     body: raw ?? JSON.stringify(body),

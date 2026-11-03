@@ -88,7 +88,7 @@ test.describe('Mức độ tương tác', () => {
     await slider.focus();
     await page.keyboard.press('End');
     await page.getByRole('button', { name: 'Lưu quỹ giờ này' }).click();
-    const saved = await page.evaluate(() => (JSON.parse(window.localStorage.getItem('rodemap:v1') ?? '{}') as { profile: { weeklyHourBudget: number } }).profile.weeklyHourBudget);
+    const saved = await page.evaluate(() => (JSON.parse(window.localStorage.getItem('vsmcclubs:v1') ?? '{}') as { profile: { weeklyHourBudget: number } }).profile.weeklyHourBudget);
     expect(saved).toBe(12);
   });
 });

@@ -43,7 +43,7 @@ export const MOCHI_TOOLS: readonly ToolDefinition[] = [
   {
     name: 'search_events',
     description:
-      'Search approved Rodemap events. Call this whenever the student asks about events matching a topic, category, club, date range or format, or when you need event ids. Returns at most `limit` events with id, title, category, club, start, end, location, seats left, registration deadline and the student\'s registration status; an external academic competition (cuộc thi ngoài trường) also carries external_competition, its organizer and information_source (Phòng Cố vấn Học tập). Never describe an event that no tool or the data snapshot returned.',
+      'Search approved vsmcclubs events. Call this whenever the student asks about events matching a topic, category, club, date range or format, or when you need event ids. Returns at most `limit` events with id, title, category, club, start, end, location, seats left, registration deadline and the student\'s registration status; an external academic competition (cuộc thi ngoài trường) also carries external_competition, its organizer and information_source (Phòng Cố vấn Học tập). Never describe an event that no tool or the data snapshot returned.',
     strict: true,
     input_schema: {
       type: 'object',

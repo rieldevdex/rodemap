@@ -37,7 +37,7 @@ export function weeklyStopNotice(stop: WeeklyStop): string {
   const when = resetLabel(stop.resetsAt);
   return stop.scope === 'weekly_browser'
     ? `Bạn đã sử dụng hết ${String(stop.limit)} câu hỏi dành cho Mochi trong tuần này. Mochi tiếp tục hỗ trợ ở chế độ ngoại tuyến; lượt hỏi được làm mới vào ${when}.`
-    : `Mochi đã đạt giới hạn câu hỏi chung của Rodemap trong tuần này. Mochi tiếp tục hỗ trợ ở chế độ ngoại tuyến; lượt hỏi được làm mới vào ${when}.`;
+    : `Mochi đã đạt giới hạn câu hỏi chung của vsmcclubs trong tuần này. Mochi tiếp tục hỗ trợ ở chế độ ngoại tuyến; lượt hỏi được làm mới vào ${when}.`;
 }
 
 /** "Còn 17/20 câu hỏi trong tuần này". */
@@ -52,6 +52,6 @@ export function quotaLabel(quota: MochiQuota): string {
  * browser's remaining questions while that count belongs to the current week, else nothing.
  */
 export function quotaLine(quota: MochiQuota | null, stop: WeeklyStop | null, realNow: number): string | null {
-  if (stop?.scope === 'weekly_total' && isStopActive(stop, realNow)) return 'Đã đạt giới hạn câu hỏi chung của Rodemap trong tuần này';
+  if (stop?.scope === 'weekly_total' && isStopActive(stop, realNow)) return 'Đã đạt giới hạn câu hỏi chung của vsmcclubs trong tuần này';
   return quota && toMillis(quota.resetsAt) > realNow ? quotaLabel(quota) : null;
 }

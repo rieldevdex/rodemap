@@ -1,9 +1,9 @@
 {
-  "name": "rodemap",
+  "name": "vsmcclubs",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Rodemap: lộ trình hoạt động ngoại khóa cho học sinh (bản trình diễn).",
+  "description": "vsmcclubs: lộ trình hoạt động ngoại khóa cho học sinh (bản trình diễn).",
   "engines": {
     "node": ">=20"
   },

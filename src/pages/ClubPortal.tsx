@@ -200,7 +200,7 @@ export function ClubPortalPage() {
                 <h3>Thông tin cuộc thi ngoài trường</h3>
                 <p className="club-portal__muted">
                   Ghi rõ đơn vị tổ chức, thể lệ, hạn nộp hồ sơ của ban tổ chức và cách thức Phòng hỗ trợ học sinh trong phần mô tả.
-                  Hạn đăng ký trên Rodemap là thời hạn Phòng tổng hợp danh sách học sinh, cần trước hạn nộp hồ sơ của ban tổ chức.
+                  Hạn đăng ký trên vsmcclubs là thời hạn Phòng tổng hợp danh sách học sinh, cần trước hạn nộp hồ sơ của ban tổ chức.
                 </p>
               </>
             ) : club.kind === 'club' ? (

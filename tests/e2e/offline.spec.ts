@@ -4,7 +4,7 @@ import { seedDemo } from '../support/app';
 test.describe('voting day without a network', () => {
   test.use({ serviceWorkers: 'allow' });
 
-  test('after one visit, Rodemap opens offline and Mochi answers in its offline mode', async ({ page, context }) => {
+  test('after one visit, vsmcclubs opens offline and Mochi answers in its offline mode', async ({ page, context }) => {
     await seedDemo(page);
     await page.goto('/');
     await page.evaluate(async () => {

@@ -105,7 +105,7 @@ export function ProposalPage() {
                 <span className="proposal__numeral">{PLAN_SECTION.numeral}.</span> {PLAN_SECTION.title}
               </h2>
               <p className="proposal__p">
-                Rodemap được triển khai theo hai giai đoạn trong năm học 2026–2027, mỗi giai đoạn có mục tiêu và kết quả cụ thể. Thời gian cụ
+                vsmcclubs được triển khai theo hai giai đoạn trong năm học 2026–2027, mỗi giai đoạn có mục tiêu và kết quả cụ thể. Thời gian cụ
                 thể của từng hoạt động sẽ được thống nhất với Hội đồng Học sinh và Phòng Công tác Học sinh.
               </p>
               <ol className="proposal__phases">

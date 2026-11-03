@@ -30,12 +30,12 @@ async function expectInCalendar(page: Page, titles: string[]) {
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Xuất toàn bộ lịch' }).click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toBe(`rodemap-lich-ca-nhan-${DEMO_TODAY}.ics`);
+  expect(download.suggestedFilename()).toBe(`vsmcclubs-lich-ca-nhan-${DEMO_TODAY}.ics`);
   const ics = await icsText(download);
   expect(ics).toContain('BEGIN:VCALENDAR');
   expect(ics).toContain('X-WR-TIMEZONE:Asia/Ho_Chi_Minh');
   for (const title of titles) expect(ics).toContain(`SUMMARY:${escapeText(title)}`);
-  await expect(page.getByText(/^Đã tạo tệp rodemap-lich-ca-nhan/)).toBeVisible();
+  await expect(page.getByText(/^Đã tạo tệp vsmcclubs-lich-ca-nhan/)).toBeVisible();
 }
 
 test.describe('demo path', () => {
@@ -86,7 +86,7 @@ test.describe('demo path', () => {
     expect(titles.length).toBeGreaterThan(0);
     expect(titles.length).toBeLessThanOrEqual(4);
     // Nothing is registered before the student confirms.
-    await expect(page.getByText(`Khi bạn xác nhận, Rodemap sẽ lưu hồ sơ và đăng ký ${String(titles.length)} sự kiện đã chọn.`)).toBeVisible();
+    await expect(page.getByText(`Khi bạn xác nhận, vsmcclubs sẽ lưu hồ sơ và đăng ký ${String(titles.length)} sự kiện đã chọn.`)).toBeVisible();
     await page.getByRole('button', { name: 'Xác nhận lộ trình' }).click();
 
     await expectOnRoute(page, titles);
@@ -106,7 +106,7 @@ test.describe('demo path', () => {
 
     await page.goto('/ho-so');
     await expect(page).toHaveURL('/thiet-lap?tiep-theo=%2Fho-so');
-    await expect(page.getByText('Sau khi hoàn tất bốn bước, Rodemap mở lại trang trước đó.', { exact: false })).toBeVisible();
+    await expect(page.getByText('Sau khi hoàn tất bốn bước, vsmcclubs mở lại trang trước đó.', { exact: false })).toBeVisible();
     await expect(page.getByRole('group', { name: 'Trung học cơ sở' }).getByRole('radio')).toHaveCount(4);
     await expect(page.getByRole('group', { name: 'Trung học phổ thông' }).getByRole('radio')).toHaveCount(3);
     await page.getByRole('radio', { name: 'Khối 7' }).check();
@@ -231,7 +231,7 @@ test.describe('demo path', () => {
     await expect(notice).toHaveCount(1);
     // The same random id is used for every request and kept in this browser.
     expect(bodies[1]?.sessionId).toBe(bodies[0]?.sessionId);
-    expect(await page.evaluate(() => window.localStorage.getItem('rodemap:mochi-id'))).toBe(bodies[0]?.sessionId);
+    expect(await page.evaluate(() => window.localStorage.getItem('vsmcclubs:mochi-id'))).toBe(bodies[0]?.sessionId);
     // The browser itself logs the refused (429) request; nothing else may fail.
     expect(errors.filter((e) => !e.includes('status of 429'))).toEqual([]);
   });

@@ -111,16 +111,16 @@ describe('utf8Length / foldLine', () => {
 
 describe('eventUrl / eventDetails', () => {
   it('joins the base URL and the event path, ignoring trailing slashes', () => {
-    expect(eventUrl('https://rodemap.example', 'abc')).toBe('https://rodemap.example/su-kien/abc');
-    expect(eventUrl('https://rodemap.example//', 'abc')).toBe('https://rodemap.example/su-kien/abc');
+    expect(eventUrl('https://vsmcclubs.site', 'abc')).toBe('https://vsmcclubs.site/su-kien/abc');
+    expect(eventUrl('https://vsmcclubs.site//', 'abc')).toBe('https://vsmcclubs.site/su-kien/abc');
   });
 
   it('lists summary, organiser and link when known', () => {
-    expect(eventDetails(debate, clubs, 'https://rodemap.example')).toBe(
+    expect(eventDetails(debate, clubs, 'https://vsmcclubs.site')).toBe(
       [
         debate.summary,
         'Đơn vị tổ chức: Câu lạc bộ Tranh biện',
-        'Thông tin chi tiết: https://rodemap.example/su-kien/tranh-bien-mo-rong',
+        'Thông tin chi tiết: https://vsmcclubs.site/su-kien/tranh-bien-mo-rong',
       ].join('\n'),
     );
     expect(eventDetails(later, clubs)).toBe(later.summary);
@@ -137,7 +137,7 @@ describe('eventUrl / eventDetails', () => {
 });
 
 describe('buildIcs', () => {
-  const ics = buildIcs([later, debate], { now, clubs, baseUrl: 'https://rodemap.example/' });
+  const ics = buildIcs([later, debate], { now, clubs, baseUrl: 'https://vsmcclubs.site/' });
 
   it('ends every line, including the last, with CRLF and has no bare line breaks', () => {
     expect(ics.endsWith('END:VCALENDAR\r\n')).toBe(true);
@@ -148,7 +148,7 @@ describe('buildIcs', () => {
     expect(logicalLines(ics).slice(0, 16)).toEqual([
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
-      'PRODID:-//Rodemap//Ban trinh dien//VI',
+      'PRODID:-//vsmcclubs//Ban trinh dien//VI',
       'CALSCALE:GREGORIAN',
       'METHOD:PUBLISH',
       `X-WR-CALNAME:${DEFAULT_CALENDAR_NAME}`,
@@ -170,18 +170,18 @@ describe('buildIcs', () => {
     const first = lines.indexOf('BEGIN:VEVENT');
     expect(lines.slice(first, first + 11)).toEqual([
       'BEGIN:VEVENT',
-      'UID:ev-tranh-bien-1@rodemap.app',
+      'UID:ev-tranh-bien-1@vsmcclubs.site',
       'DTSTAMP:20261014T020000Z',
       'DTSTART;TZID=Asia/Ho_Chi_Minh:20261014T164500',
       'DTEND;TZID=Asia/Ho_Chi_Minh:20261014T181500',
       'SUMMARY:Tranh biện mở rộng\\; vòng 1\\, khối 10',
       'LOCATION:Phòng 204\\, nhà B',
-      `DESCRIPTION:${escapeText(eventDetails(debate, clubs, 'https://rodemap.example'))}`,
+      `DESCRIPTION:${escapeText(eventDetails(debate, clubs, 'https://vsmcclubs.site'))}`,
       `CATEGORIES:${CATEGORY_LABELS.HT}`,
-      'URL:https://rodemap.example/su-kien/tranh-bien-mo-rong',
+      'URL:https://vsmcclubs.site/su-kien/tranh-bien-mo-rong',
       'END:VEVENT',
     ]);
-    expect(prop(ics, 'UID')).toEqual(['ev-tranh-bien-1@rodemap.app', 'ev-cn-1@rodemap.app']);
+    expect(prop(ics, 'UID')).toEqual(['ev-tranh-bien-1@vsmcclubs.site', 'ev-cn-1@vsmcclubs.site']);
     expect(lines.filter((l) => l === 'BEGIN:VEVENT')).toHaveLength(2);
     expect(lines.filter((l) => l === 'END:VEVENT')).toHaveLength(2);
   });
@@ -207,9 +207,9 @@ describe('buildIcs', () => {
   });
 
   it('is deterministic and keeps UIDs stable across calls, input order and edits', () => {
-    expect(buildIcs([debate, later], { now, clubs, baseUrl: 'https://rodemap.example/' })).toBe(ics);
+    expect(buildIcs([debate, later], { now, clubs, baseUrl: 'https://vsmcclubs.site/' })).toBe(ics);
     const edited = buildIcs([{ ...debate, title: 'Tranh biện mở rộng (đã cập nhật)' }], { now, clubs });
-    expect(prop(edited, 'UID')).toEqual(['ev-tranh-bien-1@rodemap.app']);
+    expect(prop(edited, 'UID')).toEqual(['ev-tranh-bien-1@vsmcclubs.site']);
   });
 
   it('folds long Vietnamese text at 75 octets and unfolding restores the original', () => {
@@ -218,18 +218,18 @@ describe('buildIcs', () => {
       'đồng thời hướng dẫn học sinh xây dựng đề cương nghiên cứu theo quy định của nhà trường \\ năm học 2026–2027';
     const summary = Array.from({ length: 6 }, () => 'Chương trình góp phần nâng cao năng lực tự học của học sinh.').join('\n');
     const long: SchoolEvent = { ...debate, title, summary };
-    const out = buildIcs([long], { now, clubs, baseUrl: 'https://rodemap.example' });
+    const out = buildIcs([long], { now, clubs, baseUrl: 'https://vsmcclubs.site' });
     const physical = out.split('\r\n').slice(0, -1);
     for (const line of physical) expect(octets(line)).toBeLessThanOrEqual(ICS_MAX_LINE_OCTETS);
     expect(physical.some((l) => l.startsWith(' '))).toBe(true);
     expect(unescapeText(prop(out, 'SUMMARY')[0] ?? '')).toBe(title);
-    expect(unescapeText(prop(out, 'DESCRIPTION')[0] ?? '')).toBe(eventDetails(long, clubs, 'https://rodemap.example'));
+    expect(unescapeText(prop(out, 'DESCRIPTION')[0] ?? '')).toBe(eventDetails(long, clubs, 'https://vsmcclubs.site'));
   });
 });
 
 describe('icsFileName', () => {
   it('uses the date in Vietnam', () => {
-    expect(icsFileName(now)).toBe('rodemap-lich-ca-nhan-2026-10-14.ics');
-    expect(icsFileName(toMillis('2026-10-15T00:30:00+07:00'))).toBe('rodemap-lich-ca-nhan-2026-10-15.ics');
+    expect(icsFileName(now)).toBe('vsmcclubs-lich-ca-nhan-2026-10-14.ics');
+    expect(icsFileName(toMillis('2026-10-15T00:30:00+07:00'))).toBe('vsmcclubs-lich-ca-nhan-2026-10-15.ics');
   });
 });

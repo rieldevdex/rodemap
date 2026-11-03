@@ -1,6 +1,6 @@
-# Rodemap
+# vsmcclubs
 
-Campaign demo web app (Vite + React 19 + strict TypeScript, plain CSS from tokens) for a Vietnamese high-school student council election. The product name is **Rodemap** — never "Rode".
+Campaign demo web app (Vite + React 19 + strict TypeScript, plain CSS from tokens) for a Vietnamese high-school student council election. The product name is **vsmcclubs** — one word, always lowercase (even at the start of a sentence), served at **https://vsmcclubs.site**. It was called Rodemap until 2026-11-03: never write "Rodemap", "Rode", "VSMC Clubs" or "Vsmcclubs" in copy (`npm run lint:copy` flags them). Infrastructure names from before the rename stay on purpose (Worker `rodemap`, Supabase function `rodemap-mochi`, schema `rodemap`, `RODEMAP_*` secrets, the `x-rodemap-client-ip` header, the `<du_lieu_rodemap>` snapshot tag, legacy storage keys read once); renaming them breaks deployment or the deployed relay.
 
 Read before changing anything:
 - `DESIGN.md` — binding visual spec (tokens, components, motion, voice, a11y).

@@ -1,5 +1,5 @@
 /**
- * GSAP set-up for Rodemap's motion layer (DESIGN.md §6). Durations and curves are read from the
+ * GSAP set-up for vsmcclubs' motion layer (DESIGN.md §6). Durations and curves are read from the
  * motion tokens in src/styles/tokens.css, so CSS and GSAP move alike and reduced motion (every
  * duration 0) applies to both; motionOff() also honours the interactivity level.
  */
@@ -27,12 +27,12 @@ export function motionSeconds(token: string): number {
 
 const easeCache = new Map<string, string>();
 
-/** A curve token as a GSAP ease: the cubic-bezier of `--ease-expo` becomes CustomEase "rodemap--ease-expo". */
+/** A curve token as a GSAP ease: the cubic-bezier of `--ease-expo` becomes CustomEase "vsmcclubs--ease-expo". */
 export function motionEase(token: string): string {
   const cached = easeCache.get(token);
   if (cached !== undefined) return cached;
   const points = /\(([^)]+)\)/.exec(rootStyle().getPropertyValue(token))?.[1];
-  const name = `rodemap${token}`;
+  const name = `vsmcclubs${token}`;
   if (points === undefined) return 'none';
   CustomEase.create(name, points.replace(/\s+/g, ''));
   easeCache.set(token, name);

@@ -11,7 +11,7 @@ export const HERO = {
   short: 'Mọi sự kiện ngoại khóa của trường trên một bản đồ.',
   secondaryCta: 'Xem đề án',
   /** Visitors can look around before setting up a profile (DESIGN.md §7.2). */
-  tryCta: 'Dùng thử Rodemap',
+  tryCta: 'Dùng thử vsmcclubs',
   setupCta: 'Thiết lập hồ sơ',
   dashboardCta: 'Về trang Tổng quan',
 } as const;
@@ -20,7 +20,7 @@ export const PROBLEM =
   'Mỗi ngày, học sinh tiếp nhận một lượng lớn thông tin về các hoạt động ngoại khóa. Tuy nhiên, thông tin được phân tán qua nhiều kênh như thư điện tử, Facebook và Instagram, khiến học sinh khó theo dõi và dễ bỏ lỡ những hoạt động phù hợp.';
 
 export const SOLUTION =
-  'Rodemap tổng hợp sự kiện của các câu lạc bộ vào một nền tảng duy nhất, phân loại theo lĩnh vực và sắp xếp trên dòng thời gian, đồng thời hỗ trợ học sinh xây dựng lộ trình cá nhân và hồ sơ năng lực.';
+  'vsmcclubs tổng hợp sự kiện của các câu lạc bộ vào một nền tảng duy nhất, phân loại theo lĩnh vực và sắp xếp trên dòng thời gian, đồng thời hỗ trợ học sinh xây dựng lộ trình cá nhân và hồ sơ năng lực.';
 
 export const MOCHI_INTRO =
   'Mochi là trợ lý đồng hành, hỗ trợ học sinh lựa chọn sự kiện phù hợp, đăng ký tham gia và sắp xếp lịch cá nhân, qua đó góp phần nâng cao hiệu quả tham gia hoạt động ngoại khóa.';

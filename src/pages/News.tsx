@@ -57,7 +57,7 @@ export function NewsPage() {
           )
         }
         title="Bản tin Hội đồng Học sinh"
-        lead="Thông báo, tin hoạt động, giới thiệu câu lạc bộ và hướng dẫn sử dụng Rodemap do Hội đồng Học sinh biên soạn và phát hành hằng tháng."
+        lead="Thông báo, tin hoạt động, giới thiệu câu lạc bộ và hướng dẫn sử dụng vsmcclubs do Hội đồng Học sinh biên soạn và phát hành hằng tháng."
       >
         <p className="news__dateline">
           {SCHOOL.name} · Năm học {SCHOOL.schoolYear}

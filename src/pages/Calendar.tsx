@@ -190,7 +190,7 @@ export function CalendarPage() {
     const ics = buildIcs([e], {
       now,
       clubs: CLUBS,
-      calendarName: 'Lịch Rodemap',
+      calendarName: 'Lịch vsmcclubs',
       baseUrl: window.location.origin,
     });
     downloadFile(icsFileName(now).replace('.ics', `-${e.slug.slice(0, 32)}.ics`), ics, 'text/calendar;charset=utf-8');

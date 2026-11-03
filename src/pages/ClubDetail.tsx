@@ -24,7 +24,7 @@ export function ClubDetailPage() {
       <PageHead
         eyebrow="Câu lạc bộ"
         title="Không tìm thấy câu lạc bộ"
-        lead="Đường dẫn không tương ứng với câu lạc bộ nào trong danh sách câu lạc bộ của Rodemap."
+        lead="Đường dẫn không tương ứng với câu lạc bộ nào trong danh sách câu lạc bộ của vsmcclubs."
       >
         <div className="cluster">
           <Button to="/cau-lac-bo" variant="primary">

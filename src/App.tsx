@@ -72,7 +72,7 @@ function PageError() {
         <h1 id="main-heading" className="page-head__title" tabIndex={-1}>
           Không thể hiển thị nội dung
         </h1>
-        <p className="page-head__lead">Rodemap không thể tải màn hình này, có thể do kết nối mạng bị gián đoạn. Vui lòng tải lại trang để tiếp tục.</p>
+        <p className="page-head__lead">vsmcclubs không thể tải màn hình này, có thể do kết nối mạng bị gián đoạn. Vui lòng tải lại trang để tiếp tục.</p>
         <div className="cluster">
           <button
             type="button"

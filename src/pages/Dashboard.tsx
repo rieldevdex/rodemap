@@ -120,7 +120,7 @@ function StudentDashboard() {
                 <p className="dashboard__muted">
                   {boardScope === 'mine'
                     ? 'Bạn chưa có sự kiện sắp diễn ra. Vui lòng xem đề xuất của Mochi hoặc khám phá sự kiện.'
-                    : 'Chưa có sự kiện sắp diễn ra trên Rodemap.'}
+                    : 'Chưa có sự kiện sắp diễn ra trên vsmcclubs.'}
                 </p>
               )}
               <p className="dashboard__more">
@@ -191,7 +191,7 @@ function StudentDashboard() {
               <h2 id="dash-digest" className="dashboard__h2">
                 Bản tin tuần
               </h2>
-              <MochiNote label={`Bản tin tuần · ${digest.weekLabel}`} footnote="Do Mochi tổng hợp từ dữ liệu minh họa của Rodemap.">
+              <MochiNote label={`Bản tin tuần · ${digest.weekLabel}`} footnote="Do Mochi tổng hợp từ dữ liệu minh họa của vsmcclubs.">
                 {digest.paragraphs.map((p) => (
                   <p key={p}>{p}</p>
                 ))}

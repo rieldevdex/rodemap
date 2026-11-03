@@ -28,7 +28,7 @@ export const CANDIDATE = {
   message: '“Vì tương lai của bạn.”',
 } as const;
 
-export const PROPOSAL_TITLE = 'Đề án xây dựng nền tảng Rodemap';
+export const PROPOSAL_TITLE = 'Đề án xây dựng nền tảng vsmcclubs';
 export const PROPOSAL_SUBTITLE =
   'Tổng hợp, phân loại và sắp xếp hoạt động ngoại khóa trên một lộ trình thống nhất, đồng thời hỗ trợ học sinh xây dựng lộ trình cá nhân và hồ sơ năng lực.';
 
@@ -47,9 +47,9 @@ export const PROPOSAL_SECTIONS: ProposalSection[] = [
     numeral: 'II',
     title: 'Giải pháp',
     paragraphs: [
-      'Rodemap tổng hợp sự kiện của các câu lạc bộ vào một nền tảng duy nhất, phân loại theo lĩnh vực và sắp xếp trên dòng thời gian, đồng thời hỗ trợ học sinh xây dựng lộ trình cá nhân và hồ sơ năng lực.',
+      'vsmcclubs tổng hợp sự kiện của các câu lạc bộ vào một nền tảng duy nhất, phân loại theo lĩnh vực và sắp xếp trên dòng thời gian, đồng thời hỗ trợ học sinh xây dựng lộ trình cá nhân và hồ sơ năng lực.',
       'Năm học được trình bày dưới dạng một bản đồ lộ trình: mỗi lĩnh vực hoạt động là một tuyến, mỗi sự kiện là một điểm dừng, và kế hoạch của học sinh là hành trình nối các điểm dừng đã chọn. Cách trình bày này giúp học sinh nhận biết nhanh mật độ hoạt động, các thời điểm kiểm tra định kỳ và sự cân bằng giữa các lĩnh vực.',
-      'Mochi là trợ lý đồng hành, hỗ trợ học sinh lựa chọn sự kiện phù hợp, đăng ký tham gia và sắp xếp lịch cá nhân, qua đó góp phần nâng cao hiệu quả tham gia hoạt động ngoại khóa. Mọi thao tác đăng ký đều cần học sinh xác nhận; Mochi chỉ sử dụng dữ liệu của Rodemap và không tự tạo thông tin.',
+      'Mochi là trợ lý đồng hành, hỗ trợ học sinh lựa chọn sự kiện phù hợp, đăng ký tham gia và sắp xếp lịch cá nhân, qua đó góp phần nâng cao hiệu quả tham gia hoạt động ngoại khóa. Mọi thao tác đăng ký đều cần học sinh xác nhận; Mochi chỉ sử dụng dữ liệu của vsmcclubs và không tự tạo thông tin.',
     ],
     bullets: [
       'Tổng hợp: một nguồn thông tin duy nhất cho sự kiện của các câu lạc bộ và Hội đồng Học sinh, cùng các cuộc thi học thuật ngoài trường do Phòng Cố vấn Học tập cập nhật.',
@@ -64,8 +64,8 @@ export const PROPOSAL_SECTIONS: ProposalSection[] = [
     numeral: 'IV',
     title: 'Nguồn lực và tính khả thi',
     paragraphs: [
-      'Rodemap được phát triển dưới dạng ứng dụng web, có thể truy cập trên máy tính và điện thoại mà không cần cài đặt. Bản trình diễn hiện tại đã có đầy đủ các chức năng chính, vận hành với dữ liệu minh họa, qua đó chứng minh tính khả thi về mặt kỹ thuật.',
-      'Danh sách câu lạc bộ và lịch sự kiện được tiếp nhận từ Phòng Công tác Học sinh; thông tin các cuộc thi học thuật ngoài trường do Phòng Cố vấn Học tập cập nhật trực tiếp trên Rodemap. Việc vận hành cần thêm ba nhóm nguồn lực: nhóm học sinh phụ trách kỹ thuật thuộc Hội đồng Học sinh; đại diện các câu lạc bộ phụ trách cập nhật sự kiện phát sinh; và thành viên Hội đồng Học sinh phụ trách kiểm duyệt. Hạ tầng lưu trữ sử dụng dịch vụ có gói miễn phí phù hợp với quy mô một trường học.',
+      'vsmcclubs được phát triển dưới dạng ứng dụng web, có thể truy cập trên máy tính và điện thoại mà không cần cài đặt. Bản trình diễn hiện tại đã có đầy đủ các chức năng chính, vận hành với dữ liệu minh họa, qua đó chứng minh tính khả thi về mặt kỹ thuật.',
+      'Danh sách câu lạc bộ và lịch sự kiện được tiếp nhận từ Phòng Công tác Học sinh; thông tin các cuộc thi học thuật ngoài trường do Phòng Cố vấn Học tập cập nhật trực tiếp trên vsmcclubs. Việc vận hành cần thêm ba nhóm nguồn lực: nhóm học sinh phụ trách kỹ thuật thuộc Hội đồng Học sinh; đại diện các câu lạc bộ phụ trách cập nhật sự kiện phát sinh; và thành viên Hội đồng Học sinh phụ trách kiểm duyệt. Hạ tầng lưu trữ sử dụng dịch vụ có gói miễn phí phù hợp với quy mô một trường học.',
       'Trợ lý Mochi sử dụng dịch vụ trí tuệ nhân tạo có tính phí theo lượt sử dụng. Để kiểm soát chi phí, mỗi trình duyệt được hỏi Mochi 20 câu mỗi tuần và toàn trường tối đa 500 câu mỗi tuần; khi hết lượt hoặc khi chưa có kinh phí được phê duyệt, Mochi hoạt động ở chế độ ngoại tuyến với các phản hồi được chuẩn bị sẵn, còn mọi chức năng tổng hợp, lộ trình và hồ sơ năng lực vẫn hoạt động đầy đủ.',
     ],
   },
@@ -74,7 +74,7 @@ export const PROPOSAL_SECTIONS: ProposalSection[] = [
     numeral: 'V',
     title: 'Bảo vệ dữ liệu học sinh',
     paragraphs: [
-      'Rodemap áp dụng nguyên tắc thu thập tối thiểu: hồ sơ học sinh chỉ gồm khối, lớp, lĩnh vực quan tâm, mục tiêu trong năm học và thời gian có thể tham gia. Nền tảng không thu thập số điện thoại, địa chỉ, thông tin sức khỏe hay thông tin tài chính.',
+      'vsmcclubs áp dụng nguyên tắc thu thập tối thiểu: hồ sơ học sinh chỉ gồm khối, lớp, lĩnh vực quan tâm, mục tiêu trong năm học và thời gian có thể tham gia. Nền tảng không thu thập số điện thoại, địa chỉ, thông tin sức khỏe hay thông tin tài chính.',
       'Trong bản trình diễn, toàn bộ dữ liệu được lưu trên thiết bị của người dùng và có thể xóa bằng chức năng khôi phục dữ liệu minh họa. Khi triển khai chính thức, phương án tài khoản và lưu trữ sẽ được trình Ban Giám hiệu phê duyệt và tuân thủ quy định pháp luật hiện hành về bảo vệ dữ liệu cá nhân.',
       'Mochi không lưu nội dung trò chuyện, không yêu cầu thông tin cá nhân nhạy cảm và được hướng dẫn từ chối các chủ đề ngoài phạm vi hoạt động của nhà trường. Để tính số câu hỏi mỗi tuần, máy chủ chỉ lưu mã băm của một mã ngẫu nhiên do trình duyệt tạo ra, không gắn với học sinh.',
     ],
@@ -84,7 +84,7 @@ export const PROPOSAL_SECTIONS: ProposalSection[] = [
     numeral: 'VI',
     title: 'Cam kết',
     paragraphs: [
-      'Nếu được tín nhiệm, tôi cam kết triển khai Rodemap theo đúng các giai đoạn đã trình bày, báo cáo tiến độ định kỳ với Hội đồng Học sinh và Phòng Công tác Học sinh, đồng thời tiếp nhận góp ý của học sinh và các câu lạc bộ để điều chỉnh nền tảng.',
+      'Nếu được tín nhiệm, tôi cam kết triển khai vsmcclubs theo đúng các giai đoạn đã trình bày, báo cáo tiến độ định kỳ với Hội đồng Học sinh và Phòng Công tác Học sinh, đồng thời tiếp nhận góp ý của học sinh và các câu lạc bộ để điều chỉnh nền tảng.',
       'Đề án được xây dựng trên tinh thần cụ thể, khả thi và trung thực: mọi chức năng nêu trong đề án đều đã có trong bản trình diễn, và những nội dung cần nhà trường phê duyệt được trình bày rõ là kế hoạch của các giai đoạn sau.',
     ],
   },
@@ -97,13 +97,13 @@ export const PROPOSAL_PHASES: ProposalPhase[] = [
     title: 'Triển khai toàn trường',
     timing: 'Tháng 11–12/2026',
     goals: [
-      'Tiếp nhận danh sách câu lạc bộ và lịch sự kiện từ Phòng Công tác Học sinh để cập nhật lên Rodemap.',
-      'Phối hợp với Phòng Cố vấn Học tập cập nhật thông tin các cuộc thi học thuật ngoài trường trên Rodemap.',
+      'Tiếp nhận danh sách câu lạc bộ và lịch sự kiện từ Phòng Công tác Học sinh để cập nhật lên vsmcclubs.',
+      'Phối hợp với Phòng Cố vấn Học tập cập nhật thông tin các cuộc thi học thuật ngoài trường trên vsmcclubs.',
       'Hướng dẫn đại diện câu lạc bộ gửi sự kiện; hoàn thiện quy trình kiểm duyệt và quy chế đăng tải sự kiện.',
       'Tổ chức buổi giới thiệu nền tảng cho học sinh các khối và thu thập ý kiến phản hồi về mức độ thuận tiện khi sử dụng.',
     ],
     outputs: [
-      'Rodemap trở thành kênh tổng hợp sự kiện chính thức của Hội đồng Học sinh.',
+      'vsmcclubs trở thành kênh tổng hợp sự kiện chính thức của Hội đồng Học sinh.',
       'Quy chế đăng tải và kiểm duyệt sự kiện.',
       'Báo cáo tổng hợp ý kiến phản hồi của học sinh.',
     ],

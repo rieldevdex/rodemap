@@ -1,5 +1,5 @@
 /**
- * Publishers on Rodemap and the wording that depends on their kind: student clubs, the Hội đồng
+ * Publishers on vsmcclubs and the wording that depends on their kind: student clubs, the Hội đồng
  * Học sinh and school offices such as Phòng Cố vấn Học tập. Pure.
  */
 import type { Club, ClubKind } from './types';

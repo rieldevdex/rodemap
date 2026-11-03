@@ -49,12 +49,12 @@ export const NEWS: NewsPost[] = [
         items: [
           'Có mặt tại sân trường trước 06:45 và tập trung theo vị trí của lớp.',
           'Mặc đồng phục theo quy định.',
-          'Đăng ký trên Rodemap trong thời hạn nêu trên để buổi lễ được bổ sung vào Lộ trình và Lịch: tại trang sự kiện, chọn Đăng ký và nhấn Xác nhận.',
+          'Đăng ký trên vsmcclubs trong thời hạn nêu trên để buổi lễ được bổ sung vào Lộ trình và Lịch: tại trang sự kiện, chọn Đăng ký và nhấn Xác nhận.',
         ],
       },
       {
         kind: 'paragraph',
-        text: 'Kể từ số này, Bản tin Hội đồng Học sinh được phát hành hằng tháng tại mục Bản tin trên Rodemap nhằm cung cấp cho học sinh toàn trường các thông báo, tin hoạt động, bài giới thiệu câu lạc bộ và hướng dẫn sử dụng ứng dụng.',
+        text: 'Kể từ số này, Bản tin Hội đồng Học sinh được phát hành hằng tháng tại mục Bản tin trên vsmcclubs nhằm cung cấp cho học sinh toàn trường các thông báo, tin hoạt động, bài giới thiệu câu lạc bộ và hướng dẫn sử dụng ứng dụng.',
       },
     ],
     eventIds: ['ev-001'],
@@ -96,7 +96,7 @@ export const NEWS: NewsPost[] = [
       { kind: 'heading', text: 'Theo dõi các hoạt động tiếp theo' },
       {
         kind: 'paragraph',
-        text: 'Các sự kiện tiếp theo của năm học được Hội đồng Học sinh kiểm duyệt và công bố tại mục Khám phá trên Rodemap. Học sinh theo dõi thời gian, địa điểm và hạn đăng ký của từng sự kiện, qua đó chủ động sắp xếp hoạt động phù hợp với lịch học. Thông báo về các sự kiện toàn trường được đăng tải đồng thời trên Bản tin Hội đồng Học sinh.',
+        text: 'Các sự kiện tiếp theo của năm học được Hội đồng Học sinh kiểm duyệt và công bố tại mục Khám phá trên vsmcclubs. Học sinh theo dõi thời gian, địa điểm và hạn đăng ký của từng sự kiện, qua đó chủ động sắp xếp hoạt động phù hợp với lịch học. Thông báo về các sự kiện toàn trường được đăng tải đồng thời trên Bản tin Hội đồng Học sinh.',
       },
     ],
     eventIds: ['ev-001'],
@@ -105,16 +105,16 @@ export const NEWS: NewsPost[] = [
   {
     id: 'bt-003',
     slug: 'huong-dan-dang-ky-su-kien-va-xuat-lich-hoat-dong',
-    title: 'Hướng dẫn đăng ký sự kiện và xuất lịch hoạt động trên Rodemap',
+    title: 'Hướng dẫn đăng ký sự kiện và xuất lịch hoạt động trên vsmcclubs',
     category: 'guide',
     author: 'Ban Truyền thông',
     publishedAt: '2026-09-09T07:30:00+07:00',
     summary:
-      'Bài viết hướng dẫn học sinh thiết lập lộ trình, đăng ký và xác nhận đăng ký sự kiện trên Rodemap, đồng thời xuất lịch hoạt động sang ứng dụng lịch cá nhân.',
+      'Bài viết hướng dẫn học sinh thiết lập lộ trình, đăng ký và xác nhận đăng ký sự kiện trên vsmcclubs, đồng thời xuất lịch hoạt động sang ứng dụng lịch cá nhân.',
     body: [
       {
         kind: 'paragraph',
-        text: 'Nhằm hỗ trợ học sinh chủ động tham gia hoạt động trong năm học 2026–2027, Ban Truyền thông tổng hợp các bước đăng ký sự kiện và quản lý lịch cá nhân trên Rodemap. Các sự kiện của câu lạc bộ chỉ hiển thị với học sinh sau khi được Hội đồng Học sinh kiểm duyệt và phê duyệt.',
+        text: 'Nhằm hỗ trợ học sinh chủ động tham gia hoạt động trong năm học 2026–2027, Ban Truyền thông tổng hợp các bước đăng ký sự kiện và quản lý lịch cá nhân trên vsmcclubs. Các sự kiện của câu lạc bộ chỉ hiển thị với học sinh sau khi được Hội đồng Học sinh kiểm duyệt và phê duyệt.',
       },
       { kind: 'heading', text: 'Bước 1. Thiết lập lộ trình' },
       {
@@ -127,7 +127,7 @@ export const NEWS: NewsPost[] = [
         items: [
           'Mở mục Khám phá, sử dụng các bộ lọc Lĩnh vực, Khối được phép tham gia hoặc Hạn đăng ký để tìm sự kiện phù hợp.',
           'Tại trang chi tiết sự kiện, chọn Đăng ký.',
-          'Kiểm tra thông tin tại hộp thoại Xác nhận đăng ký, gồm thời gian, địa điểm, số chỗ còn lại và hạn đăng ký; Rodemap cảnh báo khi sự kiện trùng lịch hoặc vượt quỹ giờ trong tuần.',
+          'Kiểm tra thông tin tại hộp thoại Xác nhận đăng ký, gồm thời gian, địa điểm, số chỗ còn lại và hạn đăng ký; vsmcclubs cảnh báo khi sự kiện trùng lịch hoặc vượt quỹ giờ trong tuần.',
           'Nhấn Xác nhận để hoàn tất đăng ký.',
         ],
       },
@@ -164,7 +164,7 @@ export const NEWS: NewsPost[] = [
     author: 'Ban Tổ chức',
     publishedAt: '2026-09-10T07:30:00+07:00',
     summary:
-      'Ngày hội Câu lạc bộ năm học 2026–2027 diễn ra vào Thứ Bảy, 19/09/2026, tại Sân trường và Nhà thi đấu đa năng; hạn đăng ký trên Rodemap là 23:59, Thứ Năm, 17/09/2026.',
+      'Ngày hội Câu lạc bộ năm học 2026–2027 diễn ra vào Thứ Bảy, 19/09/2026, tại Sân trường và Nhà thi đấu đa năng; hạn đăng ký trên vsmcclubs là 23:59, Thứ Năm, 17/09/2026.',
     body: [
       {
         kind: 'paragraph',
@@ -190,7 +190,7 @@ export const NEWS: NewsPost[] = [
       { kind: 'heading', text: 'Đề nghị đối với học sinh' },
       {
         kind: 'paragraph',
-        text: 'Trước ngày hội, học sinh tham khảo thông tin các câu lạc bộ tại mục Câu lạc bộ trên Rodemap, qua đó xác định câu lạc bộ phù hợp với lĩnh vực quan tâm. Học sinh đăng ký tham dự ngày hội tại trang sự kiện bằng cách chọn Đăng ký và nhấn Xác nhận trước thời hạn nêu trên.',
+        text: 'Trước ngày hội, học sinh tham khảo thông tin các câu lạc bộ tại mục Câu lạc bộ trên vsmcclubs, qua đó xác định câu lạc bộ phù hợp với lĩnh vực quan tâm. Học sinh đăng ký tham dự ngày hội tại trang sự kiện bằng cách chọn Đăng ký và nhấn Xác nhận trước thời hạn nêu trên.',
       },
       {
         kind: 'quote',
@@ -237,7 +237,7 @@ export const NEWS: NewsPost[] = [
       { kind: 'heading', text: 'Tiếp tục tìm hiểu câu lạc bộ' },
       {
         kind: 'paragraph',
-        text: 'Học sinh chưa có điều kiện tham dự ngày hội có thể tra cứu thông tin của từng câu lạc bộ tại mục Câu lạc bộ trên Rodemap, gồm phần giới thiệu, sự kiện sắp diễn ra và sự kiện đã tổ chức. Trong các số tiếp theo, Bản tin Hội đồng Học sinh lần lượt giới thiệu hoạt động của các câu lạc bộ trong trường.',
+        text: 'Học sinh chưa có điều kiện tham dự ngày hội có thể tra cứu thông tin của từng câu lạc bộ tại mục Câu lạc bộ trên vsmcclubs, gồm phần giới thiệu, sự kiện sắp diễn ra và sự kiện đã tổ chức. Trong các số tiếp theo, Bản tin Hội đồng Học sinh lần lượt giới thiệu hoạt động của các câu lạc bộ trong trường.',
       },
     ],
     eventIds: ['ev-003'],
@@ -278,7 +278,7 @@ export const NEWS: NewsPost[] = [
       },
       {
         kind: 'paragraph',
-        text: 'Học sinh tham gia đầy đủ chương trình được câu lạc bộ xác nhận giờ hoạt động tình nguyện. Sau mỗi sự kiện, học sinh chọn Xác nhận đã tham gia trên Rodemap để hoạt động được bổ sung vào Hồ sơ năng lực.',
+        text: 'Học sinh tham gia đầy đủ chương trình được câu lạc bộ xác nhận giờ hoạt động tình nguyện. Sau mỗi sự kiện, học sinh chọn Xác nhận đã tham gia trên vsmcclubs để hoạt động được bổ sung vào Hồ sơ năng lực.',
       },
     ],
     eventIds: ['ev-006', 'ev-012', 'ev-020', 'ev-029'],
@@ -319,7 +319,7 @@ export const NEWS: NewsPost[] = [
       },
       {
         kind: 'paragraph',
-        text: 'Học sinh quan tâm có thể theo dõi sự kiện của câu lạc bộ tại mục Câu lạc bộ trên Rodemap và đăng ký vòng loại tại trang sự kiện trước thời hạn nêu trên.',
+        text: 'Học sinh quan tâm có thể theo dõi sự kiện của câu lạc bộ tại mục Câu lạc bộ trên vsmcclubs và đăng ký vòng loại tại trang sự kiện trước thời hạn nêu trên.',
       },
     ],
     eventIds: ['ev-004', 'ev-018', 'ev-042'],
@@ -375,7 +375,7 @@ export const NEWS: NewsPost[] = [
     body: [
       {
         kind: 'paragraph',
-        text: 'Nhiều sự kiện của các câu lạc bộ diễn ra trong tháng 10/2026 đã được Hội đồng Học sinh phê duyệt và mở đăng ký trên Rodemap. Nhằm giúp học sinh chủ động sắp xếp thời gian, Ban Tổ chức tổng hợp một số sự kiện có hạn đăng ký trong tháng như sau; danh sách đầy đủ xem tại mục Khám phá.',
+        text: 'Nhiều sự kiện của các câu lạc bộ diễn ra trong tháng 10/2026 đã được Hội đồng Học sinh phê duyệt và mở đăng ký trên vsmcclubs. Nhằm giúp học sinh chủ động sắp xếp thời gian, Ban Tổ chức tổng hợp một số sự kiện có hạn đăng ký trong tháng như sau; danh sách đầy đủ xem tại mục Khám phá.',
       },
       { kind: 'heading', text: 'Sự kiện sắp hết hạn đăng ký' },
       {
@@ -394,7 +394,7 @@ export const NEWS: NewsPost[] = [
       { kind: 'heading', text: 'Lịch Kiểm tra định kỳ giữa học kỳ I' },
       {
         kind: 'paragraph',
-        text: 'Kiểm tra định kỳ giữa học kỳ I diễn ra từ Thứ Hai, 02/11/2026 đến Thứ Bảy, 07/11/2026. Lịch sự kiện đã phê duyệt không bố trí hoạt động trong thời gian này, nhằm đảm bảo học sinh tập trung ôn tập. Học sinh lưu ý cân đối quỹ giờ hoạt động trong các tuần trước kỳ kiểm tra; mục Lịch trên Rodemap hiển thị đợt kiểm tra cùng các sự kiện đã đăng ký, đồng thời cảnh báo khi có sự kiện trùng lịch.',
+        text: 'Kiểm tra định kỳ giữa học kỳ I diễn ra từ Thứ Hai, 02/11/2026 đến Thứ Bảy, 07/11/2026. Lịch sự kiện đã phê duyệt không bố trí hoạt động trong thời gian này, nhằm đảm bảo học sinh tập trung ôn tập. Học sinh lưu ý cân đối quỹ giờ hoạt động trong các tuần trước kỳ kiểm tra; mục Lịch trên vsmcclubs hiển thị đợt kiểm tra cùng các sự kiện đã đăng ký, đồng thời cảnh báo khi có sự kiện trùng lịch.',
       },
       {
         kind: 'quote',
@@ -414,11 +414,11 @@ export const NEWS: NewsPost[] = [
     author: 'Ban Truyền thông',
     publishedAt: '2026-10-19T07:30:00+07:00',
     summary:
-      'Bài viết hướng dẫn học sinh xác nhận tham gia sự kiện đã diễn ra, bổ sung vai trò, phần tự đánh giá và minh chứng, sau đó in hoặc xuất Hồ sơ năng lực trên Rodemap.',
+      'Bài viết hướng dẫn học sinh xác nhận tham gia sự kiện đã diễn ra, bổ sung vai trò, phần tự đánh giá và minh chứng, sau đó in hoặc xuất Hồ sơ năng lực trên vsmcclubs.',
     body: [
       {
         kind: 'paragraph',
-        text: 'Việc xác nhận tham gia sau mỗi sự kiện giúp học sinh tổng hợp đầy đủ hoạt động của năm học theo từng lĩnh vực. Ban Truyền thông hướng dẫn các bước thực hiện trên Rodemap như sau.',
+        text: 'Việc xác nhận tham gia sau mỗi sự kiện giúp học sinh tổng hợp đầy đủ hoạt động của năm học theo từng lĩnh vực. Ban Truyền thông hướng dẫn các bước thực hiện trên vsmcclubs như sau.',
       },
       { kind: 'heading', text: 'Bước 1. Xác nhận tham gia' },
       {

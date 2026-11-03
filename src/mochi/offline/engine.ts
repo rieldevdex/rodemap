@@ -241,8 +241,8 @@ function summaryReply(text: string, ctx: OfflineContext): OfflineReply {
   const cats = Object.entries(r.events_by_category).map(([name, n]) => `${name} (${n})`);
   parts.push(
     r.event_count === 0
-      ? `${r.period}: Rodemap chưa có sự kiện nào trong khoảng thời gian này.`
-      : `${r.period}: Rodemap có ${r.event_count} sự kiện, phân theo nhóm: ${cats.join(', ')}.`,
+      ? `${r.period}: vsmcclubs chưa có sự kiện nào trong khoảng thời gian này.`
+      : `${r.period}: vsmcclubs có ${r.event_count} sự kiện, phân theo nhóm: ${cats.join(', ')}.`,
   );
   parts.push(
     r.my_events.length > 0
@@ -263,7 +263,7 @@ function eventQuestionReply(text: string, ctx: OfflineContext): OfflineReply {
   if (!event) {
     return {
       intent: 'event_question',
-      text: 'Dữ liệu hiện có của Rodemap chưa có thông tin này. Vui lòng nêu rõ tên sự kiện, hoặc tra cứu tại trang Khám phá sự kiện.',
+      text: 'Dữ liệu hiện có của vsmcclubs chưa có thông tin này. Vui lòng nêu rõ tên sự kiện, hoặc tra cứu tại trang Khám phá sự kiện.',
       cards: [],
     };
   }
@@ -293,7 +293,7 @@ function eventQuestionReply(text: string, ctx: OfflineContext): OfflineReply {
   if (d.organizer !== undefined) {
     const source = d.information_source ?? d.club;
     parts.push(
-      `Thông tin cuộc thi do ${source} cập nhật trên Rodemap. Sau khi bạn đăng ký trên Rodemap, ${source} tổng hợp danh sách và hướng dẫn các bước nộp hồ sơ theo quy định của đơn vị tổ chức.`,
+      `Thông tin cuộc thi do ${source} cập nhật trên vsmcclubs. Sau khi bạn đăng ký trên vsmcclubs, ${source} tổng hợp danh sách và hướng dẫn các bước nộp hồ sơ theo quy định của đơn vị tổ chức.`,
     );
   }
   if (d.conflicts_with_plan.length > 0) parts.push(`Lưu ý: sự kiện trùng thời gian với ${d.conflicts_with_plan.map((c) => `“${c.title}”`).join(', ')} trong lịch của bạn.`);
@@ -349,7 +349,7 @@ export function respondOffline(text: string, ctx: OfflineContext): OfflineReply 
     case 'privacy':
       return {
         intent,
-        text: 'Để bảo vệ thông tin cá nhân, bạn vui lòng không chia sẻ số điện thoại, địa chỉ hay mật khẩu với Mochi. Mochi chỉ sử dụng dữ liệu hoạt động ngoại khóa của Rodemap. ' + SUGGESTION_HINT,
+        text: 'Để bảo vệ thông tin cá nhân, bạn vui lòng không chia sẻ số điện thoại, địa chỉ hay mật khẩu với Mochi. Mochi chỉ sử dụng dữ liệu hoạt động ngoại khóa của vsmcclubs. ' + SUGGESTION_HINT,
         cards: [],
       };
     case 'unregister':
@@ -370,7 +370,7 @@ export function respondOffline(text: string, ctx: OfflineContext): OfflineReply 
     case 'help':
       return {
         intent,
-        text: `Mochi là trợ lý đồng hành của Rodemap. Mochi có thể đề xuất sự kiện phù hợp với hồ sơ của bạn, chuẩn bị thẻ xác nhận đăng ký, tổng hợp lịch cá nhân, tóm tắt sự kiện trong tuần và đề xuất bản nháp cho hồ sơ năng lực. ${SUGGESTION_HINT}`,
+        text: `Mochi là trợ lý đồng hành của vsmcclubs. Mochi có thể đề xuất sự kiện phù hợp với hồ sơ của bạn, chuẩn bị thẻ xác nhận đăng ký, tổng hợp lịch cá nhân, tóm tắt sự kiện trong tuần và đề xuất bản nháp cho hồ sơ năng lực. ${SUGGESTION_HINT}`,
         cards: [],
       };
     case 'unknown': {

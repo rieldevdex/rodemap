@@ -43,7 +43,7 @@ test.describe('Bản tin Hội đồng Học sinh', () => {
     await expect(page).toHaveURL(`/ban-tin/${article.slug}`);
     await expect(page.locator('#main-heading')).toHaveText(article.title);
     await expect(page.getByText(article.summary)).toBeVisible();
-    await expect(page).toHaveTitle(`${article.title} · Rodemap`);
+    await expect(page).toHaveTitle(`${article.title} · vsmcclubs`);
     expect(await axe(page)).toEqual([]);
     expect(errors).toEqual([]);
   });
@@ -90,7 +90,7 @@ test.describe('Bản tin Hội đồng Học sinh', () => {
     await page.getByLabel('Nội dung', { exact: true }).fill(
       [
         '## Lịch sinh hoạt',
-        'Các câu lạc bộ duy trì lịch sinh hoạt định kỳ theo kế hoạch đã đăng ký với Hội đồng Học sinh, đồng thời cập nhật sự kiện trên Rodemap trước ngày diễn ra.',
+        'Các câu lạc bộ duy trì lịch sinh hoạt định kỳ theo kế hoạch đã đăng ký với Hội đồng Học sinh, đồng thời cập nhật sự kiện trên vsmcclubs trước ngày diễn ra.',
         '- Học sinh theo dõi lịch tại trang Lịch của tôi.',
         '- Học sinh đăng ký tham gia tại trang chi tiết sự kiện.',
         '> Hội đồng Học sinh đề nghị các câu lạc bộ cập nhật thông tin đầy đủ. — Ban Phong trào, Hội đồng Học sinh',

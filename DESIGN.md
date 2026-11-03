@@ -1,6 +1,6 @@
-# Rodemap — Design System
+# vsmcclubs — Design System
 
-The single source of truth for every visual decision in Rodemap.
+The single source of truth for every visual decision in vsmcclubs.
 All raw values live in `src/styles/tokens.css`. No other stylesheet may contain a
 raw color, a font name, or a `px`/`rem` value outside the two breakpoints
 (720 px and 1080 px, see §4). `npm run lint:tokens` fails the build if one
@@ -16,19 +16,26 @@ durations and raw easing curves outside `tokens.css`.
 > Revised again the same day under the owner's design principles: no AI design
 > slop (no generic purple gradients, standard hero layouts or repetitive card
 > grids), motion built with React Bits and GSAP, and high-contrast palettes
-> tailored to Rodemap's own identity. The new modes, type and motion follow the
+> tailored to vsmcclubs' own identity. The new modes, type and motion follow the
 > house rules of the **Taste skill** (§12); the first draft of "Rực rỡ" (cream
 > ground, violet signal, violet-to-orange CTA gradient) was withdrawn because it
-> was exactly that slop. Where Rodemap's existing brand keeps a device Taste bans
+> was exactly that slop. Where vsmcclubs' existing brand keeps a device Taste bans
 > (monospace times, eyebrows and hairline rules in "Lộ trình"), §12 says why.
 
 ---
 
 ## 1. Brand idea
 
-**Rodemap = road map.** A student's school year is drawn as a route map: each activity
-category is a line, each event is a station, and the student's own plan is the
-journey they take across the lines. The site should feel like a well-made
+**vsmcclubs = the clubs of Vinschool Smart City (VSMC), drawn as a route map.** A
+student's school year is a map: each activity category is a line, each club event is a
+station, and the student's own plan is the journey they take across the lines.
+(Renamed from Rodemap on 2026-11-03; the domain is **vsmcclubs.site**.)
+
+**Writing the name.** One word, always lowercase, also at the start of a sentence and in
+titles: `vsmcclubs`. Never "VSMC Clubs", "Vsmcclubs" or the old names (the copy lint
+flags them). The wordmark sets "vsmc" heavy and "clubs" at medium weight in the brand
+face (`--font-brand`, Bricolage Grotesque) after the route mark, so the double c reads
+apart while the name stays one word; document titles read "‹Trang› · vsmcclubs". The site should feel like a well-made
 transit authority or civic service — exact and trustworthy — with one warm
 character, **Mochi**, riding along. Students can now choose how lively it looks
 (§2.4), but every mode keeps the same grammar.
@@ -45,7 +52,7 @@ Three rules carry the whole identity, in every appearance mode:
    numbers); modes may add colour blocks, textures and softer corners, but
    Mochi stays the only character.
 
-What Rodemap must never look like: a purple-to-blue gradient SaaS hero, glassmorphism
+What vsmcclubs must never look like: a purple-to-blue gradient SaaS hero, glassmorphism
 cards (Uiverse's glass cards were reviewed and rejected: text contrast cannot be
 guaranteed over a moving backdrop), emoji section markers, a centered stock "AI
 assistant" chat bubble, cream paper with a serif headline (that belongs to Inkstep),
@@ -127,7 +134,7 @@ light/dark stays `data-theme` (Theo hệ thống / Sáng / Tối). Modes change 
 only — never layout, content or behaviour — and apply on screens only: print
 always uses Lộ trình light.
 
-Each mode is built from one thing in Rodemap's own world (the Taste skill's
+Each mode is built from one thing in vsmcclubs' own world (the Taste skill's
 "idea" rule: the look comes from the subject, never from the category), keeps
 one ground, one ink and one accent, and uses no gradient, glow or violet.
 
@@ -424,7 +431,7 @@ because research gives it a job; nothing is added for decoration.
 - **The warning.** Under the slider, always visible: "Mức tương tác càng cao, trang
   càng sử dụng nhiều tài nguyên xử lý, bộ nhớ và pin của thiết bị; trên thiết bị cấu
   hình thấp, trang có thể phản hồi chậm hơn." When the browser reports 4 or fewer
-  cores, 4 GB or less memory, or Data Saver, the panel adds that Rodemap advises
+  cores, 4 GB or less memory, or Data Saver, the panel adds that vsmcclubs advises
   "Nhẹ" (web.dev adaptive loading: these signals predict slow devices). When the
   device asks for reduced motion, it says movement stays off at every level while
   linked highlighting and shortcuts still work.
@@ -477,7 +484,7 @@ because research gives it a job; nothing is added for decoration.
 
 ### 7.2 Visitors without a profile ("Dùng thử")
 
-A visitor can try Rodemap before setting up a profile, to see events and
+A visitor can try vsmcclubs before setting up a profile, to see events and
 suggestions:
 
 - Open without a profile: Trang chủ, Tổng quan (visitor version), Khám phá,
@@ -487,9 +494,9 @@ suggestions:
   (Cổng CLB, Kiểm duyệt, Soạn bài viết). Opening one leads to Thiết lập hồ sơ
   and back afterwards. A visitor always sees the student version of the open
   pages, whatever demo role is set.
-- Trang chủ for a visitor: "Dùng thử Rodemap" (primary, to Tổng quan) and
+- Trang chủ for a visitor: "Dùng thử vsmcclubs" (primary, to Tổng quan) and
   "Thiết lập hồ sơ"; with a profile: "Về trang Tổng quan" and "Xem đề án".
-- Tổng quan for a visitor: a "Dùng thử Rodemap" head with one sentence and a
+- Tổng quan for a visitor: a "Dùng thử vsmcclubs" head with one sentence and a
   primary "Thiết lập hồ sơ" button, QuickPicks (§5) in the colour block, then
   "Gợi ý cho bạn" (up to 6 StationCards with their reasons, §6.2 #17) and "Hạn
   đăng ký tuần này". Without a grade the suggestions are listed by date with the
@@ -579,7 +586,7 @@ All UI copy is **formal, administrative Vietnamese** (văn phong hành chính).
 
 ## 10. Mật độ nội dung (text density)
 
-The owner found the home page too wordy. Students choose how much text Rodemap
+The owner found the home page too wordy. Students choose how much text vsmcclubs
 shows; the choice is `data-density` on `<html>` and a value in AppState. No
 resource in §12 covers text density, so this section follows the owner's
 request and the voice rules.
@@ -622,7 +629,7 @@ eight design resources were studied through web search results (October 2026);
 the Taste skill and React Bits were read from their source repositories. What
 was taken from each:
 
-| Resource | What it is (from the research) | Taken for Rodemap |
+| Resource | What it is (from the research) | Taken for vsmcclubs |
 |---|---|---|
 | [Uiverse](https://uiverse.io/) | MIT-licensed community library of CSS/Tailwind UI elements (buttons, toggle switches, radio buttons, cards, loaders, tooltips) | Press feedback (#1), swatch radio cards (#4), brightness control (#5); glass and neumorphic styles rejected for contrast |
 | [trending.design](https://trending.design/) | Curated design products and inspiration (design books, graphic and branding inspiration, typographic and moving posters) | Swiss modular grid discipline (§4), judging colours in pairs (§7.3), poster typography for Áp phích |
@@ -647,9 +654,9 @@ NN/g on animation duration and response-time limits (as quoted in [MDN — How l
 [web.dev — Optimize INP](https://web.dev/articles/optimize-inp) ·
 [web.dev — Adaptive loading](https://web.dev/articles/adaptive-loading-cds-2019) ·
 [Chrome — Scroll-driven animation performance](https://developer.chrome.com/blog/scroll-animation-performance-case-study) ·
-[Baymard — hover delays](https://baymard.com/research-articles/dropdown-menu-flickering-issue) (why previews wait for intent; Rodemap shows details on focus or press instead).
+[Baymard — hover delays](https://baymard.com/research-articles/dropdown-menu-flickering-issue) (why previews wait for intent; vsmcclubs shows details on focus or press instead).
 
-**Taste rules Rodemap keeps differently, and why.** Lộ trình is the existing
+**Taste rules vsmcclubs keeps differently, and why.** Lộ trình is the existing
 brand and keeps three devices Taste bans on marketing pages: monospace times
 and codes (the departure board is the product's identity; Taste's app rules
 allow "every figure in a monospace as one style's decision"), eyebrows above

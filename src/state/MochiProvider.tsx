@@ -254,7 +254,7 @@ export function MochiProvider({ children }: { children: ReactNode }) {
       exportIcs: (eventIds) => {
         const all = selectPublicEvents(st());
         const events = all.filter((e) => eventIds.includes(e.id));
-        const ics = buildIcs(events, { now: latest.current.now, clubs: CLUBS, calendarName: 'Lịch Rodemap', baseUrl: window.location.origin });
+        const ics = buildIcs(events, { now: latest.current.now, clubs: CLUBS, calendarName: 'Lịch vsmcclubs', baseUrl: window.location.origin });
         downloadFile(icsFileName(latest.current.now), ics, 'text/calendar;charset=utf-8');
       },
     };

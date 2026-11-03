@@ -6,7 +6,8 @@
   var density = 'compact';
   var interactivity = 'medium';
   try {
-    var raw = window.localStorage.getItem('rodemap:v1');
+    // vsmcclubs:v1, or the key used before the rename (rodemap:v1) on a returning browser.
+    var raw = window.localStorage.getItem('vsmcclubs:v1') || window.localStorage.getItem('rodemap:v1');
     if (raw) {
       var saved = JSON.parse(raw);
       if (saved.theme === 'light' || saved.theme === 'dark') root.setAttribute('data-theme', saved.theme);

@@ -202,7 +202,7 @@ export function reducer(state: AppState, action: Action): AppState {
 
     case 'demo/reset': {
       // Presentation settings survive a reset; the profile and the student's data are cleared,
-      // so Rodemap asks for a new profile before anything else.
+      // so vsmcclubs asks for a new profile before anything else.
       const seed = createSeedState();
       return {
         ...seed,

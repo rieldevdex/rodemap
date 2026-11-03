@@ -1,5 +1,5 @@
 /**
- * Cloudflare Worker entry for Rodemap. The Vite build in dist/ is served as static assets
+ * Cloudflare Worker entry for vsmcclubs. The Vite build in dist/ is served as static assets
  * (wrangler.toml [assets], with the single-page fallback); only /api/* requests reach this code.
  */
 import { handleMochi, type Env } from './mochi';

@@ -23,7 +23,7 @@ describe('banned-copy data', () => {
   it('detects Vietnamese diacritics case-insensitively after NFC', () => {
     expect(VIETNAMESE_DIACRITIC.test('ĐĂNG KÝ')).toBe(true);
     expect(isVietnamese('Lộ trình')).toBe(true); // NFD input
-    expect(isVietnamese('Rodemap demo')).toBe(false);
+    expect(isVietnamese('vsmcclubs demo')).toBe(false);
   });
 });
 
@@ -59,7 +59,7 @@ describe('checkCopy: banned words', () => {
   });
 
   it('ignores ASCII route paths and URLs inside Vietnamese copy', () => {
-    expect(ids('Xem lộ trình tại /lo-trinh hoặc https://rodemap.app/lo-trinh.')).toEqual([]);
+    expect(ids('Xem lộ trình tại /lo-trinh hoặc https://vsmcclubs.site/lo-trinh.')).toEqual([]);
     expect(ids('Học sinh lo/không lo')).toEqual(['banned-word', 'banned-word']);
   });
 });
@@ -96,7 +96,16 @@ describe('checkCopy: brand and emoji (all strings)', () => {
   it('flags the old brand name in any string', () => {
     expect(ids('Rode helps students')).toEqual(['old-brand']);
     expect(ids('Rode tổng hợp sự kiện.')).toEqual(['old-brand']);
-    expect(ids('Rodemap tổng hợp sự kiện.')).toEqual([]);
+    expect(ids('Rodemap tổng hợp sự kiện.')).toEqual(['old-brand']);
+    expect(ids('vsmcclubs tổng hợp sự kiện.')).toEqual([]);
+    expect(ids('Truy cập vsmcclubs.site để xem lịch.')).toEqual([]);
+  });
+
+  it('flags the new name written in any other case or spacing', () => {
+    for (const variant of ['Vsmcclubs', 'VSMCclubs', 'VSMC Clubs', 'vsmc clubs', 'VSMC-CLUBS']) {
+      expect(ids(`${variant} tổng hợp sự kiện.`), variant).toEqual(['brand-case']);
+    }
+    expect(ids('Học sinh Vinschool Smart City (VSMC) tham gia câu lạc bộ.')).toEqual([]);
     expect(ids('rodemap:v1')).toEqual([]);
     expect(ids('She rode a bike')).toEqual([]);
   });
@@ -150,7 +159,7 @@ describe('lintTsCopy', () => {
       '// chạy thử: không quét chú thích',
       'const chay = 1;',
       "export const title = 'Lộ trình hoạt động ngoại khóa';",
-      "export const body = 'Rodemap tổng hợp sự kiện, qua đó hỗ trợ học sinh xây dựng lộ trình cá nhân.';",
+      "export const body = 'vsmcclubs tổng hợp sự kiện, qua đó hỗ trợ học sinh xây dựng lộ trình cá nhân.';",
       'export const el = <p>Ban tổ chức phụ trách hậu cần, đồng thời đảm bảo an toàn.</p>;',
     ].join('\n');
     expect(lintTsCopy(source, 'x.tsx')).toEqual([]);
@@ -162,7 +171,7 @@ describe('lintHtmlCopy', () => {
     const html = [
       '<html lang="vi"><head>',
       '<meta name="description" content="Rode tổng hợp sự kiện">',
-      '<title>Rodemap · Lộ trình</title>',
+      '<title>vsmcclubs · Lộ trình</title>',
       '<script>const s = "chạy";</script><style>p::after { content: "chạy" }</style>',
       '<!-- chạy -->',
       '</head><body><noscript>Vui lòng bật JavaScript để chạy ứng dụng.</noscript></body></html>',

@@ -1,5 +1,5 @@
 /*
- * Rodemap layout primitives: container, 4/8/12-column grid, ground/surface bands
+ * vsmcclubs layout primitives: container, 4/8/12-column grid, ground/surface bands
  * separated by hairlines, the page-head pattern, stack and cluster utilities.
  * Breakpoints: 720px (phone → tablet) and 1080px (tablet → desktop), DESIGN.md §4.
  */

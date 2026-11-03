@@ -126,10 +126,10 @@ describe('pathFor', () => {
 
 describe('titles and path helpers', () => {
   it('formats the document title with the product name', () => {
-    expect(APP_NAME).toBe('Rodemap');
-    expect(documentTitle(routeTitle('dashboard'))).toBe('Tổng quan · Rodemap');
-    expect(documentTitle(routeTitle('notFound'))).toBe('Không tìm thấy trang · Rodemap');
-    expect(routeTitle('nope' as RouteName)).toBe('Rodemap');
+    expect(APP_NAME).toBe('vsmcclubs');
+    expect(documentTitle(routeTitle('dashboard'))).toBe('Tổng quan · vsmcclubs');
+    expect(documentTitle(routeTitle('notFound'))).toBe('Không tìm thấy trang · vsmcclubs');
+    expect(routeTitle('nope' as RouteName)).toBe('vsmcclubs');
   });
 
   it('normalises paths', () => {

@@ -168,7 +168,7 @@ function publicEvent(ctx: ToolContext, id: string): SchoolEvent | undefined {
 }
 
 function notFound(id: string): ToolOutcome {
-  return { result: { error: `Không tìm thấy sự kiện có mã ${id} trong dữ liệu Rodemap.` }, isError: true };
+  return { result: { error: `Không tìm thấy sự kiện có mã ${id} trong dữ liệu vsmcclubs.` }, isError: true };
 }
 
 function inRange(e: SchoolEvent, from?: string, to?: string): boolean {

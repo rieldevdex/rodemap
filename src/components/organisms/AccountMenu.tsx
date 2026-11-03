@@ -235,7 +235,7 @@ export function AccountMenu() {
             <p className="account-menu__help" id={dateHelpId}>
               {dateLabel === null
                 ? 'Bỏ trống trường này để hiển thị theo ngày thực tế.'
-                : `Rodemap đang hiển thị dữ liệu theo ngày ${dateLabel}.`}
+                : `vsmcclubs đang hiển thị dữ liệu theo ngày ${dateLabel}.`}
             </p>
           </div>
 
@@ -257,7 +257,7 @@ export function AccountMenu() {
               <div className="account-menu__confirm" role="group" aria-labelledby={confirmTextId}>
                 <p id={confirmTextId} className="account-menu__confirm-text">
                   Hồ sơ, thông tin đăng ký, hồ sơ năng lực và sự kiện đã gửi trên trình duyệt này sẽ bị xóa; bạn cần thiết lập lại
-                  hồ sơ để tiếp tục sử dụng Rodemap. Bạn có xác nhận xóa không?
+                  hồ sơ để tiếp tục sử dụng vsmcclubs. Bạn có xác nhận xóa không?
                 </p>
                 <div className="account-menu__row">
                   <Button ref={confirmRef} variant="primary" size="sm" onClick={confirmReset}>

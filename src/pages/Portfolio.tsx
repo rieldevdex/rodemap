@@ -30,7 +30,7 @@ export function PortfolioPage() {
 
   const exportJson = () => {
     const data = portfolioJson(entries, selectAllEvents(state), CLUBS, profile, now);
-    downloadFile(`rodemap-ho-so-nang-luc-${formatDate(now).split('/').reverse().join('-')}.json`, JSON.stringify(data, null, 2), 'application/json');
+    downloadFile(`vsmcclubs-ho-so-nang-luc-${formatDate(now).split('/').reverse().join('-')}.json`, JSON.stringify(data, null, 2), 'application/json');
   };
 
   const save = (entry: PortfolioEntry, patch: Pick<PortfolioEntry, 'role' | 'hours' | 'reflection' | 'evidenceLinks'>) => {
@@ -63,7 +63,7 @@ export function PortfolioPage() {
 
       {/* Print-only document header (the A4 sheet). */}
       <section className="portfolio__sheet-head print-only" aria-hidden="true">
-        <p className="portfolio__sheet-kicker">Rodemap · Hồ sơ năng lực · {SCHOOL.name}</p>
+        <p className="portfolio__sheet-kicker">vsmcclubs · Hồ sơ năng lực · {SCHOOL.name}</p>
         <h2 className="portfolio__sheet-title">Hồ sơ năng lực năm học {SCHOOL.schoolYear}</h2>
         <dl className="portfolio__sheet-facts">
           <div>

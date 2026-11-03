@@ -2,7 +2,7 @@
  * A small burst of line sparks after "Xác nhận" registers an event (DESIGN.md §6.2 #10).
  * Adapted from React Bits "ClickSpark" (https://reactbits.dev, MIT + Commons Clause,
  * Copyright (c) 2026 David Haz): line sparks radiating from the control and fading as they
- * travel. Rodemap draws twelve DOM sparks in the event's category colour and moves them with
+ * travel. vsmcclubs draws twelve DOM sparks in the event's category colour and moves them with
  * GSAP (transform and opacity only); decorative, never under reduced motion.
  */
 import { useGSAP } from '@gsap/react';

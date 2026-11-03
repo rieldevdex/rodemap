@@ -8,9 +8,9 @@ import { TIME_ZONE, VN_OFFSET_MS, toIsoDate } from './dates';
 import { eventEnd, eventStart, isExternalCompetition, sortByStart } from './events';
 import type { Club, Millis, SchoolEvent } from './types';
 
-export const ICS_PRODID = '-//Rodemap//Ban trinh dien//VI';
-export const ICS_UID_DOMAIN = 'rodemap.app';
-export const DEFAULT_CALENDAR_NAME = 'Lịch cá nhân Rodemap';
+export const ICS_PRODID = '-//vsmcclubs//Ban trinh dien//VI';
+export const ICS_UID_DOMAIN = 'vsmcclubs.site';
+export const DEFAULT_CALENDAR_NAME = 'Lịch cá nhân vsmcclubs';
 /** Maximum octets per physical content line, excluding the CRLF (RFC 5545 §3.1). */
 export const ICS_MAX_LINE_OCTETS = 75;
 const CRLF = '\r\n';
@@ -19,7 +19,7 @@ export interface IcsOptions {
   now: Millis;
   clubs: Club[];
   calendarName?: string;
-  /** Site origin, e.g. "https://rodemap.example"; adds event links when given. */
+  /** Site origin, e.g. "https://vsmcclubs.site"; adds event links when given. */
   baseUrl?: string;
 }
 
@@ -142,7 +142,7 @@ export function buildIcs(events: SchoolEvent[], opts: IcsOptions): string {
   return lines.map(foldLine).join(CRLF) + CRLF;
 }
 
-/** "rodemap-lich-ca-nhan-2026-10-14.ics" (date of `now` in Vietnam). */
+/** "vsmcclubs-lich-ca-nhan-2026-10-14.ics" (date of `now` in Vietnam). */
 export function icsFileName(now: Millis): string {
-  return `rodemap-lich-ca-nhan-${toIsoDate(now)}.ics`;
+  return `vsmcclubs-lich-ca-nhan-${toIsoDate(now)}.ics`;
 }

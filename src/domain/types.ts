@@ -1,5 +1,5 @@
 /**
- * Rodemap domain types. Pure data shapes shared by data, domain, state, mochi
+ * vsmcclubs domain types. Pure data shapes shared by data, domain, state, mochi
  * and UI layers. No React, no DOM.
  */
 
@@ -36,7 +36,7 @@ export const GRADE_LEVELS: readonly { name: string; grades: readonly Grade[] }[]
 ];
 
 /**
- * Who publishes on Rodemap: a student club, the Hội đồng Học sinh (school-wide events) or a
+ * Who publishes on vsmcclubs: a student club, the Hội đồng Học sinh (school-wide events) or a
  * school office such as Phòng Cố vấn Học tập (external academic competitions).
  */
 export type ClubKind = 'club' | 'council' | 'office';
@@ -88,7 +88,7 @@ export interface SchoolEvent {
   /**
    * The external body organising the event, e.g. "Trường đại học đối tác". Set only for
    * competitions organised outside the school ("Cuộc thi ngoài trường"), which a school office
-   * (the publisher, `clubId`) relays on Rodemap.
+   * (the publisher, `clubId`) relays on vsmcclubs.
    */
   organizer?: string;
 }
@@ -236,7 +236,7 @@ export type ThemePreference = 'system' | 'light' | 'dark';
 export type AppearanceMode = 'lo-trinh' | 'ruc-ro' | 'ap-phich' | 'diu-nhe';
 export const APPEARANCE_MODES: readonly AppearanceMode[] = ['lo-trinh', 'ruc-ro', 'ap-phich', 'diu-nhe'];
 
-/** Mật độ nội dung (DESIGN.md §10): how much text Rodemap shows. */
+/** Mật độ nội dung (DESIGN.md §10): how much text vsmcclubs shows. */
 export type TextDensity = 'full' | 'compact' | 'minimal';
 export const TEXT_DENSITIES: readonly TextDensity[] = ['full', 'compact', 'minimal'];
 

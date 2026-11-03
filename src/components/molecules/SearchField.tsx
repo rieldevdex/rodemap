@@ -22,7 +22,7 @@ export interface SearchFieldProps {
 
 /**
  * Search input with a visible label, a search icon, an optional shortcut hint and a clear
- * button. The caller decides what the text matches (Rodemap folds Vietnamese diacritics).
+ * button. The caller decides what the text matches (vsmcclubs folds Vietnamese diacritics).
  */
 export function SearchField({
   label,

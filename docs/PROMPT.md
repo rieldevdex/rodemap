@@ -1,3 +1,5 @@
+> Note (2026-11-03): the product described below as Rodemap was renamed **vsmcclubs** (https://vsmcclubs.site). This brief is kept as originally written.
+
 > Original build brief, kept for reference. The product name is **Rodemap** (the brief says "Rode"; renamed on 2026-10-07).
 
 # Prompt for Claude Code — build **Rode**

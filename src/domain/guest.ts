@@ -1,5 +1,5 @@
 /**
- * Trying Rodemap before setting up a profile: a visitor picks a grade and a few fields on
+ * Trying vsmcclubs before setting up a profile: a visitor picks a grade and a few fields on
  * Tổng quan to see suggestions. Only the grade and the fields are kept, on this device. Pure.
  */
 import { DEFAULT_WEEKLY_HOUR_BUDGET } from './budget';

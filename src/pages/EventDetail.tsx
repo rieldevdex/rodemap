@@ -59,7 +59,7 @@ export function EventDetailPage() {
     return (
       <NotPublished
         title="Không tìm thấy sự kiện"
-        lead="Đường dẫn không tương ứng với sự kiện nào trong dữ liệu Rodemap. Vui lòng tra cứu tại trang Khám phá sự kiện."
+        lead="Đường dẫn không tương ứng với sự kiện nào trong dữ liệu vsmcclubs. Vui lòng tra cứu tại trang Khám phá sự kiện."
       />
     );
   }
@@ -94,7 +94,7 @@ export function EventDetailPage() {
   const relatedTitle = club?.kind === 'office' ? `Cuộc thi khác do ${club.shortName} cập nhật` : `Sự kiện khác của ${publisherShort}`;
 
   const downloadOne = () => {
-    const ics = buildIcs([event], { now, clubs: CLUBS, calendarName: 'Lịch Rodemap', baseUrl: window.location.origin });
+    const ics = buildIcs([event], { now, clubs: CLUBS, calendarName: 'Lịch vsmcclubs', baseUrl: window.location.origin });
     downloadFile(icsFileName(now).replace('.ics', `-${event.slug.slice(0, 32)}.ics`), ics, 'text/calendar;charset=utf-8');
   };
 
@@ -165,7 +165,7 @@ export function EventDetailPage() {
 
             {organizer !== null ? (
               <p className="event-detail__note" role="note">
-                Cuộc thi do {organizer} tổ chức. {club?.shortName ?? 'Đơn vị đăng tin'} cập nhật thông tin trên Rodemap, tổng hợp danh sách
+                Cuộc thi do {organizer} tổ chức. {club?.shortName ?? 'Đơn vị đăng tin'} cập nhật thông tin trên vsmcclubs, tổng hợp danh sách
                 học sinh đăng ký và hướng dẫn các bước tiếp theo theo quy định của đơn vị tổ chức.
               </p>
             ) : null}

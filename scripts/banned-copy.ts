@@ -1,6 +1,6 @@
 /**
  * Copy rules for `npm run lint:copy` (docs/ARCHITECTURE.md "Copy rules", DESIGN.md §8),
- * kept as data. Rodemap copy is formal administrative Vietnamese (văn phong hành chính).
+ * kept as data. vsmcclubs copy is formal administrative Vietnamese (văn phong hành chính).
  *
  * - scope 'vietnamese': checked only in strings that contain a Vietnamese diacritic letter.
  * - scope 'all': checked in every string (old brand name, emoji).
@@ -10,7 +10,7 @@
  * letter or combining mark, so "Lộ trình" never trips "lo".
  */
 
-export type CopyRuleId = 'banned-word' | 'banned-structure' | 'old-brand' | 'emoji';
+export type CopyRuleId = 'banned-word' | 'banned-structure' | 'old-brand' | 'brand-case' | 'emoji';
 
 export interface CopyRule {
   id: CopyRuleId;
@@ -73,10 +73,18 @@ export const BANNED_STRUCTURES: readonly { label: string; pattern: RegExp; hint:
   },
 ];
 
+/** The product was renamed from Rodemap (and the earlier "Rode") to vsmcclubs on 2026-11-03. */
 export const OLD_BRAND: { label: string; pattern: RegExp; hint: string } = {
-  label: 'Rode',
-  pattern: /(?<![\p{L}\p{M}])Rode(?![\p{L}\p{M}])/u,
-  hint: 'tên sản phẩm là "Rodemap"',
+  label: 'Rodemap',
+  pattern: /(?<![\p{L}\p{M}])Rode(?:map)?(?![\p{L}\p{M}])/u,
+  hint: 'tên sản phẩm là "vsmcclubs" (viết liền, chữ thường)',
+};
+
+/** The name is written as one lowercase word, like the domain vsmcclubs.site. */
+export const BRAND_CASE: { label: string; pattern: RegExp; hint: string } = {
+  label: 'vsmcclubs',
+  pattern: /(?<![\p{L}\p{M}])(?!vsmcclubs(?![\p{L}\p{M}]))[Vv][Ss][Mm][Cc][ -]?[Cc][Ll][Uu][Bb][Ss](?![\p{L}\p{M}])/u,
+  hint: 'viết tên sản phẩm liền và chữ thường: "vsmcclubs"',
 };
 
 export const EMOJI: { label: string; pattern: RegExp; hint: string } = {
@@ -95,5 +103,6 @@ export const COPY_RULES: readonly CopyRule[] = [
     (s): CopyRule => ({ id: 'banned-structure', label: s.label, pattern: s.pattern, hint: s.hint, scope: 'vietnamese' }),
   ),
   { id: 'old-brand', label: OLD_BRAND.label, pattern: OLD_BRAND.pattern, hint: OLD_BRAND.hint, scope: 'all' },
+  { id: 'brand-case', label: BRAND_CASE.label, pattern: BRAND_CASE.pattern, hint: BRAND_CASE.hint, scope: 'all' },
   { id: 'emoji', label: EMOJI.label, pattern: EMOJI.pattern, hint: EMOJI.hint, scope: 'all' },
 ];

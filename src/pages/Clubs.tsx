@@ -32,7 +32,7 @@ export function ClubsPage() {
       <PageHead
         eyebrow={`Danh sách · ${countLabel(CLUBS)}`}
         title="Câu lạc bộ"
-        lead="Các câu lạc bộ, Hội đồng Học sinh và Phòng Cố vấn Học tập, kèm lĩnh vực hoạt động và các sự kiện sắp diễn ra trên Rodemap. Phòng Cố vấn Học tập cập nhật thông tin các cuộc thi học thuật ngoài trường."
+        lead="Các câu lạc bộ, Hội đồng Học sinh và Phòng Cố vấn Học tập, kèm lĩnh vực hoạt động và các sự kiện sắp diễn ra trên vsmcclubs. Phòng Cố vấn Học tập cập nhật thông tin các cuộc thi học thuật ngoài trường."
       >
         <p className="clubs__ideas">
           Chưa có hoạt động bạn mong muốn? <Link to="/de-xuat">Gửi đề xuất hoạt động tới Hội đồng Học sinh</Link>

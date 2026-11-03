@@ -218,7 +218,7 @@ export function AppearancePicker() {
               <p>
                 Mức tương tác càng cao, trang càng sử dụng nhiều tài nguyên xử lý, bộ nhớ và pin của thiết bị; trên thiết bị cấu hình thấp, trang có thể
                 phản hồi chậm hơn.
-                {recommended === null ? null : ' Thiết bị này có cấu hình hạn chế hoặc đang bật chế độ tiết kiệm dữ liệu; Rodemap khuyến nghị mức Nhẹ.'}
+                {recommended === null ? null : ' Thiết bị này có cấu hình hạn chế hoặc đang bật chế độ tiết kiệm dữ liệu; vsmcclubs khuyến nghị mức Nhẹ.'}
                 {reducedMotion ? ' Thiết bị đang yêu cầu giảm chuyển động: chuyển động luôn tắt ở mọi mức, còn tô sáng tuyến và phím tắt vẫn hoạt động.' : null}
               </p>
             </div>

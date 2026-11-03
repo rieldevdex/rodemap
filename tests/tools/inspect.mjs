@@ -46,11 +46,11 @@ for (const path of paths.length ? paths : ['/']) {
       // Pin the demo date through the app's own account menu state.
       await page.evaluate((today) => {
         try {
-          const raw = localStorage.getItem('rodemap:v1');
+          const raw = localStorage.getItem('vsmcclubs:v1');
           const s = raw ? JSON.parse(raw) : null;
           if (s && s.demoToday !== today) {
             s.demoToday = today;
-            localStorage.setItem('rodemap:v1', JSON.stringify(s));
+            localStorage.setItem('vsmcclubs:v1', JSON.stringify(s));
             location.reload();
           }
         } catch {

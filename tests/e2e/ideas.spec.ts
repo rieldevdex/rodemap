@@ -45,7 +45,7 @@ test.describe('Đề xuất hoạt động và đề xuất hợp tác', () => {
     await page.getByRole('navigation', { name: 'Điều hướng chính' }).getByRole('link', { name: 'Đề xuất' }).click();
     await expect(page).toHaveURL('/de-xuat');
     await expect(page.locator('#main-heading')).toHaveText('Đề xuất hoạt động');
-    await expect(page).toHaveTitle('Đề xuất · Rodemap');
+    await expect(page).toHaveTitle('Đề xuất · vsmcclubs');
     expect(await axe(page)).toEqual([]);
 
     // Validation: the summary takes focus and lists the fields to fix.

@@ -1091,7 +1091,7 @@ export const EVENTS: SchoolEvent[] = [
     summary:
       'Cuộc thi ngoài trường dành cho các nhóm học sinh trung học phổ thông có ý tưởng kinh doanh gắn với nhu cầu của cộng đồng. Tại vòng sơ loại trực tuyến, mỗi nhóm trình bày ý tưởng trong năm phút và nhận nhận xét của ban giám khảo do đơn vị tổ chức mời.',
     description:
-      'Cuộc thi do Trường đại học đối tác tổ chức, gồm vòng sơ loại trực tuyến, vòng bán kết và vòng chung kết tại cơ sở của đơn vị tổ chức. Mỗi nhóm gồm từ hai đến bốn học sinh, nộp bản mô tả ý tưởng theo mẫu của ban tổ chức trước vòng sơ loại. Phòng Cố vấn Học tập cập nhật thông tin cuộc thi trên Rodemap; sau khi học sinh đăng ký trên Rodemap, Phòng tổng hợp danh sách và hướng dẫn học sinh hoàn thiện hồ sơ dự thi theo các bước của ban tổ chức.',
+      'Cuộc thi do Trường đại học đối tác tổ chức, gồm vòng sơ loại trực tuyến, vòng bán kết và vòng chung kết tại cơ sở của đơn vị tổ chức. Mỗi nhóm gồm từ hai đến bốn học sinh, nộp bản mô tả ý tưởng theo mẫu của ban tổ chức trước vòng sơ loại. Phòng Cố vấn Học tập cập nhật thông tin cuộc thi trên vsmcclubs; sau khi học sinh đăng ký trên vsmcclubs, Phòng tổng hợp danh sách và hướng dẫn học sinh hoàn thiện hồ sơ dự thi theo các bước của ban tổ chức.',
     tags: ['khoi-nghiep', 'thuyet-trinh', 'lam-viec-nhom'],
     status: 'approved',
   },
@@ -1113,7 +1113,7 @@ export const EVENTS: SchoolEvent[] = [
     summary:
       'Cuộc thi ngoài trường dành cho học sinh trung học cơ sở yêu thích Toán và các môn Khoa học tự nhiên. Học sinh làm bài thi cá nhân gồm phần trắc nghiệm và phần tự luận, qua đó rèn luyện tư duy giải quyết vấn đề và làm quen với môi trường thi đấu học thuật bên ngoài nhà trường.',
     description:
-      'Cuộc thi do ban tổ chức cấp thành phố triển khai, bài thi gồm hai phần Toán và Khoa học tự nhiên với thời gian làm bài một trăm hai mươi phút. Địa điểm thi cụ thể được ban tổ chức thông báo tới từng thí sinh sau khi hồ sơ được xác nhận. Phòng Cố vấn Học tập cập nhật thông tin cuộc thi trên Rodemap; sau khi học sinh đăng ký trên Rodemap, Phòng tổng hợp danh sách, hoàn thiện hồ sơ đăng ký chung của nhà trường và hướng dẫn học sinh các bước tiếp theo theo quy định của ban tổ chức.',
+      'Cuộc thi do ban tổ chức cấp thành phố triển khai, bài thi gồm hai phần Toán và Khoa học tự nhiên với thời gian làm bài một trăm hai mươi phút. Địa điểm thi cụ thể được ban tổ chức thông báo tới từng thí sinh sau khi hồ sơ được xác nhận. Phòng Cố vấn Học tập cập nhật thông tin cuộc thi trên vsmcclubs; sau khi học sinh đăng ký trên vsmcclubs, Phòng tổng hợp danh sách, hoàn thiện hồ sơ đăng ký chung của nhà trường và hướng dẫn học sinh các bước tiếp theo theo quy định của ban tổ chức.',
     tags: ['hoc-thuat', 'thi-dau'],
     status: 'approved',
   },
@@ -1135,7 +1135,7 @@ export const EVENTS: SchoolEvent[] = [
     summary:
       'Cuộc thi ngoài trường dành cho học sinh trung học phổ thông đã có đề tài nghiên cứu khoa học cá nhân hoặc theo nhóm. Tại vòng trình bày, học sinh báo cáo kết quả nghiên cứu trước hội đồng chuyên môn và nhận góp ý để hoàn thiện đề tài.',
     description:
-      'Cuộc thi do Viện nghiên cứu đối tác tổ chức, tiếp nhận đề tài thuộc các lĩnh vực khoa học tự nhiên, khoa học xã hội và kỹ thuật. Mỗi đề tài được trình bày trong mười phút, sau đó hội đồng chuyên môn đặt câu hỏi và nhận xét; học sinh chuẩn bị báo cáo tóm tắt và áp phích theo mẫu của ban tổ chức. Phòng Cố vấn Học tập cập nhật thông tin cuộc thi trên Rodemap; sau khi học sinh đăng ký trên Rodemap, Phòng tổng hợp danh sách, rà soát hồ sơ đề tài và hướng dẫn học sinh nộp hồ sơ theo các bước của ban tổ chức.',
+      'Cuộc thi do Viện nghiên cứu đối tác tổ chức, tiếp nhận đề tài thuộc các lĩnh vực khoa học tự nhiên, khoa học xã hội và kỹ thuật. Mỗi đề tài được trình bày trong mười phút, sau đó hội đồng chuyên môn đặt câu hỏi và nhận xét; học sinh chuẩn bị báo cáo tóm tắt và áp phích theo mẫu của ban tổ chức. Phòng Cố vấn Học tập cập nhật thông tin cuộc thi trên vsmcclubs; sau khi học sinh đăng ký trên vsmcclubs, Phòng tổng hợp danh sách, rà soát hồ sơ đề tài và hướng dẫn học sinh nộp hồ sơ theo các bước của ban tổ chức.',
     tags: ['nghien-cuu', 'hoc-thuat', 'thuyet-trinh'],
     status: 'approved',
   },
@@ -1157,7 +1157,7 @@ export const EVENTS: SchoolEvent[] = [
     summary:
       'Cuộc thi ngoài trường đánh giá năng lực lập luận và trình bày quan điểm bằng tiếng Anh theo văn phong học thuật, dành cho học sinh trung học phổ thông. Học sinh viết một bài luận theo đề do ban tổ chức công bố tại buổi thi trực tuyến.',
     description:
-      'Cuộc thi do Trường đại học đối tác tổ chức; thí sinh có một trăm hai mươi phút để hoàn thành bài luận từ năm trăm đến bảy trăm từ trên nền tảng thi của ban tổ chức. Bài thi được chấm theo các tiêu chí lập luận, cấu trúc, sử dụng nguồn tham khảo và ngôn ngữ; kết quả được đơn vị tổ chức công bố sau bốn tuần. Phòng Cố vấn Học tập cập nhật thông tin cuộc thi trên Rodemap; sau khi học sinh đăng ký trên Rodemap, Phòng tổng hợp danh sách và hướng dẫn học sinh tạo tài khoản dự thi, kiểm tra thiết bị theo các bước của ban tổ chức.',
+      'Cuộc thi do Trường đại học đối tác tổ chức; thí sinh có một trăm hai mươi phút để hoàn thành bài luận từ năm trăm đến bảy trăm từ trên nền tảng thi của ban tổ chức. Bài thi được chấm theo các tiêu chí lập luận, cấu trúc, sử dụng nguồn tham khảo và ngôn ngữ; kết quả được đơn vị tổ chức công bố sau bốn tuần. Phòng Cố vấn Học tập cập nhật thông tin cuộc thi trên vsmcclubs; sau khi học sinh đăng ký trên vsmcclubs, Phòng tổng hợp danh sách và hướng dẫn học sinh tạo tài khoản dự thi, kiểm tra thiết bị theo các bước của ban tổ chức.',
     tags: ['tieng-anh', 'hoc-thuat', 'du-hoc'],
     status: 'approved',
   },

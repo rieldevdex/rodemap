@@ -6,7 +6,7 @@
  *   npm run build:supabase   → dist-supabase/rodemap-mochi/index.ts
  *
  * Deploy that file as the function's index.ts (Supabase CLI or dashboard), with JWT
- * verification on; the Rodemap Worker sends the project's anon key.
+ * verification on; the vsmcclubs Worker sends the project's anon key.
  */
 import { build, type Plugin } from 'esbuild';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';

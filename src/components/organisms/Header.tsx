@@ -116,7 +116,7 @@ export function Header() {
   return (
     <header className="site-header" ref={headerRef}>
       <div className="site-header__inner container">
-        <Link to={pathFor('home')} className="site-header__brand" aria-label="Rodemap – Trang chủ">
+        <Link to={pathFor('home')} className="site-header__brand" aria-label="vsmcclubs – Trang chủ">
           <Wordmark />
         </Link>
 

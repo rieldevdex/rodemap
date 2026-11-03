@@ -3,7 +3,7 @@
  * through useRoute() and change it through useNavigate() or <Link>.
  *
  * On every navigation to a new path: scroll to top (or to the #hash target), set
- * document.title "<route title> · Rodemap" and move focus to #main-heading once the
+ * document.title "<route title> · vsmcclubs" and move focus to #main-heading once the
  * (lazy) page has rendered it. Query-only changes (filters) keep scroll and focus.
  */
 import {
@@ -202,7 +202,7 @@ export function useSetupHref(): string {
 
 /**
  * Refines the document title for the current page, e.g. an event or club name:
- * "<title> · Rodemap". Pass null to keep the route title.
+ * "<title> · vsmcclubs". Pass null to keep the route title.
  */
 export function useDocumentTitle(title: string | null): void {
   useEffect(() => {

@@ -5,7 +5,7 @@ import { createDemoState, createSeedState, DEFAULT_CLUB_ID, isAppStateV1, migrat
 
 describe('constants', () => {
   it('pins the storage key, version and default club', () => {
-    expect(STORAGE_KEY).toBe('rodemap:v1');
+    expect(STORAGE_KEY).toBe('vsmcclubs:v1');
     expect(STATE_VERSION).toBe(1);
     expect(DEFAULT_CLUB_ID).toBe('inkstep');
   });
@@ -118,7 +118,7 @@ describe('isAppStateV1 / migrate', () => {
     expect(isAppStateV1({ ...createSeedState(), profile: null, demoToday: '2026-10-07' })).toBe(true);
   });
 
-  it.each([null, undefined, 1, 'rodemap', true, [], [createSeedState()]])('rejects the non-object %j', (raw) => {
+  it.each([null, undefined, 1, 'vsmcclubs', true, [], [createSeedState()]])('rejects the non-object %j', (raw) => {
     expect(isAppStateV1(raw)).toBe(false);
     expect(migrate(raw)).toBeNull();
   });

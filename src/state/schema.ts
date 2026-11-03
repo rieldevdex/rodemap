@@ -21,7 +21,9 @@ import type {
   ThemePreference,
 } from '../domain/types';
 
-export const STORAGE_KEY = 'rodemap:v1';
+export const STORAGE_KEY = 'vsmcclubs:v1';
+/** Where the state lived before the product was renamed (2026-11-03); read once, then removed. */
+export const LEGACY_STORAGE_KEY = 'rodemap:v1';
 export const STATE_VERSION = 1;
 export const DEFAULT_CLUB_ID = 'inkstep';
 

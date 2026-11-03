@@ -2,7 +2,7 @@
  * A figure that counts up once when it comes into view (DESIGN.md §6.2 #16, home page only).
  * Adapted from React Bits "CountUp" (https://reactbits.dev, MIT + Commons Clause,
  * Copyright (c) 2026 David Haz): the visible digits are aria-hidden and the real value is read
- * out once; tabular figures keep the width steady. Rodemap drives it with GSAP and the motion
+ * out once; tabular figures keep the width steady. vsmcclubs drives it with GSAP and the motion
  * tokens instead of motion/react, and formats numbers the Vietnamese way.
  */
 import { useGSAP } from '@gsap/react';

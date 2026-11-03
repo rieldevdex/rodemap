@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import worker from './index';
 
 const request = (path: string, method = 'GET') =>
-  new Request(`https://rodemap.test${path}`, { method, headers: { 'content-type': 'application/json' }, body: method === 'POST' ? '{}' : null });
+  new Request(`https://vsmcclubs.test${path}`, { method, headers: { 'content-type': 'application/json' }, body: method === 'POST' ? '{}' : null });
 
 describe('Worker routing', () => {
   it('sends POST /api/mochi to the Mochi handler', async () => {

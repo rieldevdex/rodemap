@@ -1,4 +1,4 @@
-# Rodemap — architecture and contracts
+# vsmcclubs — architecture and contracts
 
 Binding companion to `DESIGN.md` (visual) and `PROMPT.md` requirements. Every
 module below has a fixed public signature so layers can be built in parallel.
@@ -47,7 +47,7 @@ Prefer: phát triển, vận hành, phụ trách, đảm bảo, triển khai, t�
 xác nhận, đăng ký. Link ideas with: nhằm, qua đó, đồng thời, góp phần.
 Buttons are verbs: Đăng ký, Thêm vào lịch, Xuất hồ sơ, Gửi sự kiện, Phê duyệt.
 Dates: `14/10/2026`, times `07:30`, weekdays `Thứ Tư` / short `Th 4`.
-The product is **Rodemap** (never "Rode").
+The product is **vsmcclubs** (never "Rode").
 
 ## Styling rules (enforced by `npm run lint:tokens`)
 
@@ -256,7 +256,7 @@ export function buildIcs(events: SchoolEvent[], opts: { now: Millis; clubs: Club
 //   Asia/Ho_Chi_Minh (+0700, no DST), DTSTART/DTEND;TZID=Asia/Ho_Chi_Minh, UID `${event.id}@rodemap.app`
 //   (stable), DTSTAMP from opts.now in UTC, SUMMARY, LOCATION, DESCRIPTION (summary + club + url; an external
 //   competition gives "Đơn vị tổ chức: <organizer>" then "Nguồn thông tin: <publisher>"),
-//   CATEGORIES (category name), URL when baseUrl given. PRODID "-//Rodemap//Ban trinh dien//VI".
+//   CATEGORIES (category name), URL when baseUrl given. PRODID "-//vsmcclubs//Ban trinh dien//VI".
 export function icsFileName(now: Millis): string; // "rodemap-lich-ca-nhan-2026-10-14.ics"
 
 // gcal.ts
@@ -325,10 +325,20 @@ office publishes events with an organizer (`data.test.ts`). The event page shows
 chức" and "Nguồn thông tin"; cards and lists add the organiser to the publisher (`publisherLine`).
 In Cổng câu lạc bộ the office's form adds the required field "Đơn vị tổ chức".
 
+## Names after the rename (2026-11-03)
+
+The product is **vsmcclubs** (https://vsmcclubs.site), formerly Rodemap. Legacy infrastructure
+names stay because deployment and the deployed Mochi relay depend on them: the Cloudflare Worker
+`rodemap` (Workers Builds is bound to it), the Supabase Edge Function `rodemap-mochi`, the SQL
+schema `rodemap` and `public.rodemap_mochi_take`, the secrets `RODEMAP_*`, the header
+`x-rodemap-client-ip` (Worker → relay) and the snapshot tag `<du_lieu_rodemap>` (client → relay
+validation). Browser keys moved to `vsmcclubs:v1` and `vsmcclubs:mochi-id`; the old keys are
+read once and removed, so returning students keep their profile and Mochi quota.
+
 ## State (`src/state`)
 
 ```ts
-export const STORAGE_KEY = 'rodemap:v1';
+export const STORAGE_KEY = 'vsmcclubs:v1';     // LEGACY_STORAGE_KEY 'rodemap:v1' is read once after the rename, then removed
 export interface AppState {
   version: 1;
   role: Role; activeClubId: string;
@@ -446,7 +456,7 @@ export function RouterProvider(props: { children: ReactNode }): JSX.Element;
 export function useRoute(): { name: RouteName; params: Record<string, string>; search: URLSearchParams };
 export function useNavigate(): (to: string, opts?: { replace?: boolean }) => void;
 export function Link(props: AnchorHTMLAttributes & { to: string }): JSX.Element; // aria-current="page" when active
-// On navigation: scroll to top, set document.title "<title> · Rodemap", move focus to #main-heading.
+// On navigation: scroll to top, set document.title "<title> · vsmcclubs", move focus to #main-heading.
 ```
 
 ## Mochi (`src/mochi`)

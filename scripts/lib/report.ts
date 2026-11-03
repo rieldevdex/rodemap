@@ -1,5 +1,5 @@
 /**
- * Shared reporting helpers for the Rodemap quality-gate scripts.
+ * Shared reporting helpers for the vsmcclubs quality-gate scripts.
  * Output format (one finding per line): `path:line:col  rule  message`.
  */
 

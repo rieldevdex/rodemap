@@ -162,7 +162,7 @@ export function HomePage() {
         <DotRoad className="home-hero__road" />
       </section>
 
-      <section className="band band--block home-lines density-detail" aria-label="Rodemap trong năm học">
+      <section className="band band--block home-lines density-detail" aria-label="vsmcclubs trong năm học">
         <div className="container stack stack--lg">
           <dl className="home-figures">
             <div>
@@ -210,7 +210,7 @@ export function HomePage() {
       <section className="band density-detail" aria-labelledby="home-pillars">
         <div className="container stack stack--lg">
           <SplitLines as="h2" id="home-pillars" className="home-section-title">
-            Bốn trụ cột của Rodemap
+            Bốn trụ cột của vsmcclubs
           </SplitLines>
           <Reveal as="ol" className="home-pillars">
             {PILLARS.map((p) => (
@@ -228,7 +228,7 @@ export function HomePage() {
       <section className="band band--surface density-full-only" aria-labelledby="home-mochi">
         <div className="container home-mochi">
           <div className="home-mochi__figure">
-            <Mochi state="idle" title="Mochi, trợ lý đồng hành của Rodemap" />
+            <Mochi state="idle" title="Mochi, trợ lý đồng hành của vsmcclubs" />
           </div>
           <div className="stack stack--md">
             <p className="eyebrow">Trợ lý đồng hành</p>
@@ -237,7 +237,7 @@ export function HomePage() {
             </h2>
             <p className="home-split__body">{MOCHI_INTRO}</p>
             <ul className="home-mochi__rules">
-              <li>Mochi chỉ sử dụng dữ liệu của Rodemap và không tự tạo thông tin.</li>
+              <li>Mochi chỉ sử dụng dữ liệu của vsmcclubs và không tự tạo thông tin.</li>
               <li>Mọi thao tác đăng ký đều cần bạn nhấn Xác nhận.</li>
               <li>Mochi không yêu cầu thông tin cá nhân nhạy cảm.</li>
             </ul>

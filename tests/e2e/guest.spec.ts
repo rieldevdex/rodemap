@@ -6,12 +6,12 @@ test.describe('Dùng thử (visitor without a profile)', () => {
     await seedDemo(page, { profile: null, registrations: [], portfolio: [] });
   });
 
-  test('a visitor tries Rodemap from the home page, picks a grade and a field, and sees suggestions', async ({ page }) => {
+  test('a visitor tries vsmcclubs from the home page, picks a grade and a field, and sees suggestions', async ({ page }) => {
     const errors = trackErrors(page);
     await page.goto('/');
-    await page.getByRole('link', { name: 'Dùng thử Rodemap' }).click();
+    await page.getByRole('link', { name: 'Dùng thử vsmcclubs' }).click();
     await expect(page).toHaveURL('/tong-quan');
-    await expect(page.locator('#main-heading')).toHaveText('Dùng thử Rodemap');
+    await expect(page.locator('#main-heading')).toHaveText('Dùng thử vsmcclubs');
     await expect(page.getByText('Chọn khối để xem các sự kiện dành cho bạn.')).toBeVisible();
 
     const picks = page.getByRole('region', { name: 'Gợi ý nhanh' });

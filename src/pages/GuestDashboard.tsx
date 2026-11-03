@@ -41,8 +41,8 @@ export function GuestDashboard() {
     <div className="dashboard">
       <PageHead
         eyebrow={`Dùng thử · Tuần ${String(Number(isoWeekKey(now).slice(-2)))}`}
-        title="Dùng thử Rodemap"
-        lead="Bạn có thể xem sự kiện và gợi ý của Rodemap trước khi thiết lập hồ sơ. Khối và lĩnh vực bạn chọn dưới đây chỉ được lưu trên trình duyệt này và được điền sẵn khi bạn thiết lập hồ sơ."
+        title="Dùng thử vsmcclubs"
+        lead="Bạn có thể xem sự kiện và gợi ý của vsmcclubs trước khi thiết lập hồ sơ. Khối và lĩnh vực bạn chọn dưới đây chỉ được lưu trên trình duyệt này và được điền sẵn khi bạn thiết lập hồ sơ."
         leadShort="Chọn khối và lĩnh vực để xem gợi ý sự kiện dành cho bạn."
       >
         <div className="cluster">
@@ -109,7 +109,7 @@ export function GuestDashboard() {
                         />
                         {r.reasons.length + r.warnings.length > 0 ? (
                           <div className="dashboard__why density-detail">
-                            <p className="dashboard__why-label">Vì sao Rodemap gợi ý</p>
+                            <p className="dashboard__why-label">Vì sao vsmcclubs gợi ý</p>
                             <ul>
                               {describeReasons(r)
                                 .slice(0, 3)
