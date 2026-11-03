@@ -47,7 +47,7 @@ export function ModerationPage() {
           <div className="container">
             <div className="stack stack--md moderation__gate">
               <p>
-                Trong bản trình diễn, bạn có thể chuyển sang vai trò HĐHS để xem hàng chờ kiểm duyệt. Vai trò có thể thay đổi tại mục
+                Trong giai đoạn thử nghiệm, bạn có thể chuyển sang vai trò HĐHS để xem hàng chờ kiểm duyệt. Vai trò có thể thay đổi tại mục
                 Tài khoản minh họa.
               </p>
               <div className="cluster">

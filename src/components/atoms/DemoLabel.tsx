@@ -1,14 +1,14 @@
 import './DemoLabel.css';
 
-export const DEMO_LABEL_TEXT = 'Bản trình diễn · Dữ liệu minh họa';
+export const DEMO_LABEL_TEXT = 'Dữ liệu minh họa';
 
 export interface DemoLabelProps {
-  /** Defaults to "Bản trình diễn · Dữ liệu minh họa". */
+  /** Defaults to "Dữ liệu minh họa". */
   text?: string;
   className?: string;
 }
 
-/** The permanent, honest marker that vsmcclubs is a demo with illustrative data. */
+/** The honest marker on content that is still illustrative (HĐHS events, competitions, articles, the sample student). */
 export function DemoLabel({ text = DEMO_LABEL_TEXT, className }: DemoLabelProps) {
   return (
     <span className={className ? `demo-label ${className}` : 'demo-label'}>

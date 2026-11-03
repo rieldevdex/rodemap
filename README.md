@@ -2,7 +2,7 @@
 
 vsmcclubs tổng hợp sự kiện của các câu lạc bộ vào một nền tảng duy nhất, phân loại theo lĩnh vực và sắp xếp trên dòng thời gian, đồng thời hỗ trợ học sinh xây dựng lộ trình cá nhân và hồ sơ năng lực. Trợ lý Mochi hỗ trợ học sinh lựa chọn sự kiện, đăng ký tham gia và sắp xếp lịch cá nhân.
 
-> **Bản trình diễn · Dữ liệu minh họa.** Danh sách 20 câu lạc bộ là danh sách thật của Vinschool Smart City (cập nhật ngày 03/11/2026), cùng hai sự kiện các câu lạc bộ đã công bố ngày tổ chức. Sự kiện của Hội đồng Học sinh, cuộc thi ngoài trường, hồ sơ học sinh và bài viết Bản tin vẫn là dữ liệu minh họa phục vụ đề xuất tranh cử Hội đồng Học sinh nhiệm kỳ 2026–2027.
+> **Dữ liệu.** Danh sách 20 câu lạc bộ là danh sách thật của Vinschool Smart City (cập nhật ngày 03/11/2026), cùng hai sự kiện các câu lạc bộ đã công bố ngày tổ chức. Sự kiện của Hội đồng Học sinh, cuộc thi ngoài trường, hồ sơ học sinh và bài viết Bản tin vẫn là dữ liệu minh họa phục vụ đề xuất tranh cử Hội đồng Học sinh nhiệm kỳ 2026–2027.
 
 ## 1. Yêu cầu
 

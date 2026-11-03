@@ -138,7 +138,7 @@ export function EventDetailPage() {
         {event.status !== 'approved' ? (
           <p className="event-detail__staff">
             <StatusTag tone={STATUS_LABELS[event.status].tone}>{STATUS_LABELS[event.status].label}</StatusTag>
-            Sự kiện chưa hiển thị với học sinh; bạn đang xem với vai trò trình diễn.
+            Sự kiện chưa hiển thị với học sinh; bạn đang xem với vai trò thử nghiệm.
           </p>
         ) : null}
         <div className="cluster event-detail__actions">
@@ -280,7 +280,8 @@ export function EventDetailPage() {
                 )}
               </div>
             </dl>
-            <DemoLabel />
+            {/* Events of the real clubs are real; the council's and the office's are still illustrative. */}
+            {club?.kind === 'club' ? null : <DemoLabel />}
           </div>
         </div>
       </section>

@@ -15,7 +15,8 @@ test.describe('shell', () => {
   test('the demo label is always visible in the footer', async ({ page }) => {
     await seedDemo(page);
     await page.goto('/');
-    await expect(page.getByRole('contentinfo')).toContainText('Bản trình diễn · Dữ liệu minh họa');
+    await expect(page.getByRole('contentinfo')).toContainText('Một số sự kiện và bài viết là dữ liệu minh họa');
+    await expect(page.getByText(/trình diễn/i)).toHaveCount(0);
   });
 
   test('Giao diện: mode, brightness and density apply at once and persist', async ({ page }) => {

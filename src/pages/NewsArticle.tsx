@@ -221,7 +221,7 @@ export function NewsArticlePage() {
           navigate('/ban-tin');
         }}
       >
-        <p>Bài viết “{post.title}” sẽ không còn hiển thị với học sinh. Thao tác này chỉ áp dụng cho bài viết đăng trong bản trình diễn.</p>
+        <p>Bài viết “{post.title}” sẽ không còn hiển thị với học sinh. Thao tác này chỉ áp dụng cho bài viết đăng trên trình duyệt này.</p>
       </ConfirmDialog>
     </div>
   );

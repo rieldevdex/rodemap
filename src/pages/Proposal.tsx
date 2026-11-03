@@ -74,7 +74,7 @@ export function ProposalPage() {
             In đề án
           </Button>
           <Button to="/thiet-lap" variant="secondary" iconEnd="arrow-right">
-            Trải nghiệm bản trình diễn
+            Trải nghiệm vsmcclubs
           </Button>
         </div>
       </PageHead>

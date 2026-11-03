@@ -79,7 +79,7 @@ export function PortfolioPage() {
             <dd>{formatDate(now)}</dd>
           </div>
         </dl>
-        <p className="portfolio__sheet-note">Bản trình diễn · Dữ liệu minh họa. Các phần được đánh dấu “Bản nháp do Mochi đề xuất” chưa được học sinh xác nhận.</p>
+        <p className="portfolio__sheet-note">Các phần được đánh dấu “Bản nháp do Mochi đề xuất” chưa được học sinh xác nhận.</p>
       </section>
 
       <section className="band band--surface portfolio__summary-band" aria-labelledby="portfolio-summary">

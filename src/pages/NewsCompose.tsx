@@ -65,7 +65,7 @@ export function NewsComposePage() {
           <div className="container">
             <div className="stack stack--md news-compose__gate">
               <p>
-                Trong bản trình diễn, bạn có thể chuyển sang vai trò HĐHS để soạn bài viết. Vai trò có thể thay đổi tại mục Tài khoản minh họa.
+                Trong giai đoạn thử nghiệm, bạn có thể chuyển sang vai trò HĐHS để soạn bài viết. Vai trò có thể thay đổi tại mục Tài khoản minh họa.
               </p>
               <div className="cluster">
                 <Button

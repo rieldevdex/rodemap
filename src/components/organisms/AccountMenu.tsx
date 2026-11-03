@@ -154,14 +154,14 @@ export function AccountMenu() {
             <p className="account-menu__title" id={titleId}>
               Tài khoản minh họa
             </p>
-            <span className="account-menu__badge">Tính năng trình diễn</span>
+            <span className="account-menu__badge">Tính năng thử nghiệm</span>
           </div>
           <p className="account-menu__note">
-            Các thiết lập dưới đây phục vụ bản trình diễn và chỉ được lưu trên trình duyệt này.
+            Các thiết lập dưới đây phục vụ thử nghiệm và chỉ được lưu trên trình duyệt này.
           </p>
 
           <fieldset className="account-menu__section">
-            <legend className="account-menu__label">Vai trò trình diễn</legend>
+            <legend className="account-menu__label">Vai trò thử nghiệm</legend>
             <div className="account-menu__roles">
               {ROLE_OPTIONS.map((option) => (
                 <label key={option.value} className="account-menu__role">
