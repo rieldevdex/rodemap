@@ -1,13 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
-import { clientAddress, handlevsmcclubsMochi, quotaGate, serviceKey } from './handler';
+import { clientAddress, handleMochiRelay, quotaGate, serviceKey } from './handler';
 
 const post = (body: unknown, headers: Record<string, string> = {}) =>
   new Request('https://relay.test/functions/v1/rodemap-mochi', { method: 'POST', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify(body) });
 
 describe('Supabase function rodemap-mochi', () => {
   it('answers POST only and stays offline without a key', async () => {
-    expect((await handlevsmcclubsMochi(new Request('https://relay.test/', { method: 'GET' }), () => undefined)).status).toBe(405);
-    const res = await handlevsmcclubsMochi(post({ sessionId: 'abc12345', messages: [] }), () => undefined);
+    expect((await handleMochiRelay(new Request('https://relay.test/', { method: 'GET' }), () => undefined)).status).toBe(405);
+    const res = await handleMochiRelay(post({ sessionId: 'abc12345', messages: [] }), () => undefined);
     expect(res.status).toBe(503);
     expect(await res.json()).toEqual({ ok: false, error: 'offline' });
   });
@@ -16,12 +16,12 @@ describe('Supabase function rodemap-mochi', () => {
   const env = (name: string) => settings[name];
 
   it('validates the body before calling Claude', async () => {
-    expect((await handlevsmcclubsMochi(post({ sessionId: 'x', messages: [] }), env)).status).toBe(400);
+    expect((await handleMochiRelay(post({ sessionId: 'x', messages: [] }), env)).status).toBe(400);
   });
 
   it('never skips the weekly quota: without the database settings every request is refused', async () => {
     const quiet = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    const res = await handlevsmcclubsMochi(post({ sessionId: 'abc12345', messages: [] }), (name) => (name === 'ANTHROPIC_API_KEY' ? 'k' : undefined));
+    const res = await handleMochiRelay(post({ sessionId: 'abc12345', messages: [] }), (name) => (name === 'ANTHROPIC_API_KEY' ? 'k' : undefined));
     expect(res.status).toBe(503);
     expect(await res.json()).toEqual({ ok: false, error: 'upstream' });
     quiet.mockRestore();
@@ -32,7 +32,7 @@ describe('Supabase function rodemap-mochi', () => {
       Promise.resolve(new Response(JSON.stringify({ allowed: false, scope: 'weekly_browser', browser_questions: 20, total_questions: 70 }), { status: 200 })),
     );
     const body = { sessionId: 'browser-id-0001', messages: [{ role: 'user', content: [{ type: 'text', text: 'Xin chào' }] }] };
-    const res = await handlevsmcclubsMochi(post(body), (name) => ({ ...settings, RODEMAP_MOCHI_WEEKLY_PER_BROWSER: '10' })[name], send);
+    const res = await handleMochiRelay(post(body), (name) => ({ ...settings, RODEMAP_MOCHI_WEEKLY_PER_BROWSER: '10' })[name], send);
     expect(res.status).toBe(429);
     expect(await res.json()).toMatchObject({ ok: false, error: 'rate_limited', scope: 'weekly_browser', limit: 10 });
     expect(send).toHaveBeenCalledWith('https://project.supabase.co/rest/v1/rpc/rodemap_mochi_take', expect.objectContaining({ method: 'POST' }));

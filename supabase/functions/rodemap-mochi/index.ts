@@ -1,4 +1,4 @@
 /** Entry point of the Supabase Edge Function "rodemap-mochi" (see handler.ts). */
-import { handlevsmcclubsMochi } from './handler';
+import { handleMochiRelay } from './handler';
 
-Deno.serve((request) => handlevsmcclubsMochi(request, (name) => Deno.env.get(name)));
+Deno.serve((request) => handleMochiRelay(request, (name) => Deno.env.get(name)));

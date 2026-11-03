@@ -63,7 +63,7 @@ export function quotaGate(env: (name: string) => string | undefined, send?: type
   });
 }
 
-export function handlevsmcclubsMochi(request: Request, env: (name: string) => string | undefined, send?: typeof fetch): Promise<Response> {
+export function handleMochiRelay(request: Request, env: (name: string) => string | undefined, send?: typeof fetch): Promise<Response> {
   if (request.method !== 'POST') return Promise.resolve(new Response(null, { status: 405, headers: { allow: 'POST' } }));
   const key = present(env('RODEMAP_ANTHROPIC_API_KEY')) ?? present(env('ANTHROPIC_API_KEY'));
   if (key === undefined) return Promise.resolve(jsonResponse({ ok: false, error: 'offline' }, 503));
