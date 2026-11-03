@@ -10,6 +10,7 @@ import {
   eventUrl,
   foldLine,
   icsFileName,
+  icsLocalDate,
   icsLocalDateTime,
   icsUtcDateTime,
   utf8Length,
@@ -30,7 +31,7 @@ const clubs: Club[] = [
     shortName: 'CLB Tranh biện',
     description: 'Câu lạc bộ phụ trách các hoạt động tranh biện.',
     categories: ['HT'],
-    contact: '[Email câu lạc bộ]',
+    links: [],
   },
 ];
 
@@ -72,6 +73,24 @@ describe('date-time values', () => {
     // Just after midnight in Vietnam is still the previous day in UTC.
     expect(icsLocalDateTime(toMillis('2026-10-15T00:30:00+07:00'))).toBe('20261015T003000');
     expect(icsUtcDateTime(toMillis('2026-10-15T00:30:00+07:00'))).toBe('20261014T173000Z');
+    expect(icsLocalDate(toMillis('2026-10-15T00:30:00+07:00'))).toBe('20261015');
+  });
+});
+
+describe('date-only events', () => {
+  it('are all-day entries without a time zone, end date exclusive', () => {
+    const day = makeEvent({
+      id: 'ev-day',
+      dateOnly: true,
+      start: '2027-01-23T00:00:00+07:00',
+      end: '2027-01-24T00:00:00+07:00',
+      location: '',
+    });
+    const ics = buildIcs([day], { now, clubs: [] });
+    expect(prop(ics, 'DTSTART')).toEqual(['19700101T000000', '20270123']);
+    expect(logicalLines(ics)).toContain('DTSTART;VALUE=DATE:20270123');
+    expect(logicalLines(ics)).toContain('DTEND;VALUE=DATE:20270124');
+    expect(prop(ics, 'LOCATION')).toEqual([]);
   });
 });
 

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { addDays, formatDate, formatTime, isoWeekKey, overlaps, SCHOOL_YEAR, toMillis, vnParts } from '../domain/dates';
 import { AFTER_SCHOOL_MINUTE, eventEnd, eventHours, eventStart, isExternalCompetition, isOpenToAll } from '../domain/events';
-import { applyReview, canTransition, charCount, validateDraft } from '../domain/moderation';
+import { charCount, validateDraft } from '../domain/moderation';
 import { NEWS_LIMITS, newsBodyText, publishedPosts, RESERVED_NEWS_SLUGS } from '../domain/news';
-import { hasContactDetails, responseError, validateActivityDraft, validateCollaborationDraft } from '../domain/proposals';
-import { CATEGORY_CODES, GRADES, NEWS_CATEGORIES, type EventStatus, type NewsPost, type SchoolEvent, type Submission } from '../domain/types';
+import { hasContactDetails, responseError, validateActivityDraft } from '../domain/proposals';
+import { CATEGORY_CODES, GRADES, NEWS_CATEGORIES, type ClubLinkKind, type NewsPost, type SchoolEvent } from '../domain/types';
 import { PERIODS } from './calendar';
 import { CATEGORIES, categoryByCode } from './categories';
 import { CLUBS } from './clubs';
@@ -13,7 +13,7 @@ import { GOALS } from './goals';
 import { NEWS, NEWS_DEPARTMENTS } from './news';
 import { ACTIVITY_PROPOSALS, COLLABORATIONS, PROPOSAL_RESPONSES } from './proposals';
 import { SCHOOL } from './school';
-import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS, SEED_SUBMISSIONS } from './seed';
+import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS } from './seed';
 import { TAGS, tagLabel } from './tags';
 
 const ms = toMillis;
@@ -25,7 +25,8 @@ const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const HEADER = '// Dữ liệu minh họa phục vụ bản trình diễn. Thay thế bằng dữ liệu chính thức khi triển khai.';
 
 const approved = EVENTS.filter((e) => e.status === 'approved');
-const notApproved = EVENTS.filter((e) => e.status !== 'approved');
+const dateOnly = EVENTS.filter((e) => e.dateOnly === true);
+const DAY = 24 * 60 * 60 * 1000;
 const eventById = new Map(EVENTS.map((e) => [e.id, e]));
 const clubById = new Map(CLUBS.map((c) => [c.id, c]));
 const tagIds = new Set(TAGS.map((t) => t.id));
@@ -141,19 +142,18 @@ describe('data files', () => {
         SEED_PROFILE,
         SEED_REGISTRATIONS,
         SEED_PORTFOLIO,
-        SEED_SUBMISSIONS,
         NEWS,
       },
       'data',
       [],
     );
-    expect(all.length).toBeGreaterThan(500);
+    expect(all.length).toBeGreaterThan(300);
     const violations = all.flatMap(({ path, text }) => copyViolations(text).map((label) => `${path}: ${label}`));
     expect(violations).toEqual([]);
   });
 
   it('stores every string NFC-normalised (precomposed diacritics)', () => {
-    const raw = JSON.stringify([CATEGORIES, TAGS, GOALS, CLUBS, EVENTS, PERIODS, SEED_PORTFOLIO, SEED_SUBMISSIONS, NEWS]);
+    const raw = JSON.stringify([CATEGORIES, TAGS, GOALS, CLUBS, EVENTS, PERIODS, SEED_PORTFOLIO, NEWS]);
     expect(raw).toBe(raw.normalize('NFC'));
   });
 });
@@ -227,16 +227,52 @@ describe('tags and goals', () => {
 });
 
 describe('clubs', () => {
-  it('has exactly 15 publishers (13 clubs, the council, one office) with unique ids and ASCII slugs', () => {
-    expect(CLUBS).toHaveLength(15);
-    expect(isUnique(CLUBS.map((c) => c.id))).toBe(true);
-    expect(isUnique(CLUBS.map((c) => c.slug))).toBe(true);
-    for (const c of CLUBS) expect(c.slug, c.id).toMatch(SLUG);
-    expect(CLUBS.filter((c) => c.kind === 'club')).toHaveLength(13);
-    expect(CLUBS.filter((c) => c.kind !== 'club').map((c) => [c.id, c.kind])).toEqual([
+  const students = CLUBS.filter((c) => c.kind === 'club');
+  const LINK_ORDER: readonly ClubLinkKind[] = ['facebook', 'instagram', 'tiktok'];
+  const LINK_HOSTS: Record<ClubLinkKind, RegExp> = {
+    facebook: /^https:\/\/www\.facebook\.com\/[^\s]+$/u,
+    instagram: /^https:\/\/www\.instagram\.com\/[^\s]+$/u,
+    tiktok: /^https:\/\/www\.tiktok\.com\/@[^\s/?]+$/u,
+  };
+
+  it('has 22 publishers (the 20 real clubs, the council, one office) with unique ids and ASCII slugs', () => {
+    expect(CLUBS).toHaveLength(22);
+    expect(CLUBS.slice(0, 2).map((c) => [c.id, c.kind])).toEqual([
       ['hdhs', 'council'],
       ['co-van-hoc-tap', 'office'],
     ]);
+    expect(students).toHaveLength(20);
+    expect(isUnique(CLUBS.map((c) => c.id))).toBe(true);
+    expect(isUnique(CLUBS.map((c) => c.slug))).toBe(true);
+    for (const c of CLUBS) expect(c.slug, c.id).toMatch(SLUG);
+    for (const c of students) expect(c.slug, c.id).toBe(c.id);
+  });
+
+  it('lists the real clubs of Vinschool Smart City in the order of the school list', () => {
+    expect(students.map((c) => c.shortName)).toEqual([
+      'Bột và Bơ',
+      'Góc Xì Xào',
+      'Fluorescence the Lab',
+      'The Papillon',
+      'Psyched Club',
+      'Hanoi Vinschool SEIA',
+      'Novaris Project',
+      'Humans of Vinschool Smart City',
+      'KAT Music Club',
+      'Mentis Club',
+      'Vinschool Debate Society',
+      'Young Business Creators',
+      'Charité',
+      'Vintervarme',
+      'VPRC',
+      'Artemis',
+      'Hanami Shores',
+      'SMC Enterprise',
+      'Vinschool Business',
+      'Green Guardian',
+    ]);
+    // The former sample clubs are gone.
+    for (const id of ['inkstep', 'tranh-bien', 'robotics', 'tinh-nguyen-xanh']) expect(clubById.has(id), id).toBe(false);
   });
 
   it('includes Phòng Cố vấn Học tập, which publishes the external academic competitions', () => {
@@ -246,7 +282,8 @@ describe('clubs', () => {
       name: 'Phòng Cố vấn Học tập',
       shortName: 'Phòng Cố vấn Học tập',
       categories: ['HT'],
-      contact: '[Email Phòng Cố vấn Học tập]',
+      email: '[Email Phòng Cố vấn Học tập]',
+      links: [],
     });
     const description = clubById.get('co-van-hoc-tap')?.description ?? '';
     for (const words of ['cuộc thi học thuật ngoài trường', 'thể lệ', 'hạn đăng ký', 'hồ sơ dự thi']) expect(description).toContain(words);
@@ -257,34 +294,43 @@ describe('clubs', () => {
     }
   });
 
-  it('includes Inkstep as the one real club, without invented product features', () => {
-    const inkstep = clubById.get('inkstep');
-    expect(inkstep).toMatchObject({
-      slug: 'inkstep',
-      name: 'Inkstep – Câu lạc bộ Phát triển Sản phẩm Học tập',
-      shortName: 'Inkstep',
-      categories: ['CN', 'KN'],
-    });
-    expect(inkstep?.description).toContain('sản phẩm học tập Eighthundred');
-    expect(inkstep?.description).toContain('chia sẻ');
-  });
-
   it('includes Hội đồng Học sinh, which organises every school-wide event', () => {
-    expect(clubById.get('hdhs')).toMatchObject({ name: 'Hội đồng Học sinh', shortName: 'HĐHS', categories: ['TS', 'KN'] });
+    expect(clubById.get('hdhs')).toMatchObject({ name: 'Hội đồng Học sinh', shortName: 'HĐHS', categories: ['TS', 'KN'], links: [] });
     for (const e of EVENTS.filter((ev) => ev.category === 'TS')) expect(e.clubId, e.id).toBe('hdhs');
   });
 
-  it('has valid categories, a placeholder contact and a two-sentence description', () => {
+  it('has valid categories and a two-sentence formal description', () => {
     for (const c of CLUBS) {
       expect(c.categories.length, c.id).toBeGreaterThan(0);
+      expect(isUnique(c.categories), c.id).toBe(true);
       for (const code of c.categories) expect(CATEGORY_CODES, c.id).toContain(code);
-      expect(c.contact, c.id).toMatch(/^\[.+\]$/u);
       expect(sentenceCount(c.description), c.id).toBe(2);
+      // Third person: the clubs' own "chúng mình" / "chúng tôi" is not kept.
+      expect(c.description, c.id).not.toMatch(/chúng (?:mình|tôi|em)/iu);
     }
+    for (const c of students) expect(c.categories, c.id).not.toContain('TS');
   });
 
-  it('every club has at least one approved event', () => {
-    for (const c of CLUBS) expect(approved.some((e) => e.clubId === c.id), c.id).toBe(true);
+  it('lists only the club address and public pages, never personal details', () => {
+    for (const c of CLUBS) {
+      if (c.email !== undefined) {
+        const placeholder = /^\[.+\]$/u.test(c.email);
+        // Students' and teachers' school addresses are never published.
+        expect(placeholder || /^[a-z0-9.]+@gmail\.com$/u.test(c.email), `${c.id}: ${c.email}`).toBe(true);
+        expect(placeholder, c.id).toBe(c.kind !== 'club');
+      }
+      const kinds = c.links.map((l) => l.kind);
+      expect(isUnique(kinds), c.id).toBe(true);
+      expect(kinds, c.id).toEqual([...kinds].sort((a, b) => LINK_ORDER.indexOf(a) - LINK_ORDER.indexOf(b)));
+      for (const l of c.links) {
+        expect(l.url, c.id).toMatch(LINK_HOSTS[l.kind]);
+        // Share-tracking parameters are removed.
+        expect(l.url, c.id).not.toMatch(/[?&](?:mibextid|_r|_t)=/u);
+      }
+    }
+    expect(clubById.get('hdhs')?.email).toBe('[Email Hội đồng Học sinh]');
+    // A club that published nothing says so on its page.
+    expect(students.filter((c) => c.email === undefined && c.links.length === 0).map((c) => c.id)).toEqual(['vprc', 'smc-enterprise', 'vinschool-business']);
   });
 });
 
@@ -308,25 +354,27 @@ describe('calendar periods', () => {
 });
 
 describe('events: shape and integrity', () => {
-  it('has 45 approved club events, 5 in moderation (3 pending, 1 changes requested, 1 rejected) and 4 external competitions', () => {
-    expect(EVENTS).toHaveLength(54);
-    expect(approved).toHaveLength(49);
-    const count = (s: EventStatus) => EVENTS.filter((e) => e.status === s).length;
-    expect(count('pending')).toBe(3);
-    expect(count('changes_requested')).toBe(1);
-    expect(count('rejected')).toBe(1);
-    expect(count('draft')).toBe(0);
+  it('has 6 school-wide events, 4 external competitions and 2 club events announced by date only, all approved', () => {
+    expect(EVENTS).toHaveLength(12);
+    expect(approved).toHaveLength(12);
+    expect(EVENTS.filter((e) => e.clubId === 'hdhs')).toHaveLength(6);
     expect(EVENTS.filter((e) => isExternalCompetition(e))).toHaveLength(4);
+    expect(dateOnly).toHaveLength(2);
   });
 
-  it('uses ids ev-001 … ev-054 (approved club events, moderation, external competitions; each run chronological) and unique ASCII slugs', () => {
-    expect(EVENTS.map((e) => e.id)).toEqual(Array.from({ length: 54 }, (_, i) => `ev-${String(i + 1).padStart(3, '0')}`));
-    const clubApproved = EVENTS.slice(0, 45);
-    const external = EVENTS.slice(50);
-    expect(clubApproved.every((e) => e.status === 'approved' && !isExternalCompetition(e))).toBe(true);
-    expect(EVENTS.slice(45, 50).every((e) => e.status !== 'approved' && !isExternalCompetition(e))).toBe(true);
-    expect(external.every((e) => e.status === 'approved' && isExternalCompetition(e))).toBe(true);
-    for (const run of [clubApproved, external]) {
+  it('keeps the ids of the remaining events (each run chronological) and uses unique ASCII slugs', () => {
+    expect(EVENTS.map((e) => e.id)).toEqual([
+      'ev-001', 'ev-003', 'ev-027', 'ev-035', 'ev-040', 'ev-045',
+      'ev-051', 'ev-052', 'ev-053', 'ev-054',
+      'ev-055', 'ev-056',
+    ]);
+    const council = EVENTS.slice(0, 6);
+    const external = EVENTS.slice(6, 10);
+    const clubs = EVENTS.slice(10);
+    expect(council.every((e) => e.clubId === 'hdhs' && e.category === 'TS')).toBe(true);
+    expect(external.every((e) => isExternalCompetition(e))).toBe(true);
+    expect(clubs.every((e) => clubById.get(e.clubId)?.kind === 'club' && e.dateOnly === true)).toBe(true);
+    for (const run of [council, external, clubs]) {
       run.slice(1).forEach((e, i) => {
         const prev = run[i]!;
         expect(eventStart(prev) <= eventStart(e), `${prev.id} before ${e.id}`).toBe(true);
@@ -357,10 +405,11 @@ describe('events: shape and integrity', () => {
     for (const e of EVENTS) {
       for (const v of [e.start, e.end, e.registrationDeadline]) expect(v, e.id).toMatch(ISO_DATE_TIME);
       expect(eventStart(e) < eventEnd(e), e.id).toBe(true);
-      expect(eventEnd(e) - eventStart(e) <= 12 * 60 * 60 * 1000, e.id).toBe(true);
+      // A date-only event spans its whole day; a timed event lasts at most 12 hours.
+      expect(eventEnd(e) - eventStart(e) <= (e.dateOnly === true ? DAY : 12 * 60 * 60 * 1000), e.id).toBe(true);
       const deadline = ms(e.registrationDeadline);
       expect(deadline <= eventStart(e), e.id).toBe(true);
-      expect(eventStart(e) - deadline <= 7 * 24 * 60 * 60 * 1000, e.id).toBe(true);
+      expect(eventStart(e) - deadline <= 7 * DAY, e.id).toBe(true);
       expect(eventStart(e) >= yearStart && eventEnd(e) <= yearEnd, e.id).toBe(true);
     }
   });
@@ -380,21 +429,24 @@ describe('events: shape and integrity', () => {
     }
   });
 
-  it('schedules club events on weekdays only after school (school-wide events may use school hours)', () => {
-    for (const e of EVENTS.filter((ev) => ev.category !== 'TS')) {
+  it('schedules timed club events on weekdays only after school (school-wide events may use school hours)', () => {
+    for (const e of EVENTS.filter((ev) => ev.category !== 'TS' && ev.dateOnly !== true)) {
       const p = vnParts(eventStart(e));
       const weekend = p.weekday === 0 || p.weekday === 6;
       if (!weekend) expect(p.hour * 60 + p.minute >= AFTER_SCHOOL_MINUTE, e.id).toBe(true);
     }
   });
 
-  it('has sensible seats: 20–600 capacity, seatsTaken ≤ capacity, no seats taken while in moderation', () => {
+  it('has sensible seats: 20–600 capacity and seatsTaken ≤ capacity (none yet for a date-only event)', () => {
     for (const e of EVENTS) {
+      expect(Number.isInteger(e.seatsTaken), e.id).toBe(true);
+      if (e.dateOnly === true) {
+        expect([e.capacity, e.seatsTaken], e.id).toEqual([0, 0]);
+        continue;
+      }
       expect(e.capacity >= 20 && e.capacity <= 600, e.id).toBe(true);
       expect(e.seatsTaken >= 0 && e.seatsTaken <= e.capacity, e.id).toBe(true);
-      expect(Number.isInteger(e.seatsTaken), e.id).toBe(true);
     }
-    for (const e of notApproved) expect(e.seatsTaken, e.id).toBe(0);
   });
 
   it('has formal copy of the expected length', () => {
@@ -405,7 +457,8 @@ describe('events: shape and integrity', () => {
       expect(summarySentences >= 2 && summarySentences <= 3, `${e.id} summary sentences`).toBe(true);
       expect(e.description.length, e.id).toBeGreaterThanOrEqual(120);
       expect(sentenceCount(e.description), e.id).toBeGreaterThanOrEqual(2);
-      expect(e.location.trim().length, e.id).toBeGreaterThan(0);
+      // A date-only event has no place yet.
+      expect(e.location.trim().length > 0, e.id).toBe(e.dateOnly !== true);
       expect(e.eligibleGrades.length, e.id).toBeGreaterThan(0);
       expect(e.eligibleGrades.every((g) => GRADES.includes(g)), e.id).toBe(true);
       expect([...e.eligibleGrades].sort((a, b) => a - b), e.id).toEqual(e.eligibleGrades);
@@ -413,33 +466,9 @@ describe('events: shape and integrity', () => {
     }
   });
 
-  it('describes Eighthundred only as "sản phẩm học tập Eighthundred"', () => {
-    for (const { path, text } of collectStrings({ EVENTS, CLUBS }, 'data', [])) {
-      const mentions = text.match(/Eighthundred/gu)?.length ?? 0;
-      const formal = text.match(/sản phẩm(?: học tập)? Eighthundred/gu)?.length ?? 0;
-      expect(formal, path).toBe(mentions);
-    }
-  });
-});
-
-describe('events: distribution for the demo', () => {
-  it('has at least 4 approved events per category', () => {
-    for (const code of CATEGORY_CODES) {
-      expect(approved.filter((e) => e.category === code).length, code).toBeGreaterThanOrEqual(4);
-    }
-  });
-
-  it('has at least 6 approved events in September 2026', () => {
-    expect(approved.filter((e) => startsIn(e, '2026-09-01', '2026-10-01')).length).toBeGreaterThanOrEqual(6);
-  });
-
-  it('has at least 10 approved events between 08/10 and 01/11, 4 of them closing registration that week', () => {
-    expect(approved.filter((e) => startsIn(e, '2026-10-08', '2026-11-02')).length).toBeGreaterThanOrEqual(10);
-    const closing = approved.filter((e) => {
-      const d = ms(e.registrationDeadline);
-      return d >= ms('2026-10-08') && d < ms('2026-10-15');
-    });
-    expect(closing.length).toBeGreaterThanOrEqual(4);
+  it('marks online events by their location', () => {
+    for (const e of approved.filter((ev) => ev.format === 'online')) expect(e.location, e.id).toMatch(/^Trực tuyến – /u);
+    for (const e of EVENTS.filter((ev) => ev.format === 'in_person')) expect(e.location, e.id).not.toMatch(/Trực tuyến/u);
   });
 
   it('includes the school-wide milestones organised by HĐHS', () => {
@@ -450,56 +479,31 @@ describe('events: distribution for the demo', () => {
     expect(ts.some((e) => e.title.startsWith('Ngày hội Câu lạc bộ'))).toBe(true);
     expect(ts.some((e) => e.title.startsWith('Hội trại truyền thống') && e.start.startsWith('2027-03-26'))).toBe(true);
     expect(ts.some((e) => e.title.startsWith('Lễ tri ân và trưởng thành') && e.start.startsWith('2027-05'))).toBe(true);
+    for (const e of ts) expect(isOpenToAll(e.eligibleGrades) || e.eligibleGrades.every((g) => g >= 10), e.id).toBe(true);
   });
+});
 
-  it('has at least 6 online events', () => {
-    const online = approved.filter((e) => e.format === 'online');
-    expect(online.length).toBeGreaterThanOrEqual(6);
-    for (const e of online) expect(e.location, e.id).toMatch(/^Trực tuyến – /u);
-    for (const e of EVENTS.filter((ev) => ev.format === 'in_person')) expect(e.location, e.id).not.toMatch(/Trực tuyến/u);
-  });
-
-  it('has at least 3 upcoming events with ≤ 5 seats left and exactly one full event', () => {
-    const few = approved.filter((e) => {
-      const left = e.capacity - e.seatsTaken;
-      return left >= 1 && left <= 5 && eventStart(e) > DEMO_TODAY;
-    });
-    expect(few.length).toBeGreaterThanOrEqual(3);
-    const full = EVENTS.filter((e) => e.seatsTaken === e.capacity);
-    expect(full).toHaveLength(1);
-    expect(full[0]?.status).toBe('approved');
-    expect(eventStart(full[0]!) > DEMO_TODAY).toBe(true);
-  });
-
-  it('serves every grade from 6 to 12, with school-wide and grade-restricted events', () => {
-    const openToAll = approved.filter((e) => isOpenToAll(e.eligibleGrades));
-    expect(openToAll.length).toBeGreaterThanOrEqual(15);
-    expect(openToAll.filter((e) => e.category === 'TS').length).toBeGreaterThanOrEqual(3);
-    for (const g of GRADES) {
-      expect(approved.filter((e) => e.eligibleGrades.includes(g) && eventStart(e) > DEMO_TODAY).length, `khối ${String(g)}`).toBeGreaterThanOrEqual(10);
+describe('events: announced by the real clubs', () => {
+  it('are the two events the clubs announced, by date only, with nothing filled in on their behalf', () => {
+    expect(dateOnly.map((e) => [e.clubId, e.start, e.title])).toEqual([
+      ['hanoi-vinschool-seia', '2027-01-23T00:00:00+07:00', 'Hội nghị SEIA khu vực mùa xuân 2027'],
+      ['young-business-creators', '2027-01-30T00:00:00+07:00', 'Chung kết Cuộc thi khởi nghiệp cấp trường VBIS Innovation Challenge'],
+    ]);
+    for (const e of dateOnly) {
+      expect(eventEnd(e) - eventStart(e), e.id).toBe(DAY);
+      expect(e.registrationDeadline, e.id).toBe(e.start);
+      expect(e.location, e.id).toBe('');
+      expect(isOpenToAll(e.eligibleGrades), e.id).toBe(true);
+      expect(e.status, e.id).toBe('approved');
+      expect(e.organizer, e.id).toBeUndefined();
+      expect(e.summary, e.id).toContain('đang được cập nhật');
+      expect(e.summary, e.id).toContain(formatDate(eventStart(e)));
     }
-    // Lower secondary only (khối 6–9) and upper secondary only (khối 10–12) events both exist.
-    expect(approved.some((e) => e.eligibleGrades.every((g) => g <= 9))).toBe(true);
-    expect(approved.some((e) => e.eligibleGrades.every((g) => g >= 10))).toBe(true);
-    const restricted = approved.filter((e) => !isOpenToAll(e.eligibleGrades));
-    expect(restricted.some((e) => !e.eligibleGrades.includes(11) && eventStart(e) > DEMO_TODAY)).toBe(true);
   });
 
-  it('has at least 2 pairs of overlapping approved events in October–November 2026', () => {
-    const autumn = approved.filter((e) => startsIn(e, '2026-10-01', '2026-12-01'));
-    let pairs = 0;
-    autumn.forEach((a, i) => {
-      for (const b of autumn.slice(i + 1)) {
-        if (overlaps(eventStart(a), eventEnd(a), eventStart(b), eventEnd(b))) pairs += 1;
-      }
-    });
-    expect(pairs).toBeGreaterThanOrEqual(2);
-  });
-
-  it('gives Inkstep at least 3 approved events, including the Eighthundred sharing session', () => {
-    const inkstep = approved.filter((e) => e.clubId === 'inkstep');
-    expect(inkstep.length).toBeGreaterThanOrEqual(3);
-    expect(inkstep.some((e) => e.title === 'Buổi chia sẻ: Quy trình phát triển sản phẩm Eighthundred')).toBe(true);
+  it('are the only events of the student clubs: no sample event is published in a real club’s name', () => {
+    for (const e of EVENTS.filter((ev) => clubById.get(ev.clubId)?.kind === 'club')) expect(e.dateOnly, e.id).toBe(true);
+    for (const e of EVENTS.filter((ev) => ev.dateOnly === true)) expect(clubById.get(e.clubId)?.kind, e.id).toBe('club');
   });
 });
 
@@ -560,7 +564,7 @@ describe('seed profile', () => {
       goals: ['technology', 'study_abroad', 'volunteering'],
       availability: { weekdayAfterSchool: true, weekend: true },
       weeklyHourBudget: 6,
-      onboardedAt: '2026-09-20T20:00:00+07:00',
+      onboardedAt: '2026-09-01T20:00:00+07:00',
     });
     for (const c of SEED_PROFILE.topInterests) expect(SEED_PROFILE.interests).toContain(c);
   });
@@ -569,11 +573,13 @@ describe('seed profile', () => {
 describe('seed registrations', () => {
   const byStatus = (s: string) => SEED_REGISTRATIONS.filter((r) => r.status === s).map((r) => getEvent(r.eventId));
 
-  it('reference approved events once each, registered before the deadline and after onboarding', () => {
+  it('reference approved HĐHS events once each, registered before the deadline and after onboarding', () => {
     expect(isUnique(SEED_REGISTRATIONS.map((r) => r.eventId))).toBe(true);
     for (const r of SEED_REGISTRATIONS) {
       const e = getEvent(r.eventId);
       expect(e.status, r.eventId).toBe('approved');
+      // Nobody is shown registered for a real club's event on their behalf.
+      expect(e.clubId, r.eventId).toBe('hdhs');
       expect(r.registeredAt, r.eventId).toMatch(ISO_DATE_TIME);
       expect(ms(r.registeredAt) <= ms(e.registrationDeadline), r.eventId).toBe(true);
       expect(ms(r.registeredAt) >= ms(SEED_PROFILE.onboardedAt), r.eventId).toBe(true);
@@ -582,23 +588,16 @@ describe('seed registrations', () => {
     }
   });
 
-  it('has 3 attended September events in CN, TN and HT', () => {
+  it('has 2 attended September events and 1 upcoming registration after 08/10', () => {
     const attended = byStatus('attended');
-    expect(attended).toHaveLength(3);
-    expect(attended.map((e) => e.category).sort()).toEqual(['CN', 'HT', 'TN']);
+    expect(attended.map((e) => e.id)).toEqual(['ev-001', 'ev-003']);
     for (const e of attended) {
       expect(startsIn(e, '2026-09-01', '2026-10-01'), e.id).toBe(true);
       expect(eventEnd(e) < DEMO_TODAY, e.id).toBe(true);
     }
-  });
-
-  it('has 1 past registration awaiting attendance and 2 upcoming ones after 08/10', () => {
     const registered = byStatus('registered');
-    expect(registered).toHaveLength(3);
-    const past = registered.filter((e) => eventEnd(e) < DEMO_TODAY);
-    const upcoming = registered.filter((e) => eventStart(e) >= ms('2026-10-08'));
-    expect(past).toHaveLength(1);
-    expect(upcoming).toHaveLength(2);
+    expect(registered.map((e) => e.id)).toEqual(['ev-027']);
+    for (const e of registered) expect(eventStart(e) >= ms('2026-10-08'), e.id).toBe(true);
     expect(byStatus('absent')).toHaveLength(0);
   });
 
@@ -626,7 +625,7 @@ describe('seed portfolio', () => {
   const attendedIds = SEED_REGISTRATIONS.filter((r) => r.status === 'attended').map((r) => r.eventId);
 
   it('has one entry per attended event with matching category and hours', () => {
-    expect(SEED_PORTFOLIO.map((p) => p.id)).toEqual(['pf-001', 'pf-002', 'pf-003']);
+    expect(SEED_PORTFOLIO.map((p) => p.id)).toEqual(['pf-001', 'pf-002']);
     expect(SEED_PORTFOLIO.map((p) => p.eventId).sort()).toEqual([...attendedIds].sort());
     for (const p of SEED_PORTFOLIO) {
       const e = getEvent(p.eventId);
@@ -653,38 +652,6 @@ describe('seed portfolio', () => {
   });
 });
 
-describe('seed submissions', () => {
-  it('back every non-approved event with exactly one submission and nothing else', () => {
-    expect(isUnique(SEED_SUBMISSIONS.map((s) => s.id))).toBe(true);
-    for (const s of SEED_SUBMISSIONS) expect(getEvent(s.eventId).status, s.id).not.toBe('approved');
-    for (const e of notApproved) expect(SEED_SUBMISSIONS.filter((s) => s.eventId === e.id), e.id).toHaveLength(1);
-  });
-
-  it('replays to the event status through the moderation workflow', () => {
-    for (const e of notApproved) {
-      const sub = SEED_SUBMISSIONS.find((s) => s.eventId === e.id)!;
-      expect(sub.clubId, sub.id).toBe(e.clubId);
-      expect(sub.history[0]?.at, sub.id).toBe(sub.submittedAt);
-      expect(ms(sub.submittedAt) < DEMO_TODAY, sub.id).toBe(true);
-
-      let status: EventStatus = 'draft';
-      let replay: Submission = { ...sub, history: [] };
-      let previousAt = -Infinity;
-      for (const note of sub.history) {
-        expect(note.at, sub.id).toMatch(ISO_DATE_TIME);
-        expect(ms(note.at) >= previousAt, sub.id).toBe(true);
-        previousAt = ms(note.at);
-        expect(canTransition(status, note.action), `${sub.id}: ${note.action} from ${status}`).toBe(true);
-        const result = applyReview(replay, status, note.action, note.at, note.reason);
-        replay = result.submission;
-        status = result.status;
-      }
-      expect(status, sub.id).toBe(e.status);
-      expect(replay.history, sub.id).toEqual(sub.history);
-    }
-  });
-});
-
 describe('news', () => {
   const ids = (posts: readonly NewsPost[]) => posts.map((p) => p.id);
   const text = (p: NewsPost) => `${p.title}\n${p.summary}\n${newsBodyText(p.body)}`;
@@ -692,10 +659,8 @@ describe('news', () => {
   const VISIBLE_AT = ms('2026-10-07T09:00:00+07:00');
   const ASCII_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-  it('has 9–10 articles with ids bt-NNN in chronological order of publication', () => {
-    expect(NEWS.length).toBeGreaterThanOrEqual(9);
-    expect(NEWS.length).toBeLessThanOrEqual(10);
-    expect(ids(NEWS)).toEqual(Array.from({ length: NEWS.length }, (_, i) => `bt-${String(i + 1).padStart(3, '0')}`));
+  it('has 6 articles with ids bt-NNN in chronological order of publication (the ids of removed articles are not reused)', () => {
+    expect(ids(NEWS)).toEqual(['bt-001', 'bt-002', 'bt-003', 'bt-004', 'bt-005', 'bt-010']);
     for (const p of NEWS) expect(p.publishedAt, p.id).toMatch(ISO_DATE_TIME);
     NEWS.slice(1).forEach((p, i) => {
       const prev = NEWS[i]!;
@@ -712,12 +677,14 @@ describe('news', () => {
     }
   });
 
-  it('is signed by a council department and covers every category', () => {
+  it('is signed by a council department and covers announcements, activities and guides', () => {
     for (const p of NEWS) {
       expect(departments, p.id).toContain(p.author);
       expect(NEWS_CATEGORIES, p.id).toContain(p.category);
     }
-    for (const c of NEWS_CATEGORIES) expect(NEWS.some((p) => p.category === c), c).toBe(true);
+    for (const c of NEWS_CATEGORIES.filter((x) => x !== 'club')) expect(NEWS.some((p) => p.category === c), c).toBe(true);
+    // Club introductions are written once the real clubs provide their content.
+    expect(NEWS.filter((p) => p.category === 'club')).toEqual([]);
   });
 
   it('keeps title, summary and body within NEWS_LIMITS, with 150–450 words and at most one quote', () => {
@@ -758,10 +725,6 @@ describe('news', () => {
       for (const id of p.eventIds) expect(getEvent(id).status, `${p.id} → ${id}`).toBe('approved');
       for (const id of p.clubIds) expect(clubById.has(id), `${p.id} → ${id}`).toBe(true);
       for (const id of p.eventIds) expect(p.clubIds, `${p.id} → ${id}`).toContain(getEvent(id).clubId);
-      if (p.category === 'club') {
-        expect(p.clubIds.length, p.id).toBeGreaterThan(0);
-        expect(p.clubIds, p.id).not.toContain('inkstep');
-      }
     }
   });
 
@@ -851,19 +814,13 @@ describe('proposals', () => {
       expect(ms(p.submittedAt) < DEMO_TODAY && ms(p.submittedAt) >= ms(SCHOOL_YEAR.start), p.id).toBe(true);
       expect(hasContactDetails(`${p.title} ${p.description}`), p.id).toBe(false);
     }
-    // Every grade band is represented, and some proposals name a club.
+    // Every grade band is represented; no sample proposal names a club, since the clubs are real.
     expect(ACTIVITY_PROPOSALS.some((p) => p.grades.every((g) => g <= 9))).toBe(true);
-    expect(ACTIVITY_PROPOSALS.some((p) => p.clubId !== null)).toBe(true);
+    expect(ACTIVITY_PROPOSALS.every((p) => p.clubId === null)).toBe(true);
   });
 
-  it('holds valid collaborations between two different clubs within the school year', () => {
-    for (const p of COLLABORATIONS) {
-      expect(validateCollaborationDraft(p, { fromClubId: p.fromClubId, knownClubIds: clubIds, now: ms(SCHOOL_YEAR.start) }), p.id).toEqual({});
-      expect(ms(p.submittedAt) < DEMO_TODAY, p.id).toBe(true);
-    }
-    // The default demo club (Inkstep) both receives and sends one.
-    expect(COLLABORATIONS.some((p) => p.toClubId === 'inkstep')).toBe(true);
-    expect(COLLABORATIONS.some((p) => p.fromClubId === 'inkstep')).toBe(true);
+  it('holds no collaboration: nothing is sent or answered in the name of a real club', () => {
+    expect(COLLABORATIONS).toEqual([]);
   });
 
   it('answers each proposal at most once, by the right party, after it was sent', () => {
@@ -874,7 +831,7 @@ describe('proposals', () => {
       expect(r.by, id).toBe(activity ? 'hdhs' : collab?.toClubId);
       expect(responseError(r.status, r.note), id).toBeNull();
       expect(ms(r.at) > ms((activity ?? collab)?.submittedAt ?? '') && ms(r.at) < DEMO_TODAY, id).toBe(true);
-      if (r.assignedClubId !== null) expect(clubIds.has(r.assignedClubId), id).toBe(true);
+      expect(r.assignedClubId, id).toBeNull();
     }
     const statuses = new Set(Object.values(PROPOSAL_RESPONSES).map((r) => r.status));
     expect(statuses).toEqual(new Set(['accepted', 'declined']));

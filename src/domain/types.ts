@@ -46,14 +46,29 @@ export interface Club {
   kind: ClubKind;
   /** ASCII slug used in URLs. */
   slug: string;
-  /** Full name, e.g. "Câu lạc bộ Tranh biện". */
+  /** Full name, e.g. "Câu lạc bộ Vinschool Debate Society". */
   name: string;
-  /** Short name, e.g. "CLB Tranh biện". */
+  /** Short name, e.g. "VDS". */
   shortName: string;
   description: string;
   categories: CategoryCode[];
-  /** Placeholder contact, e.g. "[Email câu lạc bộ]". */
-  contact: string;
+  /**
+   * The publisher's public email address, as the club itself published it, or a placeholder in
+   * brackets ("[Email Hội đồng Học sinh]") until the school provides one. Absent when the club has
+   * not published one. Never a student's or teacher's personal address.
+   */
+  email?: string;
+  /** The club's public pages, in the order Facebook, Instagram, TikTok; empty when none is published. */
+  links: ClubLink[];
+}
+
+export type ClubLinkKind = 'facebook' | 'instagram' | 'tiktok';
+
+/** A public page of a club on a social network. */
+export interface ClubLink {
+  kind: ClubLinkKind;
+  /** https URL of the page. */
+  url: string;
 }
 
 export type EventFormat = 'in_person' | 'online';
@@ -91,6 +106,14 @@ export interface SchoolEvent {
    * (the publisher, `clubId`) relays on vsmcclubs.
    */
   organizer?: string;
+  /**
+   * Only the date is announced so far. `start` and `end` span that day (00:00 to 00:00 the next
+   * day, Vietnam time); the time, place, format, grades, seats and deadline are not known yet, so
+   * screens say "Đang cập nhật", registration does not open, and the event takes no hours of the
+   * weekly budget and conflicts with nothing. Real events are published this way until their
+   * publisher completes the details; nothing is filled in on their behalf.
+   */
+  dateOnly?: boolean;
 }
 
 /** "Kiểm tra định kỳ" zones and holidays drawn on the RouteMap. */

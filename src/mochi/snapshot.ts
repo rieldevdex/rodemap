@@ -1,7 +1,7 @@
 /** The compact data snapshot sent with each student message (a text block the model treats as data). */
 import { CATEGORY_LABELS } from '../domain/category-labels';
-import { formatLongDate, formatTimeRange, toIsoDate } from '../domain/dates';
-import { eventEnd, eventStart, isPast } from '../domain/events';
+import { formatLongDate, toIsoDate } from '../domain/dates';
+import { eventStart, eventTimeLabel, isPast } from '../domain/events';
 import type { Millis } from '../domain/types';
 import { GOALS } from '../data/goals';
 import type { AppState } from '../state/schema';
@@ -39,7 +39,7 @@ export function buildSnapshot(state: AppState, now: Millis, full: boolean): stri
       id: e.id,
       title: e.title,
       date: formatLongDate(eventStart(e)),
-      time: formatTimeRange(eventStart(e), eventEnd(e)),
+      time: eventTimeLabel(e),
     })),
     awaiting_attendance_confirmation: selectPendingAttendance(state, now).map((e) => ({ id: e.id, title: e.title })),
   };

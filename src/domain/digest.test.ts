@@ -39,6 +39,13 @@ describe('weeklyDigest', () => {
     ]);
   });
 
+  it('mentions no deadline for a date-only event, whose registration has not opened', () => {
+    const day = makeEvent({ id: 'd', dateOnly: true, start: '2026-10-17T00:00:00+07:00', end: '2026-10-18T00:00:00+07:00', registrationDeadline: '2026-10-17T00:00:00+07:00', capacity: 0, seatsTaken: 0 });
+    const d = weeklyDigest([day], { now, regs: [], periods: [] });
+    expect(d.paragraphs).toEqual(['Tuần này có 1 sự kiện thuộc 1 lĩnh vực: Học thuật (1).', 'Bạn chưa đăng ký sự kiện nào trong tuần.']);
+    expect(d.highlights).toEqual([]);
+  });
+
   it('ignores exams that are too far away and holidays', () => {
     const far: CalendarPeriod = { ...exam, start: '2026-12-21', end: '2026-12-31' };
     const d = weeklyDigest([], { now, regs: [], periods: [far, holiday] });

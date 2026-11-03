@@ -52,7 +52,9 @@ describe('recommendEvents: hard filters', () => {
   const planned = ev('h-planned', '2026-10-21T16:45', '2026-10-21T18:15');
   const ineligible = ev('h-ineligible', '2026-10-14T16:45', '2026-10-14T18:15', { eligibleGrades: [12] });
   const full = ev('h-full', '2026-10-14T16:45', '2026-10-14T18:15', { capacity: 10, seatsTaken: 10 });
-  const all = [full, ineligible, planned, absent, attended, registered, closed, past, rejected, pending, ok];
+  // Only the date is announced, so registration has not opened (seats are left on purpose).
+  const dateOnly = ev('h-date-only', '2026-10-14T00:00', '2026-10-15T00:00', { dateOnly: true });
+  const all = [dateOnly, full, ineligible, planned, absent, attended, registered, closed, past, rejected, pending, ok];
   const regs = [reg('h-registered'), reg('h-attended', 'attended'), reg('h-absent', 'absent')];
 
   it('keeps only approved, upcoming, open, unregistered, unplanned, eligible events with seats', () => {

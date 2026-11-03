@@ -1,6 +1,6 @@
 /** Schedule conflicts between events (half-open intervals: back-to-back events do not clash). Pure. */
 import { overlapMinutes, overlaps } from './dates';
-import { eventEnd, eventStart, sortByStart } from './events';
+import { eventEnd, eventStart, isDateOnly, sortByStart } from './events';
 import type { Conflict, SchoolEvent } from './types';
 
 /** Keeps the first event for each id. */
@@ -15,6 +15,8 @@ function uniqueById(events: readonly SchoolEvent[]): SchoolEvent[] {
 
 /** Conflict for two events already in start-then-id order, or null when they do not overlap. */
 function orderedConflict(a: SchoolEvent, b: SchoolEvent): Conflict | null {
+  // A date-only event has no announced time, so it cannot clash with anything.
+  if (isDateOnly(a) || isDateOnly(b)) return null;
   const aStart = eventStart(a);
   const aEnd = eventEnd(a);
   const bStart = eventStart(b);

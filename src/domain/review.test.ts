@@ -498,7 +498,7 @@ describe('review: buildIcs (RFC 5545)', () => {
       shortName: 'CLB Tranh biện',
       description: 'Mô tả.',
       categories: ['HT'],
-      contact: '[Email câu lạc bộ]',
+      links: [],
     },
   ];
   const long = makeEvent({

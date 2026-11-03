@@ -5,11 +5,11 @@ import {
   formatLongDate,
   formatMonthYear,
   formatShortDate,
-  formatTimeRange,
   startOfVnMonth,
   toIsoDate,
   toMillis,
 } from '../../domain/dates';
+import { eventPlaceLabel, eventTimeLabel } from '../../domain/events';
 import type { CalendarPeriod, Millis, SchoolEvent } from '../../domain/types';
 import { Link } from '../../router';
 import { LineBadge } from '../atoms/LineBadge';
@@ -105,7 +105,6 @@ function PeriodItem({ period }: { period: CalendarPeriod }) {
 function EventItem({ row, titleLevel }: { row: RouteListRow; titleLevel: 3 | 4 }) {
   const { event } = row;
   const start = toMillis(event.start);
-  const end = toMillis(event.end);
   const Title = titleLevel === 3 ? 'h3' : 'h4';
   return (
     <li className={['route-list__row', row.mine ? 'route-list__row--mine' : ''].filter(Boolean).join(' ')}>
@@ -114,7 +113,7 @@ function EventItem({ row, titleLevel }: { row: RouteListRow; titleLevel: 3 | 4 }
           {formatDayLabel(start)}
         </MonoTime>
         <MonoTime className="route-list__time" dateTime={event.start}>
-          {formatTimeRange(start, end)}
+          {eventTimeLabel(event)}
         </MonoTime>
       </p>
       <span className="route-list__station" aria-hidden="true">
@@ -130,7 +129,7 @@ function EventItem({ row, titleLevel }: { row: RouteListRow; titleLevel: 3 | 4 }
         <p className="route-list__meta">
           <span>{row.clubName}</span>
           <span aria-hidden="true"> · </span>
-          <span>{event.format === 'online' ? `Trực tuyến · ${event.location}` : event.location}</span>
+          <span>{eventPlaceLabel(event)}</span>
         </p>
       </div>
       <div className="route-list__status">

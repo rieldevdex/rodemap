@@ -16,7 +16,7 @@ const clubs: Club[] = [
     shortName: 'CLB Tranh biện',
     description: 'Câu lạc bộ phụ trách các hoạt động tranh biện.',
     categories: ['HT'],
-    contact: '[Email câu lạc bộ]',
+    links: [],
   },
   {
     id: 'robot',
@@ -26,7 +26,7 @@ const clubs: Club[] = [
     shortName: 'CLB Robot',
     description: 'Câu lạc bộ phụ trách các hoạt động công nghệ.',
     categories: ['CN'],
-    contact: '[Email câu lạc bộ]',
+    links: [],
   },
 ];
 

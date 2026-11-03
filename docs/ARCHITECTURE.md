@@ -158,7 +158,15 @@ export function periodOn(periods, day): CalendarPeriod | undefined; export funct
 // events.ts — event-level facts
 export function eventStart(e: SchoolEvent): Millis;
 export function eventEnd(e: SchoolEvent): Millis;
-export function eventHours(e: SchoolEvent): number;           // durationHours
+export function eventHours(e: SchoolEvent): number;           // durationHours; 0 for a date-only event
+export function isDateOnly(e: SchoolEvent): boolean;           // only the date is announced (SchoolEvent.dateOnly)
+export const DETAILS_PENDING = 'Đang cập nhật';
+export function eventTimeLabel(e): string;                     // "16:45–18:15" or DETAILS_PENDING
+export function eventStartTimeLabel(e): string;                // "16:45" or DETAILS_PENDING
+export function eventPlaceLabel(e): string;                    // "Trực tuyến · Google Meet" / room, or DETAILS_PENDING
+export function eventVenueLabel(e): string;                    // "Trực tuyến" / room, or DETAILS_PENDING
+export function eventFormatLabel(e): string;                   // "Trực tiếp" / "Trực tuyến", or DETAILS_PENDING
+export function eventGradesLabel(e): string;                   // gradesLabel, or DETAILS_PENDING
 export function isRegistered(eventId: string, regs: Registration[]): boolean; // status registered|attended
 export function seatsLeft(e: SchoolEvent, regs: Registration[]): number; // capacity - seatsTaken - (registered ? 1 : 0), min 0
 export function isFull(e: SchoolEvent, regs: Registration[]): boolean;
@@ -168,14 +176,14 @@ export function isEligible(e: SchoolEvent, grade: Grade | null): boolean; // nul
 export function isOpenToAll(grades): boolean;                   // every grade 6–12 (toàn trường)
 export const EXTERNAL_COMPETITION_LABEL = 'Cuộc thi ngoài trường';
 export function isExternalCompetition(e): e is … & { organizer: string }; // non-blank `organizer` = organised outside the school
-export function publisherLine(e, publisherName): string;       // "CLB Tranh biện" / "Phòng Cố vấn Học tập · Đơn vị tổ chức: Trường đại học đối tác"
+export function publisherLine(e, publisherName): string;       // "Vinschool Debate Society" / "Phòng Cố vấn Học tập · Đơn vị tổ chức: Trường đại học đối tác"
 export function formatGrades(grades): string;                   // "6–12", "8–12", "11, 12" (runs of 3+ as ranges)
 export function gradesLabel(grades): string;                    // "Khối 6–12 (toàn trường)", "Khối 10–12"
 export function deadlineDaysLeft(e: SchoolEvent, now: Millis): number; // calendar days, negative if passed
 export function fitsAvailability(e: SchoolEvent, a: Availability): boolean;
 //   weekend (Sat/Sun) → a.weekend; weekday starting ≥ 16:30 → a.weekdayAfterSchool;
 //   weekday during school hours → true only for category 'TS' (school-wide, scheduled by the school)
-export function registrationState(e, regs, now): 'registered'|'attended'|'absent'|'open'|'full'|'closed'|'past';
+export function registrationState(e, regs, now): 'registered'|'attended'|'absent'|'open'|'full'|'closed'|'past'|'not_open'; // not_open: date-only
 export function sortByStart(events: SchoolEvent[]): SchoolEvent[]; // stable, start then id; returns a new array
 
 // filters.ts
@@ -277,6 +285,10 @@ export const CLUB_KIND_LABELS: Record<ClubKind, string>;      // Câu lạc bộ
 export function isStudentClub(club): boolean;                 // kind 'club'
 export function studentClubs(clubs): Club[];                  // the only ones named in Đề xuất (proposal club, collaboration partner)
 export function publisherFactLabel(kind | undefined, external): string; // Câu lạc bộ phụ trách / Đơn vị phụ trách / Nguồn thông tin
+export const CLUB_LINK_LABELS: Record<ClubLinkKind, string>;  // Facebook, Instagram, TikTok
+export function isPlaceholderEmail(email): boolean;           // "[Email Hội đồng Học sinh]"
+export function mailableEmail(club): string | null;           // the address a mailto: link may use
+export function hasNoContact(club): boolean;                  // no email and no page published
 
 // moderation.ts
 export type ValidationErrors = Partial<Record<keyof EventDraft, string>>; // formal Vietnamese messages
@@ -299,15 +311,15 @@ export function charCount(s: string): number;   // graphemes after trim (Intl.Se
 categories.ts   export const CATEGORIES: Category[]; export function categoryByCode(c): Category
 tags.ts         export const TAGS: Tag[]; export function tagLabel(id): string
 goals.ts        export const GOALS: Goal[]
-clubs.ts        export const CLUBS: Club[]           // 15: HĐHS ('council'), Phòng Cố vấn Học tập ('office', id 'co-van-hoc-tap'),
-                                                     //     13 clubs ('club') incl. Inkstep (id 'inkstep')
-events.ts       export const EVENTS: SchoolEvent[]    // 45 approved club events, 5 pending/changes_requested/rejected,
-                                                     //     4 approved external competitions (ev-051 … ev-054)
+clubs.ts        export const CLUBS: Club[]           // 22: HĐHS ('council'), Phòng Cố vấn Học tập ('office', id 'co-van-hoc-tap'),
+                                                     //     the 20 real clubs ('club'); each has `email?` (the club's own) and `links`
+events.ts       export const EVENTS: SchoolEvent[]    // 6 HĐHS events, 4 external competitions (ev-051 … ev-054),
+                                                     //     2 club events announced by date only (`dateOnly`, ev-055, ev-056)
 calendar.ts     export const PERIODS: CalendarPeriod[]
-seed.ts         export const SEED_PROFILE: Profile; SEED_REGISTRATIONS; SEED_PORTFOLIO; SEED_SUBMISSIONS
+seed.ts         export const SEED_PROFILE: Profile; SEED_REGISTRATIONS; SEED_PORTFOLIO   // HĐHS events only
 news.ts         export const NEWS: NewsPost[]; NEWS_DEPARTMENTS   // council articles (one scheduled), signed by a department
 school.ts       export const SCHOOL = { name: 'Vinschool Smart City', schoolYear: '2026–2027' }
-proposals.ts    export const ACTIVITY_PROPOSALS; COLLABORATIONS; PROPOSAL_RESPONSES // anonymous (grade only) student proposals, club collaborations, sample answers
+proposals.ts    export const ACTIVITY_PROPOSALS; COLLABORATIONS; PROPOSAL_RESPONSES // anonymous (grade only) student proposals naming no club, no sample collaboration, sample answers
 ```
 
 Publishers and external competitions (`src/domain/types.ts`):

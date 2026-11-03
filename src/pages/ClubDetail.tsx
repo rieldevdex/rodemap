@@ -1,18 +1,46 @@
 import { Button } from '../components/atoms/Button';
+import { Icon } from '../components/atoms/Icon';
 import { LineBadge } from '../components/atoms/LineBadge';
 import { MonoTime } from '../components/atoms/MonoTime';
+import { VisuallyHidden } from '../components/atoms/VisuallyHidden';
 import { PageHead } from '../components/molecules/PageHead';
 import { StationCard } from '../components/molecules/StationCard';
 import { NewsRelated } from '../components/organisms/NewsRelated';
 import { CLUBS } from '../data/clubs';
-import { CLUB_KIND_LABELS } from '../domain/clubs';
+import { CLUB_KIND_LABELS, CLUB_LINK_LABELS, hasNoContact, mailableEmail } from '../domain/clubs';
 import { formatDate, toMillis } from '../domain/dates';
 import { deadlineDaysLeft, isPast, registrationState, seatsLeft } from '../domain/events';
+import type { Club } from '../domain/types';
 import { Link, useRoute } from '../router';
 import { selectClubBySlug, selectEventsForClub, selectNewsForClub } from '../state/selectors';
 import { useCatalog } from '../state/useCatalog';
 import { EventRegistration } from './connected/EventRegistration';
 import './Clubs.css';
+
+/** The club's own email address and public pages: never a student's or teacher's personal details. */
+function ClubContact({ club }: { club: Club }) {
+  if (hasNoContact(club)) return <p className="clubs__full">Câu lạc bộ chưa công bố thông tin liên hệ.</p>;
+  const mail = mailableEmail(club);
+  return (
+    <ul className="club-detail__contact" aria-label="Liên hệ">
+      {club.email === undefined ? null : (
+        <li>
+          <Icon name="mail" size="sm" />
+          {mail === null ? club.email : <a href={`mailto:${mail}`}>{mail}</a>}
+        </li>
+      )}
+      {club.links.map((l) => (
+        <li key={l.url}>
+          <Icon name="external" size="sm" />
+          <a href={l.url} target="_blank" rel="noopener noreferrer">
+            {CLUB_LINK_LABELS[l.kind]}
+            <VisuallyHidden>{` của ${club.shortName} (mở trong thẻ mới)`}</VisuallyHidden>
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export function ClubDetailPage() {
   const { params } = useRoute();
@@ -59,9 +87,8 @@ export function ClubDetailPage() {
         title={club.shortName}
         lead={club.description}
       >
-        <p className="clubs__full">
-          {club.name} · Liên hệ: {club.contact}
-        </p>
+        <p className="clubs__full">{club.name}</p>
+        <ClubContact club={club} />
         {state.role === 'club' ? (
           <div className="cluster">
             <Button to="/cong-cau-lac-bo" variant="secondary" iconEnd="arrow-right">

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CLUB_KIND_LABELS, isStudentClub, publisherFactLabel, studentClubs } from './clubs';
+import { CLUB_KIND_LABELS, CLUB_LINK_LABELS, hasNoContact, isPlaceholderEmail, isStudentClub, mailableEmail, publisherFactLabel, studentClubs } from './clubs';
 import type { ClubKind } from './types';
 
 describe('club kinds', () => {
@@ -29,5 +29,26 @@ describe('club kinds', () => {
     expect(publisherFactLabel('office', false)).toBe('Đơn vị phụ trách');
     expect(publisherFactLabel('office', true)).toBe('Nguồn thông tin');
     expect(publisherFactLabel(undefined, true)).toBe('Nguồn thông tin');
+  });
+});
+
+describe('club contact', () => {
+  it('names each network as its owner writes it', () => {
+    expect(CLUB_LINK_LABELS).toEqual({ facebook: 'Facebook', instagram: 'Instagram', tiktok: 'TikTok' });
+  });
+
+  it('links a real address and never a placeholder', () => {
+    expect(isPlaceholderEmail('[Email Hội đồng Học sinh]')).toBe(true);
+    expect(isPlaceholderEmail(' [Email] ')).toBe(true);
+    expect(isPlaceholderEmail('clb@example.com')).toBe(false);
+    expect(mailableEmail({ email: 'clb@example.com' })).toBe('clb@example.com');
+    expect(mailableEmail({ email: '[Email Phòng Cố vấn Học tập]' })).toBeNull();
+    expect(mailableEmail({})).toBeNull();
+  });
+
+  it('knows when a club has published no contact at all', () => {
+    expect(hasNoContact({ links: [] })).toBe(true);
+    expect(hasNoContact({ email: 'clb@example.com', links: [] })).toBe(false);
+    expect(hasNoContact({ links: [{ kind: 'facebook', url: 'https://www.facebook.com/example' }] })).toBe(false);
   });
 });

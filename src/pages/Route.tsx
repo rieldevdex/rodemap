@@ -23,7 +23,7 @@ import {
   toIsoDate,
   toMillis,
 } from '../domain/dates';
-import { deadlineDaysLeft, isPast, publisherLine, registrationState, seatsLeft } from '../domain/events';
+import { deadlineDaysLeft, eventStartTimeLabel, isPast, publisherLine, registrationState, seatsLeft } from '../domain/events';
 import { atLeast } from '../domain/interactivity';
 import { layoutRoute, type Orientation, type RouteLayoutInput } from '../domain/route-layout';
 import { formatHours } from '../domain/text';
@@ -330,9 +330,8 @@ export function RoutePage() {
   const stationLabel = (id: string) => {
     const e = byId.get(id);
     if (!e) return id;
-    const start = toMillis(e.start);
     const mine = mineSet.has(id) ? ' · thuộc lộ trình của bạn' : '';
-    return `${e.category} ${LANE_NAMES.get(e.category) ?? ''} · ${e.title} · ${formatDayLabel(start)}, ${formatTime(start)}${mine}`;
+    return `${e.category} ${LANE_NAMES.get(e.category) ?? ''} · ${e.title} · ${formatDayLabel(toMillis(e.start))}, ${eventStartTimeLabel(e)}${mine}`;
   };
 
   const rows: RouteListRow[] = shown.map((e) => ({

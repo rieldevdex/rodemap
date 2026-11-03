@@ -2,7 +2,7 @@
  * "Khám phá sự kiện" filters <-> URL query string. Pure: no React, no DOM, no clock.
  *
  * Readable ASCII keys and values, e.g.
- *   /kham-pha?q=tranh+bien&linh-vuc=HT,CN&clb=tranh-bien&khoi=11&thoi-gian=tuan-nay
+ *   /kham-pha?q=tranh+bien&linh-vuc=HT,CN&clb=vinschool-debate-society&khoi=11&thoi-gian=tuan-nay
  *            &hinh-thuc=truc-tiep&con-cho=1&han=sap-het-han&da-dien-ra=1&xem=danh-sach
  * `tim=1` asks the page to focus the search field (Ctrl K / ⌘K); it is never written back.
  * Parsing also accepts the domain values (`han=closing_7_days`, `thoi-gian=this_week`…).
@@ -210,7 +210,7 @@ export interface ActiveFilter {
 
 /**
  * One removable entry per active value, in rail order. `categoryName` and `clubName`
- * supply the labels ("Học thuật", "CLB Tranh biện").
+ * supply the labels ("Học thuật", "Vinschool Debate Society").
  */
 export function activeFilters(
   filter: ExploreFilterState,

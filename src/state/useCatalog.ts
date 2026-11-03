@@ -14,7 +14,7 @@ export interface Catalog {
   publicEvents: SchoolEvent[];
   eventById: (id: string) => SchoolEvent | undefined;
   clubById: (id: string) => Club | undefined;
-  /** Short club name ("CLB Tranh biện"), or an empty string. */
+  /** Short club name ("Vinschool Debate Society"), or an empty string. */
   clubName: (id: string) => string;
 }
 

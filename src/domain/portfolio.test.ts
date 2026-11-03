@@ -42,7 +42,7 @@ const clubs: Club[] = [
     shortName: 'CLB Tranh biện',
     description: 'Câu lạc bộ phụ trách các hoạt động tranh biện.',
     categories: ['HT'],
-    contact: '[Email câu lạc bộ]',
+    links: [],
   },
 ];
 

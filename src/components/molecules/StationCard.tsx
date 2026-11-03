@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { formatDayLabel, formatTimeRange, toMillis } from '../../domain/dates';
-import { EXTERNAL_COMPETITION_LABEL, isExternalCompetition, type RegistrationState } from '../../domain/events';
+import { formatDayLabel, toMillis } from '../../domain/dates';
+import { EXTERNAL_COMPETITION_LABEL, eventPlaceLabel, eventTimeLabel, isExternalCompetition, type RegistrationState } from '../../domain/events';
 import type { SchoolEvent } from '../../domain/types';
 import { Link } from '../../router';
 import { LineBadge } from '../atoms/LineBadge';
@@ -45,6 +45,8 @@ export function eventStatus(
       return { tone: 'stop', label: 'Hết hạn đăng ký' };
     case 'past':
       return { tone: 'neutral', label: 'Đã diễn ra' };
+    case 'not_open':
+      return { tone: 'neutral', label: 'Chưa mở đăng ký' };
     case 'open':
       if (deadlineDays <= 2) return { tone: 'warn', label: deadlineDays <= 0 ? 'Hạn đăng ký hôm nay' : `Còn ${deadlineDays} ngày để đăng ký` };
       if (seatsLeft <= 5) return { tone: 'warn', label: `Còn ${seatsLeft} chỗ` };
@@ -70,7 +72,6 @@ export function StationCard({
   actions,
 }: StationCardProps) {
   const start = toMillis(event.start);
-  const end = toMillis(event.end);
   const status = eventStatus(state, seatsLeft, deadlineDays);
   const Heading = headingLevel === 2 ? 'h2' : 'h3';
   const external = isExternalCompetition(event);
@@ -80,7 +81,7 @@ export function StationCard({
       <div className="station-card__top">
         <LineBadge code={event.category} showName={variant === 'full'} size="sm" />
         <MonoTime className="station-card__when" dateTime={event.start}>
-          {formatDayLabel(start)} · {formatTimeRange(start, end)}
+          {formatDayLabel(start)} · {eventTimeLabel(event)}
         </MonoTime>
       </div>
       <Heading className="station-card__title">
@@ -95,7 +96,7 @@ export function StationCard({
       <p className="station-card__meta">
         <span>{clubName}</span>
         <span aria-hidden="true"> · </span>
-        <span>{event.format === 'online' ? `Trực tuyến · ${event.location}` : event.location}</span>
+        <span>{eventPlaceLabel(event)}</span>
       </p>
       {external ? <p className="station-card__organizer">Đơn vị tổ chức: {event.organizer}</p> : null}
       {showSummary ? <p className="station-card__summary">{event.summary}</p> : null}

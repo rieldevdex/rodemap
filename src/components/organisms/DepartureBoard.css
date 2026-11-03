@@ -43,6 +43,10 @@
   font-variant-numeric: tabular-nums;
 }
 
+.departures__time--pending {
+  color: var(--color-ink-2);
+}
+
 .departures__date {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;

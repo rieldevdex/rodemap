@@ -20,12 +20,14 @@ import {
   toMillis,
 } from '../../domain/dates';
 import {
+  DETAILS_PENDING,
   deadlineDaysLeft,
   eventEnd,
   eventStart,
   findRegistration,
   formatGrades,
   gradesLabel,
+  isDateOnly,
   isExternalCompetition,
   isPast,
   registrationState,
@@ -33,6 +35,7 @@ import {
   type RegistrationState,
 } from '../../domain/events';
 import { filterEvents } from '../../domain/filters';
+import { CLUB_LINK_LABELS } from '../../domain/clubs';
 import { proposePlan } from '../../domain/planner';
 import { NEWS_CATEGORY_LABELS } from '../../domain/news';
 import { foldVietnamese } from '../../domain/text';
@@ -90,6 +93,7 @@ const STATUS_LABELS: Record<RegistrationState, string> = {
   full: 'Hết chỗ',
   closed: 'Hết hạn đăng ký',
   past: 'Đã diễn ra',
+  not_open: 'Chưa mở đăng ký',
 };
 
 function clubOf(id: string): Club | undefined {
@@ -113,6 +117,25 @@ function externalFacts(e: SchoolEvent): { external_competition?: true; organizer
 export function eventBrief(e: SchoolEvent, ctx: ToolContext) {
   const start = eventStart(e);
   const deadline = toMillis(e.registrationDeadline);
+  // Only the date is announced: every other detail is said to be pending, never guessed.
+  if (isDateOnly(e)) {
+    return {
+      id: e.id,
+      title: e.title,
+      category: e.category,
+      category_name: CATEGORY_LABELS[e.category],
+      club: clubOf(e.clubId)?.name ?? e.clubId,
+      ...externalFacts(e),
+      date: formatLongDate(start),
+      details_announced: false,
+      time: DETAILS_PENDING,
+      location: DETAILS_PENDING,
+      format: DETAILS_PENDING,
+      seats_left: DETAILS_PENDING,
+      registration_deadline: DETAILS_PENDING,
+      status: STATUS_LABELS[registrationState(e, ctx.state.registrations, ctx.now)],
+    };
+  }
   return {
     id: e.id,
     title: e.title,
@@ -143,9 +166,9 @@ export function eventDetail(e: SchoolEvent, ctx: ToolContext) {
     ...eventBrief(e, ctx),
     summary: e.summary,
     description: e.description,
-    eligible_grades: gradesLabel(e.eligibleGrades),
+    eligible_grades: isDateOnly(e) ? DETAILS_PENDING : gradesLabel(e.eligibleGrades),
     eligible_for_student: info.eligible,
-    capacity: e.capacity,
+    capacity: isDateOnly(e) ? DETAILS_PENDING : e.capacity,
     tags: e.tags.map(tagLabel),
     deadline_days_left: deadlineDaysLeft(e, ctx.now),
     conflicts_with_plan: info.conflicts.map((c) => eventBrief(c, ctx)),
@@ -233,7 +256,8 @@ function getClub(input: Record<string, unknown>, ctx: ToolContext): ToolOutcome 
       short_name: club.shortName,
       description: club.description,
       categories: club.categories.map((c) => `${c} – ${CATEGORY_LABELS[c]}`),
-      contact: club.contact,
+      email: club.email ?? 'Câu lạc bộ chưa công bố địa chỉ thư điện tử.',
+      pages: club.links.map((l) => `${CLUB_LINK_LABELS[l.kind]}: ${l.url}`),
       upcoming_events: upcoming.slice(0, 6).map((e) => eventBrief(e, ctx)),
       past_event_count: events.length - upcoming.length,
     },
@@ -301,6 +325,7 @@ const NOT_POSSIBLE: Partial<Record<RegistrationState, string>> = {
   past: 'Sự kiện đã diễn ra.',
   attended: 'Bạn đã tham gia sự kiện này.',
   absent: 'Sự kiện đã diễn ra.',
+  not_open: 'Sự kiện mới công bố ngày tổ chức; đơn vị tổ chức chưa mở đăng ký.',
 };
 
 function proposeRegistration(input: Record<string, unknown>, ctx: ToolContext): ToolOutcome {

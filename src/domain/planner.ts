@@ -3,7 +3,7 @@
 import { DEFAULT_WEEKLY_HOUR_BUDGET, hoursByWeek, wouldExceedBudget } from './budget';
 import { findConflicts } from './conflicts';
 import { DAY_MS } from './dates';
-import { eventStart, isDeadlinePassed, isEligible, isFull, isPast, isRegistered, sortByStart } from './events';
+import { eventStart, isDateOnly, isDeadlinePassed, isEligible, isFull, isPast, isRegistered, sortByStart } from './events';
 import { recommendEvents, type RecommendContext } from './recommend';
 import type { CategoryCode, SchoolEvent } from './types';
 
@@ -63,6 +63,7 @@ function bestAlternative(
       ({ event: e, distance }) =>
         e.category === target.category &&
         e.status === 'approved' &&
+        !isDateOnly(e) &&
         !excluded.has(e.id) &&
         distance <= ALTERNATIVE_WINDOW_DAYS * DAY_MS &&
         !isPast(e, ctx.now) &&

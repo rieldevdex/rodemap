@@ -1,10 +1,14 @@
 // Dữ liệu minh họa phục vụ bản trình diễn. Thay thế bằng dữ liệu chính thức khi triển khai.
+// Danh sách câu lạc bộ theo danh sách chính thức của nhà trường (cập nhật ngày 03/11/2026).
 import type { Club } from '../domain/types';
 
 /**
- * 15 publishers: Hội đồng Học sinh (kind 'council', school-wide events), Phòng Cố vấn Học tập
- * (kind 'office', external academic competitions it relays from the organisers), then 13 student
- * clubs (kind 'club'): Inkstep (the one real club) and 12 generic clubs.
+ * 22 publishers: Hội đồng Học sinh (kind 'council', school-wide events), Phòng Cố vấn Học tập
+ * (kind 'office', external academic competitions it relays from the organisers), then the 20 real
+ * student clubs of Vinschool Smart City (kind 'club'), in the order of the school's club list.
+ * Descriptions follow what each club wrote, in formal third person; the categories are the closest
+ * lines. Only the club's own email address and public pages are listed: never the names or
+ * personal addresses of student leaders or advisers.
  */
 export const CLUBS: Club[] = [
   {
@@ -16,7 +20,8 @@ export const CLUBS: Club[] = [
     description:
       'Hội đồng Học sinh là tổ chức đại diện cho học sinh toàn trường, phụ trách điều phối các sự kiện toàn trường và kết nối hoạt động giữa các câu lạc bộ. Bên cạnh đó, Hội đồng tiếp nhận và kiểm duyệt sự kiện do các câu lạc bộ đề xuất trước khi công bố tới học sinh.',
     categories: ['TS', 'KN'],
-    contact: '[Email Hội đồng Học sinh]',
+    email: '[Email Hội đồng Học sinh]',
+    links: [],
   },
   {
     id: 'co-van-hoc-tap',
@@ -27,149 +32,275 @@ export const CLUBS: Club[] = [
     description:
       'Phòng Cố vấn Học tập tư vấn cho học sinh về định hướng học tập, lựa chọn môn học và lộ trình chuẩn bị cho bậc đại học. Phòng cập nhật trên vsmcclubs thông tin các cuộc thi học thuật ngoài trường, gồm thể lệ, hạn đăng ký và cách thức Phòng hỗ trợ học sinh hoàn thiện hồ sơ dự thi.',
     categories: ['HT'],
-    contact: '[Email Phòng Cố vấn Học tập]',
+    email: '[Email Phòng Cố vấn Học tập]',
+    links: [],
   },
   {
-    id: 'inkstep',
+    id: 'bot-va-bo',
     kind: 'club',
-    slug: 'inkstep',
-    name: 'Inkstep – Câu lạc bộ Phát triển Sản phẩm Học tập',
-    shortName: 'Inkstep',
+    slug: 'bot-va-bo',
+    name: 'Câu lạc bộ Bột và Bơ',
+    shortName: 'Bột và Bơ',
     description:
-      'Inkstep là câu lạc bộ nghiên cứu, thiết kế và phát triển sản phẩm học tập Eighthundred. Câu lạc bộ định kỳ tổ chức các buổi chia sẻ về phát triển sản phẩm, qua đó tạo điều kiện để học sinh tìm hiểu quy trình và tham gia đóng góp cho sản phẩm.',
-    categories: ['CN', 'KN'],
-    contact: '[Email câu lạc bộ]',
+      'Bột và Bơ là câu lạc bộ làm bánh đầu tiên tại Vinschool Smart City, nơi các thành viên yêu thích bánh ngọt cùng học hỏi, thực hành và thử sức với những công thức mới. Bên cạnh hoạt động làm bánh, câu lạc bộ tổ chức các hoạt động gây quỹ và thiện nguyện nhằm lan tỏa những giá trị tốt đẹp tới cộng đồng.',
+    categories: ['KN', 'TN'],
+    email: 'botvabosmc@gmail.com',
+    links: [
+      { kind: 'facebook', url: 'https://www.facebook.com/share/1BM5ozKaa7/' },
+      { kind: 'tiktok', url: 'https://www.tiktok.com/@bt.b016' },
+    ],
   },
   {
-    id: 'tranh-bien',
+    id: 'goc-xi-xao',
     kind: 'club',
-    slug: 'tranh-bien',
-    name: 'Câu lạc bộ Tranh biện',
-    shortName: 'CLB Tranh biện',
+    slug: 'goc-xi-xao',
+    name: 'Câu lạc bộ Phát thanh và Truyền thông Góc Xì Xào',
+    shortName: 'Góc Xì Xào',
     description:
-      'Câu lạc bộ Tranh biện tổ chức các buổi sinh hoạt, tập huấn và giải đấu nhằm phát triển tư duy phản biện và kỹ năng lập luận của học sinh. Câu lạc bộ phụ trách Giải Tranh biện cấp trường và tuyển chọn đội tuyển tham gia các giải đấu bên ngoài nhà trường.',
-    categories: ['KN', 'HT'],
-    contact: '[Email câu lạc bộ]',
+      'Góc Xì Xào là câu lạc bộ Phát thanh và Truyền thông, lan tỏa những câu chuyện, thông tin và khoảnh khắc trong trường học qua các chương trình phát thanh và nội dung truyền thông sáng tạo. Câu lạc bộ hướng tới trở thành tiếng nói gần gũi của học sinh, góp phần kết nối mọi người và mang lại năng lượng tích cực cho cộng đồng Vinschool.',
+    categories: ['NT', 'KN'],
+    email: 'gocxixao@gmail.com',
+    links: [
+      { kind: 'facebook', url: 'https://www.facebook.com/share/1EpC1kx5xC/' },
+      { kind: 'tiktok', url: 'https://www.tiktok.com/@gocxixao_smc' },
+    ],
   },
   {
-    id: 'khoa-hoc-du-lieu',
+    id: 'fluorescence-the-lab',
     kind: 'club',
-    slug: 'khoa-hoc-du-lieu',
-    name: 'Câu lạc bộ Khoa học Dữ liệu',
-    shortName: 'CLB Khoa học Dữ liệu',
+    slug: 'fluorescence-the-lab',
+    name: 'Fluorescence the Lab',
+    shortName: 'Fluorescence the Lab',
     description:
-      'Câu lạc bộ Khoa học Dữ liệu tạo môi trường để học sinh tìm hiểu phương pháp thu thập, xử lý và phân tích dữ liệu bằng các công cụ phổ biến. Câu lạc bộ tổ chức hội thảo, buổi thực hành và cuộc thi phân tích dữ liệu, đồng thời hỗ trợ học sinh thực hiện đề tài nghiên cứu khoa học.',
-    categories: ['CN', 'HT'],
-    contact: '[Email câu lạc bộ]',
+      'Fluorescence the Lab là câu lạc bộ Khoa học – STEM – Nghiên cứu – Trải nghiệm – Giáo dục cộng đồng, quy tụ những học sinh yêu thích khám phá khoa học thông qua nghiên cứu, thực hành và thử nghiệm. Thông qua các dự án nghiên cứu, hội thảo, sự kiện khoa học, hoạt động STEM và dự án cộng đồng, câu lạc bộ xây dựng môi trường để mỗi thành viên đặt câu hỏi, thử sức với điều mới và tạo ra giá trị từ sự tò mò của mình.',
+    categories: ['HT', 'CN'],
+    email: 'fluorescencethelab@gmail.com',
+    links: [
+      { kind: 'facebook', url: 'https://www.facebook.com/share/1CB6ygNU7K/' },
+    ],
   },
   {
-    id: 'toan-hoc',
+    id: 'the-papillon',
     kind: 'club',
-    slug: 'toan-hoc',
-    name: 'Câu lạc bộ Toán học',
-    shortName: 'CLB Toán học',
+    slug: 'the-papillon',
+    name: 'The Papillon',
+    shortName: 'The Papillon',
     description:
-      'Câu lạc bộ Toán học tổ chức các buổi chuyên đề và ôn luyện nhằm nâng cao năng lực tư duy toán học của học sinh. Câu lạc bộ phối hợp với tổ Toán hỗ trợ học sinh chuẩn bị cho các kỳ kiểm tra định kỳ và kỳ thi học sinh giỏi.',
-    categories: ['HT'],
-    contact: '[Email câu lạc bộ]',
+      'The Papillon là câu lạc bộ nhảy đầu tiên tại Vinschool Smart City, quy tụ những học sinh có chung tình yêu với âm nhạc, vũ đạo và sân khấu. Sau bốn mùa hoạt động, câu lạc bộ bước vào thế hệ thứ năm với mục tiêu tiếp tục biến niềm đam mê thành những tiết mục biểu diễn mang dấu ấn tuổi trẻ.',
+    categories: ['NT'],
+    email: 'thepapillonxoxo@gmail.com',
+    links: [
+      { kind: 'facebook', url: 'https://www.facebook.com/share/1JnTJfVRdf/' },
+    ],
   },
   {
-    id: 'hung-bien-tieng-anh',
+    id: 'psyched-club',
     kind: 'club',
-    slug: 'hung-bien-tieng-anh',
-    name: 'Câu lạc bộ Hùng biện Tiếng Anh',
-    shortName: 'CLB Hùng biện Tiếng Anh',
+    slug: 'psyched-club',
+    name: 'Psyched Club',
+    shortName: 'Psyched Club',
     description:
-      'Câu lạc bộ Hùng biện Tiếng Anh tạo điều kiện để học sinh rèn luyện kỹ năng trình bày và tranh luận bằng tiếng Anh trong môi trường học thuật. Câu lạc bộ tổ chức các buổi luyện tập định kỳ và Cuộc thi Hùng biện Tiếng Anh cấp trường.',
+      'Psyched Club là câu lạc bộ Tâm lý học hướng tới học sinh trên địa bàn Hà Nội, với mong muốn đưa tâm lý học đến gần hơn với những câu chuyện và trải nghiệm của tuổi học trò. Ở thế hệ thứ tư, câu lạc bộ tiếp nối tinh thần khám phá, lắng nghe và kết nối, giúp mỗi học sinh có thêm góc nhìn về bản thân và nuôi dưỡng sự thấu hiểu.',
     categories: ['HT', 'KN'],
-    contact: '[Email câu lạc bộ]',
+    email: 'psychedvsmc@gmail.com',
+    links: [
+      { kind: 'facebook', url: 'https://www.facebook.com/share/1BZYM9p7QV/' },
+    ],
   },
   {
-    id: 'am-nhac',
+    id: 'hanoi-vinschool-seia',
     kind: 'club',
-    slug: 'am-nhac',
-    name: 'Câu lạc bộ Âm nhạc',
-    shortName: 'CLB Âm nhạc',
+    slug: 'hanoi-vinschool-seia',
+    name: 'Hanoi Vinschool SEIA',
+    shortName: 'Hanoi Vinschool SEIA',
     description:
-      'Câu lạc bộ Âm nhạc tập hợp học sinh yêu thích thanh nhạc và khí nhạc, tổ chức tập luyện định kỳ dưới sự hướng dẫn của giáo viên Âm nhạc. Câu lạc bộ phụ trách nhiều tiết mục văn nghệ trong các sự kiện toàn trường và chương trình hòa nhạc cuối học kỳ.',
-    categories: ['NT'],
-    contact: '[Email câu lạc bộ]',
-  },
-  {
-    id: 'my-thuat',
-    kind: 'club',
-    slug: 'my-thuat',
-    name: 'Câu lạc bộ Mỹ thuật',
-    shortName: 'CLB Mỹ thuật',
-    description:
-      'Câu lạc bộ Mỹ thuật tổ chức các lớp thực hành hội họa, ký họa và thiết kế nhằm bồi dưỡng năng khiếu thẩm mỹ của học sinh. Các tác phẩm của thành viên được trưng bày trong khuôn viên trường và tại các sự kiện của nhà trường.',
-    categories: ['NT'],
-    contact: '[Email câu lạc bộ]',
-  },
-  {
-    id: 'san-khau',
-    kind: 'club',
-    slug: 'san-khau',
-    name: 'Câu lạc bộ Sân khấu',
-    shortName: 'CLB Sân khấu',
-    description:
-      'Câu lạc bộ Sân khấu dàn dựng tiểu phẩm và chương trình biểu diễn về các chủ đề gắn với đời sống học đường. Câu lạc bộ giúp học sinh phát triển kỹ năng diễn xuất, biên kịch và tổ chức sân khấu, đồng thời góp phần vào công tác tuyên truyền của nhà trường.',
-    categories: ['NT'],
-    contact: '[Email câu lạc bộ]',
-  },
-  {
-    id: 'bong-ro',
-    kind: 'club',
-    slug: 'bong-ro',
-    name: 'Câu lạc bộ Bóng rổ',
-    shortName: 'CLB Bóng rổ',
-    description:
-      'Câu lạc bộ Bóng rổ tổ chức tập luyện định kỳ, giao hữu và giải đấu cấp trường cho học sinh ở mọi trình độ. Câu lạc bộ đồng thời phụ trách tuyển chọn và huấn luyện đội tuyển bóng rổ của trường.',
-    categories: ['TT'],
-    contact: '[Email câu lạc bộ]',
-  },
-  {
-    id: 'cau-long',
-    kind: 'club',
-    slug: 'cau-long',
-    name: 'Câu lạc bộ Cầu lông',
-    shortName: 'CLB Cầu lông',
-    description:
-      'Câu lạc bộ Cầu lông tạo môi trường rèn luyện thể chất thường xuyên cho học sinh yêu thích môn cầu lông. Câu lạc bộ tổ chức các buổi tập theo trình độ và giải cầu lông cấp trường ở các nội dung đơn và đôi.',
-    categories: ['TT'],
-    contact: '[Email câu lạc bộ]',
-  },
-  {
-    id: 'tinh-nguyen-xanh',
-    kind: 'club',
-    slug: 'tinh-nguyen-xanh',
-    name: 'Câu lạc bộ Tình nguyện Xanh',
-    shortName: 'CLB Tình nguyện Xanh',
-    description:
-      'Câu lạc bộ Tình nguyện Xanh triển khai các hoạt động bảo vệ môi trường và thiện nguyện trong khuôn viên trường và tại cộng đồng. Câu lạc bộ phối hợp với các đơn vị địa phương tổ chức chương trình và xác nhận giờ hoạt động tình nguyện cho học sinh.',
-    categories: ['TN'],
-    contact: '[Email câu lạc bộ]',
-  },
-  {
-    id: 'huong-nghiep',
-    kind: 'club',
-    slug: 'huong-nghiep',
-    name: 'Câu lạc bộ Hướng nghiệp',
-    shortName: 'CLB Hướng nghiệp',
-    description:
-      'Câu lạc bộ Hướng nghiệp cung cấp thông tin về ngành học, nghề nghiệp và tuyển sinh thông qua hội thảo, tọa đàm và ngày hội. Câu lạc bộ hỗ trợ học sinh tìm hiểu năng lực bản thân và xây dựng kế hoạch học tập phù hợp với định hướng nghề nghiệp.',
+      'Hanoi Vinschool SEIA trực thuộc Vietnam SEIA, tổ chức học sinh liên trường cấp quốc gia, đồng hành cùng các nhà lãnh đạo và khởi nghiệp trẻ trong các lĩnh vực quản trị, tiếp thị, tài chính và nhà hàng – khách sạn. Với tinh thần “do học sinh, vì học sinh”, tổ chức xây dựng môi trường học tập tích cực và mở rộng kết nối đối tác nhằm phát triển hệ sinh thái kinh doanh trẻ tại Việt Nam.',
     categories: ['KN'],
-    contact: '[Email câu lạc bộ]',
+    email: 'hanoivinschoolseia@gmail.com',
+    links: [],
   },
   {
-    id: 'robotics',
+    id: 'novaris-project',
     kind: 'club',
-    slug: 'robotics',
-    name: 'Câu lạc bộ Robotics',
-    shortName: 'CLB Robotics',
+    slug: 'novaris-project',
+    name: 'Novaris Project',
+    shortName: 'Novaris Project',
     description:
-      'Câu lạc bộ Robotics hướng dẫn học sinh thiết kế, lắp ráp và lập trình robot thông qua các buổi thực hành theo nhóm. Câu lạc bộ tuyển chọn và đồng hành cùng đội thi robotics của trường tại các cuộc thi dành cho học sinh trung học phổ thông.',
-    categories: ['CN'],
-    contact: '[Email câu lạc bộ]',
+      'Novaris Project là câu lạc bộ Công nghệ và Tài chính – Kinh doanh tại Vinschool Smart City, tạo môi trường chủ động và chuyên nghiệp để học sinh yêu thích kinh doanh hoặc kỹ thuật phần mềm thử sức với công việc thực tiễn và các cuộc thi. Câu lạc bộ đồng thời lan tỏa niềm đam mê kinh doanh và công nghệ tới học sinh ngoài trường thông qua dự án “Rạng Đông” dành cho học sinh Trường THCS Phật Tích, tỉnh Bắc Ninh.',
+    categories: ['CN', 'KN'],
+    email: 'clbnovarisproject@gmail.com',
+    links: [
+      { kind: 'facebook', url: 'https://www.facebook.com/profile.php?id=61592532744151' },
+    ],
+  },
+  {
+    id: 'humans-of-vinschool-smart-city',
+    kind: 'club',
+    slug: 'humans-of-vinschool-smart-city',
+    name: 'Humans of Vinschool Smart City',
+    shortName: 'Humans of Vinschool Smart City',
+    description:
+      'Humans of Vinschool Smart City là câu lạc bộ truyền thông kết nối và lan tỏa những câu chuyện, hình ảnh đẹp về con người trong cộng đồng Vinschool Smart City. Câu lạc bộ tổ chức các hoạt động giao lưu, hỗ trợ cộng đồng và ghi lại những khoảnh khắc, câu chuyện ý nghĩa của học sinh, giáo viên và nhân viên nhà trường.',
+    categories: ['NT', 'TN'],
+    email: 'humansofvinschoolsmartcity@gmail.com',
+    links: [
+      { kind: 'facebook', url: 'https://www.facebook.com/profile.php?id=61564742377738' },
+    ],
+  },
+  {
+    id: 'kat-music-club',
+    kind: 'club',
+    slug: 'kat-music-club',
+    name: 'KAT Music Club',
+    shortName: 'KAT Music Club',
+    description:
+      'KAT Music Club là câu lạc bộ âm nhạc do học sinh chủ trì, hoạt động theo hình thức ban nhạc và quy tụ những học sinh có chung niềm đam mê âm nhạc. Câu lạc bộ là nơi các thành viên cùng chơi nhạc, luyện tập và biểu diễn, đồng thời giao lưu, kết nối và phát triển khả năng âm nhạc của mỗi cá nhân.',
+    categories: ['NT'],
+    email: 'katmusicclub@gmail.com',
+    links: [],
+  },
+  {
+    id: 'mentis-club',
+    kind: 'club',
+    slug: 'mentis-club',
+    name: 'Mentis Club',
+    shortName: 'Mentis Club',
+    description:
+      'Mentis Club là câu lạc bộ nghiên cứu tâm lý học ứng dụng, tập trung phân tích cách con người suy nghĩ, ra quyết định và phản ứng trước áp lực học tập và xã hội. Câu lạc bộ thực hiện nghiên cứu theo phương pháp khoa học, khảo sát dữ liệu và tạo điều kiện để thành viên tiếp xúc thực tế với môi trường chuyên môn.',
+    categories: ['HT'],
+    email: 'mentisclubthptvinsmc@gmail.com',
+    links: [
+      { kind: 'facebook', url: 'https://www.facebook.com/profile.php?id=61590945860368' },
+    ],
+  },
+  {
+    id: 'vinschool-debate-society',
+    kind: 'club',
+    slug: 'vinschool-debate-society',
+    name: 'Vinschool Debate Society (VDS)',
+    shortName: 'Vinschool Debate Society',
+    description:
+      'Vinschool Debate Society (VDS) là câu lạc bộ tranh biện tạo môi trường năng động để học sinh Vinschool Smart City giao lưu với các thành viên và bạn đồng trang lứa, qua đó phát triển tư duy phản biện, bồi dưỡng kiến thức xã hội và sự tự tin khi nói trước đông người. Câu lạc bộ kết nối các thành viên để cùng tham gia các cuộc thi tranh biện trong và ngoài nhà trường.',
+    categories: ['KN', 'HT'],
+    email: 'vinschooldebatesociety@gmail.com',
+    links: [
+      { kind: 'facebook', url: 'https://www.facebook.com/VDS.clubs/' },
+    ],
+  },
+  {
+    id: 'young-business-creators',
+    kind: 'club',
+    slug: 'young-business-creators',
+    name: 'Young Business Creators (YBC)',
+    shortName: 'Young Business Creators',
+    description:
+      'Young Business Creators (YBC) là câu lạc bộ kinh doanh – khởi nghiệp, tạo môi trường để học sinh phát triển tư duy kinh doanh, sáng tạo ý tưởng và hiện thực hóa dự án của riêng mình. Thông qua các hội thảo kỹ năng, cuộc thi kinh doanh và buổi thuyết trình ý tưởng, câu lạc bộ giúp học sinh trải nghiệm khởi nghiệp thực tế và lan tỏa tinh thần đổi mới.',
+    categories: ['KN'],
+    email: 'younggbusinesscreators@gmail.com',
+    links: [
+      { kind: 'facebook', url: 'https://www.facebook.com/share/17NpwMnWhY/' },
+    ],
+  },
+  {
+    id: 'charite',
+    kind: 'club',
+    slug: 'charite',
+    name: 'Câu lạc bộ Charité',
+    shortName: 'Charité',
+    description:
+      'Charité là câu lạc bộ thiện nguyện, cầu nối lan tỏa tình yêu thương từ học sinh tới những hoàn cảnh khó khăn trong cộng đồng. Thông qua các hoạt động gây quỹ và phát cháo hằng tháng, câu lạc bộ tạo điều kiện để học sinh trực tiếp tham gia hoạt động thiện nguyện thiết thực và lan tỏa những giá trị nhân văn.',
+    categories: ['TN'],
+    email: 'clubcharite@gmail.com',
+    links: [
+      { kind: 'facebook', url: 'https://www.facebook.com/share/18TFCymJyz/' },
+    ],
+  },
+  {
+    id: 'vintervarme',
+    kind: 'club',
+    slug: 'vintervarme',
+    name: 'Câu lạc bộ Vintervarme',
+    shortName: 'Vintervarme',
+    description:
+      'Vintervarme là câu lạc bộ thiện nguyện, phối hợp với Đoàn trường trong một số sự kiện của nhà trường. Câu lạc bộ tạo điều kiện để học sinh tham gia các hoạt động trải nghiệm, giúp đỡ những hoàn cảnh khó khăn, đồng thời rèn luyện kỹ năng xã hội và tích lũy kinh nghiệm.',
+    categories: ['TN'],
+    links: [
+      { kind: 'facebook', url: 'https://www.facebook.com/share/1FAFi5wsFL/' },
+    ],
+  },
+  {
+    id: 'vprc',
+    kind: 'club',
+    slug: 'vprc',
+    name: 'Vinschool Psychology Research Club (VPRC)',
+    shortName: 'VPRC',
+    description:
+      'Vinschool Psychology Research Club (VPRC) là câu lạc bộ nghiên cứu tâm lý học đường do học sinh Vinschool Smart City xây dựng, tập trung tìm hiểu những vấn đề gần gũi với đời sống học sinh. Thông qua nghiên cứu, khảo sát và các hoạt động truyền thông, câu lạc bộ giúp học sinh hiểu hơn về bản thân, các mối quan hệ và sức khỏe tinh thần.',
+    categories: ['HT'],
+    links: [],
+  },
+  {
+    id: 'artemis',
+    kind: 'club',
+    slug: 'artemis',
+    name: 'Artemis Club',
+    shortName: 'Artemis',
+    description:
+      'Artemis là câu lạc bộ Mỹ thuật dành cho học sinh, xây dựng môi trường sáng tạo để các thành viên phát triển khả năng nghệ thuật, thể hiện cá tính và học hỏi qua các hoạt động, dự án và sự kiện mỹ thuật. Bên cạnh chuyên môn, câu lạc bộ chú trọng rèn luyện tinh thần làm việc nhóm, tư duy sáng tạo và kỹ năng tổ chức cho các thành viên.',
+    categories: ['NT'],
+    links: [
+      { kind: 'facebook', url: 'https://www.facebook.com/profile.php?id=61593874895254' },
+    ],
+  },
+  {
+    id: 'hanami-shores',
+    kind: 'club',
+    slug: 'hanami-shores',
+    name: 'Hanami Shores',
+    shortName: 'Hanami Shores',
+    description:
+      'Hanami Shores là câu lạc bộ tìm hiểu văn hóa Nhật Bản, tổ chức các hội thảo, gian hàng và sự kiện về văn hóa Nhật Bản. Câu lạc bộ mong muốn lan tỏa những nét văn hóa đặc sắc, mới mẻ của đất nước mặt trời mọc tới học sinh và cộng đồng nhà trường.',
+    categories: ['NT'],
+    email: 'hanamishoresvsc2526@gmail.com',
+    links: [
+      { kind: 'facebook', url: 'https://www.facebook.com/share/1EkyuoCqr3/' },
+    ],
+  },
+  {
+    id: 'smc-enterprise',
+    kind: 'club',
+    slug: 'smc-enterprise',
+    name: 'SMC Enterprise',
+    shortName: 'SMC Enterprise',
+    description:
+      'Thông tin giới thiệu câu lạc bộ đang được cập nhật. Học sinh quan tâm vui lòng theo dõi trang câu lạc bộ trên vsmcclubs.',
+    categories: ['KN'],
+    links: [],
+  },
+  {
+    id: 'vinschool-business',
+    kind: 'club',
+    slug: 'vinschool-business',
+    name: 'Câu lạc bộ Vinschool Business',
+    shortName: 'Vinschool Business',
+    description:
+      'Thông tin giới thiệu câu lạc bộ đang được cập nhật. Học sinh quan tâm vui lòng theo dõi trang câu lạc bộ trên vsmcclubs.',
+    categories: ['KN'],
+    links: [],
+  },
+  {
+    id: 'green-guardian',
+    kind: 'club',
+    slug: 'green-guardian',
+    name: 'Green Guardian',
+    shortName: 'Green Guardian',
+    description:
+      'Green Guardian là câu lạc bộ đưa các vấn đề môi trường toàn cầu đến gần hơn với cộng đồng địa phương thông qua nghiên cứu, truyền thông, hoạt động giáo dục và các dự án thực tế. Bên cạnh việc nâng cao nhận thức, câu lạc bộ tạo không gian để học sinh cùng tìm hiểu, trao đổi và biến mối quan tâm về môi trường thành hành động cụ thể.',
+    categories: ['TN'],
+    email: 'greenguardian.clb@gmail.com',
+    links: [
+      { kind: 'facebook', url: 'https://www.facebook.com/profile.php?id=61593971978293' },
+      { kind: 'instagram', url: 'https://www.instagram.com/greenguardian.clb/' },
+    ],
   },
 ];

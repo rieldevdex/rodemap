@@ -1,5 +1,5 @@
 /** Event-level facts derived from an event, the student's registrations and the clock. Pure. */
-import { calendarDaysBetween, durationHours, toMillis, vnParts } from './dates';
+import { calendarDaysBetween, durationHours, formatTime, formatTimeRange, toMillis, vnParts } from './dates';
 import { GRADES, type Availability, type Grade, type Millis, type Registration, type SchoolEvent } from './types';
 
 /** Weekday events starting at or after this minute of the day count as "after school". */
@@ -13,8 +13,50 @@ export function eventEnd(e: SchoolEvent): Millis {
   return toMillis(e.end);
 }
 
+/** A date-only event (time not announced) takes no hours. */
 export function eventHours(e: SchoolEvent): number {
-  return durationHours(eventStart(e), eventEnd(e));
+  return e.dateOnly === true ? 0 : durationHours(eventStart(e), eventEnd(e));
+}
+
+/** True while only the date of the event is announced (see SchoolEvent.dateOnly). */
+export function isDateOnly(e: SchoolEvent): boolean {
+  return e.dateOnly === true;
+}
+
+/** What screens show for a detail a date-only event does not have yet. */
+export const DETAILS_PENDING = 'Đang cập nhật';
+
+/** "14:30–16:00", or "Đang cập nhật" while only the date is announced. */
+export function eventTimeLabel(e: SchoolEvent): string {
+  return isDateOnly(e) ? DETAILS_PENDING : formatTimeRange(eventStart(e), eventEnd(e));
+}
+
+/** The start time "14:30", or "Đang cập nhật" while only the date is announced. */
+export function eventStartTimeLabel(e: SchoolEvent): string {
+  return isDateOnly(e) ? DETAILS_PENDING : formatTime(eventStart(e));
+}
+
+/** The place in full: "Trực tuyến · Google Meet" or the room, or "Đang cập nhật". */
+export function eventPlaceLabel(e: SchoolEvent): string {
+  if (isDateOnly(e)) return DETAILS_PENDING;
+  return e.format === 'online' ? `Trực tuyến · ${e.location}` : e.location;
+}
+
+/** The place in short: "Trực tuyến" or the room, or "Đang cập nhật". */
+export function eventVenueLabel(e: SchoolEvent): string {
+  if (isDateOnly(e)) return DETAILS_PENDING;
+  return e.format === 'online' ? 'Trực tuyến' : e.location;
+}
+
+/** "Trực tiếp" or "Trực tuyến", or "Đang cập nhật". */
+export function eventFormatLabel(e: SchoolEvent): string {
+  if (isDateOnly(e)) return DETAILS_PENDING;
+  return e.format === 'online' ? 'Trực tuyến' : 'Trực tiếp';
+}
+
+/** The grades the event is for (see gradesLabel), or "Đang cập nhật". */
+export function eventGradesLabel(e: SchoolEvent): string {
+  return isDateOnly(e) ? DETAILS_PENDING : gradesLabel(e.eligibleGrades);
 }
 
 export function findRegistration(eventId: string, regs: Registration[]): Registration | undefined {
@@ -86,7 +128,7 @@ export function isExternalCompetition<T extends { organizer?: string }>(e: T): e
 }
 
 /**
- * The publisher as shown next to an event in lists and dialogs: "CLB Tranh biện", or for an
+ * The publisher as shown next to an event in lists and dialogs: "Vinschool Debate Society", or for an
  * external competition "Phòng Cố vấn Học tập · Đơn vị tổ chức: Trường đại học đối tác".
  */
 export function publisherLine(e: { organizer?: string }, publisherName: string): string {
@@ -112,13 +154,15 @@ export function fitsAvailability(e: SchoolEvent, a: Availability): boolean {
   return e.category === 'TS';
 }
 
-export type RegistrationState = 'registered' | 'attended' | 'absent' | 'open' | 'full' | 'closed' | 'past';
+/** 'not_open': only the date is announced, so registration has not opened yet. */
+export type RegistrationState = 'registered' | 'attended' | 'absent' | 'open' | 'full' | 'closed' | 'past' | 'not_open';
 
 /** The single status a student sees for an event. */
 export function registrationState(e: SchoolEvent, regs: Registration[], now: Millis): RegistrationState {
   const r = findRegistration(e.id, regs);
   if (r) return r.status;
   if (isPast(e, now)) return 'past';
+  if (isDateOnly(e)) return 'not_open';
   if (isDeadlinePassed(e, now)) return 'closed';
   if (isFull(e, regs)) return 'full';
   return 'open';

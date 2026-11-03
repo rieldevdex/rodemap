@@ -11,7 +11,8 @@ import { describeReasons } from '../content/reasons';
 import { CATEGORIES } from '../data/categories';
 import { GOALS } from '../data/goals';
 import { CATEGORY_LABELS } from '../domain/category-labels';
-import { formatDayLabel, formatTimeRange, toIsoDateTime, toMillis } from '../domain/dates';
+import { formatDayLabel, toIsoDateTime, toMillis } from '../domain/dates';
+import { eventPlaceLabel, eventTimeLabel } from '../domain/events';
 import { draftFromGuestPicks } from '../domain/guest';
 import {
   BUDGET_LIMITS,
@@ -533,11 +534,11 @@ export function OnboardingPage() {
                               <p className="first-route__meta">
                                 <LineBadge code={e.category} size="sm" />
                                 <MonoTime dateTime={e.start}>
-                                  {formatDayLabel(start)} · {formatTimeRange(start, toMillis(e.end))}
+                                  {formatDayLabel(start)} · {eventTimeLabel(e)}
                                 </MonoTime>
                               </p>
                               <p className="first-route__title">{e.title}</p>
-                              <p className="first-route__place">{e.location}</p>
+                              <p className="first-route__place">{eventPlaceLabel(e)}</p>
                               {(reasonsById.get(e.id) ?? []).length > 0 ? (
                                 <ul className="first-route__reasons" aria-label="Vì sao Mochi đề xuất">
                                   {(reasonsById.get(e.id) ?? []).map((r) => (

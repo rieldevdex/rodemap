@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { ACTIVITY_PROPOSALS, COLLABORATIONS, PROPOSAL_RESPONSES } from '../../src/data/proposals';
+import { ACTIVITY_PROPOSALS, PROPOSAL_RESPONSES } from '../../src/data/proposals';
 import { STORAGE_KEY } from '../../src/state/schema';
 import { seedDemo, trackErrors } from '../support/app';
 
@@ -34,7 +34,6 @@ async function switchRole(page: Page, role: 'student' | 'club' | 'moderator'): P
 
 const pendingSeed = ACTIVITY_PROPOSALS.filter((p) => PROPOSAL_RESPONSES[p.id] === undefined);
 const [firstPending, secondPending] = pendingSeed;
-const incoming = COLLABORATIONS.find((c) => c.toClubId === 'inkstep' && PROPOSAL_RESPONSES[c.id] === undefined);
 
 test.describe('Đề xuất hoạt động và đề xuất hợp tác', () => {
   test('a student sends a proposal, supports another, filters and withdraws their own', async ({ page }) => {
@@ -126,9 +125,9 @@ test.describe('Đề xuất hoạt động và đề xuất hợp tác', () => {
     // Accept, handing the proposal to the club the student named (or another one).
     await card(page, secondPending.title).getByRole('button', { name: `Tiếp nhận đề xuất “${secondPending.title}”`, exact: true }).click();
     const accept = page.getByRole('dialog', { name: 'Tiếp nhận đề xuất' });
-    await accept.getByLabel('Đơn vị phụ trách triển khai').selectOption({ label: 'CLB Hướng nghiệp' });
+    await accept.getByLabel('Đơn vị phụ trách triển khai').selectOption({ label: 'Mentis Club' });
     await accept.getByRole('button', { name: 'Tiếp nhận', exact: true }).click();
-    await expect(notice(page)).toContainText(`Đã tiếp nhận đề xuất “${secondPending.title}” và giao CLB Hướng nghiệp phụ trách.`);
+    await expect(notice(page)).toContainText(`Đã tiếp nhận đề xuất “${secondPending.title}” và giao Mentis Club phụ trách.`);
     await expect(page.getByText(`${String(pendingSeed.length - 2)} đề xuất đang chờ xem xét`)).toBeVisible();
 
     // Students read the answers after a reload (the answers are saved).
@@ -136,63 +135,69 @@ test.describe('Đề xuất hoạt động và đề xuất hợp tác', () => {
     await expect(page.locator('#main-heading')).toHaveText('Đề xuất hoạt động');
     await expect(card(page, firstPending.title)).toContainText('Chưa tiếp nhận');
     await expect(card(page, firstPending.title)).toContainText(reason);
-    await expect(card(page, secondPending.title)).toContainText('Câu lạc bộ phụ trách: CLB Hướng nghiệp');
-    await expect(card(page, secondPending.title).getByRole('link', { name: 'Xem CLB Hướng nghiệp' })).toBeVisible();
+    await expect(card(page, secondPending.title)).toContainText('Câu lạc bộ phụ trách: Mentis Club');
+    await expect(card(page, secondPending.title).getByRole('link', { name: 'Xem Mentis Club' })).toBeVisible();
     expect(errors).toEqual([]);
   });
 
   test('clubs propose a collaboration, the partner declines it, and incoming ones are accepted', async ({ page }) => {
-    if (!incoming) throw new Error('Sample data has no pending collaboration for Inkstep');
     const errors = trackErrors(page);
-    await seedDemo(page, { role: 'club', activeClubId: 'inkstep' });
+    await seedDemo(page, { role: 'club', activeClubId: 'bot-va-bo' });
     await page.goto('/cong-cau-lac-bo');
     await page.getByRole('link', { name: 'Mở trang Đề xuất hợp tác' }).click();
     await expect(page).toHaveURL('/de-xuat');
     await expect(page.locator('#main-heading')).toHaveText('Đề xuất hợp tác');
     expect(await axe(page)).toEqual([]);
 
-    // Accept the incoming proposal: the next step points to Cổng CLB.
-    const received = card(page, incoming.title);
-    await received.getByRole('button', { name: `Đồng ý hợp tác “${incoming.title}”` }).click();
-    await page.getByRole('dialog', { name: 'Đồng ý hợp tác' }).getByRole('button', { name: 'Đồng ý hợp tác' }).click();
-    await expect(received).toContainText('Đã đồng ý hợp tác');
-    await expect(received.getByRole('link', { name: 'Gửi sự kiện qua Cổng CLB' })).toBeVisible();
-
-    // Validation, then a new proposal to CLB Robotics.
+    // Validation, then a new proposal to Charité.
     const form = page.getByRole('form', { name: 'Gửi đề xuất hợp tác' });
     await form.getByRole('button', { name: 'Gửi đề xuất hợp tác' }).click();
     const summary = form.getByRole('alert');
     await expect(summary).toBeFocused();
     await expect(summary).toContainText('Biểu mẫu còn 5 nội dung cần điều chỉnh');
-    await expect(form.getByLabel('Câu lạc bộ đối tác').locator('option', { hasText: 'Inkstep' })).toHaveCount(0);
+    await expect(form.getByLabel('Câu lạc bộ đối tác').locator('option', { hasText: 'Bột và Bơ' })).toHaveCount(0);
 
-    const title = 'Cuộc thi thiết kế trò chơi điều khiển robot';
-    await form.getByLabel('Câu lạc bộ đối tác').selectOption({ label: 'CLB Robotics' });
+    const title = 'Hội chợ bánh gây quỹ thiện nguyện';
+    await form.getByLabel('Câu lạc bộ đối tác').selectOption({ label: 'Charité' });
     await form.getByLabel('Thời gian dự kiến').selectOption({ label: 'Tháng 1/2027' });
     await form.getByLabel('Tên hoạt động phối hợp').fill(title);
-    await form.getByLabel('Lĩnh vực').selectOption('CN');
+    await form.getByLabel('Lĩnh vực').selectOption('TN');
     await form
       .getByLabel(/^Nội dung hợp tác/)
-      .fill('Inkstep phụ trách phần mềm điều khiển, Câu lạc bộ Robotics phụ trách phần cứng và sân thi đấu cho các đội học sinh.');
+      .fill('Bột và Bơ phụ trách chuẩn bị bánh, Charité phụ trách kết nối các hoàn cảnh cần hỗ trợ và tổ chức gian hàng gây quỹ.');
     await form.getByRole('button', { name: 'Gửi đề xuất hợp tác' }).click();
-    await expect(notice(page)).toContainText(`Đã gửi đề xuất hợp tác “${title}” tới CLB Robotics.`);
-    await expect(card(page, title)).toContainText('Gửi tới CLB Robotics');
+    await expect(notice(page)).toContainText(`Đã gửi đề xuất hợp tác “${title}” tới Charité.`);
+    await expect(card(page, title)).toContainText('Gửi tới Charité');
     await expect(card(page, title)).toContainText('Thời gian dự kiến: Tháng 1/2027');
 
-    // CLB Robotics receives it and declines with a reason.
-    await page.getByLabel('Câu lạc bộ đại diện').selectOption({ label: 'CLB Robotics' });
-    await expect(card(page, title)).toContainText('Từ Inkstep');
+    // Charité receives it and declines with a reason, then sends its own proposal back.
+    await page.getByLabel('Câu lạc bộ đại diện').selectOption({ label: 'Charité' });
+    await expect(card(page, title)).toContainText('Từ Bột và Bơ');
     await card(page, title).getByRole('button', { name: `Từ chối đề xuất “${title}”` }).click();
     const decline = page.getByRole('dialog', { name: 'Từ chối đề xuất hợp tác' });
-    await decline.getByLabel('Lý do (bắt buộc)').fill('Câu lạc bộ đang chuẩn bị cho giải đấu khu vực trong tháng 1/2027.');
+    await decline.getByLabel('Lý do (bắt buộc)').fill('Câu lạc bộ đang chuẩn bị chương trình phát cháo trong tháng 1/2027.');
     await decline.getByRole('button', { name: 'Từ chối' }).click();
     await expect(card(page, title)).toContainText('Đã từ chối');
 
-    // Back to Inkstep: the answer is shown on the proposal it sent.
-    await page.getByLabel('Câu lạc bộ đại diện').selectOption({ label: 'Inkstep' });
-    await expect(card(page, title)).toContainText('CLB Robotics phản hồi ngày');
-    await expect(card(page, title)).toContainText('giải đấu khu vực');
+    const reply = 'Chương trình phát cháo cuối tuần';
+    await form.getByLabel('Câu lạc bộ đối tác').selectOption({ label: 'Bột và Bơ' });
+    await form.getByLabel('Thời gian dự kiến').selectOption({ label: 'Tháng 12/2026' });
+    await form.getByLabel('Tên hoạt động phối hợp').fill(reply);
+    await form.getByLabel('Lĩnh vực').selectOption('TN');
+    await form.getByLabel(/^Nội dung hợp tác/).fill('Charité đề xuất Bột và Bơ phối hợp chuẩn bị bánh cho chương trình phát cháo hằng tháng của câu lạc bộ.');
+    await form.getByRole('button', { name: 'Gửi đề xuất hợp tác' }).click();
+    await expect(notice(page)).toContainText(`Đã gửi đề xuất hợp tác “${reply}” tới Bột và Bơ.`);
+
+    // Back to Bột và Bơ: the answer is shown on the proposal it sent, and the incoming one is accepted.
+    await page.getByLabel('Câu lạc bộ đại diện').selectOption({ label: 'Bột và Bơ' });
+    await expect(card(page, title)).toContainText('Charité phản hồi ngày');
+    await expect(card(page, title)).toContainText('phát cháo trong tháng 1/2027');
     await expect(card(page, title).getByRole('button', { name: 'Rút đề xuất' })).toHaveCount(0);
+    const received = card(page, reply);
+    await received.getByRole('button', { name: `Đồng ý hợp tác “${reply}”` }).click();
+    await page.getByRole('dialog', { name: 'Đồng ý hợp tác' }).getByRole('button', { name: 'Đồng ý hợp tác' }).click();
+    await expect(received).toContainText('Đã đồng ý hợp tác');
+    await expect(received.getByRole('link', { name: 'Gửi sự kiện qua Cổng CLB' })).toBeVisible();
     expect(errors).toEqual([]);
   });
 });

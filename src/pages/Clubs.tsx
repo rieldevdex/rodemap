@@ -13,7 +13,7 @@ import { selectEventsForClub } from '../state/selectors';
 import { useCatalog } from '../state/useCatalog';
 import './Clubs.css';
 
-/** "13 câu lạc bộ và 2 đơn vị": student clubs, then the council and the offices. */
+/** "20 câu lạc bộ và 2 đơn vị": student clubs, then the council and the offices. */
 function countLabel(list: readonly Club[]): string {
   const clubs = list.filter(isStudentClub).length;
   const units = list.length - clubs;

@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { toMillis } from '../domain/dates';
 import { EVENTS } from '../data/events';
 import { NEWS } from '../data/news';
-import { makePost } from '../domain/test-fixtures';
+import { makeEvent, makePost } from '../domain/test-fixtures';
 import { createDemoState, type AppState } from '../state/schema';
 import { addNotice, emptyConversation, needsRestart, runOfflineTurn, runOnlineTurn, setCardStatus, addStudentItem } from './conversation';
 import { isStopActive, quotaLabel, quotaLine, resetLabel, weeklyStopFrom, weeklyStopFromQuota, weeklyStopNotice } from './quota-notice';
@@ -18,7 +18,16 @@ const seed = (): AppState => ({ ...createDemoState(), demoToday: '2026-10-07' })
 const ctx = (state: AppState = seed()) => ({ state, now });
 const approved = EVENTS.filter((e) => e.status === 'approved');
 const upcoming = approved.filter((e) => toMillis(e.end) > now);
-const firstOpen = upcoming.find((e) => e.capacity - e.seatsTaken > 5 && toMillis(e.registrationDeadline) > now && e.eligibleGrades.includes(11));
+const firstOpen = upcoming.find(
+  (e) =>
+    e.dateOnly !== true &&
+    e.capacity - e.seatsTaken > 5 &&
+    toMillis(e.registrationDeadline) > now &&
+    e.eligibleGrades.includes(11) &&
+    !createDemoState().registrations.some((r) => r.eventId === e.id),
+);
+/** An event the clubs announced by date only (time, place and registration not yet known). */
+const dateOnlyEvent = EVENTS.find((e) => e.dateOnly === true);
 /** The first external academic competition (published by Phòng Cố vấn Học tập). */
 const competition = upcoming.find((e) => e.organizer !== undefined);
 
@@ -73,10 +82,11 @@ describe('executors', () => {
   });
 
   it('searches approved upcoming events with formatted facts and a card', () => {
-    const out = executeTool('search_events', { categories: ['CN'], limit: 3 }, ctx());
+    const out = executeTool('search_events', { categories: ['HT'], limit: 3 }, ctx());
     const r = out.result as { total: number; events: { category: string; date: string }[] };
+    expect(r.events.length).toBeGreaterThan(0);
     expect(r.events.length).toBeLessThanOrEqual(3);
-    expect(r.events.every((e) => e.category === 'CN')).toBe(true);
+    expect(r.events.every((e) => e.category === 'HT')).toBe(true);
     expect(r.events[0]?.date).toMatch(/^(Thứ|Chủ nhật)/);
     expect(out.card?.kind).toBe('events');
     expect(executeTool('search_events', { club_id: 'không có câu lạc bộ này' }, ctx())).toMatchObject({ isError: true });
@@ -84,10 +94,20 @@ describe('executors', () => {
   });
 
   it('finds clubs by id, slug or name and summarises them', () => {
-    expect(resolveClub('inkstep')?.id).toBe('inkstep');
+    expect(resolveClub('bot-va-bo')?.id).toBe('bot-va-bo');
     expect(resolveClub('Hội đồng Học sinh')?.id).toBe('hdhs');
-    const out = executeTool('get_club', { club_id: 'inkstep' }, ctx());
-    expect((out.result as { short_name: string }).short_name).toBe('Inkstep');
+    expect(resolveClub('Green Guardian')?.id).toBe('green-guardian');
+    const out = executeTool('get_club', { club_id: 'bot-va-bo' }, ctx());
+    expect(out.result).toMatchObject({
+      short_name: 'Bột và Bơ',
+      email: 'botvabosmc@gmail.com',
+      pages: ['Facebook: https://www.facebook.com/share/1BM5ozKaa7/', 'TikTok: https://www.tiktok.com/@bt.b016'],
+    });
+    // A club that published no address says so, instead of a guess.
+    expect(executeTool('get_club', { club_id: 'vprc' }, ctx()).result).toMatchObject({ email: 'Câu lạc bộ chưa công bố địa chỉ thư điện tử.', pages: [] });
+    // Its announced event is listed, with the details still pending.
+    const ybc = executeTool('get_club', { club_id: 'young-business-creators' }, ctx()).result as { upcoming_events: { time: string; status: string }[] };
+    expect(ybc.upcoming_events).toEqual([expect.objectContaining({ time: 'Đang cập nhật', status: 'Chưa mở đăng ký' })]);
     expect(executeTool('get_club', { club_id: 'zzz' }, ctx())).toMatchObject({ isError: true });
   });
 
@@ -112,9 +132,14 @@ describe('executors', () => {
   });
 
   it('explains when a registration or cancellation is not possible', () => {
-    const full = approved.find((e) => e.seatsTaken >= e.capacity);
-    if (!full) throw new Error('fixture: no full event');
-    expect((executeTool('propose_registration', { event_id: full.id, action: 'register' }, ctx()).result as { status: string }).status).toBe('not_possible');
+    const full = makeEvent({ id: 'ev-full', eligibleGrades: [11], capacity: 20, seatsTaken: 20, start: '2026-10-14T16:45:00+07:00', end: '2026-10-14T18:15:00+07:00', registrationDeadline: '2026-10-12T23:59:00+07:00' });
+    const withFull = { ...seed(), submittedEvents: [full] };
+    expect((executeTool('propose_registration', { event_id: full.id, action: 'register' }, ctx(withFull)).result as { status: string }).status).toBe('not_possible');
+    if (!dateOnlyEvent) throw new Error('fixture: no date-only event');
+    expect(executeTool('propose_registration', { event_id: dateOnlyEvent.id, action: 'register' }, ctx()).result).toMatchObject({
+      status: 'not_possible',
+      reason: 'Sự kiện mới công bố ngày tổ chức; đơn vị tổ chức chưa mở đăng ký.',
+    });
     const mine = seed().registrations.find((r) => r.status === 'registered' && toMillis(EVENTS.find((e) => e.id === r.eventId)?.end ?? '') > now);
     if (!mine) throw new Error('fixture: no upcoming registration');
     expect((executeTool('propose_registration', { event_id: mine.eventId, action: 'register' }, ctx()).result as { status: string }).status).toBe('already_registered');
@@ -133,7 +158,9 @@ describe('executors', () => {
   });
 
   it('checks conflicts against the plan and the weekly budget', () => {
-    const r = executeTool('check_conflicts', { event_ids: ['ev-015', 'ev-999'] }, ctx()).result as { conflicts: unknown[]; unknown_event_ids: string[] };
+    // Overlaps ev-027 (07:00–09:30 on 20/11/2026), which the demo student registered for.
+    const clash = makeEvent({ id: 'ev-clash', start: '2026-11-20T08:00:00+07:00', end: '2026-11-20T10:00:00+07:00', registrationDeadline: '2026-11-18T23:59:00+07:00' });
+    const r = executeTool('check_conflicts', { event_ids: ['ev-clash', 'ev-999'] }, ctx({ ...seed(), submittedEvents: [clash] })).result as { conflicts: unknown[]; unknown_event_ids: string[] };
     expect(r.unknown_event_ids).toEqual(['ev-999']);
     expect(r.conflicts.length).toBeGreaterThan(0);
     expect(executeTool('check_conflicts', { event_ids: [] }, ctx())).toMatchObject({ isError: true });
@@ -158,6 +185,21 @@ describe('executors', () => {
     expect((executeTool('export_calendar', { scope: 'selected', event_ids: [] }, ctx()).result as { status: string }).status).toBe('empty');
     const empty = { ...seed(), registrations: [] };
     expect((executeTool('export_calendar', { scope: 'all' }, ctx(empty)).result as { status: string }).status).toBe('empty');
+  });
+
+  it('says the details of a date-only event are pending instead of guessing them', () => {
+    if (!dateOnlyEvent) throw new Error('fixture: no date-only event');
+    expect(eventBrief(dateOnlyEvent, ctx())).toMatchObject({
+      date: 'Thứ Bảy, 23/01/2027',
+      details_announced: false,
+      time: 'Đang cập nhật',
+      location: 'Đang cập nhật',
+      format: 'Đang cập nhật',
+      seats_left: 'Đang cập nhật',
+      registration_deadline: 'Đang cập nhật',
+      status: 'Chưa mở đăng ký',
+    });
+    expect(executeTool('get_event', { event_id: dateOnlyEvent.id }, ctx()).result).toMatchObject({ eligible_grades: 'Đang cập nhật', capacity: 'Đang cập nhật' });
   });
 
   it('formats event briefs in Vietnamese conventions', () => {
@@ -219,7 +261,7 @@ describe('offline engine', () => {
 
   it('answers each intent formally with the same cards as online mode', () => {
     const c = ctx();
-    expect(respondOffline('Gợi ý sự kiện tuần tới', c).cards[0]?.kind).toBe('events');
+    expect(respondOffline('Gợi ý sự kiện', c).cards[0]?.kind).toBe('events');
     expect(respondOffline('Lịch của tôi', c).cards[0]?.kind).toBe('export');
     expect(respondOffline('Tóm tắt tuần này', c).text).toMatch(/Tuần/);
     expect(respondOffline('Tóm tắt tháng sau', c).text).toMatch(/Tháng/);
@@ -238,6 +280,17 @@ describe('offline engine', () => {
     expect(respondOffline('Đăng ký', c).cards).toEqual([]);
     expect(respondOffline('Hủy đăng ký', c).text).toMatch(/hủy đăng ký/);
     expect(respondOffline('Sự kiện tổ chức ở đâu', c).text).toMatch(/chưa có thông tin/);
+  });
+
+  it('answers about a date-only event without inventing its time or place', () => {
+    if (!dateOnlyEvent) throw new Error('fixture: no date-only event');
+    const reply = respondOffline(`${dateOnlyEvent.title} tổ chức ở đâu`, ctx());
+    expect(reply.focusEventId).toBe(dateOnlyEvent.id);
+    expect(reply.text).toContain('Thời gian cụ thể, địa điểm, đối tượng tham gia và số chỗ đang được cập nhật; đơn vị tổ chức chưa mở đăng ký.');
+    expect(reply.text).not.toContain('00:00');
+    expect(reply.cards).toEqual([{ kind: 'events', title: 'Sự kiện', eventIds: [dateOnlyEvent.id] }]);
+    // Registration is refused offline too, until the club opens it.
+    expect(respondOffline(`Đăng ký ${dateOnlyEvent.title}`, ctx()).cards).toEqual([]);
   });
 
   it('handles a student without a profile or registrations', () => {
@@ -384,7 +437,7 @@ describe('Bản tin Hội đồng Học sinh', () => {
   const withNews = (): AppState => ({
     ...seed(),
     newsPosts: [
-      makePost({ id: 'bt-x1', slug: 'thong-bao-x', title: 'Thông báo kế hoạch tháng 10', category: 'announcement', publishedAt: '2026-10-06T08:00:00+07:00', eventIds: ['ev-018'] }),
+      makePost({ id: 'bt-x1', slug: 'thong-bao-x', title: 'Thông báo kế hoạch tháng 10', category: 'announcement', publishedAt: '2026-10-06T08:00:00+07:00', eventIds: ['ev-027'] }),
       makePost({ id: 'bt-x2', slug: 'huong-dan-x', title: 'Hướng dẫn xuất lịch cá nhân', category: 'guide', publishedAt: '2026-10-05T08:00:00+07:00' }),
     ],
   });
@@ -408,7 +461,7 @@ describe('Bản tin Hội đồng Học sinh', () => {
     expect(scheduled.length).toBeGreaterThan(0);
     for (const title of scheduled) expect(newest.posts.map((p) => p.title)).not.toContain(title);
     const own = all.posts.find((p) => p.title === 'Thông báo kế hoạch tháng 10');
-    expect(own?.related_events).toEqual([EVENTS.find((e) => e.id === 'ev-018')?.title]);
+    expect(own?.related_events).toEqual([EVENTS.find((e) => e.id === 'ev-027')?.title]);
   });
 
   it('list_news reports an empty column honestly', () => {

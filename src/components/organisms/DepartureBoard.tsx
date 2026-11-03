@@ -1,8 +1,10 @@
 import { CATEGORY_LABELS } from '../../domain/category-labels';
 import { formatDayLabel, formatTime, toMillis } from '../../domain/dates';
+import { DETAILS_PENDING, eventVenueLabel, isDateOnly } from '../../domain/events';
 import type { SchoolEvent } from '../../domain/types';
 import { Link } from '../../router';
 import { StatusTag, type StatusTone } from '../atoms/StatusTag';
+import { VisuallyHidden } from '../atoms/VisuallyHidden';
 import './DepartureBoard.css';
 
 export interface DepartureRow {
@@ -37,9 +39,17 @@ export function DepartureBoard({ rows, caption }: DepartureBoardProps) {
             const start = toMillis(event.start);
             return (
               <tr key={event.id} className={mine ? 'departures__row departures__row--mine' : 'departures__row'}>
-                <td className="departures__time">
-                  <time dateTime={event.start}>{formatTime(start)}</time>
-                </td>
+                {isDateOnly(event) ? (
+                  <td className="departures__time departures__time--pending">
+                    {/* A board shows an unannounced time as --:--; screen readers hear the words. */}
+                    <span aria-hidden="true">--:--</span>
+                    <VisuallyHidden>{`Giờ ${DETAILS_PENDING.toLocaleLowerCase('vi')}`}</VisuallyHidden>
+                  </td>
+                ) : (
+                  <td className="departures__time">
+                    <time dateTime={event.start}>{formatTime(start)}</time>
+                  </td>
+                )}
                 <td className="departures__date">
                   <time dateTime={event.start}>{formatDayLabel(start)}</time>
                 </td>
@@ -55,7 +65,7 @@ export function DepartureBoard({ rows, caption }: DepartureBoardProps) {
                 <th scope="row" className="departures__event">
                   <Link to={`/su-kien/${event.slug}`}>{event.title}</Link>
                 </th>
-                <td className="departures__place">{event.format === 'online' ? 'Trực tuyến' : event.location}</td>
+                <td className="departures__place">{eventVenueLabel(event)}</td>
                 <td className="departures__status">
                   <StatusTag tone={status.tone}>{status.label}</StatusTag>
                 </td>

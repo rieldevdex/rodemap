@@ -2,7 +2,7 @@
  * Publishers on vsmcclubs and the wording that depends on their kind: student clubs, the Hội đồng
  * Học sinh and school offices such as Phòng Cố vấn Học tập. Pure.
  */
-import type { Club, ClubKind } from './types';
+import type { Club, ClubKind, ClubLinkKind } from './types';
 
 /** How a publisher is introduced on its own page and in the club list. */
 export const CLUB_KIND_LABELS: Record<ClubKind, string> = {
@@ -32,4 +32,26 @@ export function studentClubs<T extends Pick<Club, 'kind'>>(clubs: readonly T[]):
 export function publisherFactLabel(kind: ClubKind | undefined, external: boolean): string {
   if (external) return 'Nguồn thông tin';
   return kind === undefined || kind === 'club' ? 'Câu lạc bộ phụ trách' : 'Đơn vị phụ trách';
+}
+
+/** Network names as their owners write them. */
+export const CLUB_LINK_LABELS: Record<ClubLinkKind, string> = {
+  facebook: 'Facebook',
+  instagram: 'Instagram',
+  tiktok: 'TikTok',
+};
+
+/** A placeholder in brackets ("[Email Hội đồng Học sinh]") stands in until the school provides an address. */
+export function isPlaceholderEmail(email: string): boolean {
+  return /^\[.+\]$/u.test(email.trim());
+}
+
+/** A real address the page may link with mailto:, or null for none or a placeholder. */
+export function mailableEmail(club: Pick<Club, 'email'>): string | null {
+  return club.email === undefined || isPlaceholderEmail(club.email) ? null : club.email;
+}
+
+/** True when the club has published neither an email address nor a page. */
+export function hasNoContact(club: Pick<Club, 'email' | 'links'>): boolean {
+  return club.email === undefined && club.links.length === 0;
 }

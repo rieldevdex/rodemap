@@ -66,7 +66,7 @@ function submission(id: string, eventId: string, overrides: Partial<Submission> 
   return {
     id,
     eventId,
-    clubId: 'inkstep',
+    clubId: 'bot-va-bo',
     submittedAt: AT,
     history: [{ at: AT, actor: 'club', action: 'submit' }],
     ...overrides,
@@ -74,6 +74,48 @@ function submission(id: string, eventId: string, overrides: Partial<Submission> 
 }
 
 const approvedSeed = EVENTS.filter((e) => e.status === 'approved');
+
+/** A club event waiting for moderation (the sample data has none: the clubs are real). */
+const pendingEvent = makeEvent({ id: 'ev-p', slug: 'su-kien-cho-duyet', clubId: 'young-business-creators', status: 'pending', seatsTaken: 0 });
+
+/** Club submissions in every moderation state, as the clubs would send them through Cổng câu lạc bộ. */
+const SUBMITTED: SchoolEvent[] = [
+  makeEvent({ id: 'ev-s1', clubId: 'novaris-project', status: 'pending', seatsTaken: 0 }),
+  makeEvent({ id: 'ev-s2', clubId: 'kat-music-club', status: 'pending', seatsTaken: 0 }),
+  makeEvent({ id: 'ev-s3', clubId: 'bot-va-bo', status: 'pending', seatsTaken: 0 }),
+  makeEvent({ id: 'ev-s4', clubId: 'bot-va-bo', status: 'changes_requested', seatsTaken: 0 }),
+  makeEvent({ id: 'ev-s5', clubId: 'charite', status: 'rejected', seatsTaken: 0 }),
+];
+const SUBMISSIONS: Submission[] = [
+  submission('sub-001', 'ev-s1', { clubId: 'novaris-project', submittedAt: '2026-10-05T15:20:00+07:00', history: [{ at: '2026-10-05T15:20:00+07:00', actor: 'club', action: 'submit' }] }),
+  submission('sub-002', 'ev-s2', { clubId: 'kat-music-club', submittedAt: '2026-10-06T10:05:00+07:00', history: [{ at: '2026-10-06T10:05:00+07:00', actor: 'club', action: 'submit' }] }),
+  submission('sub-003', 'ev-s3', { submittedAt: '2026-10-06T16:40:00+07:00', history: [{ at: '2026-10-06T16:40:00+07:00', actor: 'club', action: 'submit' }] }),
+  submission('sub-004', 'ev-s4', {
+    submittedAt: '2026-10-02T14:00:00+07:00',
+    history: [
+      { at: '2026-10-02T14:00:00+07:00', actor: 'club', action: 'submit' },
+      { at: '2026-10-04T09:30:00+07:00', actor: 'hdhs', action: 'request_changes', reason: REASON },
+    ],
+  }),
+  submission('sub-005', 'ev-s5', {
+    clubId: 'charite',
+    submittedAt: '2026-10-03T08:45:00+07:00',
+    history: [
+      { at: '2026-10-03T08:45:00+07:00', actor: 'club', action: 'submit' },
+      { at: '2026-10-05T10:15:00+07:00', actor: 'hdhs', action: 'reject', reason: REASON },
+    ],
+  }),
+];
+
+function withSubmissions(overrides: Partial<AppState> = {}): AppState {
+  return stateWith({ submittedEvents: SUBMITTED, submissions: SUBMISSIONS, ...overrides });
+}
+
+function submitted(id: string): SchoolEvent {
+  const e = SUBMITTED.find((x) => x.id === id);
+  if (!e) throw new Error(`Unknown submitted event ${id}`);
+  return e;
+}
 
 describe('selectNow', () => {
   it('follows the real clock without a demo date', () => {
@@ -102,34 +144,34 @@ describe('selectAllEvents', () => {
   });
 
   it('applies moderation overrides without mutating the seed data', () => {
-    const s = stateWith({ moderation: { 'ev-046': 'approved', 'ev-001': 'approved', 'ev-ghost': 'rejected' } });
+    const s = stateWith({ moderation: { 'ev-027': 'rejected', 'ev-001': 'approved', 'ev-ghost': 'rejected' } });
     const all = selectAllEvents(s);
     expect(all).toHaveLength(EVENTS.length);
-    const ev046 = all.find((e) => e.id === 'ev-046');
-    expect(ev046).toEqual({ ...seedEvent('ev-046'), status: 'approved' });
-    expect(ev046).not.toBe(seedEvent('ev-046'));
-    expect(seedEvent('ev-046').status).toBe('pending');
+    const ev027 = all.find((e) => e.id === 'ev-027');
+    expect(ev027).toEqual({ ...seedEvent('ev-027'), status: 'rejected' });
+    expect(ev027).not.toBe(seedEvent('ev-027'));
+    expect(seedEvent('ev-027').status).toBe('approved');
     // An override equal to the current status keeps the original object.
     expect(all.find((e) => e.id === 'ev-001')).toBe(seedEvent('ev-001'));
   });
 
   it('replaces a seed event in place with its submitted copy, then appends new submitted events', () => {
-    const copy: SchoolEvent = { ...seedEvent('ev-049'), location: 'Phòng Tin học 2', status: 'pending' };
+    const copy: SchoolEvent = { ...seedEvent('ev-027'), location: 'Nhà thi đấu đa năng', status: 'pending' };
     const created = makeEvent({ id: 'ev-created', status: 'pending' });
     const created2 = makeEvent({ id: 'ev-created-2', status: 'approved' });
     const s = stateWith({ submittedEvents: [created, copy, created2] });
     const all = selectAllEvents(s);
     expect(all).toHaveLength(EVENTS.length + 2);
-    const index = EVENTS.findIndex((e) => e.id === 'ev-049');
+    const index = EVENTS.findIndex((e) => e.id === 'ev-027');
     expect(all[index]).toBe(copy);
     expect(ids(all.slice(-2))).toEqual(['ev-created', 'ev-created-2']);
-    expect(all.filter((e) => e.id === 'ev-049')).toHaveLength(1);
+    expect(all.filter((e) => e.id === 'ev-027')).toHaveLength(1);
   });
 
   it('lets the moderation override win over the submitted copy status', () => {
-    const copy: SchoolEvent = { ...seedEvent('ev-049'), status: 'pending' };
-    const s = stateWith({ submittedEvents: [copy], moderation: { 'ev-049': 'approved' } });
-    expect(selectEventById(s, 'ev-049')).toEqual({ ...copy, status: 'approved' });
+    const copy: SchoolEvent = { ...seedEvent('ev-027'), status: 'pending' };
+    const s = stateWith({ submittedEvents: [copy], moderation: { 'ev-027': 'approved' } });
+    expect(selectEventById(s, 'ev-027')).toEqual({ ...copy, status: 'approved' });
   });
 });
 
@@ -138,17 +180,17 @@ describe('selectPublicEvents', () => {
     const pub = selectPublicEvents(createDemoState());
     expect(ids(pub)).toEqual(ids(sortByStart(approvedSeed)));
     expect(pub.every((e) => e.status === 'approved')).toBe(true);
-    expect(ids(pub)).not.toContain('ev-046');
+    expect(ids(selectPublicEvents(stateWith({ submittedEvents: [pendingEvent] })))).not.toContain('ev-p');
   });
 
   it('honours moderation overrides and submitted events', () => {
     const created = makeEvent({ id: 'ev-created', start: '2026-09-01T16:45:00+07:00', end: '2026-09-01T18:00:00+07:00' });
     const s = stateWith({
-      moderation: { 'ev-046': 'approved', 'ev-001': 'rejected', 'ev-created': 'approved' },
-      submittedEvents: [{ ...created, status: 'pending' }],
+      moderation: { 'ev-p': 'approved', 'ev-001': 'rejected', 'ev-created': 'approved' },
+      submittedEvents: [{ ...created, status: 'pending' }, pendingEvent],
     });
     const pubIds = ids(selectPublicEvents(s));
-    expect(pubIds).toContain('ev-046');
+    expect(pubIds).toContain('ev-p');
     expect(pubIds).not.toContain('ev-001');
     expect(pubIds[0]).toBe('ev-created');
   });
@@ -156,12 +198,12 @@ describe('selectPublicEvents', () => {
 
 describe('selectEventBySlug / selectEventById', () => {
   it('finds events by slug or id, whatever their status', () => {
-    const s = createDemoState();
-    const ev014 = seedEvent('ev-014');
-    expect(selectEventBySlug(s, ev014.slug)).toBe(ev014);
-    expect(selectEventBySlug(s, seedEvent('ev-046').slug)?.status).toBe('pending');
-    expect(selectEventById(s, 'ev-014')).toBe(ev014);
-    expect(selectEventById(s, 'ev-050')?.status).toBe('rejected');
+    const s = withSubmissions({ submittedEvents: [...SUBMITTED, pendingEvent] });
+    const ev027 = seedEvent('ev-027');
+    expect(selectEventBySlug(s, ev027.slug)).toBe(ev027);
+    expect(selectEventBySlug(s, 'su-kien-cho-duyet')?.status).toBe('pending');
+    expect(selectEventById(s, 'ev-027')).toBe(ev027);
+    expect(selectEventById(s, 'ev-s5')?.status).toBe('rejected');
   });
 
   it('returns undefined for unknown slugs and ids', () => {
@@ -171,10 +213,10 @@ describe('selectEventBySlug / selectEventById', () => {
   });
 
   it('prefers the approved event when slugs collide, else the first one', () => {
-    const slug = seedEvent('ev-014').slug;
+    const slug = seedEvent('ev-027').slug;
     const pendingTwin = makeEvent({ id: 'ev-twin', slug, status: 'pending' });
     const s = stateWith({ submittedEvents: [pendingTwin] });
-    expect(selectEventBySlug(s, slug)?.id).toBe('ev-014');
+    expect(selectEventBySlug(s, slug)?.id).toBe('ev-027');
 
     const a = makeEvent({ id: 'ev-a', slug: 'trung-ten', status: 'pending' });
     const b = makeEvent({ id: 'ev-b', slug: 'trung-ten', status: 'approved' });
@@ -184,25 +226,24 @@ describe('selectEventBySlug / selectEventById', () => {
   });
 
   it('reflects the moderation override', () => {
-    const s = stateWith({ moderation: { 'ev-046': 'approved' } });
-    expect(selectEventById(s, 'ev-046')?.status).toBe('approved');
-    expect(selectEventBySlug(s, seedEvent('ev-046').slug)?.status).toBe('approved');
+    const s = stateWith({ submittedEvents: [pendingEvent], moderation: { 'ev-p': 'approved' } });
+    expect(selectEventById(s, 'ev-p')?.status).toBe('approved');
+    expect(selectEventBySlug(s, 'su-kien-cho-duyet')?.status).toBe('approved');
   });
 });
 
 describe('selectEventsForClub', () => {
   it('lists the club approved events sorted by start', () => {
-    const s = createDemoState();
-    const inkstep = selectEventsForClub(s, 'inkstep');
-    expect(ids(inkstep)).toEqual(ids(sortByStart(approvedSeed.filter((e) => e.clubId === 'inkstep'))));
-    expect(ids(inkstep)).toContain('ev-014');
-    expect(ids(inkstep)).not.toContain('ev-048');
-    expect(ids(inkstep)).not.toContain('ev-049');
+    const s = stateWith({ submittedEvents: [pendingEvent] });
+    const council = selectEventsForClub(s, 'hdhs');
+    expect(ids(council)).toEqual(ids(sortByStart(approvedSeed.filter((e) => e.clubId === 'hdhs'))));
+    expect(ids(council)).toContain('ev-027');
+    expect(ids(selectEventsForClub(s, 'young-business-creators'))).toEqual(['ev-056']);
   });
 
   it('includes events approved through moderation and returns [] for an unknown club', () => {
-    const s = stateWith({ moderation: { 'ev-048': 'approved' } });
-    expect(ids(selectEventsForClub(s, 'inkstep'))).toContain('ev-048');
+    const s = stateWith({ submittedEvents: [pendingEvent], moderation: { 'ev-p': 'approved' } });
+    expect(ids(selectEventsForClub(s, 'young-business-creators'))).toContain('ev-p');
     expect(selectEventsForClub(s, 'clb-khong-ton-tai')).toEqual([]);
   });
 });
@@ -210,12 +251,12 @@ describe('selectEventsForClub', () => {
 describe('selectClub / selectClubBySlug', () => {
   it('finds clubs by id and slug', () => {
     const s = createDemoState();
-    const inkstep = CLUBS.find((c) => c.id === 'inkstep');
-    expect(inkstep).toBeDefined();
-    expect(selectClub(s, 'inkstep')).toBe(inkstep);
-    expect(selectClubBySlug(s, 'inkstep')).toBe(inkstep);
-    const robotics = CLUBS.find((c) => c.id === 'robotics');
-    expect(selectClubBySlug(s, robotics?.slug ?? '')).toBe(robotics);
+    const club = CLUBS.find((c) => c.id === 'bot-va-bo');
+    expect(club).toBeDefined();
+    expect(selectClub(s, 'bot-va-bo')).toBe(club);
+    expect(selectClubBySlug(s, 'bot-va-bo')).toBe(club);
+    const office = CLUBS.find((c) => c.id === 'co-van-hoc-tap');
+    expect(selectClubBySlug(s, 'phong-co-van-hoc-tap')).toBe(office);
   });
 
   it('returns undefined for unknown clubs', () => {
@@ -228,29 +269,31 @@ describe('selectClub / selectClubBySlug', () => {
 describe('selectRegistration', () => {
   it('returns the registration for an event, or undefined', () => {
     const s = createDemoState();
-    expect(selectRegistration(s, 'ev-014')?.status).toBe('registered');
-    expect(selectRegistration(s, 'ev-005')?.status).toBe('attended');
-    expect(selectRegistration(s, 'ev-016')).toBeUndefined();
+    expect(selectRegistration(s, 'ev-027')?.status).toBe('registered');
+    expect(selectRegistration(s, 'ev-001')?.status).toBe('attended');
+    expect(selectRegistration(s, 'ev-051')).toBeUndefined();
   });
 });
 
 describe('selectMyEvents / selectUpcomingMine', () => {
   it('lists registered and attended approved events, sorted by start', () => {
-    expect(ids(selectMyEvents(createDemoState()))).toEqual(['ev-005', 'ev-006', 'ev-007', 'ev-009', 'ev-014', 'ev-020']);
+    expect(ids(selectMyEvents(createDemoState()))).toEqual(['ev-001', 'ev-003', 'ev-027']);
   });
 
   it('leaves out absences, unknown events and events that are not approved', () => {
     const s = stateWith({
-      registrations: [reg('ev-014'), reg('ev-009', 'absent'), reg('ev-404'), reg('ev-046'), reg('ev-005', 'attended')],
+      submittedEvents: [pendingEvent],
+      registrations: [reg('ev-027'), reg('ev-003', 'absent'), reg('ev-404'), reg('ev-p'), reg('ev-001', 'attended')],
     });
-    expect(ids(selectMyEvents(s))).toEqual(['ev-005', 'ev-014']);
+    expect(ids(selectMyEvents(s))).toEqual(['ev-001', 'ev-027']);
   });
 
   it('keeps upcoming events only (an event in progress is still upcoming)', () => {
     const s = createDemoState();
-    expect(ids(selectUpcomingMine(s, NOW))).toEqual(['ev-014', 'ev-020']);
-    expect(ids(selectUpcomingMine(s, toMillis('2026-10-15T17:00:00+07:00')))).toEqual(['ev-014', 'ev-020']);
-    expect(ids(selectUpcomingMine(s, toMillis('2026-10-15T18:30:00+07:00')))).toEqual(['ev-020']);
+    expect(ids(selectUpcomingMine(s, NOW))).toEqual(['ev-027']);
+    // ev-027 runs 07:00–09:30 on 20/11/2026.
+    expect(ids(selectUpcomingMine(s, toMillis('2026-11-20T08:00:00+07:00')))).toEqual(['ev-027']);
+    expect(selectUpcomingMine(s, toMillis('2026-11-20T10:00:00+07:00'))).toEqual([]);
     expect(selectUpcomingMine(s, toMillis('2027-06-01T00:00:00+07:00'))).toEqual([]);
   });
 });
@@ -261,29 +304,35 @@ describe('selectConflictsInPlan', () => {
   });
 
   it('reports overlapping registrations', () => {
-    const s = reducer(createDemoState(), { type: 'registration/register', eventId: 'ev-015', at: AT });
-    expect(selectConflictsInPlan(s)).toEqual([{ a: 'ev-014', b: 'ev-015', overlapMinutes: 90 }]);
+    const clash = makeEvent({ id: 'ev-clash', start: '2026-11-20T08:00:00+07:00', end: '2026-11-20T10:00:00+07:00', registrationDeadline: '2026-11-18T23:59:00+07:00' });
+    const s = reducer(stateWith({ submittedEvents: [clash] }), { type: 'registration/register', eventId: 'ev-clash', at: AT });
+    expect(selectConflictsInPlan(s)).toEqual([{ a: 'ev-027', b: 'ev-clash', overlapMinutes: 90 }]);
+  });
+
+  it('never reports a date-only event, whose time is not announced', () => {
+    const s = stateWith({ registrations: [...createDemoState().registrations, reg('ev-055')] });
+    expect(selectConflictsInPlan(s)).toEqual([]);
   });
 });
 
 describe('selectPlanBudget', () => {
+  /** Tuesday of the week of ev-027 (2.5 hours on Friday 20/11/2026, ISO week 2026-W47). */
+  const tuesday = toMillis('2026-11-17T09:00:00+07:00');
+
   it('counts my upcoming events in the current ISO week against the profile budget', () => {
     const s = createDemoState();
     expect(selectPlanBudget(s, NOW)).toEqual({ weekKey: '2026-W41', used: 0, budget: 6, remaining: 6 });
-    // ev-014 (16:45–18:30) falls in 2026-W42.
-    const tuesday = toMillis('2026-10-13T09:00:00+07:00');
-    expect(selectPlanBudget(s, tuesday)).toEqual({ weekKey: '2026-W42', used: 1.75, budget: 6, remaining: 4.25 });
+    expect(selectPlanBudget(s, tuesday)).toEqual({ weekKey: '2026-W47', used: 2.5, budget: 6, remaining: 3.5 });
   });
 
   it('stops counting an event once it has ended', () => {
-    const after = toMillis('2026-10-15T19:00:00+07:00');
+    const after = toMillis('2026-11-20T10:00:00+07:00');
     expect(selectPlanBudget(createDemoState(), after).used).toBe(0);
   });
 
   it('uses the profile budget, or 6 hours without a profile', () => {
-    const tuesday = toMillis('2026-10-13T09:00:00+07:00');
     const custom = stateWith({ profile: makeProfile({ weeklyHourBudget: 1 }) });
-    expect(selectPlanBudget(custom, tuesday)).toEqual({ weekKey: '2026-W42', used: 1.75, budget: 1, remaining: 0 });
+    expect(selectPlanBudget(custom, tuesday)).toEqual({ weekKey: '2026-W47', used: 2.5, budget: 1, remaining: 0 });
     expect(selectPlanBudget(stateWith({ profile: null }), tuesday).budget).toBe(6);
   });
 });
@@ -295,7 +344,7 @@ describe('selectGuestRecommendations', () => {
     expect(byDate).toEqual(recommendEvents(selectPublicEvents(visitor), { profile: null, plan: [], regs: [], now: NOW, goals: GOALS, availabilityKnown: false }, { limit: 10 }));
     expect(byDate.every((r) => r.reasons.every((c) => c === 'deadline_soon'))).toBe(true);
 
-    const picked = { ...visitor, guestPicks: { grade: 7 as Grade, interests: ['NT' as const] } };
+    const picked = { ...visitor, guestPicks: { grade: 7 as Grade, interests: ['HT' as const] } };
     const recs = selectGuestRecommendations(picked, NOW, { limit: 5 });
     expect(recs.length).toBeGreaterThan(0);
     for (const r of recs) {
@@ -303,7 +352,7 @@ describe('selectGuestRecommendations', () => {
       expect(r.reasons).not.toContain('fits_time');
       expect(r.reasons).not.toContain('goal');
     }
-    expect(recs[0]?.event.category).toBe('NT');
+    expect(recs[0]?.event.category).toBe('HT');
   });
 });
 
@@ -331,30 +380,36 @@ describe('selectRecommendations', () => {
   it('passes options through', () => {
     const s = createDemoState();
     expect(selectRecommendations(s, NOW, { limit: 2 })).toHaveLength(2);
-    const tn = selectRecommendations(s, NOW, { category: 'TN', limit: 50 });
-    expect(tn.length).toBeGreaterThan(0);
-    expect(tn.every((r) => r.event.category === 'TN')).toBe(true);
+    const ht = selectRecommendations(s, NOW, { category: 'HT', limit: 50 });
+    expect(ht.length).toBeGreaterThan(0);
+    expect(ht.every((r) => r.event.category === 'HT')).toBe(true);
   });
 
   it('warns about clashes with my upcoming events', () => {
     const clash = makeEvent({
       id: 'ev-clash',
-      start: '2026-10-15T17:30:00+07:00',
-      end: '2026-10-15T19:00:00+07:00',
-      registrationDeadline: '2026-10-14T23:59:00+07:00',
+      start: '2026-11-20T08:00:00+07:00',
+      end: '2026-11-20T10:00:00+07:00',
+      registrationDeadline: '2026-11-18T23:59:00+07:00',
     });
     const s = stateWith({ submittedEvents: [clash] });
-    const from = toMillis('2026-10-15T00:00:00+07:00');
-    const to = toMillis('2026-10-16T00:00:00+07:00');
+    const from = toMillis('2026-11-20T00:00:00+07:00');
+    const to = toMillis('2026-11-21T00:00:00+07:00');
     const rec = selectRecommendations(s, NOW, { from, to, limit: 50 }).find((r) => r.event.id === 'ev-clash');
     expect(rec?.warnings).toContain('conflict');
   });
 
   it('only recommends events approved through moderation', () => {
-    const range = { from: toMillis('2026-11-26T00:00:00+07:00'), to: toMillis('2026-11-27T00:00:00+07:00'), limit: 50 };
-    expect(ids(selectRecommendations(createDemoState(), NOW, range).map((r) => r.event))).not.toContain('ev-046');
-    const approved = stateWith({ moderation: { 'ev-046': 'approved' } });
-    expect(ids(selectRecommendations(approved, NOW, range).map((r) => r.event))).toContain('ev-046');
+    const range = { from: toMillis('2026-10-14T00:00:00+07:00'), to: toMillis('2026-10-15T00:00:00+07:00'), limit: 50 };
+    const club = { ...pendingEvent, eligibleGrades: [11 as Grade] };
+    expect(ids(selectRecommendations(stateWith({ submittedEvents: [club] }), NOW, range).map((r) => r.event))).not.toContain('ev-p');
+    const approved = stateWith({ submittedEvents: [club], moderation: { 'ev-p': 'approved' } });
+    expect(ids(selectRecommendations(approved, NOW, range).map((r) => r.event))).toContain('ev-p');
+  });
+
+  it('never recommends a date-only event: its registration has not opened', () => {
+    const recs = selectRecommendations(createDemoState(), NOW, { limit: 50 });
+    expect(recs.some((r) => r.event.dateOnly === true)).toBe(false);
   });
 });
 
@@ -381,14 +436,22 @@ describe('selectFirstRoute', () => {
 });
 
 describe('selectDeadlinesThisWeek', () => {
+  const closing = makeEvent({ id: 'ev-d1', start: '2026-10-10T08:00:00+07:00', end: '2026-10-10T10:00:00+07:00', registrationDeadline: '2026-10-08T23:59:00+07:00' });
+  const closingLater = makeEvent({ id: 'ev-d2', start: '2026-10-10T14:00:00+07:00', end: '2026-10-10T16:00:00+07:00', registrationDeadline: '2026-10-08T23:59:00+07:00' });
+  const nextWeek = makeEvent({ id: 'ev-d3', start: '2026-10-14T16:45:00+07:00', end: '2026-10-14T18:15:00+07:00', registrationDeadline: '2026-10-12T23:59:00+07:00' });
+  const withDeadlines = (extra: SchoolEvent[] = []) => stateWith({ submittedEvents: [closing, closingLater, nextWeek, ...extra] });
+
   it('lists unregistered approved events closing before next Monday, by deadline', () => {
-    // ev-011 and ev-012 close 08/10 23:59; ev-013 closes 12/10 23:59 (next week).
-    expect(ids(selectDeadlinesThisWeek(createDemoState(), NOW))).toEqual(['ev-011', 'ev-012']);
+    expect(ids(selectDeadlinesThisWeek(withDeadlines(), NOW))).toEqual(['ev-d1', 'ev-d2']);
+    // No seed event closes registration in the demo week.
+    expect(selectDeadlinesThisWeek(createDemoState(), NOW)).toEqual([]);
   });
 
-  it('leaves out registered events', () => {
-    const s = reducer(createDemoState(), { type: 'registration/register', eventId: 'ev-012', at: AT });
-    expect(ids(selectDeadlinesThisWeek(s, NOW))).toEqual(['ev-011']);
+  it('leaves out registered events and date-only events', () => {
+    const s = reducer(withDeadlines(), { type: 'registration/register', eventId: 'ev-d2', at: AT });
+    expect(ids(selectDeadlinesThisWeek(s, NOW))).toEqual(['ev-d1']);
+    const day = makeEvent({ id: 'ev-day', dateOnly: true, start: '2026-10-09T00:00:00+07:00', end: '2026-10-10T00:00:00+07:00', registrationDeadline: '2026-10-09T00:00:00+07:00' });
+    expect(ids(selectDeadlinesThisWeek(withDeadlines([day]), NOW))).toEqual(['ev-d1', 'ev-d2']);
   });
 
   it('includes a deadline at now, excludes next Monday 00:00, and orders by deadline before start', () => {
@@ -407,39 +470,46 @@ describe('selectDeadlinesThisWeek', () => {
     const monday = makeEvent({ id: 'ev-monday', registrationDeadline: '2026-10-12T00:00:00+07:00' });
     const passed = makeEvent({ id: 'ev-passed', registrationDeadline: '2026-10-07T08:59:00+07:00' });
     const pending = makeEvent({ id: 'ev-pending', registrationDeadline: '2026-10-09T12:00:00+07:00', status: 'pending' });
-    const s = stateWith({ submittedEvents: [sunday, monday, passed, pending, atNow] });
-    expect(ids(selectDeadlinesThisWeek(s, NOW))).toEqual(['ev-at-now', 'ev-011', 'ev-012', 'ev-sunday']);
+    const s = withDeadlines([sunday, monday, passed, pending, atNow]);
+    expect(ids(selectDeadlinesThisWeek(s, NOW))).toEqual(['ev-at-now', 'ev-d1', 'ev-d2', 'ev-sunday']);
   });
 
   it('keeps the start order for equal deadlines and is empty late on Sunday', () => {
     const lateSunday = toMillis('2026-10-11T23:00:00+07:00');
-    expect(selectDeadlinesThisWeek(createDemoState(), lateSunday)).toEqual([]);
-    // Same deadline as ev-011/ev-012 but a later start: start order wins over the id order.
+    expect(selectDeadlinesThisWeek(withDeadlines(), lateSunday)).toEqual([]);
+    // Same deadline as ev-d1/ev-d2 but a later start: start order wins over the id order.
     const twin = makeEvent({
       id: 'ev-000',
-      start: '2026-10-10T09:00:00+07:00',
-      end: '2026-10-10T10:00:00+07:00',
+      start: '2026-10-10T15:00:00+07:00',
+      end: '2026-10-10T16:00:00+07:00',
       registrationDeadline: '2026-10-08T23:59:00+07:00',
     });
-    expect(ids(selectDeadlinesThisWeek(stateWith({ submittedEvents: [twin] }), NOW))).toEqual(['ev-011', 'ev-012', 'ev-000']);
+    expect(ids(selectDeadlinesThisWeek(withDeadlines([twin]), NOW))).toEqual(['ev-d1', 'ev-d2', 'ev-000']);
   });
 });
 
 describe('selectPendingAttendance', () => {
+  /** The demo student before confirming attendance at ev-003 (Ngày hội Câu lạc bộ). */
+  const awaiting = () => {
+    const demo = createDemoState();
+    return stateWith({ registrations: [reg('ev-001', 'attended'), reg('ev-003'), reg('ev-027')], portfolio: demo.portfolio.filter((p) => p.eventId !== 'ev-003') });
+  };
+
   it('lists past registered events without an entry', () => {
-    expect(ids(selectPendingAttendance(createDemoState(), NOW))).toEqual(['ev-009']);
+    expect(ids(selectPendingAttendance(awaiting(), NOW))).toEqual(['ev-003']);
+    expect(selectPendingAttendance(createDemoState(), NOW)).toEqual([]);
   });
 
   it('drops events once attendance is confirmed, marked absent or already in the portfolio', () => {
-    const s = createDemoState();
+    const s = awaiting();
     const attended = reducer(s, {
       type: 'registration/markAttended',
-      eventId: 'ev-009',
+      eventId: 'ev-003',
       entry: {
-        id: 'pf-009',
-        eventId: 'ev-009',
-        category: 'KN',
-        role: 'Thành viên tham gia',
+        id: 'pf-003',
+        eventId: 'ev-003',
+        category: 'TS',
+        role: 'Học sinh tham dự',
         hours: 3.5,
         reflection: '',
         reflectionSource: 'mochi_draft',
@@ -449,43 +519,44 @@ describe('selectPendingAttendance', () => {
       },
     });
     expect(selectPendingAttendance(attended, NOW)).toEqual([]);
-    expect(selectPendingAttendance(reducer(s, { type: 'registration/markAbsent', eventId: 'ev-009' }), NOW)).toEqual([]);
-    expect(selectPendingAttendance(stateWith({ portfolio: attended.portfolio }), NOW)).toEqual([]);
+    expect(selectPendingAttendance(reducer(s, { type: 'registration/markAbsent', eventId: 'ev-003' }), NOW)).toEqual([]);
+    expect(selectPendingAttendance(stateWith({ registrations: s.registrations, portfolio: attended.portfolio }), NOW)).toEqual([]);
   });
 
   it('adds upcoming registrations once they have ended', () => {
-    const later = toMillis('2026-10-16T09:00:00+07:00');
-    expect(ids(selectPendingAttendance(createDemoState(), later))).toEqual(['ev-009', 'ev-014']);
+    const later = toMillis('2026-11-21T09:00:00+07:00');
+    expect(ids(selectPendingAttendance(awaiting(), later))).toEqual(['ev-003', 'ev-027']);
   });
 });
 
 describe('selectSubmissionsForClub', () => {
   it('joins each submission with its event and effective status, newest first', () => {
-    const rows = selectSubmissionsForClub(createDemoState(), 'inkstep');
+    const rows = selectSubmissionsForClub(withSubmissions(), 'bot-va-bo');
     expect(rows.map((r) => [r.submission.id, r.event.id, r.status])).toEqual([
-      ['sub-003', 'ev-048', 'pending'],
-      ['sub-004', 'ev-049', 'changes_requested'],
+      ['sub-003', 'ev-s3', 'pending'],
+      ['sub-004', 'ev-s4', 'changes_requested'],
     ]);
-    expect(rows[0]?.event).toBe(seedEvent('ev-048'));
+    expect(rows[0]?.event).toBe(submitted('ev-s3'));
+    expect(selectSubmissionsForClub(createDemoState(), 'bot-va-bo')).toEqual([]);
   });
 
   it('reflects reviews, resubmitted copies and new submissions', () => {
-    let s = reducer(createDemoState(), { type: 'moderation/review', submissionId: 'sub-003', action: 'approve', at: AT });
-    const edited = { ...seedEvent('ev-049'), location: 'Phòng Tin học 2' };
+    let s = reducer(withSubmissions(), { type: 'moderation/review', submissionId: 'sub-003', action: 'approve', at: AT });
+    const edited = { ...submitted('ev-s4'), location: 'Phòng đa năng tầng 3' };
     s = reducer(s, { type: 'submission/resubmit', submissionId: 'sub-004', event: edited, at: AT });
-    const created = makeEvent({ id: 'ev-created', clubId: 'inkstep' });
+    const created = makeEvent({ id: 'ev-created', clubId: 'bot-va-bo' });
     s = reducer(s, {
       type: 'submission/create',
       event: created,
       submission: submission('sub-created', 'ev-created', { submittedAt: '2026-10-07T10:00:00+07:00' }),
     });
-    const rows = selectSubmissionsForClub(s, 'inkstep');
+    const rows = selectSubmissionsForClub(s, 'bot-va-bo');
     expect(rows.map((r) => [r.submission.id, r.status])).toEqual([
       ['sub-created', 'pending'],
       ['sub-003', 'approved'],
       ['sub-004', 'pending'],
     ]);
-    expect(rows[2]?.event.location).toBe('Phòng Tin học 2');
+    expect(rows[2]?.event.location).toBe('Phòng đa năng tầng 3');
     expect(rows[1]?.event.status).toBe('approved');
   });
 
@@ -496,33 +567,35 @@ describe('selectSubmissionsForClub', () => {
         submission('sub-b', 'ev-x'),
         submission('sub-a', 'ev-y'),
         submission('sub-ghost', 'ev-ghost'),
-        submission('sub-other', 'ev-x', { clubId: 'robotics' }),
+        submission('sub-other', 'ev-x', { clubId: 'charite' }),
       ],
     });
-    expect(selectSubmissionsForClub(s, 'inkstep').map((r) => r.submission.id)).toEqual(['sub-a', 'sub-b']);
-    expect(selectSubmissionsForClub(s, 'robotics').map((r) => r.submission.id)).toEqual(['sub-other']);
+    expect(selectSubmissionsForClub(s, 'bot-va-bo').map((r) => r.submission.id)).toEqual(['sub-a', 'sub-b']);
+    expect(selectSubmissionsForClub(s, 'charite').map((r) => r.submission.id)).toEqual(['sub-other']);
     expect(selectSubmissionsForClub(s, 'khong-ton-tai')).toEqual([]);
   });
 });
 
 describe('selectModerationQueue', () => {
   it('lists pending submissions oldest first, joined with event and club', () => {
-    const queue = selectModerationQueue(createDemoState());
+    const queue = selectModerationQueue(withSubmissions());
     expect(queue.map((q) => [q.submission.id, q.event.id, q.club?.id])).toEqual([
-      ['sub-001', 'ev-046', 'robotics'],
-      ['sub-002', 'ev-047', 'am-nhac'],
-      ['sub-003', 'ev-048', 'inkstep'],
+      ['sub-001', 'ev-s1', 'novaris-project'],
+      ['sub-002', 'ev-s2', 'kat-music-club'],
+      ['sub-003', 'ev-s3', 'bot-va-bo'],
     ]);
-    expect(queue[0]?.club).toBe(CLUBS.find((c) => c.id === 'robotics'));
+    expect(queue[0]?.club).toBe(CLUBS.find((c) => c.id === 'novaris-project'));
     expect(queue.every((q) => q.event.status === 'pending')).toBe(true);
+    // Nothing waits for moderation in the sample data.
+    expect(selectModerationQueue(createDemoState())).toEqual([]);
   });
 
   it('follows reviews and resubmissions', () => {
-    let s = reducer(createDemoState(), { type: 'moderation/review', submissionId: 'sub-001', action: 'approve', at: AT });
+    let s = reducer(withSubmissions(), { type: 'moderation/review', submissionId: 'sub-001', action: 'approve', at: AT });
     s = reducer(s, { type: 'moderation/review', submissionId: 'sub-002', action: 'reject', reason: REASON, at: AT });
     expect(selectModerationQueue(s).map((q) => q.submission.id)).toEqual(['sub-003']);
 
-    const edited = { ...seedEvent('ev-049'), capacity: 30 };
+    const edited = { ...submitted('ev-s4'), capacity: 30 };
     s = reducer(s, { type: 'submission/resubmit', submissionId: 'sub-004', event: edited, at: AT });
     const queue = selectModerationQueue(s);
     // sub-004 was first submitted on 02/10, before sub-003.
@@ -542,13 +615,13 @@ describe('selectModerationQueue', () => {
     });
     const queue = selectModerationQueue(s);
     expect(queue.map((q) => [q.submission.id, q.club?.id ?? null])).toEqual([
-      ['sub-a', 'inkstep'],
+      ['sub-a', 'bot-va-bo'],
       ['sub-b', null],
     ]);
   });
 
   it('is empty when nothing is pending', () => {
-    const s = stateWith({ moderation: { 'ev-046': 'approved', 'ev-047': 'approved', 'ev-048': 'rejected' } });
+    const s = withSubmissions({ moderation: { 'ev-s1': 'approved', 'ev-s2': 'approved', 'ev-s3': 'rejected' } });
     expect(selectModerationQueue(s)).toEqual([]);
   });
 });
@@ -606,7 +679,7 @@ describe('proposal selectors', () => {
     category: 'TT' as const,
     description: 'Đề xuất tổ chức giải Cờ tướng dành cho học sinh toàn trường vào buổi chiều thứ Bảy.',
     grades: [6, 7, 8] as Grade[],
-    clubId: 'inkstep',
+    clubId: 'bot-va-bo',
     authorGrade: 7 as const,
     submittedAt: AT,
     supporters: 0,
@@ -622,7 +695,7 @@ describe('proposal selectors', () => {
     expect([...pending].sort((a, b) => b - a)).toEqual(pending);
     expect(views.find((v) => v.proposal.id === 'dx-006')).toMatchObject({ supportedByMe: true, support: 13, mine: false });
     expect(views.find((v) => v.proposal.id === 'dx-demo-1')).toMatchObject({ mine: true, status: 'pending', response: null });
-    expect(views.find((v) => v.proposal.id === 'dx-001')?.response?.assignedClubId).toBe('toan-hoc');
+    expect(views.find((v) => v.proposal.id === 'dx-001')?.response).toMatchObject({ status: 'accepted', assignedClubId: null });
     expect(selectPendingActivityCount(state)).toBe(views.filter((v) => v.status === 'pending').length);
   });
 
@@ -633,16 +706,27 @@ describe('proposal selectors', () => {
   });
 
   it("splits a club's collaborations into received and sent", () => {
-    const { incoming, outgoing } = selectClubCollaborations(stateWith({}), 'inkstep');
-    expect(incoming.map((v) => v.proposal.id)).toContain('ht-001');
-    expect(incoming.every((v) => v.proposal.toClubId === 'inkstep')).toBe(true);
-    expect(outgoing.find((v) => v.proposal.id === 'ht-002')?.status).toBe('accepted');
-    expect(selectCollaborations(stateWith({})).length).toBeGreaterThanOrEqual(4);
+    const base = { category: 'TN' as const, description: 'Hai câu lạc bộ phối hợp tổ chức hoạt động gây quỹ thiện nguyện.', month: '2026-12', submittedAt: AT };
+    const received = { ...base, id: 'ht-901', fromClubId: 'charite', toClubId: 'bot-va-bo', title: 'Hội chợ bánh gây quỹ' };
+    const sent = { ...base, id: 'ht-902', fromClubId: 'bot-va-bo', toClubId: 'green-guardian', title: 'Ngày hội sống xanh' };
+    const state = stateWith({
+      collaborations: [received, sent],
+      proposalResponses: { 'ht-902': { status: 'accepted', at: AT, by: 'green-guardian', note: 'Câu lạc bộ đồng ý phối hợp.', assignedClubId: null } },
+    });
+    const { incoming, outgoing } = selectClubCollaborations(state, 'bot-va-bo');
+    expect(incoming.map((v) => v.proposal.id)).toEqual(['ht-901']);
+    expect(outgoing.find((v) => v.proposal.id === 'ht-902')?.status).toBe('accepted');
+    expect(selectCollaborations(state)).toHaveLength(2);
+    // The sample data sends nothing in a real club's name.
+    expect(selectCollaborations(createDemoState())).toEqual([]);
   });
 
   it('finds the student proposals that name a club or were handed to it', () => {
-    const state = stateWith({ proposals: [sent] });
-    expect(selectProposalsForClub(state, 'inkstep').map((v) => v.proposal.id)).toEqual(expect.arrayContaining(['dx-007', 'dx-demo-1']));
-    expect(selectProposalsForClub(state, 'toan-hoc').map((v) => v.proposal.id)).toEqual(['dx-001']);
+    const state = stateWith({
+      proposals: [sent],
+      proposalResponses: { 'dx-002': { status: 'accepted', at: AT, by: 'hdhs', note: 'Đề xuất được chuyển tới câu lạc bộ phù hợp.', assignedClubId: 'humans-of-vinschool-smart-city' } },
+    });
+    expect(selectProposalsForClub(state, 'bot-va-bo').map((v) => v.proposal.id)).toEqual(['dx-demo-1']);
+    expect(selectProposalsForClub(state, 'humans-of-vinschool-smart-city').map((v) => v.proposal.id)).toEqual(['dx-002']);
   });
 });

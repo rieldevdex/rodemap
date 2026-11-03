@@ -1,6 +1,6 @@
 import { useState, type CSSProperties } from 'react';
-import { formatDate, formatLongDate, formatTime, formatTimeRange, toMillis } from '../../domain/dates';
-import { formatGrades, type RegistrationState } from '../../domain/events';
+import { formatDate, formatLongDate, formatTime, toMillis } from '../../domain/dates';
+import { eventPlaceLabel, eventTimeLabel, formatGrades, type RegistrationState } from '../../domain/events';
 import type { SchoolEvent } from '../../domain/types';
 import { Button } from '../atoms/Button';
 import { LineBadge } from '../atoms/LineBadge';
@@ -31,6 +31,7 @@ const BLOCKED: Partial<Record<RegistrationState, string>> = {
   closed: 'Đã hết hạn đăng ký.',
   past: 'Sự kiện đã diễn ra.',
   attended: 'Bạn đã tham gia sự kiện này.',
+  not_open: 'Chưa mở đăng ký.',
 };
 
 /**
@@ -55,7 +56,6 @@ export function RegistrationControl({
   const [announcement, setAnnouncement] = useState('');
   const [burst, setBurst] = useState(0);
   const start = toMillis(event.start);
-  const end = toMillis(event.end);
 
   const close = () => {
     setDialog(null);
@@ -129,13 +129,13 @@ export function RegistrationControl({
             <dt>Thời gian</dt>
             <dd>
               <MonoTime dateTime={event.start}>
-                {formatLongDate(start)} · {formatTimeRange(start, end)}
+                {formatLongDate(start)} · {eventTimeLabel(event)}
               </MonoTime>
             </dd>
           </div>
           <div>
             <dt>Địa điểm</dt>
-            <dd>{event.format === 'online' ? `Trực tuyến · ${event.location}` : event.location}</dd>
+            <dd>{eventPlaceLabel(event)}</dd>
           </div>
           {dialog === 'register' ? (
             <>
@@ -162,7 +162,7 @@ export function RegistrationControl({
             <ul>
               {conflicts.map((c) => (
                 <li key={c.id}>
-                  {c.title} ({formatTimeRange(toMillis(c.start), toMillis(c.end))})
+                  {c.title} ({eventTimeLabel(c)})
                 </li>
               ))}
             </ul>

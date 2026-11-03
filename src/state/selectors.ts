@@ -10,7 +10,7 @@ import { ACTIVITY_PROPOSALS, COLLABORATIONS, PROPOSAL_RESPONSES } from '../data/
 import { budgetStatus, DEFAULT_WEEKLY_HOUR_BUDGET, type BudgetStatus } from '../domain/budget';
 import { allConflicts } from '../domain/conflicts';
 import { addDays, startOfIsoWeek, toMillis } from '../domain/dates';
-import { findRegistration, isPast, isRegistered, sortByStart } from '../domain/events';
+import { findRegistration, isDateOnly, isPast, isRegistered, sortByStart } from '../domain/events';
 import { isPublished, postsAboutClub, postsAboutEvent, sortNews } from '../domain/news';
 import { guestProfile } from '../domain/guest';
 import { firstRoute, type PlanProposal } from '../domain/planner';
@@ -168,7 +168,8 @@ export function selectDeadlinesThisWeek(state: AppState, now: Millis): SchoolEve
   return selectPublicEvents(state)
     .map((event) => ({ event, deadline: toMillis(event.registrationDeadline) }))
     .filter(
-      ({ event, deadline }) => deadline >= now && deadline < weekEnd && !isRegistered(event.id, state.registrations),
+      ({ event, deadline }) =>
+        !isDateOnly(event) && deadline >= now && deadline < weekEnd && !isRegistered(event.id, state.registrations),
     )
     .sort((a, b) => a.deadline - b.deadline)
     .map(({ event }) => event);

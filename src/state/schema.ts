@@ -1,5 +1,7 @@
 /** Persisted application state: shape, seed and versioned migration. Pure. */
-import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS, SEED_SUBMISSIONS } from '../data/seed';
+import { CLUBS } from '../data/clubs';
+import { EVENTS } from '../data/events';
+import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS } from '../data/seed';
 import { APPEARANCE_MODES, INTERACTIVITY_LEVELS, TEXT_DENSITIES } from '../domain/types';
 import type {
   ActivityProposal,
@@ -25,7 +27,7 @@ export const STORAGE_KEY = 'vsmcclubs:v1';
 /** Where the state lived before the product was renamed (2026-11-03); read once, then removed. */
 export const LEGACY_STORAGE_KEY = 'rodemap:v1';
 export const STATE_VERSION = 1;
-export const DEFAULT_CLUB_ID = 'inkstep';
+export const DEFAULT_CLUB_ID = 'bot-va-bo';
 
 export interface AppState {
   version: 1;
@@ -66,8 +68,8 @@ export interface AppState {
 
 /**
  * A new visitor: no student profile yet (every page except Trang chủ, Thiết lập hồ sơ and
- * Đề án asks for one first), so no registrations or portfolio either. The clubs' submission
- * history is shared illustrative data.
+ * Đề án asks for one first), so no registrations or portfolio either, and no submission history:
+ * the clubs are real, so nothing is submitted on their behalf.
  */
 export function createSeedState(): AppState {
   return {
@@ -79,7 +81,7 @@ export function createSeedState(): AppState {
     portfolio: [],
     submittedEvents: [],
     moderation: {},
-    submissions: structuredClone(SEED_SUBMISSIONS),
+    submissions: [],
     newsPosts: [],
     proposals: [],
     collaborations: [],
@@ -172,6 +174,43 @@ export function migrate(raw: unknown): AppState | null {
     const missing = Object.entries(LATER_V1_FIELDS).filter(([key]) => !(key in raw));
     if (missing.length > 0) upgraded = { ...raw, ...Object.fromEntries(missing.map(([key, empty]) => [key, empty()])) };
   }
-  if (isAppStateV1(upgraded)) return upgraded;
+  if (isAppStateV1(upgraded)) return dropRetiredReferences(upgraded);
   return null;
+}
+
+/**
+ * The sample clubs and their events were replaced by the school's real clubs (2026-11-03). A state
+ * saved before then may still point at them: this drops registrations, portfolio entries, status
+ * overrides and submissions of events that no longer exist, collaborations of clubs that no longer
+ * exist, unlinks such clubs from proposals and answers, and moves the "Câu lạc bộ" role to the
+ * default club. A state with nothing retired comes back unchanged (same object).
+ */
+export function dropRetiredReferences(s: AppState): AppState {
+  const eventIds = new Set([...EVENTS.map((e) => e.id), ...s.submittedEvents.map((e) => e.id)]);
+  const clubIds = new Set(CLUBS.map((c) => c.id));
+  const knownEvent = (x: { eventId: string }) => eventIds.has(x.eventId);
+  const knownClub = (id: string | null) => id === null || clubIds.has(id);
+  const stale =
+    !clubIds.has(s.activeClubId) ||
+    !s.registrations.every(knownEvent) ||
+    !s.portfolio.every(knownEvent) ||
+    !s.submissions.every(knownEvent) ||
+    !Object.keys(s.moderation).every((id) => eventIds.has(id)) ||
+    !s.collaborations.every((c) => knownClub(c.fromClubId) && knownClub(c.toClubId)) ||
+    !s.proposals.every((p) => knownClub(p.clubId)) ||
+    !Object.values(s.proposalResponses).every((r) => knownClub(r.assignedClubId));
+  if (!stale) return s;
+  return {
+    ...s,
+    activeClubId: clubIds.has(s.activeClubId) ? s.activeClubId : DEFAULT_CLUB_ID,
+    registrations: s.registrations.filter(knownEvent),
+    portfolio: s.portfolio.filter(knownEvent),
+    submissions: s.submissions.filter(knownEvent),
+    moderation: Object.fromEntries(Object.entries(s.moderation).filter(([id]) => eventIds.has(id))),
+    collaborations: s.collaborations.filter((c) => knownClub(c.fromClubId) && knownClub(c.toClubId)),
+    proposals: s.proposals.map((p) => (knownClub(p.clubId) ? p : { ...p, clubId: null })),
+    proposalResponses: Object.fromEntries(
+      Object.entries(s.proposalResponses).map(([id, r]) => [id, knownClub(r.assignedClubId) ? r : { ...r, assignedClubId: null }]),
+    ),
+  };
 }

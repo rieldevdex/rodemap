@@ -4,8 +4,8 @@
  * It reuses the same tool executors as online mode, so cards and facts are identical.
  */
 import { CATEGORY_LABELS } from '../../domain/category-labels';
-import { addDays, formatDate, formatLongDate, formatTimeRange, toIsoDate } from '../../domain/dates';
-import { eventEnd, eventStart, isExternalCompetition, isPast } from '../../domain/events';
+import { addDays, formatDate, formatLongDate, toIsoDate } from '../../domain/dates';
+import { eventPlaceLabel, eventStart, eventTimeLabel, isDateOnly, isExternalCompetition, isPast } from '../../domain/events';
 import { windowRange, type DateWindow } from '../../domain/filters';
 import { groupByCategory, totalHours } from '../../domain/portfolio';
 import { NEWS_CATEGORY_LABELS } from '../../domain/news';
@@ -102,7 +102,7 @@ export function windowInText(text: string): DateWindow | undefined {
   return undefined;
 }
 
-const line = (e: SchoolEvent) => `${formatLongDate(eventStart(e))}, ${formatTimeRange(eventStart(e), eventEnd(e))}`;
+const line = (e: SchoolEvent) => `${formatLongDate(eventStart(e))}, ${eventTimeLabel(e)}`;
 const clubName = (id: string) => CLUBS.find((c) => c.id === id)?.name ?? '';
 /** "Tiếng Anh" → "tiếng Anh": only the first letter is lowered, so proper names keep their capitals. */
 const lowerFirst = (text: string) => text.charAt(0).toLocaleLowerCase('vi') + text.slice(1);
@@ -159,7 +159,7 @@ function registrationReply(intent: 'register' | 'unregister', text: string, ctx:
   }
   const out = executeTool('propose_registration', { event_id: event.id, action: intent }, ctx);
   const r = out.result as { status: string; reason?: string; conflicts?: { title: string }[]; exceeds_weekly_budget?: boolean };
-  const facts = `“${event.title}” (${line(event)}, ${event.location})`;
+  const facts = `“${event.title}” (${line(event)}, ${eventPlaceLabel(event)})`;
   if (r.status === 'awaiting_confirmation') {
     const parts =
       intent === 'register'
@@ -282,6 +282,19 @@ function eventQuestionReply(text: string, ctx: OfflineContext): OfflineReply {
     summary: string;
     conflicts_with_plan: { title: string }[];
   };
+  // Only the date is announced: say so, and never guess the time, place or seats.
+  if (isDateOnly(event)) {
+    return {
+      intent: 'event_question',
+      text: [
+        `“${event.title}” do ${d.club} tổ chức vào ${d.date}. Thời gian cụ thể, địa điểm, đối tượng tham gia và số chỗ đang được cập nhật; đơn vị tổ chức chưa mở đăng ký.`,
+        d.summary,
+        'Mochi sẽ cung cấp thông tin chi tiết khi đơn vị tổ chức cập nhật sự kiện trên vsmcclubs.',
+      ].join('\n\n'),
+      cards: [{ kind: 'events', title: 'Sự kiện', eventIds: [event.id] }],
+      focusEventId: event.id,
+    };
+  }
   // An external competition is organised outside the school; its publisher (Phòng Cố vấn Học tập) only relays it.
   const who = d.organizer === undefined ? `do ${d.club} tổ chức` : `là cuộc thi ngoài trường do ${d.organizer} tổ chức, diễn ra`;
   const parts = [

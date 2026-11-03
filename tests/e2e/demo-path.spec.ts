@@ -142,7 +142,7 @@ test.describe('demo path', () => {
       toMillis(e.registrationDeadline) > today &&
       e.eligibleGrades.includes(11) &&
       e.seatsTaken < e.capacity &&
-      e.format === 'in_person' &&
+      e.dateOnly !== true &&
       !SEED_REGISTRATIONS.some((r) => r.eventId === e.id),
   );
 

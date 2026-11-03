@@ -6,8 +6,10 @@ export const NEWS_DEPARTMENTS = ['Ban Truyền thông', 'Ban Học tập', 'Ban 
 
 /**
  * Articles of the Bản tin Hội đồng Học sinh, oldest first.
- * bt-001 … bt-009 are published between 03/09/2026 and 06/10/2026 (bt-009 is pinned);
- * bt-010 is scheduled for 19/10/2026 and stays hidden until then.
+ * bt-001 … bt-005 are published between 03/09/2026 and 21/09/2026 (bt-003, the registration
+ * guide, is pinned); bt-010 is scheduled for 19/10/2026 and stays hidden until then. The articles
+ * about the former demo clubs and their events (bt-006 … bt-009) were removed on 03/11/2026 with
+ * those clubs; their ids are not reused.
  * Facts about events quote src/data/events.ts; exam weeks quote src/data/calendar.ts.
  */
 export const NEWS: NewsPost[] = [
@@ -155,6 +157,7 @@ export const NEWS: NewsPost[] = [
     ],
     eventIds: [],
     clubIds: [],
+    pinned: true,
   },
   {
     id: 'bt-004',
@@ -243,169 +246,7 @@ export const NEWS: NewsPost[] = [
     eventIds: ['ev-003'],
     clubIds: ['hdhs'],
   },
-  {
-    id: 'bt-006',
-    slug: 'gioi-thieu-cau-lac-bo-tinh-nguyen-xanh',
-    title: 'Giới thiệu Câu lạc bộ Tình nguyện Xanh',
-    category: 'club',
-    author: 'Ban Phong trào',
-    publishedAt: '2026-09-23T07:30:00+07:00',
-    summary:
-      'Câu lạc bộ Tình nguyện Xanh triển khai các hoạt động bảo vệ môi trường và thiện nguyện trong khuôn viên trường và tại cộng đồng, đồng thời xác nhận giờ hoạt động tình nguyện cho học sinh.',
-    body: [
-      {
-        kind: 'paragraph',
-        text: 'Câu lạc bộ Tình nguyện Xanh triển khai các hoạt động bảo vệ môi trường và thiện nguyện trong khuôn viên trường và tại cộng đồng. Câu lạc bộ phối hợp với các đơn vị địa phương tổ chức chương trình và xác nhận giờ hoạt động tình nguyện cho học sinh.',
-      },
-      { kind: 'heading', text: 'Các chương trình trong học kỳ I' },
-      {
-        kind: 'paragraph',
-        text: 'Theo lịch sự kiện đã được Hội đồng Học sinh phê duyệt, câu lạc bộ tổ chức các chương trình sau, dành cho học sinh toàn trường, từ khối 6 đến khối 12:',
-      },
-      {
-        kind: 'list',
-        items: [
-          'Chương trình Chủ nhật Xanh: Vệ sinh khuôn viên trường và tuyến phố lân cận (từ 07:30 đến 10:00, Chủ nhật, 27/09/2026, tại Cổng trường và tuyến phố lân cận; hạn đăng ký 23:59, Thứ Sáu, 25/09/2026).',
-          'Chương trình Quyên góp sách cho thư viện trường vùng cao (từ 08:30 đến 11:00, Thứ Bảy, 10/10/2026, tại Thư viện trường; hạn đăng ký 23:59, Thứ Năm, 08/10/2026).',
-          'Hoạt động trồng cây xanh tại công viên khu vực (từ 07:30 đến 11:00, Thứ Bảy, 24/10/2026, tại Công viên khu vực lân cận trường; học sinh tập trung tại cổng trường lúc 07:30 và di chuyển cùng thành viên ban chủ nhiệm đến địa điểm hoạt động; hạn đăng ký 23:59, Thứ Tư, 21/10/2026).',
-          'Chương trình Áo ấm mùa đông: Tiếp nhận và phân loại hiện vật quyên góp (từ 08:00 đến 11:30, Thứ Bảy, 28/11/2026, tại Nhà thi đấu đa năng; hạn đăng ký 23:59, Thứ Tư, 25/11/2026).',
-        ],
-      },
-      { kind: 'heading', text: 'Hình thức tham gia' },
-      {
-        kind: 'paragraph',
-        text: 'Tại Chương trình Chủ nhật Xanh, học sinh được chia thành các nhóm phụ trách từng khu vực, được phát găng tay, túi đựng rác và hướng dẫn phân loại rác thải tại nguồn trước khi bắt đầu. Đối với chương trình quyên góp sách, học sinh có thể mang theo sách giáo khoa, sách tham khảo và truyện thiếu nhi còn sử dụng tốt để đóng góp; các nhóm phụ trách kiểm tra tình trạng sách, phân loại theo cấp học, dán nhãn và đóng thùng.',
-      },
-      {
-        kind: 'paragraph',
-        text: 'Học sinh tham gia đầy đủ chương trình được câu lạc bộ xác nhận giờ hoạt động tình nguyện. Sau mỗi sự kiện, học sinh chọn Xác nhận đã tham gia trên vsmcclubs để hoạt động được bổ sung vào Hồ sơ năng lực.',
-      },
-    ],
-    eventIds: ['ev-006', 'ev-012', 'ev-020', 'ev-029'],
-    clubIds: ['tinh-nguyen-xanh'],
-  },
-
   /* ── Số 2 · Tháng 10/2026 ─────────────────────────────────────────── */
-  {
-    id: 'bt-007',
-    slug: 'gioi-thieu-cau-lac-bo-tranh-bien',
-    title: 'Giới thiệu Câu lạc bộ Tranh biện',
-    category: 'club',
-    author: 'Ban Học tập',
-    publishedAt: '2026-10-01T07:30:00+07:00',
-    summary:
-      'Câu lạc bộ Tranh biện tổ chức sinh hoạt, tập huấn và giải đấu nhằm phát triển tư duy phản biện và kỹ năng lập luận; vòng loại giải cấp trường diễn ra ngày 21/10/2026.',
-    body: [
-      {
-        kind: 'paragraph',
-        text: 'Câu lạc bộ Tranh biện tổ chức các buổi sinh hoạt, tập huấn và giải đấu nhằm phát triển tư duy phản biện và kỹ năng lập luận của học sinh. Câu lạc bộ phụ trách Giải Tranh biện cấp trường và tuyển chọn đội tuyển tham gia các giải đấu bên ngoài nhà trường.',
-      },
-      { kind: 'heading', text: 'Buổi sinh hoạt định hướng đầu năm học' },
-      {
-        kind: 'paragraph',
-        text: 'Chiều Thứ Ba, 22/09/2026, từ 16:45 đến 18:15, câu lạc bộ đã tổ chức Buổi sinh hoạt định hướng: Kỹ năng tranh biện căn bản tại Phòng 204. Nội dung gồm giới thiệu các thể thức tranh biện phổ biến, phương pháp phân tích kiến nghị và cách tổ chức luận điểm, dẫn chứng; phần thực hành được tổ chức theo nhóm bốn học sinh.',
-      },
-      { kind: 'heading', text: 'Giải Tranh biện cấp trường năm học 2026–2027' },
-      {
-        kind: 'list',
-        items: [
-          'Giải Tranh biện cấp trường năm học 2026–2027: Vòng loại (từ 16:45 đến 18:30, Thứ Tư, 21/10/2026, tại Phòng 201 và Phòng 202; dành cho học sinh các khối 10, 11 và 12; hạn đăng ký 23:59, Thứ Sáu, 16/10/2026).',
-          'Giải Tranh biện cấp trường năm học 2026–2027: Vòng chung kết (từ 08:00 đến 11:30, Thứ Bảy, 10/04/2027, tại Hội trường A; học sinh các khối 10, 11 và 12 tham dự với vai trò khán giả; hạn đăng ký 23:59, Thứ Tư, 07/04/2027).',
-        ],
-      },
-      {
-        kind: 'paragraph',
-        text: 'Tại vòng loại, các đội ba học sinh thi đấu theo thể thức tranh biện ba người với kiến nghị được công bố mười lăm phút trước giờ thi đấu. Ban giám khảo gồm giáo viên và thành viên ban chủ nhiệm câu lạc bộ, đánh giá theo tiêu chí nội dung lập luận, khả năng phản biện và phong cách trình bày. Các đội xuất sắc được chọn vào vòng chung kết tổ chức trong học kỳ II.',
-      },
-      {
-        kind: 'paragraph',
-        text: 'Học sinh quan tâm có thể theo dõi sự kiện của câu lạc bộ tại mục Câu lạc bộ trên vsmcclubs và đăng ký vòng loại tại trang sự kiện trước thời hạn nêu trên.',
-      },
-    ],
-    eventIds: ['ev-004', 'ev-018', 'ev-042'],
-    clubIds: ['tranh-bien'],
-  },
-  {
-    id: 'bt-008',
-    slug: 'hoc-sinh-tim-hieu-to-hop-mon-hoc-va-nganh-hoc',
-    title: 'Hội thảo Định hướng lựa chọn tổ hợp môn học và ngành học đã diễn ra tại Hội trường A',
-    category: 'activity',
-    author: 'Ban Học tập',
-    publishedAt: '2026-10-05T16:30:00+07:00',
-    summary:
-      'Sáng Thứ Bảy, 03/10/2026, Câu lạc bộ Hướng nghiệp tổ chức Hội thảo Định hướng lựa chọn tổ hợp môn học và ngành học tại Hội trường A, dành cho học sinh từ khối 9 đến khối 12.',
-    body: [
-      {
-        kind: 'paragraph',
-        text: 'Sáng Thứ Bảy, 03/10/2026, từ 08:00 đến 11:30, Câu lạc bộ Hướng nghiệp đã tổ chức Hội thảo Định hướng lựa chọn tổ hợp môn học và ngành học tại Hội trường A. Hội thảo dành cho học sinh từ khối 9 đến khối 12, nhằm cung cấp thông tin về mối liên hệ giữa tổ hợp môn học ở bậc trung học phổ thông và các nhóm ngành đào tạo đại học.',
-      },
-      { kind: 'heading', text: 'Nội dung hội thảo' },
-      {
-        kind: 'list',
-        items: [
-          'Chương trình có sự tham gia của chuyên viên tư vấn tuyển sinh và cựu học sinh đang theo học tại các trường đại học.',
-          'Học sinh tham gia phần trắc nghiệm sở thích nghề nghiệp.',
-          'Học sinh trao đổi trực tiếp với diễn giả về yêu cầu tuyển sinh của từng nhóm ngành.',
-          'Học sinh được tư vấn cách xác định thế mạnh cá nhân và lập kế hoạch học tập theo định hướng nghề nghiệp.',
-        ],
-      },
-      { kind: 'heading', text: 'Về đơn vị tổ chức' },
-      {
-        kind: 'paragraph',
-        text: 'Câu lạc bộ Hướng nghiệp cung cấp thông tin về ngành học, nghề nghiệp và tuyển sinh thông qua hội thảo, tọa đàm và ngày hội. Câu lạc bộ hỗ trợ học sinh tìm hiểu năng lực bản thân và xây dựng kế hoạch học tập phù hợp với định hướng nghề nghiệp.',
-      },
-      { kind: 'heading', text: 'Đề nghị đối với học sinh đã tham dự' },
-      {
-        kind: 'paragraph',
-        text: 'Đề nghị học sinh đã đăng ký và tham dự hội thảo chọn Xác nhận đã tham gia tại mục Xác nhận tham gia trên trang Tổng quan hoặc tại trang Hồ sơ. Sau khi xác nhận, hội thảo được bổ sung vào Hồ sơ năng lực với vai trò Thành viên tham gia và số giờ theo thời lượng sự kiện; học sinh chọn Chỉnh sửa để cập nhật vai trò, số giờ và trình bày phần tự đánh giá, qua đó góp phần hoàn thiện hồ sơ trong năm học.',
-      },
-    ],
-    eventIds: ['ev-009'],
-    clubIds: ['huong-nghiep'],
-  },
-  {
-    id: 'bt-009',
-    slug: 'thong-bao-han-dang-ky-su-kien-thang-10-2026',
-    title: 'Thông báo hạn đăng ký sự kiện tháng 10/2026 và lịch Kiểm tra định kỳ giữa học kỳ I',
-    category: 'announcement',
-    author: 'Ban Tổ chức',
-    publishedAt: '2026-10-06T07:00:00+07:00',
-    summary:
-      'Hội đồng Học sinh tổng hợp hạn đăng ký của một số sự kiện trong tháng 10/2026, đồng thời lưu ý học sinh về lịch Kiểm tra định kỳ giữa học kỳ I từ 02/11/2026 đến 07/11/2026.',
-    body: [
-      {
-        kind: 'paragraph',
-        text: 'Nhiều sự kiện của các câu lạc bộ diễn ra trong tháng 10/2026 đã được Hội đồng Học sinh phê duyệt và mở đăng ký trên vsmcclubs. Nhằm giúp học sinh chủ động sắp xếp thời gian, Ban Tổ chức tổng hợp một số sự kiện có hạn đăng ký trong tháng như sau; danh sách đầy đủ xem tại mục Khám phá.',
-      },
-      { kind: 'heading', text: 'Sự kiện sắp hết hạn đăng ký' },
-      {
-        kind: 'list',
-        items: [
-          'Buổi thực hành: Lắp ráp và lập trình robot dò đường, do Câu lạc bộ Robotics tổ chức (từ 08:00 đến 11:30, Thứ Bảy, 10/10/2026, tại Phòng Công nghệ; dành cho học sinh từ khối 6 đến khối 12; hạn đăng ký 23:59, Thứ Năm, 08/10/2026).',
-          'Buổi luyện tập trực tuyến: Thuyết trình học thuật bằng tiếng Anh, do Câu lạc bộ Hùng biện Tiếng Anh tổ chức (từ 19:30 đến 21:00, Thứ Ba, 13/10/2026, Trực tuyến – Google Meet; dành cho học sinh từ khối 8 đến khối 12; hạn đăng ký 23:59, Thứ Hai, 12/10/2026).',
-          'Cuộc thi Phân tích dữ liệu học đường cấp trường, do Câu lạc bộ Khoa học Dữ liệu tổ chức (từ 08:00 đến 11:30, Thứ Bảy, 17/10/2026, tại Phòng Tin học 1 và Phòng Tin học 2; dành cho học sinh khối 11 và khối 12; hạn đăng ký 23:59, Thứ Tư, 14/10/2026).',
-          'Buổi ôn tập trực tuyến: Hệ thống hóa kiến thức Toán giữa học kỳ I, do Câu lạc bộ Toán học tổ chức (từ 19:30 đến 21:00, Thứ Năm, 29/10/2026, Trực tuyến – Google Meet; dành cho học sinh từ khối 6 đến khối 9; hạn đăng ký 23:59, Thứ Tư, 28/10/2026).',
-        ],
-      },
-      {
-        kind: 'paragraph',
-        text: 'Cuộc thi Phân tích dữ liệu học đường cấp trường được tổ chức theo đội, mỗi đội gồm ba học sinh. Trước khi nhấn Xác nhận, học sinh kiểm tra số chỗ còn lại tại hộp thoại Xác nhận đăng ký.',
-      },
-      { kind: 'heading', text: 'Lịch Kiểm tra định kỳ giữa học kỳ I' },
-      {
-        kind: 'paragraph',
-        text: 'Kiểm tra định kỳ giữa học kỳ I diễn ra từ Thứ Hai, 02/11/2026 đến Thứ Bảy, 07/11/2026. Lịch sự kiện đã phê duyệt không bố trí hoạt động trong thời gian này, nhằm đảm bảo học sinh tập trung ôn tập. Học sinh lưu ý cân đối quỹ giờ hoạt động trong các tuần trước kỳ kiểm tra; mục Lịch trên vsmcclubs hiển thị đợt kiểm tra cùng các sự kiện đã đăng ký, đồng thời cảnh báo khi có sự kiện trùng lịch.',
-      },
-      {
-        kind: 'quote',
-        text: 'Đề nghị học sinh hoàn tất đăng ký trước thời hạn và chỉ đăng ký các sự kiện có thể tham gia đầy đủ, qua đó đảm bảo chỗ cho học sinh khác có nhu cầu.',
-        source: 'Ban Tổ chức, Hội đồng Học sinh',
-      },
-    ],
-    eventIds: ['ev-011', 'ev-013', 'ev-016', 'ev-023'],
-    clubIds: ['robotics', 'hung-bien-tieng-anh', 'khoa-hoc-du-lieu', 'toan-hoc'],
-    pinned: true,
-  },
   {
     id: 'bt-010',
     slug: 'huong-dan-xac-nhan-tham-gia-va-hoan-thien-ho-so-nang-luc',

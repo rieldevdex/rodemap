@@ -150,6 +150,7 @@ describe('proposePlan: alternatives', () => {
   const tooFar = ev('alt-far', '2026-11-08T17:00', '2026-11-08T18:00'); // 23 days from c-full
   const noise = [
     ev('alt-pending', '2026-10-14T19:00', '2026-10-14T20:00', { status: 'pending' }),
+    ev('alt-date-only', '2026-10-14T00:00', '2026-10-15T00:00', { dateOnly: true }),
     ev('alt-other-cat', '2026-10-14T19:00', '2026-10-14T20:00', { category: 'CN' }),
     ev('alt-past', '2026-09-28T17:00', '2026-09-28T18:00'),
     ev('alt-closed', '2026-10-13T17:00', '2026-10-13T18:00', { registrationDeadline: '2026-09-30T23:59:00+07:00' }),

@@ -12,7 +12,7 @@ const clubs: Club[] = [
     shortName: 'CLB Tranh biện',
     description: 'Câu lạc bộ phụ trách các hoạt động tranh biện.',
     categories: ['HT'],
-    contact: '[Email câu lạc bộ]',
+    links: [],
   },
 ];
 
@@ -25,6 +25,11 @@ const event = makeEvent({
 });
 
 describe('googleCalendarUrl', () => {
+  it('adds a date-only event as an all-day entry', () => {
+    const day = makeEvent({ dateOnly: true, start: '2027-01-30T00:00:00+07:00', end: '2027-01-31T00:00:00+07:00' });
+    expect(new URL(googleCalendarUrl(day, { clubs })).searchParams.get('dates')).toBe('20270130/20270131');
+  });
+
   it('builds a TEMPLATE link with Vietnam wall-clock dates and ctz', () => {
     const url = new URL(googleCalendarUrl(event, { clubs, baseUrl: 'https://vsmcclubs.site' }));
     expect(`${url.origin}${url.pathname}`).toBe(GOOGLE_CALENDAR_RENDER_URL);

@@ -29,7 +29,6 @@ import {
   formatMonthYear,
   formatShortDate,
   formatTime,
-  formatTimeRange,
   isSameVnDay,
   SCHOOL_YEAR,
   startOfIsoWeek,
@@ -39,7 +38,7 @@ import {
   vnParts,
   weekdayLong,
 } from '../domain/dates';
-import { findRegistration, isPast } from '../domain/events';
+import { eventPlaceLabel, eventTimeLabel, findRegistration, isDateOnly, isPast } from '../domain/events';
 import { googleCalendarUrl } from '../domain/gcal';
 import { buildIcs, icsFileName } from '../domain/ics';
 import type { CalendarPeriod, Millis, SchoolEvent } from '../domain/types';
@@ -91,7 +90,6 @@ interface EventItemProps {
 }
 
 function CalendarEventItem({ event: e, now, attended, conflictTitles, onIcs }: EventItemProps) {
-  const start = toMillis(e.start);
   const past = isPast(e, now);
   return (
     <article
@@ -100,12 +98,12 @@ function CalendarEventItem({ event: e, now, attended, conflictTitles, onIcs }: E
     >
       <p className="cal-event__meta">
         <LineBadge code={e.category} size="sm" />
-        <MonoTime dateTime={e.start}>{formatTimeRange(start, toMillis(e.end))}</MonoTime>
+        <MonoTime dateTime={e.start}>{eventTimeLabel(e)}</MonoTime>
       </p>
       <h4 className="cal-event__title">
         <Link to={`/su-kien/${e.slug}`}>{e.title}</Link>
       </h4>
-      <p className="cal-event__place">{e.location}</p>
+      <p className="cal-event__place">{eventPlaceLabel(e)}</p>
       {conflictTitles.length > 0 || attended || past ? (
         <div className="cluster cluster--sm">
           {conflictTitles.length > 0 ? <StatusTag tone="stop">Trùng lịch</StatusTag> : null}
@@ -389,7 +387,7 @@ export function CalendarPage() {
                                           } as Record<string, string>
                                         }
                                       >
-                                        <span className="cal-chip__time">{formatTime(toMillis(e.start))}</span>
+                                        {isDateOnly(e) ? null : <span className="cal-chip__time">{formatTime(toMillis(e.start))}</span>}
                                         <span className="cal-chip__title">{e.title}</span>
                                         {conflictTitles(e.id).length > 0 ? <VisuallyHidden>, trùng lịch</VisuallyHidden> : null}
                                       </Link>

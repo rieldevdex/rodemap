@@ -5,6 +5,7 @@ import {
   deadlineDaysLeft,
   eventStart,
   fitsAvailability,
+  isDateOnly,
   isDeadlinePassed,
   isEligible,
   isPast,
@@ -100,6 +101,8 @@ function profileFacts(e: SchoolEvent, profile: Profile, goals: readonly Goal[], 
 function passesHardFilters(e: SchoolEvent, ctx: RecommendContext, planIds: ReadonlySet<string>): boolean {
   return (
     e.status === 'approved' &&
+    // Only events open for registration: a date-only event has not opened yet.
+    !isDateOnly(e) &&
     !isPast(e, ctx.now) &&
     !isDeadlinePassed(e, ctx.now) &&
     !isRegistered(e.id, ctx.regs) &&

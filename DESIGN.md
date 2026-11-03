@@ -293,8 +293,21 @@ metadata. Taste: two typefaces at most per mode, numbers in tabular figures.*
   ngoài trường" (icon `external`) before its status; the event page repeats
   the tag and explains the office's role in a ground box with an ink edge.
   (Added 2026-10-13.) Hover and focus darken its edge (§6.2 #3).
+  An event announced by date only (`dateOnly`, added 2026-11-03) keeps its mono
+  date and reads "Đang cập nhật" for time and place, with the neutral status
+  "Chưa mở đăng ký" and no "Đăng ký" button; nothing is guessed. Its event page
+  says "Thời gian và địa điểm: đang cập nhật" under the title and "Đang cập
+  nhật" for every unknown fact; the departure board shows its time as a dimmed
+  mono `--:--` (screen readers hear "Giờ đang cập nhật"); calendars get an
+  all-day entry.
 - **LineBadge**: two-letter code on a category color, used everywhere a
   category appears.
+- **ClubContact** (club page, added 2026-11-03): one wrapping row under the
+  club's full name: the club's own email as a `mailto:` link (icon `mail`) and
+  its public pages as "Facebook", "Instagram", "TikTok" links (icon `external`,
+  new tab, the club name in visually hidden text). Only what the club itself
+  published; never a student's or teacher's name or personal address. A club
+  with nothing published reads "Câu lạc bộ chưa công bố thông tin liên hệ."
 - **DepartureBoard**: the "Sắp diễn ra" list on the dashboard, styled like a
   departure board: time, code, title, place, status, in tabular columns.
 - **ProposalCard**: one proposal on Đề xuất. Code badge + category and a

@@ -2,12 +2,20 @@ import { describe, expect, it } from 'vitest';
 import { toMillis } from './dates';
 import {
   deadlineDaysLeft,
+  DETAILS_PENDING,
   eventEnd,
+  eventFormatLabel,
+  eventGradesLabel,
   eventHours,
+  eventPlaceLabel,
   eventStart,
+  eventStartTimeLabel,
+  eventTimeLabel,
+  eventVenueLabel,
   EXTERNAL_COMPETITION_LABEL,
   findRegistration,
   fitsAvailability,
+  isDateOnly,
   isDeadlinePassed,
   formatGrades,
   gradesLabel,
@@ -130,5 +138,51 @@ describe('sortByStart', () => {
     const input = [b, a, early];
     expect(sortByStart(input).map((e) => e.id)).toEqual(['z', 'a', 'b']);
     expect(input.map((e) => e.id)).toEqual(['b', 'a', 'z']);
+  });
+});
+
+describe('date-only events', () => {
+  const dateOnly = makeEvent({
+    id: 'd',
+    dateOnly: true,
+    start: '2027-01-23T00:00:00+07:00',
+    end: '2027-01-24T00:00:00+07:00',
+    location: '',
+    capacity: 0,
+    seatsTaken: 0,
+    registrationDeadline: '2027-01-23T00:00:00+07:00',
+  });
+  const room = makeEvent({ id: 'r', location: 'Phòng 204' });
+  const online = makeEvent({ id: 'o', format: 'online', location: 'Google Meet' });
+
+  it('takes no hours and never opens registration', () => {
+    expect(isDateOnly(dateOnly)).toBe(true);
+    expect(isDateOnly(room)).toBe(false);
+    expect(eventHours(dateOnly)).toBe(0);
+    expect(registrationState(dateOnly, [], now)).toBe('not_open');
+    // Once the day has passed it reads as past, like any other event.
+    expect(registrationState(dateOnly, [], toMillis('2027-01-25T09:00:00+07:00'))).toBe('past');
+  });
+
+  it('says the details are pending instead of showing a time or place', () => {
+    expect(DETAILS_PENDING).toBe('Đang cập nhật');
+    expect(eventTimeLabel(dateOnly)).toBe(DETAILS_PENDING);
+    expect(eventStartTimeLabel(dateOnly)).toBe(DETAILS_PENDING);
+    expect(eventPlaceLabel(dateOnly)).toBe(DETAILS_PENDING);
+    expect(eventVenueLabel(dateOnly)).toBe(DETAILS_PENDING);
+    expect(eventFormatLabel(dateOnly)).toBe(DETAILS_PENDING);
+    expect(eventGradesLabel(dateOnly)).toBe(DETAILS_PENDING);
+  });
+
+  it('labels the time, place, format and grades of an event with full details', () => {
+    expect(eventTimeLabel(room)).toBe('16:45–18:15');
+    expect(eventStartTimeLabel(room)).toBe('16:45');
+    expect(eventPlaceLabel(room)).toBe('Phòng 204');
+    expect(eventPlaceLabel(online)).toBe('Trực tuyến · Google Meet');
+    expect(eventVenueLabel(room)).toBe('Phòng 204');
+    expect(eventVenueLabel(online)).toBe('Trực tuyến');
+    expect(eventFormatLabel(room)).toBe('Trực tiếp');
+    expect(eventFormatLabel(online)).toBe('Trực tuyến');
+    expect(eventGradesLabel(room)).toBe('Khối 10–12');
   });
 });

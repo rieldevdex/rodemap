@@ -85,3 +85,39 @@ test.describe('shell', () => {
     expect(counts.compact).toBeGreaterThan(counts.minimal ?? 0);
   });
 });
+
+test.describe('real clubs', () => {
+  test('a club page lists only the club address and public pages', async ({ page }) => {
+    const errors = trackErrors(page);
+    await seedDemo(page);
+    await page.goto('/cau-lac-bo/green-guardian');
+    await expect(page.locator('#main-heading')).toHaveText('Green Guardian');
+    const contact = page.getByRole('list', { name: 'Liên hệ' });
+    await expect(contact.getByRole('link', { name: 'greenguardian.clb@gmail.com' })).toHaveAttribute('href', 'mailto:greenguardian.clb@gmail.com');
+    const facebook = contact.getByRole('link', { name: /^Facebook/ });
+    await expect(facebook).toHaveAttribute('href', 'https://www.facebook.com/profile.php?id=61593971978293');
+    await expect(facebook).toHaveAttribute('target', '_blank');
+    await expect(facebook).toHaveAttribute('rel', 'noopener noreferrer');
+    await expect(contact.getByRole('link', { name: /^Instagram/ })).toHaveAttribute('href', 'https://www.instagram.com/greenguardian.clb/');
+    // A club that published nothing says so.
+    await page.goto('/cau-lac-bo/vprc');
+    await expect(page.getByText('Câu lạc bộ chưa công bố thông tin liên hệ.')).toBeVisible();
+    expect(errors).toEqual([]);
+  });
+
+  test('an event announced by date only shows its date, says the rest is pending and does not open registration', async ({ page }) => {
+    const errors = trackErrors(page);
+    await seedDemo(page);
+    await page.goto('/su-kien/chung-ket-vbis-innovation-challenge-2027');
+    await expect(page.locator('#main-heading')).toHaveText('Chung kết Cuộc thi khởi nghiệp cấp trường VBIS Innovation Challenge');
+    await expect(page.getByText('Thứ Bảy, 30/01/2027').first()).toBeVisible();
+    await expect(page.getByText('Thời gian và địa điểm: đang cập nhật')).toBeVisible();
+    await expect(page.getByText('Chưa mở đăng ký.')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Đăng ký', exact: true })).toHaveCount(0);
+    const facts = page.locator('.event-detail__facts');
+    await expect(facts).toContainText('Giờ tổ chức: đang cập nhật');
+    await expect(facts).toContainText('Đang cập nhật (chưa mở đăng ký)');
+    await expect(facts).not.toContainText('00:00');
+    expect(errors).toEqual([]);
+  });
+});

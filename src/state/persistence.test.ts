@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { makeEvent } from '../domain/test-fixtures';
 import { getStorage, loadState, saveState } from './persistence';
 import { reducer } from './reducer';
 import { createSeedState, STORAGE_KEY } from './schema';
@@ -107,13 +108,19 @@ describe('saveState', () => {
     state = reducer(state, { type: 'role/set', role: 'moderator' });
     state = reducer(state, { type: 'theme/set', theme: 'dark' });
     state = reducer(state, { type: 'demo/setToday', date: '2026-10-07' });
-    state = reducer(state, { type: 'registration/register', eventId: 'ev-016', at: '2026-10-07T09:05:00+07:00' });
+    state = reducer(state, { type: 'registration/register', eventId: 'ev-051', at: '2026-10-07T09:05:00+07:00' });
+    state = reducer(state, {
+      type: 'submission/create',
+      event: makeEvent({ id: 'ev-created', clubId: 'bot-va-bo' }),
+      submission: { id: 'sub-created', eventId: 'ev-created', clubId: 'bot-va-bo', submittedAt: '2026-10-07T09:08:00+07:00', history: [{ at: '2026-10-07T09:08:00+07:00', actor: 'club', action: 'submit' }] },
+    });
     state = reducer(state, {
       type: 'moderation/review',
-      submissionId: 'sub-001',
+      submissionId: 'sub-created',
       action: 'approve',
       at: '2026-10-07T09:10:00+07:00',
     });
+    expect(state.moderation).toEqual({ 'ev-created': 'approved' });
 
     const storage = memoryStorage();
     saveState(storage, state);

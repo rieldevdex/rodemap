@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS, SEED_SUBMISSIONS } from '../data/seed';
+import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS } from '../data/seed';
 import { makeEvent } from '../domain/test-fixtures';
-import { createDemoState, createSeedState, DEFAULT_CLUB_ID, isAppStateV1, migrate, STATE_VERSION, STORAGE_KEY } from './schema';
+import { createDemoState, createSeedState, DEFAULT_CLUB_ID, dropRetiredReferences, isAppStateV1, migrate, STATE_VERSION, STORAGE_KEY } from './schema';
 
 describe('constants', () => {
   it('pins the storage key, version and default club', () => {
     expect(STORAGE_KEY).toBe('vsmcclubs:v1');
     expect(STATE_VERSION).toBe(1);
-    expect(DEFAULT_CLUB_ID).toBe('inkstep');
+    expect(DEFAULT_CLUB_ID).toBe('bot-va-bo');
   });
 });
 
@@ -16,13 +16,13 @@ describe('createSeedState', () => {
     expect(createSeedState()).toEqual({
       version: 1,
       role: 'student',
-      activeClubId: 'inkstep',
+      activeClubId: 'bot-va-bo',
       profile: null,
       registrations: [],
       portfolio: [],
       submittedEvents: [],
       moderation: {},
-      submissions: SEED_SUBMISSIONS,
+      submissions: [],
       newsPosts: [],
       proposals: [],
       collaborations: [],
@@ -43,13 +43,13 @@ describe('createSeedState', () => {
     expect(s).toEqual({
       version: 1,
       role: 'student',
-      activeClubId: 'inkstep',
+      activeClubId: 'bot-va-bo',
       profile: SEED_PROFILE,
       registrations: SEED_REGISTRATIONS,
       portfolio: SEED_PORTFOLIO,
       submittedEvents: [],
       moderation: {},
-      submissions: SEED_SUBMISSIONS,
+      submissions: [],
       newsPosts: [],
       proposals: [],
       collaborations: [],
@@ -70,14 +70,12 @@ describe('createSeedState', () => {
     expect(first.profile).not.toBe(SEED_PROFILE);
     expect(first.registrations).not.toBe(SEED_REGISTRATIONS);
     expect(first.portfolio).not.toBe(SEED_PORTFOLIO);
-    expect(first.submissions).not.toBe(SEED_SUBMISSIONS);
 
     first.profile!.interests.push('TS');
     first.profile!.availability.weekend = false;
     first.registrations.push({ eventId: 'ev-099', registeredAt: '2026-10-07T09:00:00+07:00', status: 'registered' });
     first.registrations[0]!.status = 'absent';
     first.portfolio[0]!.evidenceLinks.push('https://example.com/minh-chung/them');
-    first.submissions[0]!.history.push({ at: '2026-10-07T09:00:00+07:00', actor: 'hdhs', action: 'approve' });
     first.submittedEvents.push(makeEvent({ id: 'ev-new' }));
     first.moderation['ev-001'] = 'rejected';
 
@@ -85,7 +83,7 @@ describe('createSeedState', () => {
     expect(second.profile).toEqual(SEED_PROFILE);
     expect(second.registrations).toEqual(SEED_REGISTRATIONS);
     expect(second.portfolio).toEqual(SEED_PORTFOLIO);
-    expect(second.submissions).toEqual(SEED_SUBMISSIONS);
+    expect(second.submissions).toEqual([]);
     expect(second.submittedEvents).toEqual([]);
     expect(second.moderation).toEqual({});
 
@@ -94,7 +92,6 @@ describe('createSeedState', () => {
     expect(SEED_REGISTRATIONS.map((r) => r.eventId)).not.toContain('ev-099');
     expect(SEED_REGISTRATIONS[0]?.status).toBe('attended');
     expect(SEED_PORTFOLIO[0]?.evidenceLinks).toHaveLength(1);
-    expect(SEED_SUBMISSIONS[0]?.history).toHaveLength(1);
   });
 });
 
@@ -217,5 +214,65 @@ describe('isAppStateV1 / migrate', () => {
     const raw: unknown = { ...createSeedState(), ...patch };
     expect(isAppStateV1(raw)).toBe(false);
     expect(migrate(raw)).toBeNull();
+  });
+});
+
+describe('dropRetiredReferences', () => {
+  it('keeps a current state as it is (same object)', () => {
+    const demo = createDemoState();
+    expect(dropRetiredReferences(demo)).toBe(demo);
+    const own = { ...demo, submittedEvents: [makeEvent({ id: 'ev-own', clubId: 'bot-va-bo' })], registrations: [...demo.registrations, { eventId: 'ev-own', registeredAt: '2026-10-07T09:00:00+07:00', status: 'registered' as const }] };
+    expect(dropRetiredReferences(own)).toBe(own);
+  });
+
+  it('drops what a state saved before the real clubs points at, and keeps everything else', () => {
+    const demo = createDemoState();
+    const saved = {
+      ...demo,
+      activeClubId: 'inkstep',
+      registrations: [...demo.registrations, { eventId: 'ev-007', registeredAt: '2026-09-20T20:35:00+07:00', status: 'attended' as const }],
+      portfolio: [...demo.portfolio, { ...demo.portfolio[0]!, id: 'pf-old', eventId: 'ev-007' }],
+      submissions: [
+        { id: 'sub-001', eventId: 'ev-046', clubId: 'robotics', submittedAt: '2026-10-05T15:20:00+07:00', history: [] },
+        { id: 'sub-own', eventId: 'ev-own', clubId: 'bot-va-bo', submittedAt: '2026-10-06T15:20:00+07:00', history: [] },
+      ],
+      submittedEvents: [makeEvent({ id: 'ev-own', clubId: 'bot-va-bo' })],
+      moderation: { 'ev-047': 'approved' as const, 'ev-own': 'pending' as const },
+      collaborations: [
+        { id: 'ht-901', fromClubId: 'inkstep', toClubId: 'charite', title: 'Hợp tác', category: 'TN' as const, description: 'Mô tả.', month: '2026-12', submittedAt: '2026-10-01T20:30:00+07:00' },
+        { id: 'ht-902', fromClubId: 'bot-va-bo', toClubId: 'charite', title: 'Hợp tác', category: 'TN' as const, description: 'Mô tả.', month: '2026-12', submittedAt: '2026-10-01T20:30:00+07:00' },
+      ],
+      proposals: [
+        { id: 'dx-901', title: 'Đề xuất', category: 'HT' as const, description: 'Mô tả.', grades: [11 as const], clubId: 'tranh-bien', authorGrade: 11 as const, submittedAt: '2026-10-01T20:30:00+07:00', supporters: 0 },
+        { id: 'dx-902', title: 'Đề xuất', category: 'HT' as const, description: 'Mô tả.', grades: [11 as const], clubId: 'mentis-club', authorGrade: 11 as const, submittedAt: '2026-10-01T20:30:00+07:00', supporters: 0 },
+      ],
+      proposalResponses: {
+        'dx-901': { status: 'accepted' as const, at: '2026-10-02T20:30:00+07:00', by: 'hdhs', note: 'Tiếp nhận.', assignedClubId: 'toan-hoc' },
+        'dx-902': { status: 'accepted' as const, at: '2026-10-02T20:30:00+07:00', by: 'hdhs', note: 'Tiếp nhận.', assignedClubId: 'mentis-club' },
+      },
+    };
+    const clean = dropRetiredReferences(saved);
+    expect(clean.activeClubId).toBe(DEFAULT_CLUB_ID);
+    expect(clean.registrations).toEqual(demo.registrations);
+    expect(clean.portfolio).toEqual(demo.portfolio);
+    expect(clean.submissions.map((x) => x.id)).toEqual(['sub-own']);
+    expect(clean.moderation).toEqual({ 'ev-own': 'pending' });
+    expect(clean.collaborations.map((c) => c.id)).toEqual(['ht-902']);
+    expect(clean.proposals.map((p) => p.clubId)).toEqual([null, 'mentis-club']);
+    expect(clean.proposalResponses['dx-901']?.assignedClubId).toBeNull();
+    expect(clean.proposalResponses['dx-902']?.assignedClubId).toBe('mentis-club');
+    // Unrelated fields come through untouched.
+    expect(clean.profile).toEqual(demo.profile);
+  });
+
+  it('keeps a real active club and cleans each kind of stale reference on its own', () => {
+    const demo = createDemoState();
+    expect(dropRetiredReferences({ ...demo, activeClubId: 'charite', moderation: { 'ev-046': 'pending' } })).toEqual({ ...demo, activeClubId: 'charite' });
+    expect(dropRetiredReferences({ ...demo, portfolio: [{ ...demo.portfolio[0]!, eventId: 'ev-005' }] }).portfolio).toEqual([]);
+  });
+
+  it('runs on load, through migrate', () => {
+    const saved: unknown = JSON.parse(JSON.stringify({ ...createDemoState(), activeClubId: 'inkstep' }));
+    expect(migrate(saved)?.activeClubId).toBe(DEFAULT_CLUB_ID);
   });
 });

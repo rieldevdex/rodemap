@@ -98,3 +98,13 @@ describe('conflictIdsFor', () => {
     expect(conflictIdsFor('a', repeated)).toEqual(['d', 'b']);
   });
 });
+
+describe('date-only events', () => {
+  it('never clash: their time is not announced', () => {
+    const day = makeEvent({ id: 'day', dateOnly: true, start: '2026-10-14T00:00:00+07:00', end: '2026-10-15T00:00:00+07:00' });
+    const timed = makeEvent({ id: 'timed', start: '2026-10-14T16:45:00+07:00', end: '2026-10-14T18:15:00+07:00' });
+    expect(findConflicts(timed, [day])).toEqual([]);
+    expect(findConflicts(day, [timed])).toEqual([]);
+    expect(allConflicts([day, timed])).toEqual([]);
+  });
+});

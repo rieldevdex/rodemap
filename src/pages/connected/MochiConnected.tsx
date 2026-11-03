@@ -2,8 +2,8 @@ import { useCallback, useRef } from 'react';
 import { MochiCardView, type CardEvent } from '../../components/organisms/MochiCards';
 import { MochiDock } from '../../components/organisms/MochiDock';
 import { MochiPanel } from '../../components/organisms/MochiPanel';
-import { formatDayLabel, formatTimeRange, toMillis } from '../../domain/dates';
-import { publisherLine } from '../../domain/events';
+import { formatDayLabel, toMillis } from '../../domain/dates';
+import { eventPlaceLabel, eventTimeLabel, publisherLine } from '../../domain/events';
 import { googleCalendarUrl } from '../../domain/gcal';
 import { CLUBS } from '../../data/clubs';
 import { useMochi } from '../../state/mochiContext';
@@ -48,8 +48,8 @@ export function MochiConnected() {
         title: e.title,
         category: e.category,
         club: publisherLine(e, clubName(e.clubId)),
-        when: `${formatDayLabel(start)} · ${formatTimeRange(start, toMillis(e.end))}`,
-        location: e.location,
+        when: `${formatDayLabel(start)} · ${eventTimeLabel(e)}`,
+        location: eventPlaceLabel(e),
         status: STATUS[info.state] ?? '',
         href: `/su-kien/${e.slug}`,
         conflicts: info.conflicts.map((c) => c.title),

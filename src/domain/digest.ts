@@ -4,7 +4,7 @@
  */
 import { CATEGORY_LABELS } from './category-labels';
 import { addDays, formatDate, formatDayLabel, formatShortDate, formatTime, startOfIsoWeek, toMillis } from './dates';
-import { eventStart, isPast, isRegistered, seatsLeft, sortByStart } from './events';
+import { eventStart, isDateOnly, isPast, isRegistered, seatsLeft, sortByStart } from './events';
 import { CATEGORY_CODES, type CalendarPeriod, type Millis, type Registration, type SchoolEvent } from './types';
 
 export interface DigestContext {
@@ -53,7 +53,8 @@ export function weeklyDigest(events: readonly SchoolEvent[], ctx: DigestContext)
   );
 
   const deadlines = approved
-    .filter((e) => !isRegistered(e.id, ctx.regs) && !isPast(e, ctx.now))
+    // A date-only event has not opened registration, so it has no deadline to mention.
+    .filter((e) => !isDateOnly(e) && !isRegistered(e.id, ctx.regs) && !isPast(e, ctx.now))
     .map((e) => ({ e, d: toMillis(e.registrationDeadline) }))
     .filter(({ d }) => d >= ctx.now && d < weekEnd)
     .sort((a, b) => a.d - b.d);

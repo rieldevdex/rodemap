@@ -17,7 +17,7 @@ import { PERIODS } from '../data/calendar';
 import { CLUBS } from '../data/clubs';
 import { EVENTS } from '../data/events';
 import { addDays, formatDayLabel, formatTime, startOfIsoWeek, toMillis } from '../domain/dates';
-import { deadlineDaysLeft, isRegistered, registrationState, seatsLeft } from '../domain/events';
+import { deadlineDaysLeft, eventStartTimeLabel, isRegistered, registrationState, seatsLeft } from '../domain/events';
 import { atLeast } from '../domain/interactivity';
 import { layoutRoute } from '../domain/route-layout';
 import { respondOffline } from '../mochi/offline/engine';
@@ -78,8 +78,7 @@ export function HomePage() {
   const stationLabel = (id: string) => {
     const e = byId.get(id);
     if (!e) return id;
-    const start = toMillis(e.start);
-    return `${e.category} · ${e.title} · ${formatDayLabel(start)}, ${formatTime(start)}`;
+    return `${e.category} · ${e.title} · ${formatDayLabel(toMillis(e.start))}, ${eventStartTimeLabel(e)}`;
   };
 
   return (

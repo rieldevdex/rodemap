@@ -10,12 +10,17 @@ import { StationCard } from '../components/molecules/StationCard';
 import { NewsRelated } from '../components/organisms/NewsRelated';
 import { STATUS_LABELS } from '../content/moderation';
 import { CATEGORY_LABELS } from '../domain/category-labels';
-import { formatDate, formatDayLabel, formatLongDate, formatTime, formatTimeRange, toMillis } from '../domain/dates';
+import { formatDate, formatDayLabel, formatLongDate, formatTime, toMillis } from '../domain/dates';
 import { publisherFactLabel } from '../domain/clubs';
 import {
   deadlineDaysLeft,
+  DETAILS_PENDING,
+  eventFormatLabel,
+  eventGradesLabel,
+  eventTimeLabel,
+  eventVenueLabel,
   EXTERNAL_COMPETITION_LABEL,
-  gradesLabel,
+  isDateOnly,
   isExternalCompetition,
   isPast,
   registrationState,
@@ -76,7 +81,8 @@ export function EventDetailPage() {
   }
 
   const start = toMillis(event.start);
-  const end = toMillis(event.end);
+  // Only the date is announced: the other facts read "Đang cập nhật" (SchoolEvent.dateOnly).
+  const dateOnly = isDateOnly(event);
   const deadline = toMillis(event.registrationDeadline);
   const daysLeft = deadlineDaysLeft(event, now);
   const seats = seatsLeft(event, state.registrations);
@@ -120,8 +126,12 @@ export function EventDetailPage() {
         title={event.title}
         lead={
           <>
-            <MonoTime dateTime={event.start}>{formatLongDate(start)}</MonoTime> · <MonoTime dateTime={event.start}>{formatTimeRange(start, end)}</MonoTime> ·{' '}
-            {event.format === 'online' ? 'Trực tuyến' : event.location}
+            <MonoTime dateTime={event.start}>{formatLongDate(start)}</MonoTime> ·{' '}
+            {dateOnly ? `Thời gian và địa điểm: ${DETAILS_PENDING.toLocaleLowerCase('vi')}` : (
+              <>
+                <MonoTime dateTime={event.start}>{eventTimeLabel(event)}</MonoTime> · {eventVenueLabel(event)}
+              </>
+            )}
           </>
         }
       >
@@ -177,8 +187,7 @@ export function EventDetailPage() {
                 <ul>
                   {info.conflicts.map((c) => (
                     <li key={c.id}>
-                      <Link to={`/su-kien/${c.slug}`}>{c.title}</Link> ({formatDayLabel(toMillis(c.start))},{' '}
-                      {formatTimeRange(toMillis(c.start), toMillis(c.end))})
+                      <Link to={`/su-kien/${c.slug}`}>{c.title}</Link> ({formatDayLabel(toMillis(c.start))}, {eventTimeLabel(c)})
                     </li>
                   ))}
                 </ul>
@@ -214,16 +223,16 @@ export function EventDetailPage() {
                 <dd>
                   <MonoTime dateTime={event.start}>{formatLongDate(start)}</MonoTime>
                   <br />
-                  <MonoTime dateTime={event.start}>{formatTimeRange(start, end)}</MonoTime>
+                  {dateOnly ? <span>Giờ tổ chức: {DETAILS_PENDING.toLocaleLowerCase('vi')}</span> : <MonoTime dateTime={event.start}>{eventTimeLabel(event)}</MonoTime>}
                 </dd>
               </div>
               <div>
                 <dt>Địa điểm</dt>
-                <dd>{event.location}</dd>
+                <dd>{dateOnly ? DETAILS_PENDING : event.location}</dd>
               </div>
               <div>
                 <dt>Hình thức</dt>
-                <dd>{event.format === 'online' ? 'Trực tuyến' : 'Trực tiếp'}</dd>
+                <dd>{eventFormatLabel(event)}</dd>
               </div>
               <div>
                 <dt>Lĩnh vực</dt>
@@ -243,24 +252,32 @@ export function EventDetailPage() {
               </div>
               <div>
                 <dt>Khối được phép tham gia</dt>
-                <dd>{gradesLabel(event.eligibleGrades)}</dd>
+                <dd>{eventGradesLabel(event)}</dd>
               </div>
               <div>
                 <dt>Số chỗ còn lại</dt>
-                <dd>
-                  <span className="mono">{seats}</span> / <span className="mono">{event.capacity}</span>
-                  {seats > 0 && seats <= 5 ? <StatusTag tone="warn">Còn ít chỗ</StatusTag> : null}
-                  {seats === 0 ? <StatusTag tone="stop">Hết chỗ</StatusTag> : null}
-                </dd>
+                {dateOnly ? (
+                  <dd>{DETAILS_PENDING}</dd>
+                ) : (
+                  <dd>
+                    <span className="mono">{seats}</span> / <span className="mono">{event.capacity}</span>
+                    {seats > 0 && seats <= 5 ? <StatusTag tone="warn">Còn ít chỗ</StatusTag> : null}
+                    {seats === 0 ? <StatusTag tone="stop">Hết chỗ</StatusTag> : null}
+                  </dd>
+                )}
               </div>
               <div>
                 <dt>Hạn đăng ký</dt>
-                <dd>
-                  <MonoTime dateTime={event.registrationDeadline}>
-                    {formatDate(deadline)} · {formatTime(deadline)}
-                  </MonoTime>{' '}
-                  ({deadlineNote})
-                </dd>
+                {dateOnly ? (
+                  <dd>{DETAILS_PENDING} (chưa mở đăng ký)</dd>
+                ) : (
+                  <dd>
+                    <MonoTime dateTime={event.registrationDeadline}>
+                      {formatDate(deadline)} · {formatTime(deadline)}
+                    </MonoTime>{' '}
+                    ({deadlineNote})
+                  </dd>
+                )}
               </div>
             </dl>
             <DemoLabel />

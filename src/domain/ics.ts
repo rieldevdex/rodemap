@@ -5,7 +5,7 @@
  */
 import { CATEGORY_LABELS } from './category-labels';
 import { TIME_ZONE, VN_OFFSET_MS, toIsoDate } from './dates';
-import { eventEnd, eventStart, isExternalCompetition, sortByStart } from './events';
+import { eventEnd, eventStart, isDateOnly, isExternalCompetition, sortByStart } from './events';
 import type { Club, Millis, SchoolEvent } from './types';
 
 export const ICS_PRODID = '-//vsmcclubs//Ban trinh dien//VI';
@@ -31,6 +31,11 @@ function compactIso(iso: string): string {
 /** Vietnam wall-clock time "20261014T164500", for TZID-qualified values. */
 export function icsLocalDateTime(ms: Millis): string {
   return compactIso(new Date(ms + VN_OFFSET_MS).toISOString());
+}
+
+/** Vietnam calendar date "20261014", for all-day (VALUE=DATE) values. */
+export function icsLocalDate(ms: Millis): string {
+  return icsLocalDateTime(ms).slice(0, 8);
 }
 
 /** UTC time "20261014T094500Z". */
@@ -104,8 +109,10 @@ function eventLines(e: SchoolEvent, stamp: string, opts: IcsOptions): string[] {
     'BEGIN:VEVENT',
     `UID:${e.id}@${ICS_UID_DOMAIN}`,
     `DTSTAMP:${stamp}`,
-    `DTSTART;TZID=${TIME_ZONE}:${icsLocalDateTime(eventStart(e))}`,
-    `DTEND;TZID=${TIME_ZONE}:${icsLocalDateTime(eventEnd(e))}`,
+    // A date-only event is an all-day entry: the time has not been announced.
+    ...(isDateOnly(e)
+      ? [`DTSTART;VALUE=DATE:${icsLocalDate(eventStart(e))}`, `DTEND;VALUE=DATE:${icsLocalDate(eventEnd(e))}`]
+      : [`DTSTART;TZID=${TIME_ZONE}:${icsLocalDateTime(eventStart(e))}`, `DTEND;TZID=${TIME_ZONE}:${icsLocalDateTime(eventEnd(e))}`]),
     `SUMMARY:${escapeText(e.title)}`,
   ];
   if (e.location.trim() !== '') lines.push(`LOCATION:${escapeText(e.location)}`);
