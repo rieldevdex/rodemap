@@ -1,7 +1,6 @@
 import { AnimatePresence, MotionConfig, motion } from 'framer-motion';
 import { useRef } from 'react';
 import { Button } from '../components/atoms/Button';
-import { DemoLabel } from '../components/atoms/DemoLabel';
 import { MonoTime } from '../components/atoms/MonoTime';
 import { StatusTag } from '../components/atoms/StatusTag';
 import { useListAccelerators } from '../components/keyboard';
@@ -49,7 +48,6 @@ export function GuestDashboard() {
           <Button to={setupHref} variant="primary" iconEnd="arrow-right">
             Thiết lập hồ sơ
           </Button>
-          <DemoLabel />
         </div>
       </PageHead>
 

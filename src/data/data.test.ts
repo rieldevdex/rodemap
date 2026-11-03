@@ -1,33 +1,34 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { addDays, formatDate, formatTime, isoWeekKey, overlaps, SCHOOL_YEAR, toMillis, vnParts } from '../domain/dates';
 import { AFTER_SCHOOL_MINUTE, eventEnd, eventHours, eventStart, isExternalCompetition, isOpenToAll } from '../domain/events';
 import { charCount, validateDraft } from '../domain/moderation';
 import { NEWS_LIMITS, newsBodyText, publishedPosts, RESERVED_NEWS_SLUGS } from '../domain/news';
-import { hasContactDetails, responseError, validateActivityDraft } from '../domain/proposals';
 import { CATEGORY_CODES, GRADES, NEWS_CATEGORIES, type ClubLinkKind, type NewsPost, type SchoolEvent } from '../domain/types';
-import { PERIODS } from './calendar';
 import { CATEGORIES, categoryByCode } from './categories';
 import { CLUBS } from './clubs';
-import { EVENTS } from './events';
 import { GOALS } from './goals';
-import { NEWS, NEWS_DEPARTMENTS } from './news';
-import { ACTIVITY_PROPOSALS, COLLABORATIONS, PROPOSAL_RESPONSES } from './proposals';
 import { SCHOOL } from './school';
-import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS } from './seed';
+import { SAMPLE_EVENTS, SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS } from '../testing/sample-data';
 import { TAGS, tagLabel } from './tags';
+
+// The official data itself, without the test-only sample content merged in by src/testing/setup.ts.
+const { PERIODS } = await vi.importActual<typeof import('./calendar')>('./calendar');
+const { EVENTS } = await vi.importActual<typeof import('./events')>('./events');
+const { NEWS, NEWS_DEPARTMENTS } = await vi.importActual<typeof import('./news')>('./news');
+const { ACTIVITY_PROPOSALS, COLLABORATIONS, PROPOSAL_RESPONSES } = await vi.importActual<typeof import('./proposals')>('./proposals');
 
 const ms = toMillis;
 /** "Today" in the demo (DEMO_TODAY in tests/support/app.ts). */
 const DEMO_TODAY = ms('2026-10-07');
 const ISO_DATE_TIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:00\+07:00$/;
-const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const HEADER = '// Dữ liệu minh họa phục vụ bản trình diễn. Thay thế bằng dữ liệu chính thức khi triển khai.';
+const HEADER = '// Dữ liệu chính thức của vsmcclubs. Cập nhật theo hướng dẫn tại README, mục 5.';
 
 const approved = EVENTS.filter((e) => e.status === 'approved');
 const dateOnly = EVENTS.filter((e) => e.dateOnly === true);
 const DAY = 24 * 60 * 60 * 1000;
-const eventById = new Map(EVENTS.map((e) => [e.id, e]));
+/** Site events plus the test-only sample events the sample student registered for. */
+const eventById = new Map([...EVENTS, ...SAMPLE_EVENTS].map((e) => [e.id, e]));
 const clubById = new Map(CLUBS.map((c) => [c.id, c]));
 const tagIds = new Set(TAGS.map((t) => t.id));
 
@@ -99,9 +100,9 @@ function copyViolations(text: string): string[] {
 describe('data files', () => {
   const sources = import.meta.glob<string>(['./*.ts', '!./*.test.ts'], { query: '?raw', import: 'default', eager: true });
 
-  it('every data file starts with the illustrative comment', () => {
+  it('every data file starts with the data comment', () => {
     expect(Object.keys(sources).sort()).toEqual(
-      ['calendar', 'categories', 'clubs', 'events', 'goals', 'news', 'proposals', 'school', 'seed', 'tags'].map((n) => `./${n}.ts`),
+      ['calendar', 'categories', 'clubs', 'events', 'goals', 'news', 'proposals', 'school', 'tags'].map((n) => `./${n}.ts`),
     );
     for (const [file, source] of Object.entries(sources)) {
       expect(source.startsWith(`${HEADER}\n`), file).toBe(true);
@@ -335,51 +336,17 @@ describe('clubs', () => {
 });
 
 describe('calendar periods', () => {
-  it('lists the four exam periods and the Tết holiday', () => {
-    expect(PERIODS.map((p) => [p.kind, p.label, p.start, p.end])).toEqual([
-      ['exam', 'Kiểm tra định kỳ giữa học kỳ I', '2026-11-02', '2026-11-07'],
-      ['exam', 'Kiểm tra định kỳ cuối học kỳ I', '2026-12-21', '2027-01-02'],
-      ['holiday', 'Nghỉ Tết Nguyên đán', '2027-02-01', '2027-02-14'],
-      ['exam', 'Kiểm tra định kỳ giữa học kỳ II', '2027-03-15', '2027-03-20'],
-      ['exam', 'Kiểm tra định kỳ cuối học kỳ II', '2027-04-26', '2027-05-08'],
-    ]);
-    expect(isUnique(PERIODS.map((p) => p.id))).toBe(true);
-    for (const p of PERIODS) {
-      expect(p.start, p.id).toMatch(ISO_DATE);
-      expect(p.end, p.id).toMatch(ISO_DATE);
-      expect(ms(p.start) <= ms(p.end), p.id).toBe(true);
-      expect(ms(p.start) >= ms(SCHOOL_YEAR.start) && ms(p.end) <= ms(SCHOOL_YEAR.end), p.id).toBe(true);
-    }
+  it('is empty until the school publishes its calendar (no invented exam or holiday dates)', () => {
+    expect(PERIODS).toEqual([]);
   });
 });
 
 describe('events: shape and integrity', () => {
-  it('has 6 school-wide events, 4 external competitions and 2 club events announced by date only, all approved', () => {
-    expect(EVENTS).toHaveLength(12);
-    expect(approved).toHaveLength(12);
-    expect(EVENTS.filter((e) => e.clubId === 'hdhs')).toHaveLength(6);
-    expect(EVENTS.filter((e) => isExternalCompetition(e))).toHaveLength(4);
+  it('holds only the events the real clubs announced (2, by date only, approved)', () => {
+    expect(EVENTS.map((e) => e.id)).toEqual(['ev-055', 'ev-056']);
+    expect(approved).toHaveLength(2);
     expect(dateOnly).toHaveLength(2);
-  });
-
-  it('keeps the ids of the remaining events (each run chronological) and uses unique ASCII slugs', () => {
-    expect(EVENTS.map((e) => e.id)).toEqual([
-      'ev-001', 'ev-003', 'ev-027', 'ev-035', 'ev-040', 'ev-045',
-      'ev-051', 'ev-052', 'ev-053', 'ev-054',
-      'ev-055', 'ev-056',
-    ]);
-    const council = EVENTS.slice(0, 6);
-    const external = EVENTS.slice(6, 10);
-    const clubs = EVENTS.slice(10);
-    expect(council.every((e) => e.clubId === 'hdhs' && e.category === 'TS')).toBe(true);
-    expect(external.every((e) => isExternalCompetition(e))).toBe(true);
-    expect(clubs.every((e) => clubById.get(e.clubId)?.kind === 'club' && e.dateOnly === true)).toBe(true);
-    for (const run of [council, external, clubs]) {
-      run.slice(1).forEach((e, i) => {
-        const prev = run[i]!;
-        expect(eventStart(prev) <= eventStart(e), `${prev.id} before ${e.id}`).toBe(true);
-      });
-    }
+    expect(EVENTS.filter((e) => isExternalCompetition(e))).toHaveLength(0);
     expect(isUnique(EVENTS.map((e) => e.slug))).toBe(true);
     for (const e of EVENTS) {
       expect(e.slug, e.id).toMatch(SLUG);
@@ -470,17 +437,6 @@ describe('events: shape and integrity', () => {
     for (const e of approved.filter((ev) => ev.format === 'online')) expect(e.location, e.id).toMatch(/^Trực tuyến – /u);
     for (const e of EVENTS.filter((ev) => ev.format === 'in_person')) expect(e.location, e.id).not.toMatch(/Trực tuyến/u);
   });
-
-  it('includes the school-wide milestones organised by HĐHS', () => {
-    const ts = approved.filter((e) => e.category === 'TS');
-    const opening = ts.find((e) => e.title.startsWith('Lễ khai giảng'));
-    expect(opening?.start).toBe('2026-09-05T07:00:00+07:00');
-    expect(opening?.end).toBe('2026-09-05T09:30:00+07:00');
-    expect(ts.some((e) => e.title.startsWith('Ngày hội Câu lạc bộ'))).toBe(true);
-    expect(ts.some((e) => e.title.startsWith('Hội trại truyền thống') && e.start.startsWith('2027-03-26'))).toBe(true);
-    expect(ts.some((e) => e.title.startsWith('Lễ tri ân và trưởng thành') && e.start.startsWith('2027-05'))).toBe(true);
-    for (const e of ts) expect(isOpenToAll(e.eligibleGrades) || e.eligibleGrades.every((g) => g >= 10), e.id).toBe(true);
-  });
 });
 
 describe('events: announced by the real clubs', () => {
@@ -507,15 +463,16 @@ describe('events: announced by the real clubs', () => {
   });
 });
 
-describe('events: external academic competitions', () => {
-  const external = EVENTS.filter((e) => isExternalCompetition(e));
+describe('sample external academic competitions (tests only)', () => {
+  const external = SAMPLE_EVENTS.filter((e) => isExternalCompetition(e));
   const office = clubById.get('co-van-hoc-tap');
 
   it('are published only by Phòng Cố vấn Học tập, and every event it publishes names its organiser', () => {
     expect(external.length).toBeGreaterThanOrEqual(3);
     for (const e of external) expect(clubById.get(e.clubId)?.kind, e.id).toBe('office');
-    for (const e of EVENTS.filter((ev) => ev.clubId === office?.id)) expect(isExternalCompetition(e), e.id).toBe(true);
-    for (const e of EVENTS.filter((ev) => clubById.get(ev.clubId)?.kind !== 'office')) expect(e.organizer, e.id).toBeUndefined();
+    const all = [...EVENTS, ...SAMPLE_EVENTS];
+    for (const e of all.filter((ev) => ev.clubId === office?.id)) expect(isExternalCompetition(e), e.id).toBe(true);
+    for (const e of all.filter((ev) => clubById.get(ev.clubId)?.kind !== 'office')) expect(e.organizer, e.id).toBeUndefined();
   });
 
   it('are approved, upcoming on the demo date and spread from October 2026 to March 2027', () => {
@@ -659,8 +616,8 @@ describe('news', () => {
   const VISIBLE_AT = ms('2026-10-07T09:00:00+07:00');
   const ASCII_SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-  it('has 6 articles with ids bt-NNN in chronological order of publication (the ids of removed articles are not reused)', () => {
-    expect(ids(NEWS)).toEqual(['bt-001', 'bt-002', 'bt-003', 'bt-004', 'bt-005', 'bt-010']);
+  it('keeps the two how-to guides, in chronological order of publication (the ids of removed articles are not reused)', () => {
+    expect(ids(NEWS)).toEqual(['bt-003', 'bt-010']);
     for (const p of NEWS) expect(p.publishedAt, p.id).toMatch(ISO_DATE_TIME);
     NEWS.slice(1).forEach((p, i) => {
       const prev = NEWS[i]!;
@@ -677,14 +634,13 @@ describe('news', () => {
     }
   });
 
-  it('is signed by a council department and covers announcements, activities and guides', () => {
+  it('is signed by a council department; only guides remain, describing features that exist', () => {
     for (const p of NEWS) {
       expect(departments, p.id).toContain(p.author);
       expect(NEWS_CATEGORIES, p.id).toContain(p.category);
+      expect(p.category, p.id).toBe('guide');
+      expect(p.eventIds, p.id).toEqual([]);
     }
-    for (const c of NEWS_CATEGORIES.filter((x) => x !== 'club')) expect(NEWS.some((p) => p.category === c), c).toBe(true);
-    // Club introductions are written once the real clubs provide their content.
-    expect(NEWS.filter((p) => p.category === 'club')).toEqual([]);
   });
 
   it('keeps title, summary and body within NEWS_LIMITS, with 150–450 words and at most one quote', () => {
@@ -796,45 +752,9 @@ describe('news', () => {
 });
 
 describe('proposals', () => {
-  const clubIds = new Set(CLUBS.map((c) => c.id));
-  const all = [...ACTIVITY_PROPOSALS, ...COLLABORATIONS];
-
-  it('uses unique, patterned ids', () => {
-    expect(new Set(all.map((p) => p.id)).size).toBe(all.length);
-    for (const p of ACTIVITY_PROPOSALS) expect(p.id).toMatch(/^dx-\d{3}$/);
-    for (const p of COLLABORATIONS) expect(p.id).toMatch(/^ht-\d{3}$/);
-  });
-
-  it('holds valid, anonymous student proposals sent before the demo date', () => {
-    for (const p of ACTIVITY_PROPOSALS) {
-      expect(validateActivityDraft(p, clubIds), p.id).toEqual({});
-      expect(p.grades, p.id).toEqual([...new Set(p.grades)].sort((a, b) => a - b));
-      expect(GRADES.includes(p.authorGrade), p.id).toBe(true);
-      expect(p.supporters, p.id).toBeGreaterThanOrEqual(0);
-      expect(ms(p.submittedAt) < DEMO_TODAY && ms(p.submittedAt) >= ms(SCHOOL_YEAR.start), p.id).toBe(true);
-      expect(hasContactDetails(`${p.title} ${p.description}`), p.id).toBe(false);
-    }
-    // Every grade band is represented; no sample proposal names a club, since the clubs are real.
-    expect(ACTIVITY_PROPOSALS.some((p) => p.grades.every((g) => g <= 9))).toBe(true);
-    expect(ACTIVITY_PROPOSALS.every((p) => p.clubId === null)).toBe(true);
-  });
-
-  it('holds no collaboration: nothing is sent or answered in the name of a real club', () => {
+  it('holds no sample proposal, collaboration or answer: Đề xuất starts empty', () => {
+    expect(ACTIVITY_PROPOSALS).toEqual([]);
     expect(COLLABORATIONS).toEqual([]);
-  });
-
-  it('answers each proposal at most once, by the right party, after it was sent', () => {
-    for (const [id, r] of Object.entries(PROPOSAL_RESPONSES)) {
-      const activity = ACTIVITY_PROPOSALS.find((p) => p.id === id);
-      const collab = COLLABORATIONS.find((p) => p.id === id);
-      expect(activity ?? collab, id).toBeDefined();
-      expect(r.by, id).toBe(activity ? 'hdhs' : collab?.toClubId);
-      expect(responseError(r.status, r.note), id).toBeNull();
-      expect(ms(r.at) > ms((activity ?? collab)?.submittedAt ?? '') && ms(r.at) < DEMO_TODAY, id).toBe(true);
-      expect(r.assignedClubId, id).toBeNull();
-    }
-    const statuses = new Set(Object.values(PROPOSAL_RESPONSES).map((r) => r.status));
-    expect(statuses).toEqual(new Set(['accepted', 'declined']));
-    expect(ACTIVITY_PROPOSALS.filter((p) => PROPOSAL_RESPONSES[p.id] === undefined).length).toBeGreaterThanOrEqual(3);
+    expect(PROPOSAL_RESPONSES).toEqual({});
   });
 });

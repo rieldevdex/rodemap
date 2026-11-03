@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { NEWS } from '../data/news';
-import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS } from '../data/seed';
+import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS } from '../testing/sample-data';
 import { makeEvent, makePost, makeProfile, reg } from '../domain/test-fixtures';
 import type { PortfolioEntry, SchoolEvent, Submission } from '../domain/types';
 import type { Action } from './actions';
 import { effectiveStatus, reducer } from './reducer';
-import { createDemoState, createSeedState, type AppState } from './schema';
+import { createSeedState, type AppState } from './schema';
+import { createDemoState } from '../testing/sample-data';
 
 const AT = '2026-10-07T09:00:00+07:00';
 const LATER = '2026-10-08T10:30:00+07:00';

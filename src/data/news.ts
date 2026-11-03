@@ -1,109 +1,16 @@
-// Dữ liệu minh họa phục vụ bản trình diễn. Thay thế bằng dữ liệu chính thức khi triển khai.
+// Dữ liệu chính thức của vsmcclubs. Cập nhật theo hướng dẫn tại README, mục 5.
 import type { NewsPost } from '../domain/types';
 
 /** Council departments that sign articles (an article is signed by a department, never by a student). */
 export const NEWS_DEPARTMENTS = ['Ban Truyền thông', 'Ban Học tập', 'Ban Phong trào', 'Ban Tổ chức'] as const;
 
 /**
- * Articles of the Bản tin Hội đồng Học sinh, oldest first.
- * bt-001 … bt-005 are published between 03/09/2026 and 21/09/2026 (bt-003, the registration
- * guide, is pinned); bt-010 is scheduled for 19/10/2026 and stays hidden until then. The articles
- * about the former demo clubs and their events (bt-006 … bt-009) were removed on 03/11/2026 with
- * those clubs; their ids are not reused.
- * Facts about events quote src/data/events.ts; exam weeks quote src/data/calendar.ts.
+ * Articles of the Bản tin Hội đồng Học sinh, oldest first: the two how-to guides (bt-003, pinned, and
+ * bt-010, shown from 19/10/2026). The sample announcements and reports (bt-001, bt-002, bt-004 …
+ * bt-009) were removed on 03/11/2026; their ids are not reused. New articles are written in Soạn bài viết.
  */
 export const NEWS: NewsPost[] = [
   /* ── Số 1 · Tháng 9/2026 ──────────────────────────────────────────── */
-  {
-    id: 'bt-001',
-    slug: 'thong-bao-to-chuc-le-khai-giang-nam-hoc-2026-2027',
-    title: 'Thông báo tổ chức Lễ khai giảng năm học 2026–2027',
-    category: 'announcement',
-    author: 'Ban Tổ chức',
-    publishedAt: '2026-09-03T07:30:00+07:00',
-    summary:
-      'Hội đồng Học sinh thông báo kế hoạch tổ chức Lễ khai giảng năm học 2026–2027 vào Thứ Bảy, 05/09/2026, tại sân trường, dành cho học sinh toàn trường từ khối 6 đến khối 12.',
-    body: [
-      {
-        kind: 'paragraph',
-        text: 'Lễ khai giảng năm học 2026–2027 là sự kiện chính thức mở đầu năm học mới, dành cho toàn thể học sinh nhà trường. Tại buổi lễ, học sinh được phổ biến kế hoạch năm học và các nhiệm vụ trọng tâm, đồng thời tham dự lễ tuyên dương học sinh tiêu biểu.',
-      },
-      { kind: 'heading', text: 'Thông tin sự kiện' },
-      {
-        kind: 'list',
-        items: [
-          'Sự kiện: Lễ khai giảng năm học 2026–2027.',
-          'Thời gian: từ 07:00 đến 09:30, Thứ Bảy, 05/09/2026.',
-          'Địa điểm: Sân trường.',
-          'Đối tượng: học sinh toàn trường, từ khối 6 đến khối 12.',
-          'Đơn vị tổ chức: Hội đồng Học sinh.',
-          'Hạn đăng ký: 23:59, Thứ Năm, 03/09/2026.',
-        ],
-      },
-      { kind: 'heading', text: 'Nội dung chương trình' },
-      {
-        kind: 'paragraph',
-        text: 'Chương trình gồm nghi thức chào cờ, diễn văn khai giảng của Ban Giám hiệu, tuyên dương học sinh đạt thành tích xuất sắc năm học trước và phần văn nghệ chào mừng do các câu lạc bộ phụ trách.',
-      },
-      { kind: 'heading', text: 'Lưu ý đối với học sinh' },
-      {
-        kind: 'list',
-        items: [
-          'Có mặt tại sân trường trước 06:45 và tập trung theo vị trí của lớp.',
-          'Mặc đồng phục theo quy định.',
-          'Đăng ký trên vsmcclubs trong thời hạn nêu trên để buổi lễ được bổ sung vào Lộ trình và Lịch: tại trang sự kiện, chọn Đăng ký và nhấn Xác nhận.',
-        ],
-      },
-      {
-        kind: 'paragraph',
-        text: 'Kể từ số này, Bản tin Hội đồng Học sinh được phát hành hằng tháng tại mục Bản tin trên vsmcclubs nhằm cung cấp cho học sinh toàn trường các thông báo, tin hoạt động, bài giới thiệu câu lạc bộ và hướng dẫn sử dụng ứng dụng.',
-      },
-    ],
-    eventIds: ['ev-001'],
-    clubIds: ['hdhs'],
-  },
-  {
-    id: 'bt-002',
-    slug: 'nhin-lai-le-khai-giang-nam-hoc-2026-2027',
-    title: 'Nhìn lại Lễ khai giảng năm học 2026–2027',
-    category: 'activity',
-    author: 'Ban Truyền thông',
-    publishedAt: '2026-09-07T16:30:00+07:00',
-    summary:
-      'Sáng Thứ Bảy, 05/09/2026, Lễ khai giảng năm học 2026–2027 diễn ra tại sân trường, chính thức mở đầu năm học mới của học sinh toàn trường.',
-    body: [
-      {
-        kind: 'paragraph',
-        text: 'Sáng Thứ Bảy, 05/09/2026, từ 07:00 đến 09:30, Lễ khai giảng năm học 2026–2027 do Hội đồng Học sinh tổ chức đã diễn ra tại sân trường. Buổi lễ dành cho học sinh toàn trường, từ khối 6 đến khối 12, chính thức mở đầu năm học mới.',
-      },
-      { kind: 'heading', text: 'Chương trình buổi lễ' },
-      {
-        kind: 'list',
-        items: [
-          'Nghi thức chào cờ.',
-          'Diễn văn khai giảng của Ban Giám hiệu.',
-          'Tuyên dương học sinh đạt thành tích xuất sắc năm học trước.',
-          'Phần văn nghệ chào mừng do các câu lạc bộ phụ trách.',
-        ],
-      },
-      {
-        kind: 'paragraph',
-        text: 'Thông qua buổi lễ, học sinh được phổ biến kế hoạch năm học và các nhiệm vụ trọng tâm.',
-      },
-      {
-        kind: 'quote',
-        text: 'Hội đồng Học sinh trân trọng cảm ơn Ban Giám hiệu và các câu lạc bộ đã phối hợp thực hiện chương trình.',
-        source: 'Ban Tổ chức, Hội đồng Học sinh',
-      },
-      { kind: 'heading', text: 'Theo dõi các hoạt động tiếp theo' },
-      {
-        kind: 'paragraph',
-        text: 'Các sự kiện tiếp theo của năm học được Hội đồng Học sinh kiểm duyệt và công bố tại mục Khám phá trên vsmcclubs. Học sinh theo dõi thời gian, địa điểm và hạn đăng ký của từng sự kiện, qua đó chủ động sắp xếp hoạt động phù hợp với lịch học. Thông báo về các sự kiện toàn trường được đăng tải đồng thời trên Bản tin Hội đồng Học sinh.',
-      },
-    ],
-    eventIds: ['ev-001'],
-    clubIds: ['hdhs'],
-  },
   {
     id: 'bt-003',
     slug: 'huong-dan-dang-ky-su-kien-va-xuat-lich-hoat-dong',
@@ -158,93 +65,6 @@ export const NEWS: NewsPost[] = [
     eventIds: [],
     clubIds: [],
     pinned: true,
-  },
-  {
-    id: 'bt-004',
-    slug: 'thong-bao-to-chuc-ngay-hoi-cau-lac-bo-nam-hoc-2026-2027',
-    title: 'Thông báo tổ chức Ngày hội Câu lạc bộ năm học 2026–2027',
-    category: 'announcement',
-    author: 'Ban Tổ chức',
-    publishedAt: '2026-09-10T07:30:00+07:00',
-    summary:
-      'Ngày hội Câu lạc bộ năm học 2026–2027 diễn ra vào Thứ Bảy, 19/09/2026, tại Sân trường và Nhà thi đấu đa năng; hạn đăng ký trên vsmcclubs là 23:59, Thứ Năm, 17/09/2026.',
-    body: [
-      {
-        kind: 'paragraph',
-        text: 'Hội đồng Học sinh thông báo tổ chức Ngày hội Câu lạc bộ năm học 2026–2027 nhằm giới thiệu hoạt động của các câu lạc bộ tới học sinh toàn trường, đặc biệt là học sinh khối 6 và khối 10. Tại ngày hội, học sinh được tìm hiểu kế hoạch hoạt động, trao đổi trực tiếp với ban chủ nhiệm và đăng ký tham gia câu lạc bộ phù hợp.',
-      },
-      { kind: 'heading', text: 'Thông tin sự kiện' },
-      {
-        kind: 'list',
-        items: [
-          'Sự kiện: Ngày hội Câu lạc bộ năm học 2026–2027.',
-          'Thời gian: từ 07:30 đến 11:00, Thứ Bảy, 19/09/2026.',
-          'Địa điểm: Sân trường và Nhà thi đấu đa năng.',
-          'Đối tượng: học sinh toàn trường, từ khối 6 đến khối 12.',
-          'Đơn vị tổ chức: Hội đồng Học sinh.',
-          'Hạn đăng ký: 23:59, Thứ Năm, 17/09/2026.',
-        ],
-      },
-      { kind: 'heading', text: 'Nội dung ngày hội' },
-      {
-        kind: 'paragraph',
-        text: 'Mỗi câu lạc bộ bố trí một gian trưng bày giới thiệu thành tích, kế hoạch hoạt động năm học và tiêu chí tuyển thành viên. Hội đồng Học sinh phụ trách điều phối chương trình, đồng thời tổ chức phần trình diễn của các câu lạc bộ nghệ thuật và thể thao tại sân khấu chính.',
-      },
-      { kind: 'heading', text: 'Đề nghị đối với học sinh' },
-      {
-        kind: 'paragraph',
-        text: 'Trước ngày hội, học sinh tham khảo thông tin các câu lạc bộ tại mục Câu lạc bộ trên vsmcclubs, qua đó xác định câu lạc bộ phù hợp với lĩnh vực quan tâm. Học sinh đăng ký tham dự ngày hội tại trang sự kiện bằng cách chọn Đăng ký và nhấn Xác nhận trước thời hạn nêu trên.',
-      },
-      {
-        kind: 'quote',
-        text: 'Ngày hội là dịp để học sinh khối 6 và khối 10 tìm hiểu các câu lạc bộ và lựa chọn hoạt động phù hợp ngay từ đầu năm học.',
-        source: 'Ban Tổ chức, Hội đồng Học sinh',
-      },
-    ],
-    eventIds: ['ev-003'],
-    clubIds: ['hdhs'],
-  },
-  {
-    id: 'bt-005',
-    slug: 'ngay-hoi-cau-lac-bo-nam-hoc-2026-2027-da-dien-ra',
-    title: 'Ngày hội Câu lạc bộ năm học 2026–2027 đã diễn ra tại Sân trường và Nhà thi đấu đa năng',
-    category: 'activity',
-    author: 'Ban Phong trào',
-    publishedAt: '2026-09-21T16:30:00+07:00',
-    summary:
-      'Sáng Thứ Bảy, 19/09/2026, Ngày hội Câu lạc bộ năm học 2026–2027 diễn ra tại Sân trường và Nhà thi đấu đa năng, giới thiệu hoạt động của các câu lạc bộ tới học sinh toàn trường.',
-    body: [
-      {
-        kind: 'paragraph',
-        text: 'Sáng Thứ Bảy, 19/09/2026, từ 07:30 đến 11:00, Ngày hội Câu lạc bộ năm học 2026–2027 do Hội đồng Học sinh tổ chức đã diễn ra tại Sân trường và Nhà thi đấu đa năng. Ngày hội dành cho học sinh toàn trường, từ khối 6 đến khối 12, đặc biệt là học sinh khối 6 và khối 10.',
-      },
-      { kind: 'heading', text: 'Hoạt động tại ngày hội' },
-      {
-        kind: 'list',
-        items: [
-          'Các câu lạc bộ bố trí gian trưng bày giới thiệu thành tích, kế hoạch hoạt động năm học và tiêu chí tuyển thành viên.',
-          'Học sinh tìm hiểu kế hoạch hoạt động và trao đổi trực tiếp với ban chủ nhiệm các câu lạc bộ.',
-          'Học sinh đăng ký tham gia câu lạc bộ phù hợp.',
-          'Phần trình diễn của các câu lạc bộ nghệ thuật và thể thao được tổ chức tại sân khấu chính.',
-        ],
-      },
-      {
-        kind: 'paragraph',
-        text: 'Hội đồng Học sinh phụ trách điều phối chương trình, qua đó tạo điều kiện để học sinh tiếp cận hoạt động của các câu lạc bộ ngay từ đầu năm học.',
-      },
-      {
-        kind: 'quote',
-        text: 'Hội đồng Học sinh trân trọng cảm ơn ban chủ nhiệm và thành viên các câu lạc bộ đã phối hợp tổ chức ngày hội.',
-        source: 'Ban Phong trào, Hội đồng Học sinh',
-      },
-      { kind: 'heading', text: 'Tiếp tục tìm hiểu câu lạc bộ' },
-      {
-        kind: 'paragraph',
-        text: 'Học sinh chưa có điều kiện tham dự ngày hội có thể tra cứu thông tin của từng câu lạc bộ tại mục Câu lạc bộ trên vsmcclubs, gồm phần giới thiệu, sự kiện sắp diễn ra và sự kiện đã tổ chức. Trong các số tiếp theo, Bản tin Hội đồng Học sinh lần lượt giới thiệu hoạt động của các câu lạc bộ trong trường.',
-      },
-    ],
-    eventIds: ['ev-003'],
-    clubIds: ['hdhs'],
   },
   /* ── Số 2 · Tháng 10/2026 ─────────────────────────────────────────── */
   {

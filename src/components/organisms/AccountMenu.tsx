@@ -30,7 +30,7 @@ function demoDateLabel(date: IsoDate): string | null {
 type FocusTarget = 'confirm' | 'reset' | null;
 
 /**
- * "Tài khoản minh họa": the demo control panel (role, club, demo date, Mochi offline,
+ * "Tài khoản thử nghiệm": the demo control panel (role, club, demo date, Mochi offline,
  * clearing the data so the profile is set up again; colours and density live in Giao diện). A disclosure: Escape or a click outside closes it; Escape returns focus
  * to the button.
  */
@@ -144,7 +144,7 @@ export function AccountMenu() {
         onClick={toggle}
       >
         <Icon name="user" />
-        <VisuallyHidden>Tài khoản minh họa</VisuallyHidden>
+        <VisuallyHidden>Tài khoản thử nghiệm</VisuallyHidden>
         <Icon name="chevron-down" size="sm" className="account-menu__chevron" />
       </button>
 
@@ -152,7 +152,7 @@ export function AccountMenu() {
         <div id={panelId} className="account-menu__panel" role="group" aria-labelledby={titleId}>
           <div className="account-menu__head">
             <p className="account-menu__title" id={titleId}>
-              Tài khoản minh họa
+              Tài khoản thử nghiệm
             </p>
             <span className="account-menu__badge">Tính năng thử nghiệm</span>
           </div>
@@ -204,7 +204,7 @@ export function AccountMenu() {
 
           <div className="account-menu__section">
             <label className="account-menu__label" htmlFor={dateId}>
-              Ngày minh họa
+              Ngày hiển thị
             </label>
             <div className="account-menu__row">
               <input

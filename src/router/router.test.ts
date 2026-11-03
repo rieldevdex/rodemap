@@ -39,7 +39,7 @@ describe('ROUTES', () => {
       club: '/cau-lac-bo/:slug',
       clubPortal: '/cong-cau-lac-bo',
       moderation: '/kiem-duyet',
-      proposal: '/de-an',
+      about: '/gioi-thieu',
       ideas: '/de-xuat',
       news: '/ban-tin',
       newsCompose: '/ban-tin/soan-bai',
@@ -58,7 +58,10 @@ describe('matchRoute', () => {
     expect(matchRoute('/ho-so')).toEqual({ name: 'portfolio', params: {} });
     expect(matchRoute('/cong-cau-lac-bo')).toEqual({ name: 'clubPortal', params: {} });
     expect(matchRoute('/kiem-duyet')).toEqual({ name: 'moderation', params: {} });
-    expect(matchRoute('/de-an')).toEqual({ name: 'proposal', params: {} });
+    expect(matchRoute('/gioi-thieu')).toEqual({ name: 'about', params: {} });
+    // The old campaign page address still opens Giới thiệu.
+    expect(matchRoute('/de-an')).toEqual({ name: 'about', params: {} });
+    expect(matchRoute('/de-an/')).toEqual({ name: 'about', params: {} });
     expect(matchRoute('/thiet-lap')).toEqual({ name: 'onboarding', params: {} });
   });
 
@@ -78,7 +81,7 @@ describe('matchRoute', () => {
     expect(matchRoute('/tong-quan/')).toEqual({ name: 'dashboard', params: {} });
     expect(matchRoute('//kham-pha//')).toEqual({ name: 'explore', params: {} });
     expect(matchRoute('/kham-pha?q=tranh&linh-vuc=HT')).toEqual({ name: 'explore', params: {} });
-    expect(matchRoute('/de-an#ke-hoach')).toEqual({ name: 'proposal', params: {} });
+    expect(matchRoute('/gioi-thieu#ke-hoach')).toEqual({ name: 'about', params: {} });
     expect(matchRoute('')).toEqual({ name: 'home', params: {} });
   });
 
@@ -99,7 +102,7 @@ describe('pathFor', () => {
   it('builds static paths', () => {
     expect(pathFor('home')).toBe('/');
     expect(pathFor('dashboard')).toBe('/tong-quan');
-    expect(pathFor('proposal')).toBe('/de-an');
+    expect(pathFor('about')).toBe('/gioi-thieu');
     expect(pathFor('notFound')).toBe('/khong-tim-thay');
   });
 
@@ -151,7 +154,7 @@ describe('titles and path helpers', () => {
 
 describe('profile gate', () => {
   it('lets a visitor browse events and suggestions; personal and demo-role pages need a profile', () => {
-    expect([...PUBLIC_ROUTES].sort()).toEqual(['club', 'clubs', 'dashboard', 'event', 'explore', 'home', 'ideas', 'news', 'newsArticle', 'notFound', 'onboarding', 'proposal', 'route']);
+    expect([...PUBLIC_ROUTES].sort()).toEqual(['about', 'club', 'clubs', 'dashboard', 'event', 'explore', 'home', 'ideas', 'news', 'newsArticle', 'notFound', 'onboarding', 'route']);
     expect(ROUTES.filter((r) => requiresProfile(r.name)).map((r) => r.name)).toEqual(['calendar', 'portfolio', 'clubPortal', 'moderation', 'newsCompose']);
     for (const r of ROUTES) expect(requiresProfile(r.name), r.name).toBe(!PUBLIC_ROUTES.includes(r.name));
   });
@@ -165,7 +168,7 @@ describe('profile gate', () => {
     expect(returnPathAfterSetup('/kham-pha?linh-vuc=CN')).toBe('/kham-pha?linh-vuc=CN');
     expect(returnPathAfterSetup('/ban-tin/thong-bao')).toBe('/ban-tin/thong-bao');
     expect(returnPathAfterSetup('/lich')).toBe('/lich');
-    expect(returnPathAfterSetup('/de-an')).toBe('/de-an');
+    expect(returnPathAfterSetup('/gioi-thieu')).toBe('/gioi-thieu');
     expect(returnPathAfterSetup(null)).toBeNull();
     expect(returnPathAfterSetup('')).toBeNull();
     expect(returnPathAfterSetup('https://example.org/tong-quan')).toBeNull();

@@ -2,7 +2,7 @@
 
 vsmcclubs tổng hợp sự kiện của các câu lạc bộ vào một nền tảng duy nhất, phân loại theo lĩnh vực và sắp xếp trên dòng thời gian, đồng thời hỗ trợ học sinh xây dựng lộ trình cá nhân và hồ sơ năng lực. Trợ lý Mochi hỗ trợ học sinh lựa chọn sự kiện, đăng ký tham gia và sắp xếp lịch cá nhân.
 
-> **Dữ liệu.** Danh sách 20 câu lạc bộ là danh sách thật của Vinschool Smart City (cập nhật ngày 03/11/2026), cùng hai sự kiện các câu lạc bộ đã công bố ngày tổ chức. Sự kiện của Hội đồng Học sinh, cuộc thi ngoài trường, hồ sơ học sinh và bài viết Bản tin vẫn là dữ liệu minh họa phục vụ đề xuất tranh cử Hội đồng Học sinh nhiệm kỳ 2026–2027.
+> vsmcclubs do Hội đồng Học sinh Vinschool Smart City vận hành. Trang chỉ hiển thị dữ liệu chính thức: 20 câu lạc bộ theo danh sách của nhà trường (cập nhật ngày 03/11/2026), các sự kiện câu lạc bộ đã công bố và hai bài hướng dẫn của Bản tin. Dữ liệu mẫu dùng cho kiểm thử nằm riêng trong `src/testing/` và không bao giờ được đưa lên trang.
 
 ## 1. Yêu cầu
 
@@ -67,27 +67,29 @@ Trang được phục vụ tại **https://vsmcclubs.site**. Tên Worker, Edge F
 
 Ngoài ra, mỗi trình duyệt được gửi tối đa 40 yêu cầu và mỗi địa chỉ mạng tối đa 400 yêu cầu trong 10 phút, nhằm tránh gửi dồn dập mà không chặn cả lớp dùng chung mạng của trường. Tùy chọn: để giới hạn ngắn hạn này bền vững giữa các máy chủ của Worker, tạo một KV namespace và gắn với tên `MOCHI_RATE_LIMIT` (xem `wrangler.toml`). Khi Worker gọi Claude trực tiếp (secret `ANTHROPIC_API_KEY` trên Worker), chỉ có giới hạn ngắn hạn được áp dụng.
 
-## 4. Chuẩn bị trước Ngày bầu cử
+## 4. Trước một buổi giới thiệu vsmcclubs
 
 1. Mở trang đã triển khai trên máy dùng để trình chiếu **ít nhất một lần khi có kết nối mạng**: service worker lưu toàn bộ ứng dụng vào bộ nhớ đệm, nhờ đó các trang vẫn mở được khi mạng tại hội trường gián đoạn và Mochi tự động trả lời ở chế độ ngoại tuyến.
-2. Mở **Tài khoản minh họa** (góc trên bên phải) → **Xóa dữ liệu trên trình duyệt này** → **Xác nhận xóa** để đưa ứng dụng về trạng thái của người dùng mới (khách dùng thử, chưa có hồ sơ).
+2. Mở **Tài khoản thử nghiệm** (góc trên bên phải) → **Xóa dữ liệu trên trình duyệt này** → **Xác nhận xóa** để đưa ứng dụng về trạng thái của người dùng mới (khách dùng thử, chưa có hồ sơ).
 3. Tùy chọn trong cùng trình đơn:
-   - **Ngày minh họa**: cố định "hôm nay" (ví dụ ngày bầu cử) để bảng tin, hạn đăng ký và lộ trình hiển thị ổn định;
+   - **Ngày hiển thị**: cố định "hôm nay" (ví dụ ngày giới thiệu) để bảng tin, hạn đăng ký và lộ trình hiển thị ổn định;
    - **Chuyển Mochi sang chế độ ngoại tuyến**: Mochi sử dụng phản hồi chuẩn bị sẵn, không phụ thuộc mạng.
-4. Thực hiện thử luồng trình diễn: Trang chủ → Bắt đầu thiết lập lộ trình → hoàn tất bốn bước → nhận đề xuất của Mochi → Xác nhận đăng ký → kiểm tra sự kiện trên Lộ trình và Lịch của tôi → Xuất toàn bộ lịch.
+4. Thực hiện thử luồng chính: Trang chủ → Bắt đầu thiết lập lộ trình → hoàn tất bốn bước → nhận đề xuất của Mochi → Xác nhận đăng ký → kiểm tra sự kiện trên Lộ trình và Lịch của tôi → Xuất toàn bộ lịch.
 
-## 5. Thay dữ liệu minh họa bằng dữ liệu thật
+## 5. Cập nhật dữ liệu
 
-Dữ liệu nằm trong `src/data/` (mỗi tệp đều ghi chú là dữ liệu minh họa): `clubs.ts`, `events.ts`, `calendar.ts` (các đợt kiểm tra định kỳ, ngày nghỉ), `seed.ts` (hồ sơ học sinh minh họa, chỉ dùng cho kiểm thử và ảnh chụp màn hình), `school.ts` (tên trường: Vinschool Smart City), `news.ts` (các bài viết của Bản tin Hội đồng Học sinh; mỗi bài viết ký tên một ban, không ghi họ tên học sinh), `proposals.ts` (đề xuất hoạt động của học sinh, chỉ ghi khối của người gửi, không nêu tên câu lạc bộ; không có đề xuất hợp tác mẫu vì các câu lạc bộ là câu lạc bộ thật). Thông tin ứng cử viên (họ và tên, lớp, vị trí ứng tuyển, thông điệp tranh cử; hiển thị trên trang Đề án) và thời gian dự kiến của từng giai đoạn trên trang Đề án nằm trong `src/content/proposal.ts`. Sau khi thay, thực hiện `npm run check` để đảm bảo dữ liệu hợp lệ.
+Dữ liệu chính thức nằm trong `src/data/`: `clubs.ts`, `events.ts`, `calendar.ts` (các đợt kiểm tra định kỳ và ngày nghỉ; đang để trống cho tới khi nhà trường công bố lịch), `school.ts` (tên trường: Vinschool Smart City), `news.ts` (bài viết của Bản tin Hội đồng Học sinh, ký tên một ban, không ghi họ tên học sinh; hiện có hai bài hướng dẫn), `proposals.ts` (đề xuất mẫu: để trống). Nội dung trang **Giới thiệu** (`/gioi-thieu`; đường dẫn cũ `/de-an` vẫn mở trang này), gồm kế hoạch triển khai theo giai đoạn, nằm trong `src/content/about.ts`. Sau khi cập nhật, thực hiện `npm run check` để đảm bảo dữ liệu hợp lệ.
+
+Dữ liệu mẫu (sự kiện của Hội đồng Học sinh và Phòng Cố vấn Học tập, bài Bản tin, đề xuất, lịch kiểm tra và hồ sơ học sinh lớp 11) chỉ phục vụ kiểm thử: `src/testing/sample-content.ts`. Kiểm thử đơn vị nạp dữ liệu này qua `src/testing/setup.ts`; kiểm thử trình duyệt nạp sự kiện mẫu vào trình duyệt kiểm thử. Ứng dụng không nhập các tệp này.
 
 Đơn vị đăng tin và cuộc thi ngoài trường:
 
 - Mỗi mục trong `clubs.ts` có trường `kind`: `'club'` (câu lạc bộ), `'council'` (Hội đồng Học sinh, phụ trách sự kiện toàn trường) hoặc `'office'` (Phòng Cố vấn Học tập, mã `co-van-hoc-tap`). Danh sách câu lạc bộ và sự kiện của câu lạc bộ được tổng hợp từ Phòng Công tác Học sinh.
 - `clubs.ts` hiện chứa 20 câu lạc bộ thật theo danh sách của nhà trường. Mỗi câu lạc bộ chỉ ghi phần giới thiệu (viết lại theo văn phong hành chính, ngôi thứ ba), lĩnh vực, địa chỉ thư điện tử của câu lạc bộ (`email`) và trang mạng xã hội công khai (`links`: Facebook, Instagram, TikTok). Không ghi họ tên, lớp hay địa chỉ thư cá nhân của học sinh chủ trì và giáo viên cố vấn, cũng không ghi đường dẫn kế hoạch hoạt động nội bộ. Câu lạc bộ chưa gửi giới thiệu (SMC Enterprise, Vinschool Business) hiển thị "Thông tin giới thiệu câu lạc bộ đang được cập nhật."
 - Sự kiện mới chỉ có ngày tổ chức được ghi với `dateOnly: true`: `start` và `end` là 00:00 của ngày đó và 00:00 ngày hôm sau, `location` để trống, `capacity` bằng 0. vsmcclubs hiển thị "Đang cập nhật" cho giờ, địa điểm, hình thức, khối, số chỗ và hạn đăng ký, chưa mở đăng ký, không tính vào quỹ giờ, không báo trùng lịch và không đưa vào gợi ý của Mochi. Khi câu lạc bộ có đủ thông tin, bỏ `dateOnly` và điền đầy đủ các trường (hoặc câu lạc bộ gửi lại sự kiện qua Cổng câu lạc bộ). Hiện có hai sự kiện như vậy: Hội nghị SEIA khu vực mùa xuân 2027 (23/01/2027, Hanoi Vinschool SEIA) và Chung kết VBIS Innovation Challenge (30/01/2027, Young Business Creators).
-- Dữ liệu đã lưu trên trình duyệt trước ngày 03/11/2026 có thể trỏ tới câu lạc bộ và sự kiện minh họa cũ; khi tải trang, vsmcclubs tự bỏ các đăng ký, mục hồ sơ, bài gửi kiểm duyệt và đề xuất hợp tác liên quan đến các câu lạc bộ, sự kiện không còn tồn tại (`dropRetiredReferences` trong `src/state/schema.ts`).
-- Các cuộc thi học thuật ngoài trường (ví dụ cuộc thi do trường đại học tổ chức), trước đây đăng trên Google Site của Phòng Cố vấn Học tập, là các sự kiện trong `events.ts` có `clubId: 'co-van-hoc-tap'` và trường `organizer` ghi đơn vị tổ chức bên ngoài. vsmcclubs hiển thị nhãn "Cuộc thi ngoài trường", đơn vị tổ chức và nguồn thông tin là Phòng Cố vấn Học tập; sau khi học sinh đăng ký trên vsmcclubs, Phòng tổng hợp danh sách và hướng dẫn các bước nộp hồ sơ theo quy định của đơn vị tổ chức. Dữ liệu minh họa chỉ dùng tên đơn vị chung (ví dụ "Trường đại học đối tác").
-- Phòng Cố vấn Học tập tự cập nhật cuộc thi qua **Cổng câu lạc bộ** (Tài khoản minh họa → vai trò **Câu lạc bộ** → **Đơn vị đại diện**: Phòng Cố vấn Học tập); biểu mẫu khi đó có thêm trường bắt buộc **Đơn vị tổ chức**. Chỉ các câu lạc bộ (`kind: 'club'`) tham gia trang Đề xuất (câu lạc bộ phù hợp, câu lạc bộ đối tác).
+- Dữ liệu đã lưu trên trình duyệt trước ngày 03/11/2026 có thể trỏ tới câu lạc bộ và sự kiện mẫu cũ; khi tải trang, vsmcclubs tự bỏ các đăng ký, mục hồ sơ, bài gửi kiểm duyệt và đề xuất hợp tác liên quan đến các câu lạc bộ, sự kiện không còn tồn tại (`dropRetiredReferences` trong `src/state/schema.ts`).
+- Các cuộc thi học thuật ngoài trường (ví dụ cuộc thi do trường đại học tổ chức), trước đây đăng trên Google Site của Phòng Cố vấn Học tập, là các sự kiện trong `events.ts` có `clubId: 'co-van-hoc-tap'` và trường `organizer` ghi đơn vị tổ chức bên ngoài. vsmcclubs hiển thị nhãn "Cuộc thi ngoài trường", đơn vị tổ chức và nguồn thông tin là Phòng Cố vấn Học tập; sau khi học sinh đăng ký trên vsmcclubs, Phòng tổng hợp danh sách và hướng dẫn các bước nộp hồ sơ theo quy định của đơn vị tổ chức. Hiện chưa có cuộc thi nào được đăng.
+- Phòng Cố vấn Học tập tự cập nhật cuộc thi qua **Cổng câu lạc bộ** (Tài khoản thử nghiệm → vai trò **Câu lạc bộ** → **Đơn vị đại diện**: Phòng Cố vấn Học tập); biểu mẫu khi đó có thêm trường bắt buộc **Đơn vị tổ chức**. Chỉ các câu lạc bộ (`kind: 'club'`) tham gia trang Đề xuất (câu lạc bộ phù hợp, câu lạc bộ đối tác).
 
 ## 6. Hồ sơ học sinh và khối lớp
 
@@ -99,17 +101,17 @@ Nút **Giao diện** (biểu tượng bảng màu trên thanh tiêu đề) cho p
 
 ## 7. Bản tin Hội đồng Học sinh
 
-Trang **Bản tin** (`/ban-tin`) trình bày các bài viết của Hội đồng Học sinh theo từng số hằng tháng. Để đăng bài trong bản trình diễn: mở **Tài khoản minh họa** → chọn vai trò **HĐHS** → **Bản tin** → **Soạn bài viết**. Bài viết được hiển thị ngay sau khi nhấn **Đăng bài**, đồng thời xuất hiện tại trang Tổng quan, trang của các sự kiện được liên kết và trang của câu lạc bộ tổ chức các sự kiện đó. Mochi có thể giới thiệu bài viết khi học sinh hỏi về thông báo mới. Bài viết đăng trong bản trình diễn được lưu trên trình duyệt, luôn hiển thị dù ngày minh họa được đặt là ngày nào, và có thể gỡ bằng nút **Gỡ bài viết**.
+Trang **Bản tin** (`/ban-tin`) trình bày các bài viết của Hội đồng Học sinh theo từng số hằng tháng. Để đăng bài: mở **Tài khoản thử nghiệm** → chọn vai trò **HĐHS** → **Bản tin** → **Soạn bài viết**. Bài viết được hiển thị ngay sau khi nhấn **Đăng bài**, đồng thời xuất hiện tại trang Tổng quan, trang của các sự kiện được liên kết và trang của câu lạc bộ tổ chức các sự kiện đó. Mochi có thể giới thiệu bài viết khi học sinh hỏi về thông báo mới. Ở phiên bản hiện tại, bài viết được lưu trên trình duyệt đã đăng (chưa có cơ sở dữ liệu dùng chung), luôn hiển thị dù ngày hiển thị được đặt là ngày nào, và có thể gỡ bằng nút **Gỡ bài viết**.
 
 ## 8. Đề xuất hoạt động và đề xuất hợp tác
 
-Trang **Đề xuất** (`/de-xuat`) thay đổi theo vai trò trong **Tài khoản minh họa**:
+Trang **Đề xuất** (`/de-xuat`) thay đổi theo vai trò trong **Tài khoản thử nghiệm**:
 
 - **Học sinh** gửi đề xuất hoạt động hoặc sự kiện tới Hội đồng Học sinh (tên hoạt động, lĩnh vực, khối dự kiến tham gia, câu lạc bộ phù hợp nếu có, nội dung). Đề xuất chỉ hiển thị khối của người gửi, không ghi họ tên; biểu mẫu từ chối nội dung có số điện thoại hoặc địa chỉ thư điện tử. Học sinh có thể ủng hộ đề xuất của học sinh khác, lọc theo trạng thái và rút đề xuất của mình khi chưa được phản hồi.
 - **HĐHS** xem xét đề xuất của học sinh: **Tiếp nhận** (có thể giao câu lạc bộ phụ trách) hoặc **Không tiếp nhận** (bắt buộc nêu lý do). Trang Kiểm duyệt hiển thị số đề xuất đang chờ xem xét.
 - **Câu lạc bộ** gửi **đề xuất hợp tác** tới câu lạc bộ khác (câu lạc bộ đối tác, tháng dự kiến, nội dung và phân công), đồng ý hoặc từ chối đề xuất nhận được (bắt buộc nêu lý do khi từ chối), và theo dõi đề xuất của học sinh nêu tên hoặc được giao cho câu lạc bộ. Sau khi hai bên thống nhất, câu lạc bộ chủ trì gửi sự kiện qua Cổng câu lạc bộ để Hội đồng Học sinh kiểm duyệt.
 
-Đề xuất và phản hồi trong bản trình diễn được lưu trên trình duyệt; thanh điều hướng hiển thị mục **Đề xuất** với vai trò Học sinh, còn với vai trò Câu lạc bộ hoặc HĐHS trang được mở từ Cổng CLB hoặc Kiểm duyệt.
+Ở phiên bản hiện tại, đề xuất và phản hồi được lưu trên trình duyệt (chưa có cơ sở dữ liệu dùng chung); thanh điều hướng hiển thị mục **Đề xuất** với vai trò Học sinh, còn với vai trò Câu lạc bộ hoặc HĐHS trang được mở từ Cổng CLB hoặc Kiểm duyệt.
 
 ## 9. Cấu trúc mã nguồn
 

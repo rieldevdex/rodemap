@@ -5,11 +5,11 @@
 import type { CategoryCode } from '../domain/types';
 
 export const HERO = {
-  eyebrow: 'Đề xuất tranh cử Hội đồng Học sinh nhiệm kỳ 2026–2027',
+  eyebrow: 'Hội đồng Học sinh Vinschool Smart City · Năm học 2026–2027',
   headline: 'Toàn bộ hoạt động ngoại khóa trên một lộ trình thống nhất.',
   /** The one line under the headline in Gọn and Tối giản (DESIGN.md §10); Đầy đủ shows SOLUTION. */
   short: 'Mọi sự kiện ngoại khóa của trường trên một bản đồ.',
-  secondaryCta: 'Xem đề án',
+  secondaryCta: 'Giới thiệu vsmcclubs',
   /** Visitors can look around before setting up a profile (DESIGN.md §7.2). */
   tryCta: 'Dùng thử vsmcclubs',
   setupCta: 'Thiết lập hồ sơ',
@@ -94,7 +94,7 @@ export const PARTICIPATION: ParticipantStep[] = [
   },
 ];
 
-/** Đoạn hội thoại minh họa trên Trang chủ; phản hồi của Mochi được sinh từ dữ liệu minh họa ở chế độ ngoại tuyến. */
+/** Đoạn trao đổi mẫu trên Trang chủ; phản hồi của Mochi được tạo từ dữ liệu hiện có ở chế độ ngoại tuyến. */
 export const DEMO_QUESTION = 'Mochi gợi ý cho mình một vài sự kiện phù hợp trong tuần tới nhé.';
 
 export const CLOSING = {

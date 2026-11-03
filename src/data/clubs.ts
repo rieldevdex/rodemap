@@ -1,4 +1,4 @@
-// Dữ liệu minh họa phục vụ bản trình diễn. Thay thế bằng dữ liệu chính thức khi triển khai.
+// Dữ liệu chính thức của vsmcclubs. Cập nhật theo hướng dẫn tại README, mục 5.
 // Danh sách câu lạc bộ theo danh sách chính thức của nhà trường (cập nhật ngày 03/11/2026).
 import type { Club } from '../domain/types';
 

@@ -1,7 +1,6 @@
 /** Persisted application state: shape, seed and versioned migration. Pure. */
 import { CLUBS } from '../data/clubs';
 import { EVENTS } from '../data/events';
-import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS } from '../data/seed';
 import { APPEARANCE_MODES, INTERACTIVITY_LEVELS, TEXT_DENSITIES } from '../domain/types';
 import type {
   ActivityProposal,
@@ -94,16 +93,6 @@ export function createSeedState(): AppState {
     interactivity: 'medium',
     demoToday: null,
     mochiForcedOffline: false,
-  };
-}
-
-/** The illustrative grade 11 student (profile, registrations, portfolio) used by tests and screenshots. */
-export function createDemoState(): AppState {
-  return {
-    ...createSeedState(),
-    profile: structuredClone(SEED_PROFILE),
-    registrations: structuredClone(SEED_REGISTRATIONS),
-    portfolio: structuredClone(SEED_PORTFOLIO),
   };
 }
 

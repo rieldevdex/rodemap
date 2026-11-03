@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS } from '../data/seed';
+import { SEED_PORTFOLIO, SEED_PROFILE, SEED_REGISTRATIONS } from '../testing/sample-data';
 import { makeEvent } from '../domain/test-fixtures';
-import { createDemoState, createSeedState, DEFAULT_CLUB_ID, dropRetiredReferences, isAppStateV1, migrate, STATE_VERSION, STORAGE_KEY } from './schema';
+import { createSeedState, DEFAULT_CLUB_ID, dropRetiredReferences, isAppStateV1, migrate, STATE_VERSION, STORAGE_KEY } from './schema';
+import { createDemoState } from '../testing/sample-data';
 
 describe('constants', () => {
   it('pins the storage key, version and default club', () => {

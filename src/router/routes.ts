@@ -13,7 +13,7 @@ export type RouteName =
   | 'club'
   | 'clubPortal'
   | 'moderation'
-  | 'proposal'
+  | 'about'
   | 'ideas'
   | 'news'
   | 'newsCompose'
@@ -43,7 +43,7 @@ export const ROUTES: RouteDef[] = [
   { name: 'club', path: '/cau-lac-bo/:slug', title: 'Câu lạc bộ' },
   { name: 'clubPortal', path: '/cong-cau-lac-bo', title: 'Cổng câu lạc bộ' },
   { name: 'moderation', path: '/kiem-duyet', title: 'Kiểm duyệt' },
-  { name: 'proposal', path: '/de-an', title: 'Đề án' },
+  { name: 'about', path: '/gioi-thieu', title: 'Giới thiệu' },
   { name: 'ideas', path: '/de-xuat', title: 'Đề xuất' },
   { name: 'news', path: '/ban-tin', title: 'Bản tin Hội đồng Học sinh' },
   // Before newsArticle, so /ban-tin/soan-bai is never read as an article slug.
@@ -101,9 +101,13 @@ function matchPattern(pattern: string[], segments: string[]): Record<string, str
   return params;
 }
 
+/** Old paths that still open their page: /de-an was the campaign proposal, now Giới thiệu. */
+export const PATH_ALIASES: Readonly<Record<string, string>> = { '/de-an': '/gioi-thieu' };
+
 /** Resolves a pathname (query and hash ignored, trailing slash tolerated) to a route. */
 export function matchRoute(pathname: string): RouteMatch {
-  const segments = splitPath(stripPath(pathname));
+  const normalized = normalizePath(pathname);
+  const segments = splitPath(PATH_ALIASES[normalized] ?? normalized);
   for (const route of ROUTES) {
     if (route.name === 'notFound') continue;
     const params = matchPattern(splitPath(route.path), segments);
@@ -129,13 +133,13 @@ export function pathFor(name: RouteName, params: Record<string, string> = {}): s
 /**
  * Pages a visitor can try before setting up a profile: browsing events and suggestions
  * (Tổng quan shows quick picks instead of the personal dashboard), the route map, clubs, the
- * newsletter and the proposals list, plus Trang chủ, Thiết lập hồ sơ, Đề án and 404.
+ * newsletter and the proposals list, plus Trang chủ, Thiết lập hồ sơ, Giới thiệu and 404.
  * Actions on these pages that need a profile (registering, sending a proposal) ask for it.
  */
 export const PUBLIC_ROUTES: readonly RouteName[] = [
   'home',
   'onboarding',
-  'proposal',
+  'about',
   'notFound',
   'dashboard',
   'explore',

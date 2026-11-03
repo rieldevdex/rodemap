@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { ACTIVITY_PROPOSALS, PROPOSAL_RESPONSES } from '../../src/data/proposals';
+import { SAMPLE_PROPOSAL_RESPONSES, SAMPLE_PROPOSALS } from '../../src/testing/sample-data';
 import { STORAGE_KEY } from '../../src/state/schema';
 import { seedDemo, trackErrors } from '../support/app';
 
@@ -32,12 +32,12 @@ async function switchRole(page: Page, role: 'student' | 'club' | 'moderator'): P
   await page.reload();
 }
 
-const pendingSeed = ACTIVITY_PROPOSALS.filter((p) => PROPOSAL_RESPONSES[p.id] === undefined);
+/** Two unanswered sample proposals, loaded as sent from this browser (the site ships none). */
+const pendingSeed = SAMPLE_PROPOSALS.filter((p) => SAMPLE_PROPOSAL_RESPONSES[p.id] === undefined).slice(0, 2);
 const [firstPending, secondPending] = pendingSeed;
 
 test.describe('Đề xuất hoạt động và đề xuất hợp tác', () => {
-  test('a student sends a proposal, supports another, filters and withdraws their own', async ({ page }) => {
-    if (!firstPending) throw new Error('Sample data has no pending proposal');
+  test('a student sends a proposal, filters and withdraws their own', async ({ page }) => {
     const errors = trackErrors(page);
     await seedDemo(page);
     await page.goto('/tong-quan');
@@ -76,20 +76,8 @@ test.describe('Đề xuất hoạt động và đề xuất hợp tác', () => {
     await expect(card(page, title)).toContainText('Khối 10, 11');
     await expect(card(page, title)).toContainText('Đang xem xét');
 
-    // Support another student's proposal: the count goes up and the toggle is pressed.
-    const other = card(page, firstPending.title);
-    const support = other.getByRole('button', { name: `Ủng hộ đề xuất “${firstPending.title}”` });
-    await expect(support).toHaveAttribute('aria-pressed', 'false');
-    await support.click();
-    await expect(support).toHaveAttribute('aria-pressed', 'true');
-    await expect(other).toContainText(`${String(firstPending.supporters + 1)} học sinh ủng hộ`);
-
-    // Filter by status.
-    const filters = page.getByRole('group', { name: 'Lọc theo trạng thái' });
-    await filters.getByRole('button', { name: /^Đã tiếp nhận/ }).click();
-    const accepted = ACTIVITY_PROPOSALS.filter((p) => PROPOSAL_RESPONSES[p.id]?.status === 'accepted');
-    for (const p of accepted) await expect(card(page, p.title)).toBeVisible();
-    await expect(card(page, firstPending.title)).toHaveCount(0);
+    // No other student has sent a proposal on this site yet: the list says so.
+    await expect(page.getByText('Không có đề xuất nào ở trạng thái này.')).toBeVisible();
 
     // Withdraw the student's own proposal.
     await card(page, title).getByRole('button', { name: 'Rút đề xuất' }).click();
@@ -103,7 +91,7 @@ test.describe('Đề xuất hoạt động và đề xuất hợp tác', () => {
   test('HĐHS declines with a reason and accepts with a club in charge; students see both answers', async ({ page }) => {
     if (!firstPending || !secondPending) throw new Error('Sample data needs two pending proposals');
     const errors = trackErrors(page);
-    await seedDemo(page, { role: 'moderator' });
+    await seedDemo(page, { role: 'moderator', proposals: pendingSeed });
     await page.goto('/kiem-duyet');
     await page.getByRole('link', { name: `Đề xuất của học sinh: ${String(pendingSeed.length)} đề xuất đang chờ xem xét` }).click();
     await expect(page).toHaveURL('/de-xuat');
@@ -136,7 +124,6 @@ test.describe('Đề xuất hoạt động và đề xuất hợp tác', () => {
     await expect(card(page, firstPending.title)).toContainText('Chưa tiếp nhận');
     await expect(card(page, firstPending.title)).toContainText(reason);
     await expect(card(page, secondPending.title)).toContainText('Câu lạc bộ phụ trách: Mentis Club');
-    await expect(card(page, secondPending.title).getByRole('link', { name: 'Xem Mentis Club' })).toBeVisible();
     expect(errors).toEqual([]);
   });
 

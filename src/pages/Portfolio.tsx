@@ -1,5 +1,4 @@
 import { Button } from '../components/atoms/Button';
-import { DemoLabel } from '../components/atoms/DemoLabel';
 import { LineBadge } from '../components/atoms/LineBadge';
 import { MonoTime } from '../components/atoms/MonoTime';
 import { PageHead } from '../components/molecules/PageHead';
@@ -58,7 +57,6 @@ export function PortfolioPage() {
             Xuất tệp JSON
           </Button>
         </div>
-        <DemoLabel className="no-print" />
       </PageHead>
 
       {/* Print-only document header (the A4 sheet). */}

@@ -1,9 +1,8 @@
 import { Button } from '../components/atoms/Button';
 import { PageHead } from '../components/molecules/PageHead';
-import { CANDIDATE, PLAN_SECTION, PROPOSAL_PHASES, PROPOSAL_SECTIONS, PROPOSAL_SUBTITLE, PROPOSAL_TITLE, type ProposalSection } from '../content/proposal';
+import { ABOUT_LEAD, ABOUT_PHASES, ABOUT_SECTIONS, ABOUT_TITLE, PLAN_SECTION, type AboutSection } from '../content/about';
 import { SCHOOL } from '../data/school';
-import { printPage } from '../state/effects';
-import './Proposal.css';
+import './About.css';
 
 /** "Tổng hợp: một nguồn…" → a bold lead-in and the rest. */
 function splitLead(text: string): [string, string] | null {
@@ -11,7 +10,7 @@ function splitLead(text: string): [string, string] | null {
   return i > 0 && i < 24 ? [text.slice(0, i), text.slice(i + 1).trim()] : null;
 }
 
-function Section({ section }: { section: ProposalSection }) {
+function Section({ section }: { section: AboutSection }) {
   return (
     <section className="proposal__section" id={section.id} aria-labelledby={`${section.id}-title`}>
       <h2 id={`${section.id}-title`} className="proposal__h2">
@@ -44,37 +43,20 @@ function Section({ section }: { section: ProposalSection }) {
   );
 }
 
-export function ProposalPage() {
-  const [first, second, ...rest] = PROPOSAL_SECTIONS;
-  const toc = [...PROPOSAL_SECTIONS.slice(0, 2), PLAN_SECTION, ...PROPOSAL_SECTIONS.slice(2)];
+/** Giới thiệu: what vsmcclubs is, how the council runs it and how student data is handled. */
+export function AboutPage() {
+  const [first, second, ...rest] = ABOUT_SECTIONS;
+  const toc = [...ABOUT_SECTIONS.slice(0, 2), PLAN_SECTION, ...ABOUT_SECTIONS.slice(2)];
 
   return (
     <div className="proposal">
-      <PageHead eyebrow={`Đề xuất tranh cử Hội đồng Học sinh nhiệm kỳ ${SCHOOL.schoolYear}`} title={PROPOSAL_TITLE} lead={PROPOSAL_SUBTITLE}>
-        <dl className="proposal__candidate">
-          <div>
-            <dt>Ứng cử viên</dt>
-            <dd>{CANDIDATE.name}</dd>
-          </div>
-          <div>
-            <dt>Lớp</dt>
-            <dd>{CANDIDATE.className}</dd>
-          </div>
-          <div>
-            <dt>Vị trí ứng tuyển</dt>
-            <dd>{CANDIDATE.position}</dd>
-          </div>
-          <div className="proposal__candidate-message">
-            <dt>Thông điệp tranh cử</dt>
-            <dd>{CANDIDATE.message}</dd>
-          </div>
-        </dl>
+      <PageHead eyebrow={`Hội đồng Học sinh ${SCHOOL.name} · Năm học ${SCHOOL.schoolYear}`} title={ABOUT_TITLE} lead={ABOUT_LEAD}>
         <div className="cluster no-print">
-          <Button variant="primary" iconStart="print" onClick={printPage}>
-            In đề án
+          <Button to="/tong-quan" variant="primary" iconEnd="arrow-right">
+            Dùng thử vsmcclubs
           </Button>
-          <Button to="/thiet-lap" variant="secondary" iconEnd="arrow-right">
-            Trải nghiệm vsmcclubs
+          <Button to="/cau-lac-bo" variant="secondary">
+            Xem danh sách câu lạc bộ
           </Button>
         </div>
       </PageHead>
@@ -96,7 +78,7 @@ export function ProposalPage() {
             </ol>
           </nav>
 
-          <article className="proposal__body" aria-label={PROPOSAL_TITLE}>
+          <article className="proposal__body" aria-label={ABOUT_TITLE}>
             {first ? <Section section={first} /> : null}
             {second ? <Section section={second} /> : null}
 
@@ -105,11 +87,11 @@ export function ProposalPage() {
                 <span className="proposal__numeral">{PLAN_SECTION.numeral}.</span> {PLAN_SECTION.title}
               </h2>
               <p className="proposal__p">
-                vsmcclubs được triển khai theo hai giai đoạn trong năm học 2026–2027, mỗi giai đoạn có mục tiêu và kết quả cụ thể. Thời gian cụ
-                thể của từng hoạt động sẽ được thống nhất với Hội đồng Học sinh và Phòng Công tác Học sinh.
+                Hội đồng Học sinh triển khai vsmcclubs theo hai giai đoạn trong năm học 2026–2027, mỗi giai đoạn có mục tiêu và kết quả cụ thể.
+                Thời gian cụ thể của từng hoạt động được thống nhất với Phòng Công tác Học sinh.
               </p>
               <ol className="proposal__phases">
-                {PROPOSAL_PHASES.map((phase) => (
+                {ABOUT_PHASES.map((phase) => (
                   <li key={phase.id} className="proposal__phase">
                     <span className="proposal__phase-dot" aria-hidden="true" />
                     <div className="proposal__phase-body">
@@ -147,11 +129,9 @@ export function ProposalPage() {
             ))}
 
             <footer className="proposal__signature">
-              <p className="proposal__label">Người đề xuất</p>
-              <p className="proposal__signature-name">{CANDIDATE.name}</p>
-              <p>
-                Lớp {CANDIDATE.className} · {SCHOOL.name}
-              </p>
+              <p className="proposal__label">Đơn vị vận hành</p>
+              <p className="proposal__signature-name">Hội đồng Học sinh</p>
+              <p>{SCHOOL.name}</p>
             </footer>
           </article>
         </div>

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Button } from '../components/atoms/Button';
-import { DemoLabel } from '../components/atoms/DemoLabel';
 import { Icon } from '../components/atoms/Icon';
 import { LineBadge } from '../components/atoms/LineBadge';
 import { MonoTime } from '../components/atoms/MonoTime';
@@ -115,7 +114,6 @@ export function NewsArticlePage() {
               Gỡ bài viết
             </Button>
           ) : null}
-          <DemoLabel />
           {/* Always rendered, so the first message lands in an existing live region. */}
           <p className="news-article__status" role="status">
             {status ? (

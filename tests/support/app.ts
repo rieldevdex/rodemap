@@ -2,12 +2,15 @@ import type { Page } from '@playwright/test';
 import { CLUBS } from '../../src/data/clubs';
 import { EVENTS } from '../../src/data/events';
 import { NEWS } from '../../src/data/news';
-import { createDemoState, STORAGE_KEY } from '../../src/state/schema';
+import { STORAGE_KEY } from '../../src/state/schema';
+import { createDemoState, SAMPLE_EVENTS } from '../../src/testing/sample-data';
 
 /** The fixed demo date used by every browser test, so screens and flows are deterministic. */
 export const DEMO_TODAY = '2026-10-07';
 
 const firstApproved = EVENTS.find((e) => e.status === 'approved');
+/** Every event a browser test can see: the official ones plus the sample events seedDemo loads. */
+export const ALL_EVENTS = [...SAMPLE_EVENTS, ...EVENTS];
 const firstClub = CLUBS[0];
 const firstArticle = NEWS.find((p) => p.publishedAt <= `${DEMO_TODAY}T09:00:00+07:00`);
 if (!firstApproved || !firstClub || !firstArticle) throw new Error('Sample data is missing events, clubs or newsletter articles');
@@ -25,7 +28,7 @@ export const ROUTES: { name: string; path: string }[] = [
   { name: 'chi-tiet-cau-lac-bo', path: `/cau-lac-bo/${firstClub.slug}` },
   { name: 'cong-cau-lac-bo', path: '/cong-cau-lac-bo' },
   { name: 'kiem-duyet', path: '/kiem-duyet' },
-  { name: 'de-an', path: '/de-an' },
+  { name: 'gioi-thieu', path: '/gioi-thieu' },
   { name: 'de-xuat', path: '/de-xuat' },
   { name: 'ban-tin', path: '/ban-tin' },
   { name: 'bai-viet', path: `/ban-tin/${firstArticle.slug}` },
@@ -39,7 +42,8 @@ export const ROUTES: { name: string; path: string }[] = [
  * start as a new visitor who has not set up a profile yet.
  */
 export async function seedDemo(page: Page, overrides: Record<string, unknown> = {}): Promise<void> {
-  const state = { ...createDemoState(), demoToday: DEMO_TODAY, ...overrides };
+  // The site ships no sample events; the sample student's events are loaded as published submissions.
+  const state = { ...createDemoState(), submittedEvents: structuredClone(SAMPLE_EVENTS), demoToday: DEMO_TODAY, ...overrides };
   await page.addInitScript(
     ([key, value]) => {
       try {

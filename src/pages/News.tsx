@@ -1,6 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
 import { Button } from '../components/atoms/Button';
-import { DemoLabel } from '../components/atoms/DemoLabel';
 import { MonoTime } from '../components/atoms/MonoTime';
 import { Station } from '../components/atoms/Station';
 import { NewsCard } from '../components/molecules/NewsCard';
@@ -68,7 +67,6 @@ export function NewsPage() {
               Soạn bài viết
             </Button>
           ) : null}
-          <DemoLabel />
         </div>
       </PageHead>
 

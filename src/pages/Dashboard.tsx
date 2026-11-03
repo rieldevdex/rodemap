@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
 import { Button } from '../components/atoms/Button';
-import { DemoLabel } from '../components/atoms/DemoLabel';
 import { LineBadge } from '../components/atoms/LineBadge';
 import { MonoTime } from '../components/atoms/MonoTime';
 import { StatusTag } from '../components/atoms/StatusTag';
@@ -88,7 +87,6 @@ function StudentDashboard() {
         title="Tổng quan"
         lead={`Xin chào bạn, học sinh lớp ${profile?.className ?? ''}. Hôm nay là ${formatLongDate(now)}.`}
       >
-        <DemoLabel />
       </PageHead>
 
       <div className="band band--surface">
@@ -191,7 +189,7 @@ function StudentDashboard() {
               <h2 id="dash-digest" className="dashboard__h2">
                 Bản tin tuần
               </h2>
-              <MochiNote label={`Bản tin tuần · ${digest.weekLabel}`} footnote="Do Mochi tổng hợp từ dữ liệu minh họa của vsmcclubs.">
+              <MochiNote label={`Bản tin tuần · ${digest.weekLabel}`} footnote="Do Mochi tổng hợp từ dữ liệu của vsmcclubs.">
                 {digest.paragraphs.map((p) => (
                   <p key={p}>{p}</p>
                 ))}

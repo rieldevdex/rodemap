@@ -16,7 +16,7 @@ import { CATEGORIES } from '../data/categories';
 import { PERIODS } from '../data/calendar';
 import { CLUBS } from '../data/clubs';
 import { EVENTS } from '../data/events';
-import { addDays, formatDayLabel, formatTime, startOfIsoWeek, toMillis } from '../domain/dates';
+import { addDays, DAY_MS, formatDayLabel, formatTime, startOfIsoWeek, toMillis } from '../domain/dates';
 import { deadlineDaysLeft, eventStartTimeLabel, isRegistered, registrationState, seatsLeft } from '../domain/events';
 import { atLeast } from '../domain/interactivity';
 import { layoutRoute } from '../domain/route-layout';
@@ -27,7 +27,10 @@ import { useAppState, useNow } from '../state/hooks';
 import { requestMochi } from '../state/mochiBridge';
 import './Home.css';
 
+/** The home map shows at least six weeks, and stretches to reach the next few events (at most 20 weeks). */
 const FRAGMENT_WEEKS = 6;
+const MAX_FRAGMENT_WEEKS = 20;
+const EVENTS_TO_REACH = 3;
 
 export function HomePage() {
   const state = useAppState();
@@ -38,11 +41,20 @@ export function HomePage() {
 
   const hasProfile = state.profile !== null;
   const events = useMemo(() => EVENTS.filter((e) => e.status === 'approved'), []);
-  // The figures are counted from the sample data, never typed in (DESIGN.md §6.2 #16).
+  // The figures are counted from the data, never typed in (DESIGN.md §6.2 #16).
   const openCount = events.filter((e) => registrationState(e, state.registrations, now) === 'open').length;
   const clubCount = CLUBS.filter((c) => c.kind === 'club').length;
   const byId = useMemo(() => new Map(events.map((e) => [e.id, e])), [events]);
   const clubName = (id: string) => CLUBS.find((c) => c.id === id)?.shortName ?? '';
+
+  // From last week until the next few events, so the map is never empty while events lie ahead.
+  const weeks = useMemo(() => {
+    const from = addDays(startOfIsoWeek(now), -7);
+    const ahead = events.filter((e) => toMillis(e.end) > now).map((e) => toMillis(e.start)).sort((a, b) => a - b);
+    const target = ahead[Math.min(EVENTS_TO_REACH, ahead.length) - 1];
+    const needed = target === undefined ? FRAGMENT_WEEKS : Math.ceil((target - from) / (7 * DAY_MS)) + 1;
+    return Math.min(MAX_FRAGMENT_WEEKS, Math.max(FRAGMENT_WEEKS, needed));
+  }, [events, now]);
 
   const layout = useMemo(() => {
     const from = addDays(startOfIsoWeek(now), -7);
@@ -50,15 +62,16 @@ export function HomePage() {
       events,
       myEventIds: events.filter((e) => isRegistered(e.id, state.registrations)).map((e) => e.id),
       periods: PERIODS,
-      range: { from, to: addDays(from, FRAGMENT_WEEKS * 7) },
+      range: { from, to: addDays(from, weeks * 7) },
       orientation,
-      pxPerDay: wide ? 12 : 9,
+      // A longer stretch is drawn denser, so the map keeps its six-week size and month labels never collide.
+      pxPerDay: ((wide ? 12 : 9) * FRAGMENT_WEEKS) / weeks,
       laneGap: wide ? 34 : 40,
       padding: wide ? { start: 24, end: 24, cross: 56 } : { start: 40, end: 24, cross: 36 },
       categories: [...CATEGORY_CODES],
       now,
     });
-  }, [events, state.registrations, orientation, wide, now]);
+  }, [events, state.registrations, orientation, wide, now, weeks]);
 
   /* The landing demo exchange: Mochi's offline engine answering DEMO_QUESTION over the current demo data. */
   const demo = useMemo(() => {
@@ -100,7 +113,7 @@ export function HomePage() {
                   <Button to="/tong-quan" variant="primary" size="lg" iconEnd="arrow-right">
                     {HERO.dashboardCta}
                   </Button>
-                  <Button to="/de-an" variant="secondary" size="lg">
+                  <Button to="/gioi-thieu" variant="secondary" size="lg">
                     {HERO.secondaryCta}
                   </Button>
                 </>
@@ -117,20 +130,20 @@ export function HomePage() {
             </div>
             {hasProfile ? null : (
               <p className="home-hero__note density-full-only">
-                <Link to="/de-an">{HERO.secondaryCta}</Link>
+                <Link to="/gioi-thieu">{HERO.secondaryCta}</Link>
               </p>
             )}
           </div>
           <figure className="home-hero__map">
             <figcaption className="home-hero__map-caption">
-              <span>Lộ trình minh họa</span>
-              <span className="home-hero__map-note density-detail">Sáu tuần, dữ liệu minh họa</span>
+              <span>Lộ trình sắp tới</span>
+              <span className="home-hero__map-note density-detail">{`${String(weeks)} tuần, từ tuần trước`}</span>
             </figcaption>
             <RouteMap
               layout={layout}
               orientation={orientation}
               lanes={CATEGORIES.map((c) => ({ code: c.code, name: c.name }))}
-              label="Lộ trình minh họa trong sáu tuần"
+              label={`Lộ trình ${String(weeks)} tuần sắp tới`}
               stationLabel={stationLabel}
               animateIn
               fit
@@ -171,7 +184,7 @@ export function HomePage() {
               </dd>
             </div>
             <div>
-              <dt>câu lạc bộ đăng sự kiện</dt>
+              <dt>câu lạc bộ</dt>
               <dd>
                 <CountUp value={clubCount} />
               </dd>
@@ -243,7 +256,7 @@ export function HomePage() {
           </div>
           <figure className="home-demo" aria-labelledby="home-demo-caption">
             <figcaption id="home-demo-caption" className="home-demo__caption">
-              Đoạn trao đổi mẫu · được tạo từ dữ liệu minh họa ở chế độ ngoại tuyến
+              Đoạn trao đổi mẫu · Mochi trả lời ở chế độ ngoại tuyến từ dữ liệu hiện có
             </figcaption>
             <ol className="home-demo__log">
               <li className="home-demo__entry home-demo__entry--student">

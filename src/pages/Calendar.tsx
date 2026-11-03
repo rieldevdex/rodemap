@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { Button } from '../components/atoms/Button';
-import { DemoLabel } from '../components/atoms/DemoLabel';
 import { Icon } from '../components/atoms/Icon';
 import { LineBadge } from '../components/atoms/LineBadge';
 import { MonoTime } from '../components/atoms/MonoTime';
@@ -224,7 +223,6 @@ export function CalendarPage() {
           <Button variant="primary" iconStart="download" onClick={exportAll} disabled={myEvents.length === 0}>
             Xuất toàn bộ lịch
           </Button>
-          <DemoLabel />
         </div>
         <p className="calendar__status" role="status">
           {status}

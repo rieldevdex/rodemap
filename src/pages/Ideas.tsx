@@ -1,7 +1,6 @@
 import { useId, useState, type ReactNode } from 'react';
 import { Button } from '../components/atoms/Button';
 import { Chip } from '../components/atoms/Chip';
-import { DemoLabel } from '../components/atoms/DemoLabel';
 import { LineBadge } from '../components/atoms/LineBadge';
 import type { StatusTone } from '../components/atoms/StatusTag';
 import { StatusTag } from '../components/atoms/StatusTag';
@@ -287,7 +286,6 @@ function StudentIdeas({ catalog }: { catalog: Catalog }) {
         title="Đề xuất hoạt động"
         lead="Học sinh đề xuất hoạt động hoặc sự kiện mong muốn được tổ chức trong năm học. Hội đồng Học sinh xem xét, phản hồi kèm lý do và chuyển đề xuất được tiếp nhận tới câu lạc bộ phù hợp."
       >
-        <DemoLabel />
       </PageHead>
 
       <p className="visually-hidden" role="status">

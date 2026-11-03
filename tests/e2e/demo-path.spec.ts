@@ -1,7 +1,7 @@
 import { expect, test, type Download, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
-import { EVENTS } from '../../src/data/events';
-import { SEED_REGISTRATIONS } from '../../src/data/seed';
+import { ALL_EVENTS as EVENTS } from '../support/app';
+import { SEED_REGISTRATIONS } from '../../src/testing/sample-data';
 import { toMillis } from '../../src/domain/dates';
 import { formatGrades, isOpenToAll } from '../../src/domain/events';
 import { escapeText } from '../../src/domain/ics';

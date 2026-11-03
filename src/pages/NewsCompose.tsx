@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type SyntheticEvent } from 'react';
 import { Button } from '../components/atoms/Button';
-import { DemoLabel } from '../components/atoms/DemoLabel';
 import { Icon } from '../components/atoms/Icon';
 import { MonoTime } from '../components/atoms/MonoTime';
 import { ConfirmDialog } from '../components/molecules/ConfirmDialog';
@@ -65,7 +64,7 @@ export function NewsComposePage() {
           <div className="container">
             <div className="stack stack--md news-compose__gate">
               <p>
-                Trong giai đoạn thử nghiệm, bạn có thể chuyển sang vai trò HĐHS để soạn bài viết. Vai trò có thể thay đổi tại mục Tài khoản minh họa.
+                Trong giai đoạn thử nghiệm, bạn có thể chuyển sang vai trò HĐHS để soạn bài viết. Vai trò có thể thay đổi tại mục Tài khoản thử nghiệm.
               </p>
               <div className="cluster">
                 <Button
@@ -134,7 +133,6 @@ export function NewsComposePage() {
         title="Soạn bài viết"
         lead="Bài viết được phát hành ngay sau khi bạn nhấn Đăng bài và hiển thị với toàn bộ học sinh tại trang Bản tin."
       >
-        <DemoLabel />
       </PageHead>
 
       <div className="band band--surface">

@@ -10,7 +10,8 @@ import { NEWS } from '../data/news';
 import { makeEvent, makePost, makeProfile, reg } from '../domain/test-fixtures';
 import type { Grade, SchoolEvent, Submission } from '../domain/types';
 import { reducer } from './reducer';
-import { createDemoState, createSeedState, type AppState } from './schema';
+import { createSeedState, type AppState } from './schema';
+import { createDemoState } from '../testing/sample-data';
 import {
   selectActivityProposals,
   selectAllEvents,

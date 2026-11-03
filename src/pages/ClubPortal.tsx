@@ -56,7 +56,7 @@ export function ClubPortalPage() {
             <div className="stack stack--md club-portal__gate">
               <p>
                 Trong giai đoạn thử nghiệm, bạn có thể chuyển sang vai trò Câu lạc bộ để xem cổng gửi sự kiện. Vai trò được lưu trên trình
-                duyệt này và có thể thay đổi tại mục Tài khoản minh họa.
+                duyệt này và có thể thay đổi tại mục Tài khoản thử nghiệm.
               </p>
               <div className="cluster">
                 <Button

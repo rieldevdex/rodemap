@@ -1,5 +1,4 @@
 import { Button } from '../components/atoms/Button';
-import { DemoLabel } from '../components/atoms/DemoLabel';
 import { Icon } from '../components/atoms/Icon';
 import { LineBadge } from '../components/atoms/LineBadge';
 import { MonoTime } from '../components/atoms/MonoTime';
@@ -280,8 +279,6 @@ export function EventDetailPage() {
                 )}
               </div>
             </dl>
-            {/* Events of the real clubs are real; the council's and the office's are still illustrative. */}
-            {club?.kind === 'club' ? null : <DemoLabel />}
           </div>
         </div>
       </section>

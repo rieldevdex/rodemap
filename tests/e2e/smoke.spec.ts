@@ -12,11 +12,20 @@ test.describe('shell', () => {
     expect(errors).toEqual([]);
   });
 
-  test('the demo label is always visible in the footer', async ({ page }) => {
+  test('the footer names the council, and no page reads as a demo or a campaign', async ({ page }) => {
     await seedDemo(page);
     await page.goto('/');
-    await expect(page.getByRole('contentinfo')).toContainText('Một số sự kiện và bài viết là dữ liệu minh họa');
-    await expect(page.getByText(/trình diễn/i)).toHaveCount(0);
+    const footer = page.getByRole('contentinfo');
+    await expect(footer).toContainText('Do Hội đồng Học sinh vận hành');
+    for (const path of ['/', '/gioi-thieu', '/cau-lac-bo', '/ban-tin']) {
+      await page.goto(path);
+      await expect(page.getByText(/trình diễn|minh họa|tranh cử|ứng cử/i), path).toHaveCount(0);
+    }
+    // The old campaign address opens Giới thiệu.
+    await page.goto('/de-an');
+    await expect(page.locator('#main-heading')).toHaveText('Giới thiệu vsmcclubs');
+    await footer.getByRole('link', { name: 'Giới thiệu' }).click();
+    await expect(page).toHaveURL('/gioi-thieu');
   });
 
   test('Giao diện: mode, brightness and density apply at once and persist', async ({ page }) => {

@@ -313,14 +313,20 @@ tags.ts         export const TAGS: Tag[]; export function tagLabel(id): string
 goals.ts        export const GOALS: Goal[]
 clubs.ts        export const CLUBS: Club[]           // 22: HĐHS ('council'), Phòng Cố vấn Học tập ('office', id 'co-van-hoc-tap'),
                                                      //     the 20 real clubs ('club'); each has `email?` (the club's own) and `links`
-events.ts       export const EVENTS: SchoolEvent[]    // 6 HĐHS events, 4 external competitions (ev-051 … ev-054),
-                                                     //     2 club events announced by date only (`dateOnly`, ev-055, ev-056)
-calendar.ts     export const PERIODS: CalendarPeriod[]
-seed.ts         export const SEED_PROFILE: Profile; SEED_REGISTRATIONS; SEED_PORTFOLIO   // HĐHS events only
+events.ts       export const EVENTS: SchoolEvent[]    // official events only: 2 club events announced by date only (`dateOnly`, ev-055, ev-056)
+calendar.ts     export const PERIODS: CalendarPeriod[]  // empty until the school publishes its calendar
 news.ts         export const NEWS: NewsPost[]; NEWS_DEPARTMENTS   // council articles (one scheduled), signed by a department
 school.ts       export const SCHOOL = { name: 'Vinschool Smart City', schoolYear: '2026–2027' }
-proposals.ts    export const ACTIVITY_PROPOSALS; COLLABORATIONS; PROPOSAL_RESPONSES // anonymous (grade only) student proposals naming no club, no sample collaboration, sample answers
+proposals.ts    export const ACTIVITY_PROPOSALS; COLLABORATIONS; PROPOSAL_RESPONSES // empty: proposals are sent through Đề xuất
 ```
+
+Test-only sample content lives in `src/testing/` and is never imported by the app:
+`sample-content.ts` (sample council events and external competitions, articles, proposals, school
+calendar and the grade 11 sample student), `sample-data.ts` (`createDemoState()`), and `setup.ts`
+(Vitest setup that merges the sample content into `src/data` for unit tests; `data.test.ts` checks
+the official data through `vi.importActual`). Browser tests load the sample events into the saved
+state as published submissions (`tests/support/app.ts`).
+
 
 Publishers and external competitions (`src/domain/types.ts`):
 
@@ -451,7 +457,7 @@ export type RouteName = 'home'|'onboarding'|'dashboard'|'explore'|'event'|'route
   |'portfolio'|'clubs'|'club'|'clubPortal'|'moderation'|'proposal'|'ideas'|'news'|'newsCompose'|'newsArticle'|'notFound';
 export const ROUTES: { name: RouteName; path: string; title: string }[];
 // paths: / · /thiet-lap · /tong-quan · /kham-pha · /su-kien/:slug · /lo-trinh · /lich · /ho-so
-//        /cau-lac-bo · /cau-lac-bo/:slug · /cong-cau-lac-bo · /kiem-duyet · /de-an · /de-xuat
+//        /cau-lac-bo · /cau-lac-bo/:slug · /cong-cau-lac-bo · /kiem-duyet · /gioi-thieu (old /de-an aliased) · /de-xuat
 //        /ban-tin · /ban-tin/soan-bai (before the slug route) · /ban-tin/:slug
 export function matchRoute(pathname: string): { name: RouteName; params: Record<string, string> };
 export function pathFor(name: RouteName, params?: Record<string, string>): string;

@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
-import { EVENTS } from '../../src/data/events';
+import { ALL_EVENTS as EVENTS } from '../support/app';
 import { NEWS } from '../../src/data/news';
 import { addDays, toIsoDate, toMillis } from '../../src/domain/dates';
 import { DEMO_TODAY, seedDemo, trackErrors } from '../support/app';

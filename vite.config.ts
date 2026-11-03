@@ -14,6 +14,7 @@ export default defineConfig({
   },
   test: {
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'scripts/**/*.test.ts', 'worker/**/*.test.ts', 'supabase/**/*.test.ts'],
+    setupFiles: ['src/testing/setup.ts'],
     environment: 'node',
     coverage: {
       provider: 'v8',

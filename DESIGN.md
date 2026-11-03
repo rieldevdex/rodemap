@@ -502,7 +502,7 @@ suggestions:
 
 - Open without a profile: Trang chủ, Tổng quan (visitor version), Khám phá,
   Chi tiết sự kiện, Lộ trình (the whole school's map), Câu lạc bộ, Bản tin, Đề
-  xuất (reading), Đề án, Thiết lập hồ sơ.
+  xuất (reading), Giới thiệu, Thiết lập hồ sơ.
 - Still need a profile: Lịch của tôi, Hồ sơ năng lực, and the demo role pages
   (Cổng CLB, Kiểm duyệt, Soạn bài viết). Opening one leads to Thiết lập hồ sơ
   and back afterwards. A visitor always sees the student version of the open
