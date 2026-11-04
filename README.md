@@ -113,6 +113,23 @@ Trang **Đề xuất** (`/de-xuat`) thay đổi theo vai trò trong **Tài kho�
 
 Ở phiên bản hiện tại, đề xuất và phản hồi được lưu trên trình duyệt (chưa có cơ sở dữ liệu dùng chung); thanh điều hướng hiển thị mục **Đề xuất** với vai trò Học sinh, còn với vai trò Câu lạc bộ hoặc HĐHS trang được mở từ Cổng CLB hoặc Kiểm duyệt.
 
-## 9. Cấu trúc mã nguồn
+## 9. Không gian HĐHS (nội bộ)
+
+Trang **Không gian HĐHS** (`/hdhs`, liên kết ở chân trang) là nơi thành viên Hội đồng Học sinh theo dõi công việc theo Masterplan nhiệm kỳ 2026–2027: **Việc của tôi** (việc được giao, việc cần duyệt, việc của ban chưa có người thực hiện), **Công việc các ban** (việc phụ trách chính và phối hợp của từng ban), **Phiếu yêu cầu** (yêu cầu giữa các ban; ban nhận tiếp nhận thành công việc hoặc không tiếp nhận kèm lý do) và **Thành viên**.
+
+- Đăng nhập bằng tài khoản Google của trường (`@stu.vinschool.edu.vn`). Chỉ địa chỉ đã được Ban điều hành hoặc Ban Nhân sự thêm vào danh sách thành viên mới vào được; lần đăng nhập đầu tiên tự liên kết tài khoản với thành viên.
+- Phân quyền: Ban điều hành quản lý mọi ban; trưởng ban và phó ban giao việc, duyệt và chấm chất lượng (1–5) trong ban mình; thành viên nộp sản phẩm (đường dẫn) và báo trễ hạn trước ít nhất 24 giờ; Ban điều hành và Ban Nhân sự quản lý danh sách thành viên và xem địa chỉ thư điện tử.
+- Dữ liệu nằm trong schema `hdhs` của dự án Supabase, không mở trực tiếp ra Data API; trình duyệt chỉ gọi các hàm `public.hdhs_*`, mỗi hàm kiểm tra người gọi (`supabase/migrations/20261104130000_hdhs_workspace.sql`). Danh sách thành viên và các đầu việc Masterplan được nhập thẳng vào cơ sở dữ liệu, không lưu trong mã nguồn.
+- Công thức điểm tháng theo Masterplan (A–E, điểm cộng tối đa +15 mỗi tháng, hỗ trợ ban khác tối đa +6, không thấp hơn 0, xếp loại) nằm trong `src/domain/workspace.ts` (`monthlyScore`); phần điểm danh và bảng điểm hằng tháng thuộc giai đoạn tiếp theo.
+
+### Bật đăng nhập Google (thực hiện một lần)
+
+1. Tại Google Cloud Console, tạo **OAuth client ID** loại *Web application*; mục *Authorized redirect URIs* thêm `https://zanfzylebhprtkgdwvpd.supabase.co/auth/v1/callback`.
+2. Tại Supabase → **Authentication → Sign In / Providers → Google**: bật Google, dán Client ID và Client Secret.
+3. Tại Supabase → **Authentication → URL Configuration**: *Site URL* là `https://vsmcclubs.site`; *Redirect URLs* thêm `https://vsmcclubs.site/hdhs` (và `http://localhost:5173/hdhs` khi phát triển trên máy cá nhân).
+4. Tài khoản học sinh dưới 18 tuổi của Google Workspace for Education có thể bị chặn đăng nhập vào ứng dụng bên ngoài cho tới khi quản trị viên của trường cho phép. Nếu đăng nhập báo bị chặn, đề nghị bộ phận CNTT của trường thêm OAuth client ID ở bước 1 vào danh sách ứng dụng được tin cậy.
+5. Thêm địa chỉ thư điện tử của thành viên đầu tiên thuộc Ban điều hành bằng SQL (Supabase → SQL Editor): `update hdhs.members set email = 'ten@stu.vinschool.edu.vn' where full_name = '…';`. Sau đó thành viên này thêm địa chỉ cho những người còn lại tại thẻ Thành viên.
+
+## 10. Cấu trúc mã nguồn
 
 Xem `docs/ARCHITECTURE.md` (kiến trúc và giao kèo giữa các lớp) và `DESIGN.md` (hệ thống thiết kế).

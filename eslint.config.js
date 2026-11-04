@@ -58,7 +58,13 @@ export default tseslint.config(
       ],
       'no-restricted-imports': [
         'error',
-        { paths: [{ name: '../../mochi/client', message: 'Use the Mochi hooks from src/state, not the API client.' }] },
+        {
+          paths: [
+            { name: '../../mochi/client', message: 'Use the Mochi hooks from src/state, not the API client.' },
+            { name: '@supabase/supabase-js', message: 'Supabase is reached only through src/workspace/client.ts.' },
+            { name: '../../workspace/client', message: 'Use useWorkspace() from src/workspace/useWorkspace.ts.' },
+          ],
+        },
       ],
     },
   },

@@ -552,6 +552,27 @@ suggestions:
 
 ---
 
+### 7.5 Không gian HĐHS (council workspace, added 2026-11-04)
+
+An internal tool at `/hdhs`, reached from the footer, never from the main navigation. Same page
+head as other pages (eyebrow "Hội đồng Học sinh · Nội bộ"), then on the surface band:
+
+- **Sign-in gate**: one sentence, one primary button "Đăng nhập bằng tài khoản trường", one note
+  that only listed members can enter. Refusals (wrong domain, not a member, pending, inactive) say
+  what happened and who to contact, with "Đăng xuất".
+- **Who am I** row (name · position · department, then quiet "Tải lại" and "Đăng xuất"), then a
+  tab row (`role="tablist"`, arrow keys move): the selected tab is a signal fill; a count pill (ink)
+  shows open work or open request slips.
+- **Task card** (`ws-task`): mono department code, status tag (Được giao neutral, Đang thực hiện
+  signal, Chờ duyệt warn, Cần chỉnh sửa stop, Hoàn thành ok), Quá hạn / Đã báo trễ hạn tags, title,
+  a facts list (người thực hiện, hạn in mono with days left, đầu ra, phối hợp, sản phẩm link,
+  chất lượng n/5), then the actions this member may take under a hairline. Two columns from 1080px.
+  Actions that need input (nộp: link; báo trễ: reason; yêu cầu chỉnh sửa: note; duyệt hoàn thành:
+  quality 1–5 radios) open the ConfirmDialog; the confirm button stays disabled until valid.
+- Forms reuse `submission-form` fields inside a bordered surface card (`ws-form`).
+- **Member table**: one table per department, mono class, status tag; e-mail and "Đăng nhập" only
+  for Ban điều hành and Ban Nhân sự.
+
 ## 8. Voice (UI copy)
 
 All UI copy is **formal, administrative Vietnamese** (văn phong hành chính).

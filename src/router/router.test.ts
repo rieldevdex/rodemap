@@ -20,7 +20,7 @@ describe('ROUTES', () => {
   it('lists every screen once with a Vietnamese title', () => {
     const names = ROUTES.map((r) => r.name);
     expect(new Set(names).size).toBe(names.length);
-    expect(names).toHaveLength(18);
+    expect(names).toHaveLength(19);
     for (const r of ROUTES) expect(r.title.length).toBeGreaterThan(0);
   });
 
@@ -40,6 +40,7 @@ describe('ROUTES', () => {
       clubPortal: '/cong-cau-lac-bo',
       moderation: '/kiem-duyet',
       about: '/gioi-thieu',
+      workspace: '/hdhs',
       ideas: '/de-xuat',
       news: '/ban-tin',
       newsCompose: '/ban-tin/soan-bai',
@@ -154,7 +155,7 @@ describe('titles and path helpers', () => {
 
 describe('profile gate', () => {
   it('lets a visitor browse events and suggestions; personal and demo-role pages need a profile', () => {
-    expect([...PUBLIC_ROUTES].sort()).toEqual(['about', 'club', 'clubs', 'dashboard', 'event', 'explore', 'home', 'ideas', 'news', 'newsArticle', 'notFound', 'onboarding', 'route']);
+    expect([...PUBLIC_ROUTES].sort()).toEqual(['about', 'club', 'clubs', 'dashboard', 'event', 'explore', 'home', 'ideas', 'news', 'newsArticle', 'notFound', 'onboarding', 'route', 'workspace']);
     expect(ROUTES.filter((r) => requiresProfile(r.name)).map((r) => r.name)).toEqual(['calendar', 'portfolio', 'clubPortal', 'moderation', 'newsCompose']);
     for (const r of ROUTES) expect(requiresProfile(r.name), r.name).toBe(!PUBLIC_ROUTES.includes(r.name));
   });

@@ -32,6 +32,9 @@ export function Footer() {
             <li>
               <Link to="/kham-pha">Khám phá sự kiện</Link>
             </li>
+            <li>
+              <Link to="/hdhs">Không gian HĐHS</Link>
+            </li>
           </ul>
         </nav>
         <div className="footer__meta">

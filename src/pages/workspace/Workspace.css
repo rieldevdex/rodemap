@@ -1,0 +1,202 @@
+/* Không gian HĐHS (DESIGN.md §7.5): tabs, task cards, forms and the member table. */
+
+.workspace__note {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.workspace__gate {
+  max-inline-size: var(--measure);
+}
+
+.workspace__whoami {
+  padding-block-end: var(--space-3);
+  border-block-end: var(--rule-hair) solid var(--color-rule);
+}
+
+.workspace__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  border-block-end: var(--rule-strong) solid var(--color-ink);
+}
+
+.workspace__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font: inherit;
+  font-weight: var(--weight-medium);
+  color: var(--color-ink-2);
+  background: none;
+  border: 0;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  cursor: pointer;
+}
+
+.workspace__tab[aria-selected='true'] {
+  color: var(--color-signal-ink);
+  background: var(--color-signal);
+}
+
+.workspace__tab:focus-visible {
+  outline: var(--rule-strong) solid var(--color-ink);
+  outline-offset: var(--space-1);
+}
+
+.workspace__count {
+  min-inline-size: var(--space-5);
+  padding: 0 var(--space-1);
+  font-size: var(--text-xs);
+  text-align: center;
+  color: var(--color-surface);
+  background: var(--color-ink);
+  border-radius: var(--radius-pill);
+}
+
+.workspace__error {
+  padding: var(--space-3);
+  color: var(--color-ink);
+  background: var(--color-surface-2);
+  border-inline-start: var(--rule-strong) solid var(--color-stop);
+}
+
+.workspace__h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+}
+
+/* ── Task and request cards ─────────────────────────────────────── */
+
+.ws-task-list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 1080px) {
+  .ws-task-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ws-task {
+  display: grid;
+  gap: var(--space-2);
+  block-size: 100%;
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-md);
+}
+
+.ws-task:hover,
+.ws-task:focus-within {
+  border-color: var(--color-ink);
+}
+
+.ws-task__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.ws-task__dept {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-caps);
+  text-transform: var(--case-caps);
+  color: var(--color-ink-2);
+}
+
+.ws-task__title {
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+}
+
+.ws-task__facts {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.ws-task__facts > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.ws-task__facts dt {
+  color: var(--color-ink-2);
+}
+
+.ws-task__facts dt::after {
+  content: ':';
+}
+
+.ws-task__facts dd {
+  margin: 0;
+}
+
+.ws-task__desc {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.ws-task__actions {
+  padding-block-start: var(--space-2);
+  border-block-start: var(--rule-hair) solid var(--color-rule);
+}
+
+/* ── Forms ──────────────────────────────────────────────────────── */
+
+.ws-form {
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-radius: var(--radius-md);
+}
+
+.ws-form__title {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+}
+
+/* ── Member table ───────────────────────────────────────────────── */
+
+.ws-table-wrap {
+  overflow-x: auto;
+}
+
+.ws-table {
+  inline-size: 100%;
+  font-size: var(--text-sm);
+  border-collapse: collapse;
+}
+
+.ws-table th,
+.ws-table td {
+  padding: var(--space-2) var(--space-3);
+  text-align: start;
+  vertical-align: middle;
+  border-block-end: var(--rule-hair) solid var(--color-rule);
+}
+
+.ws-table thead th {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-caps);
+  text-transform: var(--case-caps);
+  color: var(--color-ink-2);
+}
+
+.ws-table tbody th {
+  font-weight: var(--weight-semibold);
+}

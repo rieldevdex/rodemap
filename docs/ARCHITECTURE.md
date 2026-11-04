@@ -18,6 +18,10 @@ worker/          Cloudflare Worker entry (index.ts routes /api/*) and the Mochi 
                  dist/ is served as the Worker's static assets (wrangler.toml).
 supabase/        Edge Function "rodemap-mochi" (Deno): Mochi's Claude relay holding the API key as a
                  Supabase secret; bundled by scripts/build-supabase-function.ts (npm run build:supabase).
+                 migrations/: SQL applied to the project, incl. the hdhs schema of Không gian HĐHS.
+src/workspace/   Không gian HĐHS data layer: config.ts (project URL, publishable key), client.ts (the only
+                 Supabase caller: Google sign-in, hdhs_* functions), useWorkspace.ts (React state hook).
+                 Lazy-loaded with /hdhs; pages may not import supabase-js or client.ts (ESLint).
 scripts/         token lint, copy lint, size check, service-worker build plugin (sw-plugin.ts).
 tests/e2e        Playwright smoke, demo path, offline (service worker) + axe; tests/screens screenshots.
 ```
@@ -304,6 +308,23 @@ export function canTransition(from: EventStatus, action: ReviewAction): boolean;
 export function slugify(title: string): string; // folded, ascii, hyphenated, ≤ 60 chars
 export function charCount(s: string): number;   // graphemes after trim (Intl.Segmenter), used by every length limit
 ```
+
+## Workspace (`src/domain/workspace.ts`, Không gian HĐHS)
+
+```ts
+DEPARTMENT_IDS, POSITIONS, POSITION_LABELS, TASK_STATUS_LABELS, TASK_ACTION_LABELS, REQUEST_STATUS_LABELS
+canManage(me, dept)            // BĐH: every department; truong_ban/pho_ban: their own (mirrors hdhs.can_manage)
+canManageMembers(me)           // BĐH and Ban Nhân sự
+availableActions(task, me, now): TaskAction[]   // mirrors public.hdhs_task_action
+canNotifyLate(task, now)       // once, open task, ≥ 24 h before the deadline
+sortTasks / tasksForMember / tasksForDepartment / tasksToReview / unassignedTasks / membersOf
+validateTaskDraft / validateRequestDraft / validateMemberDraft (school e-mail @stu.vinschool.edu.vn)
+monthlyScore(input, weights?): MonthScore   // A 35 · B 25 · C 15 · D 15 · E 10, bonuses monthly (cap 15, support cap 6), floor 0
+tasksDueInMonth(tasks, memberId, month); gradeFor(total); workspaceErrorMessage(code)
+toDateTimeInput(iso) / fromDateTimeInput(value)   // <input type="datetime-local"> in Vietnam time
+```
+
+The server is the authority: every rule above is enforced again by the `hdhs_*` database functions.
 
 ## Data (`src/data/*.ts`)
 

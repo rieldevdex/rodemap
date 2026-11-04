@@ -14,6 +14,7 @@ export type RouteName =
   | 'clubPortal'
   | 'moderation'
   | 'about'
+  | 'workspace'
   | 'ideas'
   | 'news'
   | 'newsCompose'
@@ -44,6 +45,7 @@ export const ROUTES: RouteDef[] = [
   { name: 'clubPortal', path: '/cong-cau-lac-bo', title: 'Cổng câu lạc bộ' },
   { name: 'moderation', path: '/kiem-duyet', title: 'Kiểm duyệt' },
   { name: 'about', path: '/gioi-thieu', title: 'Giới thiệu' },
+  { name: 'workspace', path: '/hdhs', title: 'Không gian HĐHS' },
   { name: 'ideas', path: '/de-xuat', title: 'Đề xuất' },
   { name: 'news', path: '/ban-tin', title: 'Bản tin Hội đồng Học sinh' },
   // Before newsArticle, so /ban-tin/soan-bai is never read as an article slug.
@@ -140,6 +142,8 @@ export const PUBLIC_ROUTES: readonly RouteName[] = [
   'home',
   'onboarding',
   'about',
+  // Council members sign in with their school account; no student profile is needed.
+  'workspace',
   'notFound',
   'dashboard',
   'explore',
