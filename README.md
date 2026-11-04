@@ -124,7 +124,7 @@ Trang **Không gian HĐHS** (`/hdhs`, liên kết ở chân trang) là nơi thà
 
 ### Bật đăng nhập Google (thực hiện một lần)
 
-1. Tại Google Cloud Console, tạo **OAuth client ID** loại *Web application*; mục *Authorized redirect URIs* thêm `https://zanfzylebhprtkgdwvpd.supabase.co/auth/v1/callback`.
+1. Tại Google Cloud Console, tạo **OAuth client ID** riêng cho vsmcclubs, loại *Web application*; mục *Authorized redirect URIs* thêm `https://haivkmfhojsswsexnpbc.supabase.co/auth/v1/callback`.
 2. Tại Supabase → **Authentication → Sign In / Providers → Google**: bật Google, dán Client ID và Client Secret.
 3. Tại Supabase → **Authentication → URL Configuration**: *Site URL* là `https://vsmcclubs.site`; *Redirect URLs* thêm `https://vsmcclubs.site/hdhs` (và `http://localhost:5173/hdhs` khi phát triển trên máy cá nhân).
 4. Tài khoản học sinh dưới 18 tuổi của Google Workspace for Education có thể bị chặn đăng nhập vào ứng dụng bên ngoài cho tới khi quản trị viên của trường cho phép. Nếu đăng nhập báo bị chặn, đề nghị bộ phận CNTT của trường thêm OAuth client ID ở bước 1 vào danh sách ứng dụng được tin cậy.
