@@ -12,8 +12,8 @@ import {
   type TaskDraft,
   type WsSnapshot,
 } from '../domain/workspace';
+import type { MonthKey, ScoreDraft, SheetAction, WsScoreSheet } from '../domain/scores';
 import { SESSION_STORAGE_KEY, SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from './config';
-
 
 let client: SupabaseClient | null = null;
 
@@ -96,3 +96,22 @@ export function saveMember(draft: MemberDraft & { id?: string }): Promise<unknow
   return rpc('hdhs_save_member', { p: draft });
 }
 
+export function loadScores(month: MonthKey): Promise<WsScoreSheet> {
+  return rpc<WsScoreSheet>('hdhs_scores', { p_month: month });
+}
+
+export function saveScore(month: MonthKey, draft: ScoreDraft): Promise<unknown> {
+  return rpc('hdhs_save_score', { p_month: month, p: draft });
+}
+
+export function sendScoreFeedback(month: MonthKey, text: string): Promise<unknown> {
+  return rpc('hdhs_score_feedback', { p_month: month, p_text: text });
+}
+
+export function decideScoreFeedback(month: MonthKey, memberId: string, text: string): Promise<unknown> {
+  return rpc('hdhs_score_decision', { p_month: month, p_member: memberId, p_text: text });
+}
+
+export function scoreSheetAction(month: MonthKey, action: SheetAction): Promise<unknown> {
+  return rpc('hdhs_score_sheet', { p_month: month, p_action: action });
+}

@@ -115,12 +115,17 @@ Trang **Đề xuất** (`/de-xuat`) thay đổi theo vai trò trong **Tài kho�
 
 ## 9. Không gian HĐHS (nội bộ)
 
-Trang **Không gian HĐHS** (`/hdhs`, liên kết ở chân trang) là nơi thành viên Hội đồng Học sinh theo dõi công việc theo Masterplan nhiệm kỳ 2026–2027: **Việc của tôi** (việc được giao, việc cần duyệt, việc của ban chưa có người thực hiện), **Công việc các ban** (việc phụ trách chính và phối hợp của từng ban), **Phiếu yêu cầu** (yêu cầu giữa các ban; ban nhận tiếp nhận thành công việc hoặc không tiếp nhận kèm lý do) và **Thành viên**.
+Trang **Không gian HĐHS** (`/hdhs`, liên kết ở chân trang) là nơi thành viên Hội đồng Học sinh theo dõi công việc theo Masterplan nhiệm kỳ 2026–2027: **Việc của tôi** (việc được giao, việc cần duyệt, việc của ban chưa có người thực hiện), **Công việc các ban** (việc phụ trách chính và phối hợp của từng ban), **Phiếu yêu cầu** (yêu cầu giữa các ban; ban nhận tiếp nhận thành công việc hoặc không tiếp nhận kèm lý do), **Bảng điểm** (điểm tháng theo Masterplan) và **Thành viên**.
 
 - Đăng nhập bằng tài khoản Google của trường (`@stu.vinschool.edu.vn`). Chỉ địa chỉ đã được Ban điều hành hoặc Ban Nhân sự thêm vào danh sách thành viên mới vào được; lần đăng nhập đầu tiên tự liên kết tài khoản với thành viên.
 - Phân quyền: Ban điều hành quản lý mọi ban; trưởng ban và phó ban giao việc, duyệt và chấm chất lượng (1–5) trong ban mình; thành viên nộp sản phẩm (đường dẫn) và báo trễ hạn trước ít nhất 24 giờ; Ban điều hành và Ban Nhân sự quản lý danh sách thành viên và xem địa chỉ thư điện tử.
 - Dữ liệu nằm trong schema `hdhs` của dự án Supabase, không mở trực tiếp ra Data API; trình duyệt chỉ gọi các hàm `public.hdhs_*`, mỗi hàm kiểm tra người gọi (`supabase/migrations/20261104130000_hdhs_workspace.sql`). Danh sách thành viên và các đầu việc Masterplan được nhập thẳng vào cơ sở dữ liệu, không lưu trong mã nguồn.
-- Công thức điểm tháng theo Masterplan (A–E, điểm cộng tối đa +15 mỗi tháng, hỗ trợ ban khác tối đa +6, không thấp hơn 0, xếp loại) nằm trong `src/domain/workspace.ts` (`monthlyScore`); phần điểm danh và bảng điểm hằng tháng thuộc giai đoạn tiếp theo.
+- **Bảng điểm tháng** theo Masterplan, ba bước:
+  1. *Đang chấm*: trưởng ban chấm thành viên và phó ban của ban mình (phó ban chấm thành viên), Ban điều hành chấm trưởng ban và đánh giá chéo lẫn nhau theo khung trưởng ban; không ai tự chấm mình. Ban Nhân sự xem toàn bộ để kiểm tra, không chấm thay.
+  2. *Đã công bố*: Ban điều hành công bố khi mọi thành viên đang hoạt động đã có điểm. Mỗi thành viên xem điểm của mình và có 3 ngày để phản hồi; Ban điều hành trả lời và có thể điều chỉnh điểm.
+  3. *Đã chốt*: Ban điều hành chốt, bảng điểm không chỉnh sửa được nữa.
+- A, B, C tính tự động từ công việc có hạn trong tháng (hoàn thành, chất lượng 1–5 khi duyệt, đúng hạn, nộp trễ có báo trước và được đồng ý tính 50%) và được cố định khi công bố và khi chốt. D (số buổi bắt buộc, có mặt, vắng có phép) và E (0–10) do người chấm nhập; điểm cộng và điểm trừ phải ghi căn cứ. Với trưởng ban, ba tiêu chí đo được (kết quả công việc của ban, chất lượng đầu ra, phối hợp liên ban) có giá trị gợi ý từ công việc và phiếu yêu cầu.
+- Công thức nằm trong `src/domain/scores.ts`; dữ liệu và quyền nằm trong `supabase/migrations/20261105090000_hdhs_scores.sql`. Phần điểm danh theo buổi thuộc giai đoạn tiếp theo.
 
 ### Bật đăng nhập Google (thực hiện một lần)
 

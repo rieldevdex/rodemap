@@ -88,6 +88,7 @@ async function signedIn(page: Page): Promise<{ calls: { fn: string; body: unknow
     [SESSION_STORAGE_KEY, JSON.stringify(session)] as const,
   );
   let data = snapshot();
+  let scores: unknown[] = [];
   await page.route(`${SUPABASE_URL}/**`, async (route: Route) => {
     const url = new URL(route.request().url());
     const fn = url.pathname.replace('/rest/v1/rpc/', '');
@@ -95,6 +96,34 @@ async function signedIn(page: Page): Promise<{ calls: { fn: string; body: unknow
     calls.push({ fn, body });
     if (fn === 'hdhs_me') return route.fulfill({ json: { status: 'ok', memberId: ME } });
     if (fn === 'hdhs_snapshot') return route.fulfill({ json: data });
+    if (fn === 'hdhs_scores') {
+      const { p_month: month } = body as { p_month: string };
+      return route.fulfill({ json: { month, status: 'draft', publishedAt: null, finalizedAt: null, scores } });
+    }
+    if (fn === 'hdhs_save_score') {
+      const { p } = body as { p: { memberId: string; attendance: unknown; cooperation: number; bonuses: unknown[]; penalties: unknown[]; note: string } };
+      scores = [
+        {
+          memberId: p.memberId,
+          framework: 'member',
+          attendance: p.attendance,
+          cooperation: p.cooperation,
+          lead: null,
+          bonuses: p.bonuses,
+          penalties: p.penalties,
+          note: p.note,
+          scoredBy: ME,
+          scoredAt: '2026-11-26T09:00:00+07:00',
+          stats: null,
+          feedback: '',
+          feedbackAt: null,
+          decision: '',
+          decidedBy: null,
+          decidedAt: null,
+        },
+      ];
+      return route.fulfill({ json: scores[0] });
+    }
     if (fn === 'hdhs_task_action') {
       const { p_task: id, p_action: action } = body as { p_task: string; p_action: string };
       data = { ...data, tasks: data.tasks.map((t) => (t.id === id && action === 'complete' ? { ...t, status: 'done', quality: 4 } : t)) };
@@ -167,6 +196,41 @@ test.describe('Không gian HĐHS', () => {
     await tabs.getByRole('tab', { name: 'Thành viên' }).click();
     await expect(page.getByRole('table', { name: 'Thành viên Ban Truyền thông (PR)' })).toContainText('Thành viên Thử nghiệm');
     await expect(page.getByRole('columnheader', { name: 'Đăng nhập' })).toHaveCount(0);
+    expect(errors).toEqual([]);
+  });
+
+  test('a head scores a member of the department on the monthly sheet', async ({ page }) => {
+    const errors = trackErrors(page);
+    const { calls } = await signedIn(page);
+    await page.goto('/hdhs');
+    await page.getByRole('tablist', { name: 'Không gian HĐHS' }).getByRole('tab', { name: 'Bảng điểm' }).click();
+    const table = page.getByRole('table', { name: /Ban Truyền thông \(PR\)/ });
+    await expect(table).toContainText('Thành viên Thử nghiệm');
+    await expect(table).toContainText('Chưa chấm');
+    // Members of other departments are not on a PR head's sheet.
+    await expect(page.getByRole('table', { name: /Ban Design/ })).toHaveCount(0);
+
+    await table.getByRole('button', { name: 'Chấm điểm Thành viên Thử nghiệm' }).click();
+    const form = page.getByRole('form', { name: 'Chấm điểm Thành viên Thử nghiệm' });
+    await form.getByLabel('Số buổi bắt buộc').fill('4');
+    await form.getByLabel('Số buổi có mặt').fill('5');
+    await form.getByRole('button', { name: 'Lưu điểm' }).click();
+    await expect(form.getByText(/không vượt quá số buổi bắt buộc/)).toBeVisible();
+    await form.getByLabel('Số buổi có mặt').fill('4');
+    await form.getByLabel(/E\. Hợp tác và thái độ/).fill('9');
+    await form.getByRole('button', { name: 'Thêm điểm cộng' }).click();
+    await form.getByLabel('Căn cứ', { exact: true }).fill('Hỗ trợ Ban Design thiết kế bài 20/11');
+    await expect(form.getByRole('status')).toContainText('Tổng điểm dự kiến: 101 điểm');
+    const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
+    expect(axe.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')).toEqual([]);
+    await form.getByRole('button', { name: 'Lưu điểm' }).click();
+
+    await expect(form).toHaveCount(0);
+    await expect(table).toContainText('101');
+    await expect(table).toContainText('Xuất sắc');
+    expect(calls.find((c) => c.fn === 'hdhs_save_score')?.body).toMatchObject({
+      p: { memberId: 'm-member', attendance: { present: 4, excused: 0, required: 4 }, cooperation: 9, bonuses: [{ kind: 'support', note: 'Hỗ trợ Ban Design thiết kế bài 20/11' }], penalties: [] },
+    });
     expect(errors).toEqual([]);
   });
 });

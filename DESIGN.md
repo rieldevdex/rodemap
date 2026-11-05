@@ -572,6 +572,15 @@ head as other pages (eyebrow "Hội đồng Học sinh · Nội bộ"), then on 
 - Forms reuse `submission-form` fields inside a bordered surface card (`ws-form`).
 - **Member table**: one table per department, mono class, status tag; e-mail and "Đăng nhập" only
   for Ban điều hành and Ban Nhân sự.
+- **Bảng điểm** (added 2026-11-05): month heading with quiet "Tháng trước" / "Tháng sau" below it,
+  a sheet status tag (Đang chấm warn, Đã công bố signal, Đã chốt ok) with "Đã chấm x/y", one line
+  on who does what next, then BĐH's primary action (Công bố / Chốt, via ConfirmDialog). "Điểm của
+  tôi" is a bordered card (`ws-score`): total in display type with the grade tag, the consequence of
+  the grade, a criteria table (mono, right-aligned), then the evidence as a facts list and the
+  feedback form. Score tables per department show base / cộng / trừ / tổng and the grade tag
+  ("Chưa chấm" neutral). The scoring form shows the automatic A–C figures as a hint, numeric fields
+  on the half-point scale, repeatable bonus and penalty rows that each need evidence, and a live
+  "Tổng điểm dự kiến" status line.
 
 ## 8. Voice (UI copy)
 

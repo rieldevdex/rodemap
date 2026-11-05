@@ -20,7 +20,7 @@ supabase/        Edge Function "rodemap-mochi" (Deno): Mochi's Claude relay hold
                  Supabase secret; bundled by scripts/build-supabase-function.ts (npm run build:supabase).
                  migrations/: SQL applied to the project, incl. the hdhs schema of Không gian HĐHS.
 src/workspace/   Không gian HĐHS data layer: config.ts (project URL, publishable key), client.ts (the only
-                 Supabase caller: Google sign-in, hdhs_* functions), useWorkspace.ts (React state hook).
+                 Supabase caller: Google sign-in, hdhs_* functions), useWorkspace.ts (React state hook), useScores.ts (Bảng điểm of one month).
                  Lazy-loaded with /hdhs; pages may not import supabase-js or client.ts (ESLint).
 scripts/         token lint, copy lint, size check, service-worker build plugin (sw-plugin.ts).
 tests/e2e        Playwright smoke, demo path, offline (service worker) + axe; tests/screens screenshots.
@@ -319,12 +319,28 @@ availableActions(task, me, now): TaskAction[]   // mirrors public.hdhs_task_acti
 canNotifyLate(task, now)       // once, open task, ≥ 24 h before the deadline
 sortTasks / tasksForMember / tasksForDepartment / tasksToReview / unassignedTasks / membersOf
 validateTaskDraft / validateRequestDraft / validateMemberDraft (school e-mail @stu.vinschool.edu.vn)
-monthlyScore(input, weights?): MonthScore   // A 35 · B 25 · C 15 · D 15 · E 10, bonuses monthly (cap 15, support cap 6), floor 0
-tasksDueInMonth(tasks, memberId, month); gradeFor(total); workspaceErrorMessage(code)
+workspaceErrorMessage(code)
 toDateTimeInput(iso) / fromDateTimeInput(value)   // <input type="datetime-local"> in Vietnam time
 ```
 
 The server is the authority: every rule above is enforced again by the `hdhs_*` database functions.
+
+## Monthly points (`src/domain/scores.ts`, Bảng điểm)
+
+```ts
+MonthKey ("2026-11"), monthKeyOf / shiftMonth / monthStart / formatMonth / scoringWindow (25th–28th)
+frameworkFor(member): 'member' | 'lead'        // BĐH and heads use the five head criteria
+canScore(me, target)            // BĐH: anyone but self; truong_ban: pho_ban + thanh_vien of the dept; pho_ban: thanh_vien
+seesWholeSheet(me)              // BĐH and Ban Nhân sự (HR checks, never scores)
+visibleRows / canEditScore / canSendFeedback (3 days after publishing) / canDecide / sheetActions / unscoredMembers
+taskStats(tasks) / memberTasksInMonth   // A, B, C inputs; frozen server-side at publish and finalize
+memberScore(input) / leadScore(criteria, bonuses, penalties) / rowResult(row, liveStats): ScoreResult
+leadSuggestions(tasks, requests, dept, month)   // results, quality, coordination from the data
+validateScoreDraft(draft, framework) / draftFor(memberId, row, suggested) / gradeFor / formatPoints
+```
+
+Sheet workflow: draft → published (BĐH, every active member scored) → final (BĐH). Server functions:
+`hdhs_scores`, `hdhs_save_score`, `hdhs_score_feedback`, `hdhs_score_decision`, `hdhs_score_sheet`.
 
 ## Data (`src/data/*.ts`)
 

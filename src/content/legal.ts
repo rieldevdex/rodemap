@@ -72,7 +72,8 @@ export const PRIVACY_POLICY: LegalDocument = {
         'Công việc: tên việc, mô tả, hạn, người thực hiện, đường dẫn sản phẩm đã nộp, đánh giá chất lượng, số lần chỉnh sửa và lý do báo trễ hạn.',
         'Phiếu yêu cầu: người gửi, ban gửi, ban nhận, nội dung, hạn và phản hồi của các yêu cầu giữa các ban.',
         'Nhật ký thao tác: người thực hiện, thao tác và thời điểm, để đối chiếu khi có ý kiến về kết quả đánh giá.',
-        'Phạm vi xem: mọi thành viên xem được công việc và danh sách thành viên của Hội đồng Học sinh; chỉ Ban điều hành và Ban Nhân sự xem được địa chỉ thư điện tử.',
+        'Bảng điểm hằng tháng: số buổi bắt buộc, có mặt và vắng có phép, điểm hợp tác hoặc điểm theo tiêu chí của trưởng ban, điểm cộng và điểm trừ kèm căn cứ, nhận xét của người chấm, phản hồi của thành viên và ý kiến của Ban điều hành.',
+        'Phạm vi xem: mọi thành viên xem được công việc và danh sách thành viên của Hội đồng Học sinh; chỉ Ban điều hành và Ban Nhân sự xem được địa chỉ thư điện tử. Mỗi thành viên chỉ xem được điểm của mình sau khi bảng điểm được công bố; người chấm xem điểm của những thành viên mình chấm; Ban điều hành và Ban Nhân sự xem toàn bộ bảng điểm.',
       ],
     },
     {

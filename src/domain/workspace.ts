@@ -1,10 +1,10 @@
 /**
  * Không gian HĐHS: the Student Council's workspace (members, tasks, request slips between
- * departments, monthly points). Pure: no clock, no network. The rules mirror the database
+ * departments; the monthly points live in scores.ts). Pure: no clock, no network. The rules mirror the database
  * functions in supabase/migrations (hdhs_*), which enforce them on the server; this module
- * decides what the screens offer and computes the monthly points of the Masterplan.
+ * decides what the screens offer.
  */
-import { calendarDaysBetween, HOUR_MS, startOfNextVnMonth, startOfVnMonth, toIsoDateTime, toMillis } from './dates';
+import { calendarDaysBetween, HOUR_MS, toIsoDateTime, toMillis } from './dates';
 import type { IsoDate, IsoDateTime, Millis } from './types';
 
 /* ── Departments and positions ───────────────────────────────────── */
@@ -337,137 +337,6 @@ export function validateMemberDraft(d: MemberDraft): MemberDraftErrors {
   return errors;
 }
 
-/* ── Monthly points (Masterplan, "Hệ thống điểm thành viên") ──────── */
-
-export interface ScoreWeights {
-  completion: number;
-  quality: number;
-  onTime: number;
-  attendance: number;
-  cooperation: number;
-}
-
-/** A 35 · B 25 · C 15 · D 15 · E 10 (kept as data so Ban điều hành can change them). */
-export const DEFAULT_SCORE_WEIGHTS: ScoreWeights = { completion: 35, quality: 25, onTime: 15, attendance: 15, cooperation: 10 };
-/** Bonus points per month, all kinds together. */
-export const BONUS_CAP = 15;
-/** "Hỗ trợ ban khác": at most +6 per month. */
-export const SUPPORT_CAP = 6;
-
-export type BonusKind = 'event_lead' | 'initiative' | 'excellent' | 'overtime' | 'support';
-
-export const BONUS_POINTS: Record<BonusKind, number> = { event_lead: 5, initiative: 5, excellent: 3, overtime: 3, support: 2 };
-
-export const BONUS_LABELS: Record<BonusKind, string> = {
-  event_lead: 'Đảm nhận vai trò chính trong sự kiện',
-  initiative: 'Sáng kiến được Ban điều hành áp dụng',
-  excellent: 'Sản phẩm được ghi nhận xuất sắc',
-  overtime: 'Làm thêm đột xuất trước sự kiện lớn',
-  support: 'Hỗ trợ ban khác',
-};
-
-export interface AttendanceTally {
-  present: number;
-  excused: number;
-  /** Required sessions in the month: department meetings, general meetings, assigned events. */
-  required: number;
-}
-
-export interface MonthInput {
-  /** Tasks assigned to the member that fall due in the month (cancelled ones are ignored). */
-  tasks: readonly WsTask[];
-  attendance: AttendanceTally;
-  /** E, 0–10, given by the head between the 25th and the 28th. */
-  cooperation: number;
-  bonuses: readonly BonusKind[];
-  /** Approved penalties, as positive numbers (10 for "−10"). */
-  penalties: readonly number[];
-}
-
-export type Grade = 'xuat_sac' | 'tot' | 'dat' | 'can_cai_thien' | 'khong_dat';
-
-export const GRADE_LABELS: Record<Grade, string> = {
-  xuat_sac: 'Xuất sắc',
-  tot: 'Tốt',
-  dat: 'Đạt',
-  can_cai_thien: 'Cần cải thiện',
-  khong_dat: 'Không đạt',
-};
-
-export interface MonthScore {
-  completion: number;
-  quality: number;
-  onTime: number;
-  attendance: number;
-  cooperation: number;
-  base: number;
-  bonus: number;
-  penalty: number;
-  total: number;
-  grade: Grade;
-}
-
-const round2 = (n: number) => Math.round(n * 100) / 100;
-
-export function gradeFor(total: number): Grade {
-  if (total >= 90) return 'xuat_sac';
-  if (total >= 75) return 'tot';
-  if (total >= 60) return 'dat';
-  if (total >= 40) return 'can_cai_thien';
-  return 'khong_dat';
-}
-
-/** On time: handed in by the deadline, or 0.5 when late after a notice the head accepted. */
-function onTimeCredit(t: WsTask): number {
-  if (t.submittedAt === null || (t.status !== 'done' && t.status !== 'submitted')) return 0;
-  if (t.dueAt === null || toMillis(t.submittedAt) <= toMillis(t.dueAt)) return 1;
-  return t.lateApproved ? 0.5 : 0;
-}
-
-/**
- * The month's points, exactly as the Masterplan defines them. An unfinished task counts against
- * both A and C (intended). Bonuses and penalties are monthly: support is capped at +6 and all
- * bonuses at +15; the total never drops below 0. A month without tasks, ratings or required
- * sessions gives the full points of that criterion (nothing was missed).
- */
-export function monthlyScore(input: MonthInput, weights: ScoreWeights = DEFAULT_SCORE_WEIGHTS): MonthScore {
-  const tasks = input.tasks.filter((t) => t.status !== 'cancelled');
-  const n = tasks.length;
-  const done = tasks.filter((t) => t.status === 'done');
-  const ratings = done.flatMap((t) => (t.quality === null ? [] : [t.quality]));
-  const completion = n === 0 ? weights.completion : (done.length / n) * weights.completion;
-  const quality = ratings.length === 0 ? weights.quality : (ratings.reduce((s, q) => s + q, 0) / ratings.length / 5) * weights.quality;
-  const onTime = n === 0 ? weights.onTime : (tasks.reduce((s, t) => s + onTimeCredit(t), 0) / n) * weights.onTime;
-  const a = input.attendance;
-  const attendance = a.required <= 0 ? weights.attendance : Math.min(1, (a.present + 0.5 * a.excused) / a.required) * weights.attendance;
-  const cooperation = Math.min(weights.cooperation, Math.max(0, input.cooperation));
-  const base = round2(completion + quality + onTime + attendance + cooperation);
-  const support = Math.min(SUPPORT_CAP, input.bonuses.filter((b) => b === 'support').length * BONUS_POINTS.support);
-  const others = input.bonuses.filter((b) => b !== 'support').reduce((s, b) => s + BONUS_POINTS[b], 0);
-  const bonus = Math.min(BONUS_CAP, support + others);
-  const penalty = input.penalties.reduce((s, p) => s + Math.abs(p), 0);
-  const total = round2(Math.max(0, base + bonus - penalty));
-  return {
-    completion: round2(completion),
-    quality: round2(quality),
-    onTime: round2(onTime),
-    attendance: round2(attendance),
-    cooperation: round2(cooperation),
-    base,
-    bonus,
-    penalty,
-    total,
-    grade: gradeFor(total),
-  };
-}
-
-/** Tasks of a member that fall due in the Vietnam calendar month containing `month`. */
-export function tasksDueInMonth(tasks: readonly WsTask[], memberId: string, month: Millis): WsTask[] {
-  const from = startOfVnMonth(month);
-  const to = startOfNextVnMonth(month);
-  return tasks.filter((t) => t.assigneeId === memberId && t.dueAt !== null && toMillis(t.dueAt) >= from && toMillis(t.dueAt) < to);
-}
-
 /* ── Server errors (raised by the hdhs_* database functions) ─────── */
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -479,6 +348,11 @@ const ERROR_MESSAGES: Record<string, string> = {
   note_required: 'Vui lòng nêu lý do hoặc nội dung cần chỉnh sửa (tối thiểu 10 ký tự).',
   notice_too_late: 'Chỉ được báo trễ hạn trước hạn nộp ít nhất 24 giờ.',
   quality_required: 'Vui lòng chấm chất lượng sản phẩm từ 1 đến 5.',
+  invalid_score: 'Điểm nhập chưa hợp lệ. Vui lòng kiểm tra lại các ô được đánh dấu.',
+  invalid_month: 'Tháng chấm điểm không hợp lệ.',
+  unscored: 'Còn thành viên chưa được chấm điểm, nên chưa thể công bố bảng điểm.',
+  sheet_locked: 'Bảng điểm tháng này đã chốt hoặc đã công bố, không thể chỉnh sửa ở bước này.',
+  feedback_closed: 'Thời hạn gửi phản hồi về bảng điểm đã kết thúc.',
   network: 'Không kết nối được máy chủ. Vui lòng kiểm tra mạng và thử lại.',
 };
 

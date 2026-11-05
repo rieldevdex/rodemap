@@ -6,17 +6,19 @@ import { useNow } from '../../state/hooks';
 import { useWorkspace, type Workspace } from '../../workspace/useWorkspace';
 import { WorkspaceMembers } from './WorkspaceMembers';
 import { WorkspaceRequests } from './WorkspaceRequests';
+import { WorkspaceScores } from './WorkspaceScores';
 import { WorkspaceBoard, WorkspaceMyTasks } from './WorkspaceTasks';
 import './Workspace.css';
 
 const EYEBROW = 'Hội đồng Học sinh · Nội bộ';
 
-type Tab = 'mine' | 'board' | 'requests' | 'members';
+type Tab = 'mine' | 'board' | 'requests' | 'scores' | 'members';
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'mine', label: 'Việc của tôi' },
   { id: 'board', label: 'Công việc các ban' },
   { id: 'requests', label: 'Phiếu yêu cầu' },
+  { id: 'scores', label: 'Bảng điểm' },
   { id: 'members', label: 'Thành viên' },
 ];
 
@@ -99,6 +101,7 @@ function Ready({ ws, snapshot, me }: { ws: Workspace; snapshot: WsSnapshot; me: 
     mine: tasksForMember(snapshot.tasks, me.id).filter((t) => t.status !== 'done' && t.status !== 'cancelled').length + tasksToReview(snapshot.tasks, me).length,
     board: 0,
     requests: requestsToDepartment(snapshot.requests, me.departmentId).filter((r) => r.status === 'open').length,
+    scores: 0,
     members: 0,
   };
   const onKey = (e: KeyboardEvent<HTMLButtonElement>, index: number) => {
@@ -157,6 +160,7 @@ function Ready({ ws, snapshot, me }: { ws: Workspace; snapshot: WsSnapshot; me: 
         {tab === 'mine' ? <WorkspaceMyTasks ws={ws} snapshot={snapshot} me={me} now={now} /> : null}
         {tab === 'board' ? <WorkspaceBoard ws={ws} snapshot={snapshot} me={me} now={now} /> : null}
         {tab === 'requests' ? <WorkspaceRequests ws={ws} snapshot={snapshot} me={me} now={now} /> : null}
+        {tab === 'scores' ? <WorkspaceScores snapshot={snapshot} me={me} now={now} /> : null}
         {tab === 'members' ? <WorkspaceMembers ws={ws} snapshot={snapshot} me={me} /> : null}
       </section>
     </>
@@ -172,8 +176,8 @@ export function WorkspacePage() {
       <PageHead
         eyebrow={EYEBROW}
         title="Không gian HĐHS"
-        lead="Theo dõi công việc được giao, phiếu yêu cầu giữa các ban và danh sách thành viên của Hội đồng Học sinh."
-        leadShort="Công việc, phiếu yêu cầu và thành viên của Hội đồng Học sinh."
+        lead="Theo dõi công việc được giao, phiếu yêu cầu giữa các ban, bảng điểm hằng tháng và danh sách thành viên của Hội đồng Học sinh."
+        leadShort="Công việc, phiếu yêu cầu, bảng điểm và thành viên của Hội đồng Học sinh."
       />
       <div className="band band--surface">
         <div className="container stack stack--lg">
