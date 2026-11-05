@@ -213,6 +213,33 @@ export function canWriteProgress(me: WsMember, dept: DepartmentId, assignments: 
   return isHrLead(me) || followedDepartments(assignments, me).includes(dept);
 }
 
+/**
+ * Tasks a member sees (mirrors hdhs.can_see_task): BĐH all; everyone the tasks their department leads
+ * or takes part in and the tasks assigned to them; the heads of Ban Nhân sự every department but BĐH;
+ * a follower of Ban Nhân sự the departments they follow.
+ */
+export function canSeeTask(me: WsMember, task: Pick<WsTask, 'departmentId' | 'collaborators' | 'assigneeId'>, assignments: readonly WsHrAssignment[]): boolean {
+  if (isBdh(me) || task.assigneeId === me.id) return true;
+  if (task.departmentId === me.departmentId || task.collaborators.includes(me.departmentId)) return true;
+  if (task.departmentId === 'bdh') return false;
+  return isHrLead(me) || followedDepartments(assignments, me).includes(task.departmentId);
+}
+
+/** Request slips a member sees: those of their department, and, like tasks, for BĐH and Ban Nhân sự. */
+export function canSeeRequest(me: WsMember, r: Pick<WsRequest, 'fromDepartment' | 'toDepartment'>, assignments: readonly WsHrAssignment[]): boolean {
+  if (isBdh(me) || r.fromDepartment === me.departmentId || r.toDepartment === me.departmentId) return true;
+  if (r.fromDepartment === 'bdh' || r.toDepartment === 'bdh') return false;
+  const followed = followedDepartments(assignments, me);
+  return isHrLead(me) || followed.includes(r.fromDepartment) || followed.includes(r.toDepartment);
+}
+
+/** Departments offered on "Công việc các ban": the member's own, every one for BĐH, all but BĐH for the heads of Nhân sự, followed ones. */
+export function canViewDepartment(me: WsMember, dept: DepartmentId, assignments: readonly WsHrAssignment[]): boolean {
+  if (isBdh(me) || dept === me.departmentId) return true;
+  if (dept === 'bdh') return false;
+  return isHrLead(me) || followedDepartments(assignments, me).includes(dept);
+}
+
 /** Progress notes are read by BĐH, the heads of Ban Nhân sự, the follower and the department's own managers. */
 export function canReadProgress(me: WsMember, dept: DepartmentId, assignments: readonly WsHrAssignment[]): boolean {
   return canManage(me, dept) || isHrLead(me) || followedDepartments(assignments, me).includes(dept);
@@ -375,7 +402,19 @@ export interface TaskDraft {
 
 export type TaskDraftErrors = Partial<Record<'title' | 'assigneeId' | 'collaborators', string>>;
 
-export function validateTaskDraft(d: TaskDraft, members: readonly WsMember[]): TaskDraftErrors {
+/** A department takes part in at most this many open tasks of other departments at a time; anything else goes through a request slip. */
+export const MAX_OPEN_COLLABORATIONS = 3;
+
+/** Open tasks (not from a request slip) a department takes part in, except `exceptId` (mirrors hdhs_save_task). */
+export function collaborationLoad(tasks: readonly WsTask[], dept: DepartmentId, exceptId?: string): number {
+  return tasks.filter((t) => t.id !== exceptId && t.source !== 'request' && !isClosed(t) && t.collaborators.includes(dept)).length;
+}
+
+/**
+ * Checks a task draft. `previous` is the stored collaborator list when editing: a department already
+ * listed may stay even over the limit; only newly added ones are checked.
+ */
+export function validateTaskDraft(d: TaskDraft, members: readonly WsMember[], tasks: readonly WsTask[] = [], editing?: { id: string; collaborators: readonly DepartmentId[] }): TaskDraftErrors {
   const errors: TaskDraftErrors = {};
   const title = d.title.trim().length;
   if (title < 3 || title > 200) errors.title = 'Tên công việc cần có từ 3 đến 200 ký tự.';
@@ -383,7 +422,9 @@ export function validateTaskDraft(d: TaskDraft, members: readonly WsMember[]): T
     const member = members.find((m) => m.id === d.assigneeId);
     if (member?.departmentId !== d.departmentId || member.status !== 'active') errors.assigneeId = 'Người thực hiện cần là thành viên đang hoạt động của ban phụ trách.';
   }
+  const full = d.collaborators.filter((c) => !editing?.collaborators.includes(c) && collaborationLoad(tasks, c, editing?.id) >= MAX_OPEN_COLLABORATIONS);
   if (d.collaborators.includes(d.departmentId)) errors.collaborators = 'Ban phụ trách chính không đồng thời là ban phối hợp.';
+  else if (full.length > 0) errors.collaborators = `Mỗi ban phối hợp tối đa ${String(MAX_OPEN_COLLABORATIONS)} việc đang mở; ban được đánh dấu đã đủ. Vui lòng gửi phiếu yêu cầu thay vì thêm ban phối hợp.`;
   return errors;
 }
 
@@ -446,6 +487,8 @@ const ERROR_MESSAGES: Record<string, string> = {
   note_required: 'Vui lòng nêu lý do hoặc nội dung cần chỉnh sửa (tối thiểu 10 ký tự).',
   notice_too_late: 'Chỉ được báo trễ hạn trước hạn nộp ít nhất 24 giờ.',
   quality_required: 'Vui lòng chấm chất lượng sản phẩm từ 1 đến 5.',
+  invalid_collaborators: 'Ban phụ trách chính không đồng thời là ban phối hợp.',
+  too_many_collaborations: 'Ban phối hợp đã có đủ 3 việc phối hợp đang mở. Vui lòng gửi phiếu yêu cầu thay vì thêm ban phối hợp.',
   invalid_assignment: 'Ban được phân công không hợp lệ.',
   invalid_score: 'Điểm nhập chưa hợp lệ. Vui lòng kiểm tra lại các ô được đánh dấu.',
   invalid_month: 'Tháng chấm điểm không hợp lệ.',

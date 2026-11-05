@@ -316,6 +316,8 @@ DEPARTMENT_IDS, POSITIONS, POSITION_LABELS, TASK_STATUS_LABELS, TASK_ACTION_LABE
 canManage(me, dept)            // BĐH: every department; truong_ban/pho_ban: their own (mirrors hdhs.can_manage)
 canManageMembers(me)           // BĐH and the heads of Ban Nhân sự (isHrLead: truong_ban/pho_ban of hr)
 followedDepartments(assignments, me) / canAssignHr(me)   // BĐH assigns members of Ban Nhân sự to departments
+canSeeTask / canSeeRequest / canViewDepartment   // mirror hdhs.can_see_task / can_see_request (snapshot filter)
+MAX_OPEN_COLLABORATIONS = 3; collaborationLoad(tasks, dept, exceptId?); validateTaskDraft(draft, members, tasks?, editing?)
 canWriteProgress / canReadProgress / departmentProgress(tasks, dept, now) / progressNotesFor / formatWeek / validateProgressNote
 availableActions(task, me, now): TaskAction[]   // mirrors public.hdhs_task_action
 canNotifyLate(task, now)       // once, open task, ≥ 24 h before the deadline

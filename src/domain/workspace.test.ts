@@ -4,6 +4,10 @@ import {
   availableActions,
   canManage,
   canAssignHr,
+  canSeeRequest,
+  canSeeTask,
+  canViewDepartment,
+  collaborationLoad,
   canManageMembers,
   canReadProgress,
   canWriteProgress,
@@ -37,6 +41,7 @@ import {
   fromDateTimeInput,
   toDateTimeInput,
   workspaceErrorMessage,
+  type DepartmentId,
   type MemberDraft,
   type WsMember,
   type WsRequest,
@@ -159,6 +164,37 @@ describe('progress follow-up by Ban Nhân sự', () => {
     expect(followedDepartments(assignments, member())).toEqual([]);
     expect(canAssignHr(bdh)).toBe(true);
     expect(canAssignHr(hrHead)).toBe(false);
+  });
+
+  it('shows a member the work of their department, its collaborations and their own tasks; BĐH work only to BĐH', () => {
+    const pr = task({ departmentId: 'pr', assigneeId: null });
+    const designWithPr = task({ departmentId: 'design', collaborators: ['pr'], assigneeId: null });
+    const design = task({ departmentId: 'design', assigneeId: null });
+    const council = task({ departmentId: 'bdh', assigneeId: null });
+    const mine = task({ departmentId: 'su-kien', assigneeId: 'm-1' });
+    const plain = member();
+    expect([pr, designWithPr, design, council, mine].map((t) => canSeeTask(plain, t, assignments))).toEqual([true, true, false, false, true]);
+    expect([pr, design, council].map((t) => canSeeTask(follower, t, assignments))).toEqual([true, true, false]);
+    expect([pr, design, council, task({ departmentId: 'su-kien', assigneeId: null })].map((t) => canSeeTask(hrHead, t, assignments))).toEqual([true, true, false, true]);
+    expect(canSeeTask(member({ id: 'n-2', departmentId: 'hr' }), design, assignments)).toBe(false);
+    expect(canSeeTask(bdh, council, assignments)).toBe(true);
+    expect(canSeeTask(member({ departmentId: 'bdh', id: 'b-9' }), task({ departmentId: 'bdh', assigneeId: null, collaborators: [] }), assignments)).toBe(true);
+
+    const slip = (fromDepartment: DepartmentId, toDepartment: DepartmentId) => request({ fromDepartment, toDepartment });
+    expect(canSeeRequest(plain, slip('design', 'pr'), assignments)).toBe(true);
+    expect(canSeeRequest(plain, slip('design', 'su-kien'), assignments)).toBe(false);
+    expect(canSeeRequest(follower, slip('su-kien', 'design'), assignments)).toBe(true);
+    expect(canSeeRequest(follower, slip('su-kien', 'tai-chinh'), assignments)).toBe(false);
+    expect(canSeeRequest(hrHead, slip('su-kien', 'tai-chinh'), assignments)).toBe(true);
+    expect(canSeeRequest(hrHead, slip('bdh', 'tai-chinh'), assignments)).toBe(false);
+    expect(canSeeRequest(bdh, slip('su-kien', 'tai-chinh'), assignments)).toBe(true);
+
+    expect(canViewDepartment(plain, 'pr', assignments)).toBe(true);
+    expect(canViewDepartment(plain, 'design', assignments)).toBe(false);
+    expect(canViewDepartment(follower, 'design', assignments)).toBe(true);
+    expect(canViewDepartment(hrHead, 'tai-chinh', assignments)).toBe(true);
+    expect(canViewDepartment(hrHead, 'bdh', assignments)).toBe(false);
+    expect(canViewDepartment(bdh, 'tai-chinh', assignments)).toBe(true);
   });
 
   it('lets the follower and the heads of Ban Nhân sự write notes, and the department managers and BĐH read them', () => {
@@ -322,6 +358,18 @@ describe('validation', () => {
     ]);
     expect(validateTaskDraft({ ...draft, assigneeId: 'pr-2' }, members).assigneeId).toBeDefined();
     expect(validateTaskDraft({ ...draft, assigneeId: 'ghost' }, members).assigneeId).toBeDefined();
+  });
+
+  it('keeps each department to 3 open collaborations, counting neither slips nor closed work, and lets existing ones stay', () => {
+    const withPr = (id: string, extra: Partial<WsTask> = {}) => task({ id, departmentId: 'design', collaborators: ['pr'], ...extra });
+    const tasks = [withPr('c-1'), withPr('c-2'), withPr('c-3'), withPr('c-4', { status: 'done' }), withPr('c-5', { source: 'request' })];
+    expect(collaborationLoad(tasks, 'pr')).toBe(3);
+    expect(collaborationLoad(tasks, 'pr', 'c-1')).toBe(2);
+    const draft = { title: 'Thiết kế bài đăng', description: '', output: '', departmentId: 'design' as const, collaborators: ['pr' as const], assigneeId: null, dueAt: null };
+    expect(validateTaskDraft(draft, [], tasks).collaborators).toContain('tối đa 3 việc');
+    expect(validateTaskDraft(draft, [], tasks, { id: 'c-9', collaborators: ['pr'] })).toEqual({});
+    expect(validateTaskDraft(draft, [], tasks, { id: 'c-1', collaborators: [] })).toEqual({});
+    expect(validateTaskDraft({ ...draft, collaborators: ['hr'] }, [], tasks)).toEqual({});
   });
 
   it('checks a request slip', () => {

@@ -573,6 +573,9 @@ head as other pages (eyebrow "Hội đồng Học sinh · Nội bộ"), then on 
 - **Member table**: one table per department, mono class, status tag; e-mail and "Đăng nhập" only
   for Ban điều hành and the heads of Ban Nhân sự. The Ban Nhân sự table adds "Theo dõi tiến độ" (followed
   departments) with a quiet "Phân công" for BĐH (checkbox ConfirmDialog).
+- **Công việc các ban** offers only the departments the member may view (own, followed, all but BĐH for
+  the heads of Nhân sự, all for BĐH). In the task form each "Ban phối hợp" checkbox shows its open
+  collaborations in mono ("PR (2/3)") with a hint to use a request slip for one-off help.
 - **Tiến độ panel** (added 2026-11-05) on "Công việc các ban", only for readers of that department's
   progress: a surface card with a signal left rule, heading "Tiến độ <ban>", the followers' names,
   fact tiles (label xs ink-2, mono value), the overdue list, the weekly note form for the follower,

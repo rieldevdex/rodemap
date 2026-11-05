@@ -8,11 +8,14 @@ import { formatDate, formatTime, toMillis } from '../../domain/dates';
 import {
   availableActions,
   canManage,
+  canViewDepartment,
+  collaborationLoad,
   daysLeft,
   DEPARTMENT_IDS,
   followedDepartments,
   fromDateTimeInput,
   isOverdue,
+  MAX_OPEN_COLLABORATIONS,
   MAX_REVISIONS,
   membersOf,
   TASK_ACTION_LABELS,
@@ -291,7 +294,7 @@ function TaskForm({ ws, snapshot, me, initial, onClose }: { ws: Workspace; snaps
       : emptyDraft(initial),
   );
   const [shown, setShown] = useState(false);
-  const errors = validateTaskDraft(draft, snapshot.members);
+  const errors = validateTaskDraft(draft, snapshot.members, snapshot.tasks, editing ? { id: initial.id, collaborators: initial.collaborators } : undefined);
   const set = (patch: Partial<TaskDraft>) => {
     setDraft((d) => ({ ...d, ...patch }));
   };
@@ -390,10 +393,16 @@ function TaskForm({ ws, snapshot, me, initial, onClose }: { ws: Workspace; snaps
                   set({ collaborators: e.target.checked ? [...draft.collaborators, d] : draft.collaborators.filter((c) => c !== d) });
                 }}
               />
-              {shortName(snapshot, d)}
+              {shortName(snapshot, d)}{' '}
+              <span className="mono">
+                ({collaborationLoad(snapshot.tasks, d, editing ? initial.id : undefined)}/{MAX_OPEN_COLLABORATIONS})
+              </span>
             </label>
           ))}
         </div>
+        <span className="submission-form__hint">
+          Số việc phối hợp đang mở của mỗi ban, tối đa {MAX_OPEN_COLLABORATIONS}. Phối hợp là cùng làm một sản phẩm; nếu chỉ cần ban khác hỗ trợ một lần, hãy gửi phiếu yêu cầu.
+        </span>
         {err('collaborators')}
       </fieldset>
       <div className="submission-form__field">
@@ -520,7 +529,7 @@ export function WorkspaceBoard(props: PanelProps) {
   return (
     <div className="stack stack--lg">
       <div className="cluster cluster--sm" role="group" aria-label="Chọn ban">
-        {snapshot.departments.map((d) => (
+        {snapshot.departments.filter((d) => canViewDepartment(me, d.id, snapshot.hrAssignments)).map((d) => (
           <Chip
             key={d.id}
             pressed={dept === d.id}

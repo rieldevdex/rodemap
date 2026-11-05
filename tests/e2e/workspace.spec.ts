@@ -196,11 +196,11 @@ test.describe('Không gian HĐHS', () => {
     await form.getByRole('button', { name: 'Gửi phiếu yêu cầu' }).click();
     await expect(form.getByText('Tên yêu cầu cần có từ 5 đến 160 ký tự.')).toBeVisible();
 
-    // Board: other departments are read-only for a PR head.
+    // Board: a PR head works on PR only; other departments and Ban điều hành are not offered.
     await tabs.getByRole('tab', { name: 'Công việc các ban' }).click();
     await expect(page.getByRole('button', { name: 'Thêm công việc' })).toBeVisible();
-    await page.getByRole('group', { name: 'Chọn ban' }).getByRole('button', { name: 'Design' }).click();
-    await expect(page.getByRole('button', { name: 'Thêm công việc' })).toHaveCount(0);
+    const chips = page.getByRole('group', { name: 'Chọn ban' });
+    await expect(chips.getByRole('button')).toHaveText(['PR']);
 
     // Members: names by department; no e-mail column for a PR head.
     await tabs.getByRole('tab', { name: 'Thành viên' }).click();
@@ -264,8 +264,9 @@ test.describe('Không gian HĐHS', () => {
     const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(axe.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')).toEqual([]);
 
-    // Other departments show no progress panel to this member, and the member list hides the e-mail column.
-    await page.getByRole('group', { name: 'Chọn ban' }).getByRole('button', { name: 'Design' }).click();
+    // Only the own and followed departments are offered, and the member list hides the e-mail column.
+    await expect(page.getByRole('group', { name: 'Chọn ban' }).getByRole('button')).toHaveText(['PR', 'Nhân sự']);
+    await page.getByRole('group', { name: 'Chọn ban' }).getByRole('button', { name: 'Nhân sự' }).click();
     await expect(page.getByRole('region', { name: /^Tiến độ/ })).toHaveCount(0);
     await tabs.getByRole('tab', { name: 'Thành viên' }).click();
     await expect(page.getByRole('table', { name: 'Thành viên Ban Nhân sự' })).toContainText('PR');
