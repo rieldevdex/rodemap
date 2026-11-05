@@ -479,6 +479,7 @@ export type RouteName = 'home'|'onboarding'|'dashboard'|'explore'|'event'|'route
 export const ROUTES: { name: RouteName; path: string; title: string }[];
 // paths: / · /thiet-lap · /tong-quan · /kham-pha · /su-kien/:slug · /lo-trinh · /lich · /ho-so
 //        /cau-lac-bo · /cau-lac-bo/:slug · /cong-cau-lac-bo · /kiem-duyet · /gioi-thieu (old /de-an aliased) · /de-xuat
+//        /hdhs · /quyen-rieng-tu · /dieu-khoan (src/content/legal.ts; linked from the Google consent screen)
 //        /ban-tin · /ban-tin/soan-bai (before the slug route) · /ban-tin/:slug
 export function matchRoute(pathname: string): { name: RouteName; params: Record<string, string> };
 export function pathFor(name: RouteName, params?: Record<string, string>): string;

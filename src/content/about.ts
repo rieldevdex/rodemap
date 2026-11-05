@@ -68,7 +68,7 @@ export const ABOUT_SECTIONS: AboutSection[] = [
     title: 'Bảo vệ dữ liệu học sinh',
     paragraphs: [
       'vsmcclubs áp dụng nguyên tắc thu thập tối thiểu: hồ sơ học sinh chỉ gồm khối, lớp, lĩnh vực quan tâm, mục tiêu trong năm học và thời gian có thể tham gia. Nền tảng không thu thập số điện thoại, địa chỉ, thông tin sức khỏe hay thông tin tài chính.',
-      'Ở phiên bản hiện tại, hồ sơ, đăng ký và hồ sơ năng lực của học sinh chỉ được lưu trên thiết bị của học sinh và có thể xóa bất kỳ lúc nào tại mục Tài khoản. Phương án tài khoản và lưu trữ trên máy chủ được trình Ban Giám hiệu phê duyệt trước khi triển khai và tuân thủ quy định pháp luật hiện hành về bảo vệ dữ liệu cá nhân.',
+      'Hồ sơ, đăng ký và hồ sơ năng lực của học sinh chỉ được lưu trên thiết bị của học sinh và có thể xóa bất kỳ lúc nào tại mục Tài khoản. Riêng Không gian HĐHS, công cụ nội bộ của thành viên Hội đồng Học sinh, lưu dữ liệu công việc trên máy chủ với sự chấp thuận của nhà trường. Chi tiết được trình bày tại Chính sách quyền riêng tư.',
       'Mochi không lưu nội dung trò chuyện, không yêu cầu thông tin cá nhân nhạy cảm và được hướng dẫn từ chối các chủ đề ngoài phạm vi hoạt động của nhà trường. Để tính số câu hỏi mỗi tuần, máy chủ chỉ lưu mã băm của một mã ngẫu nhiên do trình duyệt tạo ra, không gắn với học sinh.',
     ],
   },

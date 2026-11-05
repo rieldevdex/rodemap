@@ -30,6 +30,8 @@ export const ROUTES: { name: string; path: string }[] = [
   { name: 'kiem-duyet', path: '/kiem-duyet' },
   { name: 'gioi-thieu', path: '/gioi-thieu' },
   { name: 'hdhs', path: '/hdhs' },
+  { name: 'quyen-rieng-tu', path: '/quyen-rieng-tu' },
+  { name: 'dieu-khoan', path: '/dieu-khoan' },
   { name: 'de-xuat', path: '/de-xuat' },
   { name: 'ban-tin', path: '/ban-tin' },
   { name: 'bai-viet', path: `/ban-tin/${firstArticle.slug}` },

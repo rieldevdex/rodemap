@@ -1,47 +1,9 @@
 import { Button } from '../components/atoms/Button';
 import { PageHead } from '../components/molecules/PageHead';
-import { ABOUT_LEAD, ABOUT_PHASES, ABOUT_SECTIONS, ABOUT_TITLE, PLAN_SECTION, type AboutSection } from '../content/about';
+import { ABOUT_LEAD, ABOUT_PHASES, ABOUT_SECTIONS, ABOUT_TITLE, PLAN_SECTION } from '../content/about';
 import { SCHOOL } from '../data/school';
 import './About.css';
-
-/** "Tổng hợp: một nguồn…" → a bold lead-in and the rest. */
-function splitLead(text: string): [string, string] | null {
-  const i = text.indexOf(':');
-  return i > 0 && i < 24 ? [text.slice(0, i), text.slice(i + 1).trim()] : null;
-}
-
-function Section({ section }: { section: AboutSection }) {
-  return (
-    <section className="proposal__section" id={section.id} aria-labelledby={`${section.id}-title`}>
-      <h2 id={`${section.id}-title`} className="proposal__h2">
-        <span className="proposal__numeral">{section.numeral}.</span> {section.title}
-      </h2>
-      {section.paragraphs.map((p) => (
-        <p key={p} className="proposal__p">
-          {p}
-        </p>
-      ))}
-      {section.bullets ? (
-        <ul className="proposal__pillars">
-          {section.bullets.map((b) => {
-            const lead = splitLead(b);
-            return (
-              <li key={b}>
-                {lead ? (
-                  <>
-                    <strong>{lead[0]}</strong>: {lead[1]}
-                  </>
-                ) : (
-                  b
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      ) : null}
-    </section>
-  );
-}
+import { DocumentSection as Section } from './DocumentSection';
 
 /** Giới thiệu: what vsmcclubs is, how the council runs it and how student data is handled. */
 export function AboutPage() {

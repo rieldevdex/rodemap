@@ -35,6 +35,12 @@ export function Footer() {
             <li>
               <Link to="/hdhs">Không gian HĐHS</Link>
             </li>
+            <li>
+              <Link to="/quyen-rieng-tu">Quyền riêng tư</Link>
+            </li>
+            <li>
+              <Link to="/dieu-khoan">Điều khoản sử dụng</Link>
+            </li>
           </ul>
         </nav>
         <div className="footer__meta">

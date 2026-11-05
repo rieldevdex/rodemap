@@ -15,6 +15,8 @@ export type RouteName =
   | 'moderation'
   | 'about'
   | 'workspace'
+  | 'privacy'
+  | 'terms'
   | 'ideas'
   | 'news'
   | 'newsCompose'
@@ -46,6 +48,8 @@ export const ROUTES: RouteDef[] = [
   { name: 'moderation', path: '/kiem-duyet', title: 'Kiểm duyệt' },
   { name: 'about', path: '/gioi-thieu', title: 'Giới thiệu' },
   { name: 'workspace', path: '/hdhs', title: 'Không gian HĐHS' },
+  { name: 'privacy', path: '/quyen-rieng-tu', title: 'Chính sách quyền riêng tư' },
+  { name: 'terms', path: '/dieu-khoan', title: 'Điều khoản sử dụng' },
   { name: 'ideas', path: '/de-xuat', title: 'Đề xuất' },
   { name: 'news', path: '/ban-tin', title: 'Bản tin Hội đồng Học sinh' },
   // Before newsArticle, so /ban-tin/soan-bai is never read as an article slug.
@@ -135,7 +139,7 @@ export function pathFor(name: RouteName, params: Record<string, string> = {}): s
 /**
  * Pages a visitor can try before setting up a profile: browsing events and suggestions
  * (Tổng quan shows quick picks instead of the personal dashboard), the route map, clubs, the
- * newsletter and the proposals list, plus Trang chủ, Thiết lập hồ sơ, Giới thiệu and 404.
+ * newsletter and the proposals list, plus Trang chủ, Thiết lập hồ sơ, Giới thiệu, the privacy policy, the terms and 404.
  * Actions on these pages that need a profile (registering, sending a proposal) ask for it.
  */
 export const PUBLIC_ROUTES: readonly RouteName[] = [
@@ -144,6 +148,8 @@ export const PUBLIC_ROUTES: readonly RouteName[] = [
   'about',
   // Council members sign in with their school account; no student profile is needed.
   'workspace',
+  'privacy',
+  'terms',
   'notFound',
   'dashboard',
   'explore',
