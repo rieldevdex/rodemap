@@ -11,7 +11,7 @@
  */
 import { DAY_MS, toMillis, vnParts } from './dates';
 import type { IsoDateTime, Millis } from './types';
-import { isBdh, type DepartmentId, type Position, type WsMember, type WsRequest, type WsTask } from './workspace';
+import { followedDepartments, isBdh, isHrLead, type DepartmentId, type Position, type WsHrAssignment, type WsMember, type WsRequest, type WsTask } from './workspace';
 
 /* ── Months ───────────────────────────────────────────────────────── */
 
@@ -217,16 +217,20 @@ export function canScore(me: WsMember, target: WsMember): boolean {
   return me.position === 'pho_ban' && target.position === 'thanh_vien';
 }
 
-/** BĐH and Ban Nhân sự see the whole sheet; Ban Nhân sự checks and compiles but does not score. */
-export function seesWholeSheet(me: Pick<WsMember, 'departmentId'>): boolean {
-  return me.departmentId === 'bdh' || me.departmentId === 'hr';
+/** BĐH and the heads of Ban Nhân sự see the whole sheet; Ban Nhân sự checks and compiles but does not score. */
+export function seesWholeSheet(me: Pick<WsMember, 'departmentId' | 'position'>): boolean {
+  return isBdh(me) || isHrLead(me);
 }
 
-/** The rows shown to `me`: the whole sheet, the members they score, and their own once published. */
-export function visibleRows(sheet: WsScoreSheet, me: WsMember, members: readonly WsMember[]): WsMember[] {
+/**
+ * The rows shown to `me`: the whole sheet, the members they score, the departments they follow
+ * for Ban Nhân sự, and their own row once published.
+ */
+export function visibleRows(sheet: WsScoreSheet, me: WsMember, members: readonly WsMember[], assignments: readonly WsHrAssignment[] = []): WsMember[] {
+  const followed = followedDepartments(assignments, me);
   return members.filter((m) => {
     if (m.status !== 'active' && !sheet.scores.some((s) => s.memberId === m.id)) return false;
-    if (seesWholeSheet(me) || canScore(me, m)) return true;
+    if (seesWholeSheet(me) || canScore(me, m) || followed.includes(m.departmentId)) return true;
     return m.id === me.id && sheet.status !== 'draft';
   });
 }

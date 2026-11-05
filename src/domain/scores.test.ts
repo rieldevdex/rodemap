@@ -196,9 +196,14 @@ describe('permissions', () => {
   it('shows the whole sheet to BĐH and Nhân sự, the scored members to a head, and a member their own row once published', () => {
     const members = [mem, deputy, head, otherHead, hr, chair, member({ id: 'gone', status: 'inactive' }), member({ id: 'left', status: 'inactive' })];
     const draft = sheet({ scores: [row({ memberId: 'left' })] });
-    expect(seesWholeSheet(hr)).toBe(true);
+    expect(seesWholeSheet(hr)).toBe(false);
+    expect(seesWholeSheet(member({ departmentId: 'hr', position: 'truong_ban' }))).toBe(true);
+    expect(seesWholeSheet(chair)).toBe(true);
     expect(seesWholeSheet(head)).toBe(false);
-    expect(visibleRows(draft, hr, members).map((m) => m.id)).toEqual(['m-1', 'p-1', 'h-1', 'h-2', 'n-1', 'b-1', 'left']);
+    expect(visibleRows(draft, chair, members).map((m) => m.id)).toEqual(['m-1', 'p-1', 'h-1', 'h-2', 'n-1', 'b-1', 'left']);
+    // A member of Ban Nhân sự sees the departments BĐH assigned them, even while scoring.
+    expect(visibleRows(draft, hr, members, [{ memberId: 'n-1', departmentId: 'design' }]).map((m) => m.id)).toEqual(['h-2']);
+    expect(visibleRows(draft, hr, members)).toEqual([]);
     expect(visibleRows(draft, head, members).map((m) => m.id)).toEqual(['m-1', 'p-1', 'left']);
     expect(visibleRows(draft, mem, members)).toEqual([]);
     expect(visibleRows(sheet({ status: 'published' }), mem, members).map((m) => m.id)).toEqual(['m-1']);

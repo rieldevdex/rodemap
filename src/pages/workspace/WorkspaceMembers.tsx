@@ -4,7 +4,9 @@ import { StatusTag } from '../../components/atoms/StatusTag';
 import '../../components/organisms/EventSubmissionForm.css';
 import {
   BDH_POSITIONS,
+  canAssignHr,
   canManageMembers,
+  followedDepartments,
   MEMBER_STATUS_LABELS,
   membersOf,
   POSITION_LABELS,
@@ -18,6 +20,7 @@ import {
   type WsSnapshot,
 } from '../../domain/workspace';
 import type { Workspace } from '../../workspace/useWorkspace';
+import { HrAssignmentDialog } from './WorkspaceProgress';
 
 interface Props {
   ws: Workspace;
@@ -165,10 +168,16 @@ function MemberForm({ ws, snapshot, initial, onClose }: { ws: Workspace; snapsho
   );
 }
 
-/** "Thành viên": the member database by department. Ban điều hành and Ban Nhân sự add and edit members. */
+/** "Thành viên": the member database by department. BĐH and the heads of Ban Nhân sự add and edit members; BĐH assigns the followers of Ban Nhân sự. */
 export function WorkspaceMembers({ ws, snapshot, me }: Props) {
   const editor = canManageMembers(me);
+  const assigner = canAssignHr(me);
   const [form, setForm] = useState<WsMember | null | 'new'>(null);
+  const [assigning, setAssigning] = useState<WsMember | null>(null);
+  const followed = (m: WsMember) =>
+    followedDepartments(snapshot.hrAssignments, m)
+      .map((id) => snapshot.departments.find((d) => d.id === id)?.shortName ?? id)
+      .join(', ');
   return (
     <div className="stack stack--xl">
       {editor && form === null ? (
@@ -214,6 +223,7 @@ export function WorkspaceMembers({ ws, snapshot, me }: Props) {
                       <th scope="col">Lớp</th>
                       <th scope="col">Vị trí</th>
                       <th scope="col">Trạng thái</th>
+                      {d.id === 'hr' ? <th scope="col">Theo dõi tiến độ</th> : null}
                       {editor ? <th scope="col">Đăng nhập</th> : null}
                       {editor ? (
                         <th scope="col">
@@ -231,6 +241,24 @@ export function WorkspaceMembers({ ws, snapshot, me }: Props) {
                         <td>
                           <StatusTag tone={m.status === 'active' ? 'ok' : m.status === 'pending' ? 'warn' : 'neutral'}>{MEMBER_STATUS_LABELS[m.status]}</StatusTag>
                         </td>
+                        {d.id === 'hr' ? (
+                          <td>
+                            <div className="cluster cluster--sm">
+                              <span>{followed(m) === '' ? 'Chưa phân công' : followed(m)}</span>
+                              {assigner ? (
+                                <Button
+                                  size="sm"
+                                  variant="quiet"
+                                  onClick={() => {
+                                    setAssigning(m);
+                                  }}
+                                >
+                                  Phân công<span className="visually-hidden"> {m.fullName}</span>
+                                </Button>
+                              ) : null}
+                            </div>
+                          </td>
+                        ) : null}
                         {editor ? <td>{m.email === null ? 'Chưa có địa chỉ' : m.linked ? 'Đã liên kết' : m.email}</td> : null}
                         {editor ? (
                           <td>
@@ -254,6 +282,14 @@ export function WorkspaceMembers({ ws, snapshot, me }: Props) {
           </section>
         );
       })}
+      <HrAssignmentDialog
+        ws={ws}
+        snapshot={snapshot}
+        member={assigning}
+        onClose={() => {
+          setAssigning(null);
+        }}
+      />
     </div>
   );
 }

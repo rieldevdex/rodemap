@@ -10,6 +10,7 @@ import {
   canManage,
   daysLeft,
   DEPARTMENT_IDS,
+  followedDepartments,
   fromDateTimeInput,
   isOverdue,
   MAX_REVISIONS,
@@ -32,6 +33,7 @@ import {
 } from '../../domain/workspace';
 import type { Millis } from '../../domain/types';
 import type { Workspace } from '../../workspace/useWorkspace';
+import { FollowReminder, ProgressPanel } from './WorkspaceProgress';
 
 interface PanelProps {
   ws: Workspace;
@@ -467,6 +469,7 @@ export function WorkspaceMyTasks(props: PanelProps) {
   const free = canManage(me, me.departmentId) ? unassignedTasks(snapshot.tasks, me.departmentId) : [];
   return (
     <div className="stack stack--xl">
+      <FollowReminder snapshot={snapshot} me={me} now={props.now} />
       {review.length > 0 ? (
         <section className="stack stack--md" aria-labelledby="ws-review">
           <h2 id="ws-review" className="workspace__h2">
@@ -510,7 +513,8 @@ export function WorkspaceMyTasks(props: PanelProps) {
 export function WorkspaceBoard(props: PanelProps) {
   const { ws, snapshot, me } = props;
   const dialog = useActionDialog();
-  const [dept, setDept] = useState<DepartmentId>(me.departmentId);
+  // A member of Ban Nhân sự opens on the first department they follow.
+  const [dept, setDept] = useState<DepartmentId>(() => followedDepartments(snapshot.hrAssignments, me)[0] ?? me.departmentId);
   const [form, setForm] = useState<WsTask | DepartmentId | null>(null);
   const { lead, support } = tasksForDepartment(snapshot.tasks, dept);
   return (
@@ -529,6 +533,7 @@ export function WorkspaceBoard(props: PanelProps) {
           </Chip>
         ))}
       </div>
+      <ProgressPanel ws={ws} snapshot={snapshot} me={me} now={props.now} dept={dept} />
       {canManage(me, dept) && form === null ? (
         <div className="cluster">
           <Button

@@ -571,7 +571,13 @@ head as other pages (eyebrow "Hội đồng Học sinh · Nội bộ"), then on 
   quality 1–5 radios) open the ConfirmDialog; the confirm button stays disabled until valid.
 - Forms reuse `submission-form` fields inside a bordered surface card (`ws-form`).
 - **Member table**: one table per department, mono class, status tag; e-mail and "Đăng nhập" only
-  for Ban điều hành and Ban Nhân sự.
+  for Ban điều hành and the heads of Ban Nhân sự. The Ban Nhân sự table adds "Theo dõi tiến độ" (followed
+  departments) with a quiet "Phân công" for BĐH (checkbox ConfirmDialog).
+- **Tiến độ panel** (added 2026-11-05) on "Công việc các ban", only for readers of that department's
+  progress: a surface card with a signal left rule, heading "Tiến độ <ban>", the followers' names,
+  fact tiles (label xs ink-2, mono value), the overdue list, the weekly note form for the follower,
+  then the notes (meta line xs: week · author · last edit). "Việc của tôi" opens with "Theo dõi tiến
+  độ" for a follower: which departments, and which still lack this week's note.
 - **Bảng điểm** (added 2026-11-05): month heading with quiet "Tháng trước" / "Tháng sau" below it,
   a sheet status tag (Đang chấm warn, Đã công bố signal, Đã chốt ok) with "Đã chấm x/y", one line
   on who does what next, then BĐH's primary action (Công bố / Chốt, via ConfirmDialog). "Điểm của

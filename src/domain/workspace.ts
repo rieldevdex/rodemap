@@ -4,7 +4,7 @@
  * functions in supabase/migrations (hdhs_*), which enforce them on the server; this module
  * decides what the screens offer.
  */
-import { calendarDaysBetween, HOUR_MS, toIsoDateTime, toMillis } from './dates';
+import { calendarDaysBetween, HOUR_MS, startOfVnMonth, toIsoDateTime, toMillis } from './dates';
 import type { IsoDate, IsoDateTime, Millis } from './types';
 
 /* ── Departments and positions ───────────────────────────────────── */
@@ -150,6 +150,28 @@ export interface WsSnapshot {
   members: WsMember[];
   tasks: WsTask[];
   requests: WsRequest[];
+  /** Which members of Ban Nhân sự follow which departments (set by Ban điều hành). */
+  hrAssignments: WsHrAssignment[];
+  /** Weekly progress notes the signed-in member may read. */
+  progressNotes: WsProgressNote[];
+}
+
+/* ── Progress follow-up by Ban Nhân sự ───────────────────────────── */
+
+export interface WsHrAssignment {
+  memberId: string;
+  departmentId: DepartmentId;
+}
+
+export interface WsProgressNote {
+  id: string;
+  departmentId: DepartmentId;
+  /** ISO week, "2026-W45" (Vietnam time). */
+  week: string;
+  authorId: string;
+  body: string;
+  createdAt: IsoDateTime;
+  updatedAt: IsoDateTime;
 }
 
 /* ── Permissions (mirror hdhs.can_manage) ────────────────────────── */
@@ -164,9 +186,36 @@ export function canManage(me: Pick<WsMember, 'departmentId' | 'position'>, dept:
   return me.departmentId === dept && (me.position === 'truong_ban' || me.position === 'pho_ban');
 }
 
-/** Ban điều hành and Ban Nhân sự keep the member database. */
-export function canManageMembers(me: Pick<WsMember, 'departmentId'>): boolean {
-  return me.departmentId === 'bdh' || me.departmentId === 'hr';
+/** The head or deputy head of Ban Nhân sự (mirrors hdhs.is_hr_lead). */
+export function isHrLead(me: Pick<WsMember, 'departmentId' | 'position'>): boolean {
+  return me.departmentId === 'hr' && (me.position === 'truong_ban' || me.position === 'pho_ban');
+}
+
+/** Ban điều hành and the heads of Ban Nhân sự keep the member database and see the e-mail addresses. */
+export function canManageMembers(me: Pick<WsMember, 'departmentId' | 'position'>): boolean {
+  return isBdh(me) || isHrLead(me);
+}
+
+/** The departments a member of Ban Nhân sự follows (none for anyone else). */
+export function followedDepartments(assignments: readonly WsHrAssignment[], me: Pick<WsMember, 'id' | 'departmentId'>): DepartmentId[] {
+  if (me.departmentId !== 'hr') return [];
+  return assignments.filter((a) => a.memberId === me.id).map((a) => a.departmentId);
+}
+
+/** Only Ban điều hành assigns the members of Ban Nhân sự to departments. */
+export function canAssignHr(me: Pick<WsMember, 'departmentId'>): boolean {
+  return isBdh(me);
+}
+
+/** The heads of Ban Nhân sự write for any department but BĐH; a member of Ban Nhân sự for the departments they follow. */
+export function canWriteProgress(me: WsMember, dept: DepartmentId, assignments: readonly WsHrAssignment[]): boolean {
+  if (dept === 'bdh') return false;
+  return isHrLead(me) || followedDepartments(assignments, me).includes(dept);
+}
+
+/** Progress notes are read by BĐH, the heads of Ban Nhân sự, the follower and the department's own managers. */
+export function canReadProgress(me: WsMember, dept: DepartmentId, assignments: readonly WsHrAssignment[]): boolean {
+  return canManage(me, dept) || isHrLead(me) || followedDepartments(assignments, me).includes(dept);
 }
 
 const OPEN_STATUSES: readonly TaskStatus[] = ['todo', 'in_progress', 'changes_requested'];
@@ -263,6 +312,55 @@ export function membersOf(members: readonly WsMember[], dept: DepartmentId): WsM
     .sort((a, b) => POSITIONS.indexOf(a.position) - POSITIONS.indexOf(b.position) || a.fullName.localeCompare(b.fullName, 'vi'));
 }
 
+/** The figures of a department's own tasks that Ban Nhân sự follows week by week. */
+export interface DepartmentProgress {
+  open: number;
+  overdue: WsTask[];
+  /** Open and due within the next 7 days. */
+  dueSoon: WsTask[];
+  awaitingReview: number;
+  /** Late notices the managers have not answered yet. */
+  lateNotices: number;
+  unassigned: number;
+  /** Tasks due in the current month so far: how many, and how many handed in on time. */
+  month: { due: number; onTime: number };
+}
+
+const SOON_MS = 7 * 24 * HOUR_MS;
+
+export function departmentProgress(tasks: readonly WsTask[], dept: DepartmentId, now: Millis): DepartmentProgress {
+  const own = tasks.filter((t) => t.departmentId === dept && t.status !== 'cancelled');
+  const open = own.filter((t) => !isClosed(t) && t.status !== 'submitted');
+  const monthStart = startOfVnMonth(now);
+  const dueThisMonth = own.filter((t) => t.dueAt !== null && toMillis(t.dueAt) >= monthStart && toMillis(t.dueAt) <= now);
+  const onTime = dueThisMonth.filter((t) => t.submittedAt !== null && t.dueAt !== null && toMillis(t.submittedAt) <= toMillis(t.dueAt));
+  return {
+    open: open.length,
+    overdue: sortTasks(open.filter((t) => isOverdue(t, now))),
+    dueSoon: sortTasks(open.filter((t) => t.dueAt !== null && toMillis(t.dueAt) >= now && toMillis(t.dueAt) <= now + SOON_MS)),
+    awaitingReview: own.filter((t) => t.status === 'submitted').length,
+    lateNotices: own.filter((t) => t.lateNoticeAt !== null && !t.lateApproved && !isClosed(t)).length,
+    unassigned: open.filter((t) => t.assigneeId === null).length,
+    month: { due: dueThisMonth.length, onTime: onTime.length },
+  };
+}
+
+/** Notes of a department, newest week first, then newest edit first. */
+export function progressNotesFor(notes: readonly WsProgressNote[], dept: DepartmentId): WsProgressNote[] {
+  return notes.filter((n) => n.departmentId === dept).sort((a, b) => b.week.localeCompare(a.week) || b.updatedAt.localeCompare(a.updatedAt));
+}
+
+/** "Tuần 45/2026" for "2026-W45". */
+export function formatWeek(week: string): string {
+  const [year = '', w = ''] = week.split('-W');
+  return `Tuần ${String(Number(w))}/${year}`;
+}
+
+export function validateProgressNote(body: string): string | null {
+  const n = body.trim().length;
+  return n < 10 || n > 2000 ? 'Nhận xét tiến độ cần có từ 10 đến 2000 ký tự.' : null;
+}
+
 /* ── Drafts and validation ────────────────────────────────────────── */
 
 export interface TaskDraft {
@@ -348,6 +446,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   note_required: 'Vui lòng nêu lý do hoặc nội dung cần chỉnh sửa (tối thiểu 10 ký tự).',
   notice_too_late: 'Chỉ được báo trễ hạn trước hạn nộp ít nhất 24 giờ.',
   quality_required: 'Vui lòng chấm chất lượng sản phẩm từ 1 đến 5.',
+  invalid_assignment: 'Ban được phân công không hợp lệ.',
   invalid_score: 'Điểm nhập chưa hợp lệ. Vui lòng kiểm tra lại các ô được đánh dấu.',
   invalid_month: 'Tháng chấm điểm không hợp lệ.',
   unscored: 'Còn thành viên chưa được chấm điểm, nên chưa thể công bố bảng điểm.',

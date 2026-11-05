@@ -50,11 +50,15 @@ function snapshot(): WsSnapshot {
       { id: ME, fullName: 'Trưởng ban Thử nghiệm', className: '11A1', departmentId: 'pr', position: 'truong_ban', status: 'active', joinedOn: '2026-11-04', email: null, linked: true },
       { id: 'm-member', fullName: 'Thành viên Thử nghiệm', className: '10A2', departmentId: 'pr', position: 'thanh_vien', status: 'active', joinedOn: '2026-11-04', email: null, linked: false },
       { id: 'm-design', fullName: 'Thiết kế Thử nghiệm', className: '9A3', departmentId: 'design', position: 'truong_ban', status: 'active', joinedOn: '2026-11-04', email: null, linked: false },
+      { id: 'm-hr', fullName: 'Nhân sự Thử nghiệm', className: '10A5', departmentId: 'hr', position: 'thanh_vien', status: 'active', joinedOn: '2026-11-04', email: null, linked: true },
     ],
+    hrAssignments: [{ memberId: 'm-hr', departmentId: 'pr' }],
+    progressNotes: [],
     tasks: [
       task({ id: 't-1', title: 'Lên ý tưởng truyền thông 20/11', assigneeId: ME }),
       task({ id: 't-2', title: 'Viết caption bài chào mừng', status: 'submitted', link: 'https://example.com/caption', submittedAt: '2026-11-05T09:00:00+00:00' }),
       task({ id: 't-3', title: 'Đăng bài lịch chụp ảnh', assigneeId: null, dueAt: null }),
+      task({ id: 't-4', title: 'Chuyển giao tài khoản truyền thông', assigneeId: null, dueAt: '2026-11-02T16:59:00+00:00' }),
     ],
     requests: [
       {
@@ -77,7 +81,7 @@ function snapshot(): WsSnapshot {
 }
 
 /** A signed-in school session in this browser and a mocked database API that records the calls. */
-async function signedIn(page: Page): Promise<{ calls: { fn: string; body: unknown }[] }> {
+async function signedIn(page: Page, me = ME): Promise<{ calls: { fn: string; body: unknown }[] }> {
   const calls: { fn: string; body: unknown }[] = [];
   const user = { id: 'u-1', aud: 'authenticated', role: 'authenticated', email: 'thu.nghiem@stu.vinschool.edu.vn', app_metadata: {}, user_metadata: {}, created_at: '2026-11-04T00:00:00Z' };
   const session = { access_token: 'test-token', token_type: 'bearer', expires_in: 3600, expires_at: 4102444800, refresh_token: 'test-refresh', user };
@@ -87,15 +91,21 @@ async function signedIn(page: Page): Promise<{ calls: { fn: string; body: unknow
     },
     [SESSION_STORAGE_KEY, JSON.stringify(session)] as const,
   );
-  let data = snapshot();
+  let data = { ...snapshot(), me };
   let scores: unknown[] = [];
   await page.route(`${SUPABASE_URL}/**`, async (route: Route) => {
     const url = new URL(route.request().url());
     const fn = url.pathname.replace('/rest/v1/rpc/', '');
     const body: unknown = route.request().postDataJSON();
     calls.push({ fn, body });
-    if (fn === 'hdhs_me') return route.fulfill({ json: { status: 'ok', memberId: ME } });
+    if (fn === 'hdhs_me') return route.fulfill({ json: { status: 'ok', memberId: me } });
     if (fn === 'hdhs_snapshot') return route.fulfill({ json: data });
+    if (fn === 'hdhs_save_progress_note') {
+      const { p_department: departmentId, p_body: noteBody } = body as { p_department: WsTask['departmentId']; p_body: string };
+      const note = { id: 'n-1', departmentId, week: '2026-W45', authorId: me, body: noteBody, createdAt: '2026-11-05T09:00:00+07:00', updatedAt: '2026-11-05T09:00:00+07:00' };
+      data = { ...data, progressNotes: [note] };
+      return route.fulfill({ json: note });
+    }
     if (fn === 'hdhs_scores') {
       const { p_month: month } = body as { p_month: string };
       return route.fulfill({ json: { month, status: 'draft', publishedAt: null, finalizedAt: null, scores } });
@@ -231,6 +241,36 @@ test.describe('Không gian HĐHS', () => {
     expect(calls.find((c) => c.fn === 'hdhs_save_score')?.body).toMatchObject({
       p: { memberId: 'm-member', attendance: { present: 4, excused: 0, required: 4 }, cooperation: 9, bonuses: [{ kind: 'support', note: 'Hỗ trợ Ban Design thiết kế bài 20/11' }], penalties: [] },
     });
+    expect(errors).toEqual([]);
+  });
+
+  test('a member of Ban Nhân sự follows the progress of the department BĐH assigned', async ({ page }) => {
+    const errors = trackErrors(page);
+    const { calls } = await signedIn(page, 'm-hr');
+    await page.goto('/hdhs');
+    await expect(page.getByRole('region', { name: 'Theo dõi tiến độ' })).toContainText('Bạn theo dõi tiến độ của: PR');
+
+    // The board opens on the followed department, with its figures and the weekly note form.
+    const tabs = page.getByRole('tablist', { name: 'Không gian HĐHS' });
+    await tabs.getByRole('tab', { name: 'Công việc các ban' }).click();
+    const progress = page.getByRole('region', { name: 'Tiến độ PR' });
+    await expect(progress).toContainText('Ban Nhân sự theo dõi: Nhân sự Thử nghiệm.');
+    await expect(progress).toContainText('Chuyển giao tài khoản truyền thông');
+    const note = progress.getByRole('form', { name: 'Nhận xét tiến độ tuần này' });
+    await note.getByRole('textbox').fill('Ban PR còn một việc quá hạn: chuyển giao tài khoản.');
+    await note.getByRole('button', { name: 'Lưu nhận xét' }).click();
+    await expect(progress.getByRole('listitem').filter({ hasText: 'Ban PR còn một việc quá hạn' })).toBeVisible();
+    expect(calls.find((c) => c.fn === 'hdhs_save_progress_note')?.body).toEqual({ p_department: 'pr', p_body: 'Ban PR còn một việc quá hạn: chuyển giao tài khoản.' });
+    const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
+    expect(axe.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical')).toEqual([]);
+
+    // Other departments show no progress panel to this member, and the member list hides the e-mail column.
+    await page.getByRole('group', { name: 'Chọn ban' }).getByRole('button', { name: 'Design' }).click();
+    await expect(page.getByRole('region', { name: /^Tiến độ/ })).toHaveCount(0);
+    await tabs.getByRole('tab', { name: 'Thành viên' }).click();
+    await expect(page.getByRole('table', { name: 'Thành viên Ban Nhân sự' })).toContainText('PR');
+    await expect(page.getByRole('columnheader', { name: 'Đăng nhập' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Phân công/ })).toHaveCount(0);
     expect(errors).toEqual([]);
   });
 });

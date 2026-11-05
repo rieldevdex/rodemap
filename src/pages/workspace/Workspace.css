@@ -257,3 +257,61 @@
     grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) auto;
   }
 }
+
+/* ── Tiến độ (Ban Nhân sự follow-up) ───────────────────────────── */
+
+.ws-progress {
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: var(--rule-hair) solid var(--color-rule);
+  border-inline-start: var(--rule-strong) solid var(--color-signal);
+  border-radius: var(--radius-md);
+}
+
+.ws-progress__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--space-8) + var(--space-7)), 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.ws-progress__facts > div {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+}
+
+.ws-progress__facts dt {
+  font-size: var(--text-xs);
+  color: var(--color-ink-2);
+}
+
+.ws-progress__facts dd {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+}
+
+.ws-progress__list,
+.ws-progress__notes {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+}
+
+.ws-progress__notes > li {
+  display: grid;
+  gap: var(--space-1);
+  padding-block-end: var(--space-2);
+  border-block-end: var(--rule-hair) solid var(--color-rule);
+}
+
+.ws-progress__meta {
+  font-size: var(--text-xs);
+  color: var(--color-ink-2);
+}

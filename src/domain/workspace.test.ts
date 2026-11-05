@@ -3,7 +3,16 @@ import { toMillis } from './dates';
 import {
   availableActions,
   canManage,
+  canAssignHr,
   canManageMembers,
+  canReadProgress,
+  canWriteProgress,
+  departmentProgress,
+  followedDepartments,
+  formatWeek,
+  isHrLead,
+  progressNotesFor,
+  validateProgressNote,
   canNotifyLate,
   daysLeft,
   isBdh,
@@ -124,10 +133,84 @@ describe('permissions', () => {
     expect(canManage(member(), 'pr')).toBe(false);
   });
 
-  it('lets only Ban điều hành and Ban Nhân sự keep the member database', () => {
+  it('lets only Ban điều hành and the heads of Ban Nhân sự keep the member database', () => {
     expect(canManageMembers(bdh)).toBe(true);
-    expect(canManageMembers(member({ departmentId: 'hr' }))).toBe(true);
+    expect(canManageMembers(member({ departmentId: 'hr', position: 'truong_ban' }))).toBe(true);
+    expect(canManageMembers(member({ departmentId: 'hr', position: 'pho_ban' }))).toBe(true);
+    expect(canManageMembers(member({ departmentId: 'hr' }))).toBe(false);
     expect(canManageMembers(head)).toBe(false);
+    expect(isHrLead(member({ departmentId: 'hr', position: 'truong_ban' }))).toBe(true);
+    expect(isHrLead(head)).toBe(false);
+  });
+});
+
+describe('progress follow-up by Ban Nhân sự', () => {
+  const follower = member({ id: 'n-1', departmentId: 'hr' });
+  const hrHead = member({ id: 'n-0', departmentId: 'hr', position: 'truong_ban' });
+  const assignments = [
+    { memberId: 'n-1', departmentId: 'pr' as const },
+    { memberId: 'n-1', departmentId: 'design' as const },
+    { memberId: 'm-1', departmentId: 'su-kien' as const },
+  ];
+
+  it('lists the departments a member of Ban Nhân sự follows, and lets only BĐH assign them', () => {
+    expect(followedDepartments(assignments, follower)).toEqual(['pr', 'design']);
+    // An assignment left behind after a member moved out of Ban Nhân sự grants nothing.
+    expect(followedDepartments(assignments, member())).toEqual([]);
+    expect(canAssignHr(bdh)).toBe(true);
+    expect(canAssignHr(hrHead)).toBe(false);
+  });
+
+  it('lets the follower and the heads of Ban Nhân sự write notes, and the department managers and BĐH read them', () => {
+    expect(canWriteProgress(follower, 'pr', assignments)).toBe(true);
+    expect(canWriteProgress(follower, 'su-kien', assignments)).toBe(false);
+    expect(canWriteProgress(hrHead, 'su-kien', assignments)).toBe(true);
+    expect(canWriteProgress(hrHead, 'bdh', assignments)).toBe(false);
+    expect(canWriteProgress(bdh, 'pr', assignments)).toBe(false);
+    expect(canReadProgress(follower, 'design', assignments)).toBe(true);
+    expect(canReadProgress(follower, 'su-kien', assignments)).toBe(false);
+    expect(canReadProgress(hrHead, 'su-kien', assignments)).toBe(true);
+    expect(canReadProgress(head, 'pr', assignments)).toBe(true);
+    expect(canReadProgress(head, 'design', assignments)).toBe(false);
+    expect(canReadProgress(member(), 'pr', assignments)).toBe(false);
+    expect(canReadProgress(bdh, 'design', assignments)).toBe(true);
+  });
+
+  it('measures a department: open, overdue, due within 7 days, awaiting review, late notices, unassigned and on-time this month', () => {
+    const progress = departmentProgress(
+      [
+        task({ id: 'late', dueAt: '2026-11-03T23:59:00+07:00' }),
+        task({ id: 'soon', dueAt: '2026-11-10T23:59:00+07:00', assigneeId: null }),
+        task({ id: 'later', dueAt: '2026-11-30T23:59:00+07:00', lateNoticeAt: '2026-11-04T09:00:00+07:00', lateNoticeReason: 'Chờ nội dung từ Ban Sự kiện' }),
+        task({ id: 'nodate', dueAt: null, assigneeId: null }),
+        task({ id: 'review', status: 'submitted', dueAt: '2026-11-04T23:59:00+07:00', submittedAt: '2026-11-04T20:00:00+07:00' }),
+        task({ id: 'done-late', status: 'done', dueAt: '2026-11-02T23:59:00+07:00', submittedAt: '2026-11-03T08:00:00+07:00' }),
+        task({ id: 'done-unsubmitted', status: 'done', dueAt: '2026-11-01T23:59:00+07:00' }),
+        task({ id: 'cancelled', status: 'cancelled', dueAt: '2026-11-02T23:59:00+07:00' }),
+        task({ id: 'october', status: 'done', dueAt: '2026-10-30T23:59:00+07:00', submittedAt: '2026-10-29T08:00:00+07:00' }),
+        task({ id: 'other', departmentId: 'design', dueAt: '2026-11-03T23:59:00+07:00' }),
+      ],
+      'pr',
+      NOW,
+    );
+    expect(progress.open).toBe(4);
+    expect(progress.overdue.map((t) => t.id)).toEqual(['late']);
+    expect(progress.dueSoon.map((t) => t.id)).toEqual(['soon']);
+    expect(progress.awaitingReview).toBe(1);
+    expect(progress.lateNotices).toBe(1);
+    expect(progress.unassigned).toBe(2);
+    expect(progress.month).toEqual({ due: 4, onTime: 1 });
+  });
+
+  it('orders notes by week then by last edit, names weeks and checks their length', () => {
+    const note = (id: string, week: string, updatedAt: string, departmentId: 'pr' | 'design' = 'pr') => ({ id, departmentId, week, authorId: 'n-1', body: 'Ban hoàn thành đúng hạn.', createdAt: updatedAt, updatedAt });
+    const notes = [note('a', '2026-W44', '2026-11-01T09:00:00+07:00'), note('b', '2026-W45', '2026-11-05T09:00:00+07:00'), note('c', '2026-W45', '2026-11-06T09:00:00+07:00'), note('d', '2026-W45', '2026-11-06T09:00:00+07:00', 'design')];
+    expect(progressNotesFor(notes, 'pr').map((n) => n.id)).toEqual(['c', 'b', 'a']);
+    expect(formatWeek('2026-W05')).toBe('Tuần 5/2026');
+    expect(formatWeek('')).toBe('Tuần 0/');
+    expect(validateProgressNote('Ngắn')).not.toBeNull();
+    expect(validateProgressNote('x'.repeat(2001))).not.toBeNull();
+    expect(validateProgressNote('Ban hoàn thành 3/4 việc đúng hạn.')).toBeNull();
   });
 });
 

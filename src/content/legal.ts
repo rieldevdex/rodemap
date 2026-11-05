@@ -64,7 +64,7 @@ export const PRIVACY_POLICY: LegalDocument = {
       numeral: 'V',
       title: 'Không gian HĐHS',
       paragraphs: [
-        'Không gian HĐHS là công cụ nội bộ để Hội đồng Học sinh phân công, theo dõi và đánh giá công việc theo Masterplan của nhiệm kỳ. Chỉ thành viên có tên trong danh sách do Ban điều hành hoặc Ban Nhân sự quản lý mới đăng nhập được, bằng tài khoản Google của trường. Việc sử dụng tài khoản trường cho mục đích này đã được nhà trường chấp thuận.',
+        'Không gian HĐHS là công cụ nội bộ để Hội đồng Học sinh phân công, theo dõi và đánh giá công việc theo Masterplan của nhiệm kỳ. Chỉ thành viên có tên trong danh sách do Ban điều hành hoặc trưởng ban, phó ban Nhân sự quản lý mới đăng nhập được, bằng tài khoản Google của trường. Việc sử dụng tài khoản trường cho mục đích này đã được nhà trường chấp thuận.',
         'Dữ liệu được lưu trên máy chủ gồm:',
       ],
       bullets: [
@@ -72,8 +72,9 @@ export const PRIVACY_POLICY: LegalDocument = {
         'Công việc: tên việc, mô tả, hạn, người thực hiện, đường dẫn sản phẩm đã nộp, đánh giá chất lượng, số lần chỉnh sửa và lý do báo trễ hạn.',
         'Phiếu yêu cầu: người gửi, ban gửi, ban nhận, nội dung, hạn và phản hồi của các yêu cầu giữa các ban.',
         'Nhật ký thao tác: người thực hiện, thao tác và thời điểm, để đối chiếu khi có ý kiến về kết quả đánh giá.',
+        'Nhận xét tiến độ hằng tuần của thành viên Ban Nhân sự về các ban được phân công theo dõi, kèm tên người nhận xét.',
         'Bảng điểm hằng tháng: số buổi bắt buộc, có mặt và vắng có phép, điểm hợp tác hoặc điểm theo tiêu chí của trưởng ban, điểm cộng và điểm trừ kèm căn cứ, nhận xét của người chấm, phản hồi của thành viên và ý kiến của Ban điều hành.',
-        'Phạm vi xem: mọi thành viên xem được công việc và danh sách thành viên của Hội đồng Học sinh; chỉ Ban điều hành và Ban Nhân sự xem được địa chỉ thư điện tử. Mỗi thành viên chỉ xem được điểm của mình sau khi bảng điểm được công bố; người chấm xem điểm của những thành viên mình chấm; Ban điều hành và Ban Nhân sự xem toàn bộ bảng điểm.',
+        'Phạm vi xem: mọi thành viên xem được công việc và danh sách thành viên của Hội đồng Học sinh; chỉ Ban điều hành và trưởng ban, phó ban Nhân sự xem được địa chỉ thư điện tử. Mỗi thành viên chỉ xem được điểm của mình sau khi bảng điểm được công bố; người chấm xem điểm của những thành viên mình chấm; thành viên Ban Nhân sự xem điểm và nhận xét tiến độ của các ban được phân công theo dõi; Ban điều hành và trưởng ban, phó ban Nhân sự xem toàn bộ bảng điểm. Nhận xét tiến độ của một ban được đọc bởi trưởng ban, phó ban của ban đó.',
       ],
     },
     {

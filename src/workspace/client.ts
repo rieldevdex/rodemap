@@ -6,6 +6,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import {
   SCHOOL_EMAIL_DOMAIN,
+  type DepartmentId,
   type MemberDraft,
   type RequestDraft,
   type TaskAction,
@@ -94,6 +95,14 @@ export function answerRequest(requestId: string, accept: boolean, assigneeId: st
 
 export function saveMember(draft: MemberDraft & { id?: string }): Promise<unknown> {
   return rpc('hdhs_save_member', { p: draft });
+}
+
+export function setHrAssignments(memberId: string, departments: DepartmentId[]): Promise<unknown> {
+  return rpc('hdhs_set_hr_assignments', { p_member: memberId, p_departments: departments });
+}
+
+export function saveProgressNote(department: DepartmentId, body: string): Promise<unknown> {
+  return rpc('hdhs_save_progress_note', { p_department: department, p_body: body });
 }
 
 export function loadScores(month: MonthKey): Promise<WsScoreSheet> {

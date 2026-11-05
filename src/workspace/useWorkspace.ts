@@ -4,7 +4,7 @@
  * always shows the stored state.
  */
 import { useCallback, useEffect, useState } from 'react';
-import { workspaceErrorMessage, type MemberDraft, type RequestDraft, type TaskAction, type TaskDraft, type WsMember, type WsSnapshot } from '../domain/workspace';
+import { workspaceErrorMessage, type DepartmentId, type MemberDraft, type RequestDraft, type TaskAction, type TaskDraft, type WsMember, type WsSnapshot } from '../domain/workspace';
 import * as api from './client';
 
 export type WorkspacePhase = 'loading' | 'signed_out' | 'wrong_domain' | 'not_member' | 'pending' | 'inactive' | 'ready' | 'error';
@@ -26,6 +26,8 @@ export interface Workspace {
   createRequest: (draft: RequestDraft) => Promise<boolean>;
   answerRequest: (requestId: string, accept: boolean, assigneeId: string | null, note: string) => Promise<boolean>;
   saveMember: (draft: MemberDraft & { id?: string }) => Promise<boolean>;
+  setHrAssignments: (memberId: string, departments: DepartmentId[]) => Promise<boolean>;
+  saveProgressNote: (department: DepartmentId, body: string) => Promise<boolean>;
 }
 
 /** Removes the one-time sign-in code Google sends back, so a reload does not reuse it. */
@@ -114,5 +116,7 @@ export function useWorkspace(): Workspace {
     createRequest: (draft) => run(() => api.createRequest(draft)),
     answerRequest: (requestId, accept, assigneeId, note) => run(() => api.answerRequest(requestId, accept, assigneeId, note)),
     saveMember: (draft) => run(() => api.saveMember(draft)),
+    setHrAssignments: (memberId, departments) => run(() => api.setHrAssignments(memberId, departments)),
+    saveProgressNote: (department, body) => run(() => api.saveProgressNote(department, body)),
   };
 }

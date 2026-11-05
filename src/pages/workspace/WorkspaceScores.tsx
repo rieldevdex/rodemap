@@ -691,7 +691,7 @@ export function WorkspaceScores({ snapshot, me, now }: Props) {
 
   const rowOf = (id: string) => sheet.scores.find((s) => s.memberId === id);
   const resultOf = (m: WsMember) => rowResult(rowOf(m.id), statsFor(snapshot, rowOf(m.id), m.id, sheet.month));
-  const rows = visibleRows(sheet, me, snapshot.members).filter((m) => m.id !== me.id);
+  const rows = visibleRows(sheet, me, snapshot.members, snapshot.hrAssignments).filter((m) => m.id !== me.id);
   const unscored = unscoredMembers(sheet, snapshot.members);
   const mine = sheet.status === 'draft' ? undefined : rowOf(me.id);
   const mineResult = mine === undefined ? null : resultOf(me);

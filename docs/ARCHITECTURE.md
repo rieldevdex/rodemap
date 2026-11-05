@@ -314,7 +314,9 @@ export function charCount(s: string): number;   // graphemes after trim (Intl.Se
 ```ts
 DEPARTMENT_IDS, POSITIONS, POSITION_LABELS, TASK_STATUS_LABELS, TASK_ACTION_LABELS, REQUEST_STATUS_LABELS
 canManage(me, dept)            // BĐH: every department; truong_ban/pho_ban: their own (mirrors hdhs.can_manage)
-canManageMembers(me)           // BĐH and Ban Nhân sự
+canManageMembers(me)           // BĐH and the heads of Ban Nhân sự (isHrLead: truong_ban/pho_ban of hr)
+followedDepartments(assignments, me) / canAssignHr(me)   // BĐH assigns members of Ban Nhân sự to departments
+canWriteProgress / canReadProgress / departmentProgress(tasks, dept, now) / progressNotesFor / formatWeek / validateProgressNote
 availableActions(task, me, now): TaskAction[]   // mirrors public.hdhs_task_action
 canNotifyLate(task, now)       // once, open task, ≥ 24 h before the deadline
 sortTasks / tasksForMember / tasksForDepartment / tasksToReview / unassignedTasks / membersOf
@@ -331,7 +333,7 @@ The server is the authority: every rule above is enforced again by the `hdhs_*` 
 MonthKey ("2026-11"), monthKeyOf / shiftMonth / monthStart / formatMonth / scoringWindow (25th–28th)
 frameworkFor(member): 'member' | 'lead'        // BĐH and heads use the five head criteria
 canScore(me, target)            // BĐH: anyone but self; truong_ban: pho_ban + thanh_vien of the dept; pho_ban: thanh_vien
-seesWholeSheet(me)              // BĐH and Ban Nhân sự (HR checks, never scores)
+seesWholeSheet(me)              // BĐH and the heads of Ban Nhân sự (HR checks, never scores); followers see their departments
 visibleRows / canEditScore / canSendFeedback (3 days after publishing) / canDecide / sheetActions / unscoredMembers
 taskStats(tasks) / memberTasksInMonth   // A, B, C inputs; frozen server-side at publish and finalize
 memberScore(input) / leadScore(criteria, bonuses, penalties) / rowResult(row, liveStats): ScoreResult
@@ -341,6 +343,8 @@ validateScoreDraft(draft, framework) / draftFor(memberId, row, suggested) / grad
 
 Sheet workflow: draft → published (BĐH, every active member scored) → final (BĐH). Server functions:
 `hdhs_scores`, `hdhs_save_score`, `hdhs_score_feedback`, `hdhs_score_decision`, `hdhs_score_sheet`.
+Progress follow-up: `hdhs_set_hr_assignments` (BĐH), `hdhs_save_progress_note` (one note per author, department
+and ISO week, computed on the server); the snapshot carries `hrAssignments` and the readable `progressNotes`.
 
 ## Data (`src/data/*.ts`)
 
